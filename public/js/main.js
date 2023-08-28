@@ -50,9 +50,13 @@ function mapHeight() {
         topLineHeight = topLine.height() + parseInt(topLine.css('padding-top')) + parseInt(topLine.css('padding-bottom')) + parseInt(topLine.css('margin-bottom'));
 
     if ($(window).width() >= 768) {
-        map.css('height',windowHeight - topLineHeight - 60);
+        map.css({'height':windowHeight - topLineHeight - 60,'margin-bottom':0});
     } else {
-        let filtersHeight = filters.height() + parseInt(filters.css('padding-top')) + parseInt(filters.css('padding-bottom'));
-        map.css('height',windowHeight - (filtersHeight + topLineHeight + parseInt(map.css('margin-top'))) - 30);
+        if ($(window).height() <= 600) {
+            map.css({'height':400,'margin-bottom':20});
+        } else {
+            let filtersHeight = filters.height() + parseInt(filters.css('padding-top')) + parseInt(filters.css('padding-bottom'));
+            map.css({'height':windowHeight - (filtersHeight + topLineHeight + parseInt(map.css('margin-top'))) - 30,'margin-bottom':0});
+        }
     }
 }

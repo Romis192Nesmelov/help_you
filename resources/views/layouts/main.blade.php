@@ -33,10 +33,12 @@
 
     <script src="https://code.jquery.com/jquery-3.6.3.js" integrity="sha256-nQLuAZGRRcILA+6dMBOvcRh5Pe310sBpanc6+QBmyVM=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="https://api-maps.yandex.ru/2.1/?apikey=fa455148-7970-4574-b087-4f913652328d&lang=ru_RU" type="text/javascript"></script>
     <script type="text/javascript" src="{{ asset('js/jquery.maskedinput.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/jquery.fancybox.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/fancybox_init.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/max.height.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('js/map.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/main.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/loader.js') }}"></script>
 </head>
@@ -51,20 +53,27 @@
 <div id="top-line">
     <div class="container">
         <div class="logo"><a href="{{ route('home') }}"><img src="{{ asset('storage/images/logo.svg') }}" /></a></div>
-        <div class="buttons-block">
-            @include('blocks.button_block',[
-                'id' => null,
-                'primary' => true,
-                'icon' => 'icon-plus-circle2',
-                'buttonText' => trans('menu.post_a_question')
-            ])
-            @include('blocks.button_block',[
-                'id' => null,
-                'primary' => false,
-                'icon' => 'icon-enter3',
-                'buttonText' => trans('menu.login_or_register')
-            ])
-        </div>
+        <table class="buttons-block">
+            <tr>
+                <td>
+                    @include('blocks.button_block',[
+                    'id' => null,
+                    'primary' => true,
+                    'icon' => 'icon-plus-circle2',
+                    'buttonText' => trans('menu.post_a_question')
+                ])
+                    @include('blocks.button_block',[
+                        'id' => null,
+                        'primary' => false,
+                        'icon' => 'icon-enter3',
+                        'buttonText' => trans('menu.login_or_register')
+                    ])
+                </td>
+                <td>
+                    <i class="icon-bell3"><span class="dot"></span></i>
+                </td>
+            </tr>
+        </table>
         @include('blocks.main_nav_block', [
             'id' => 'main-nav',
             'useHome' => false,
@@ -75,5 +84,6 @@
 
 @yield('content')
 
+<script>window.getPointsURL = "{{ route('get_points') }}";</script>
 </body>
 </html>

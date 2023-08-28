@@ -1,6 +1,12 @@
 @extends('layouts.main')
 
 @section('content')
+    @csrf
+    <x-modal id="point-modal" close-white>
+        <div class="image"><img height="200" src="{{ asset('storage/images/placeholder.jpg') }}" /></div>
+        <h3></h3>
+        <p></p>
+    </x-modal>
     <section>
         <div class="container">
             <div class="row d-table-lg d-table-md">

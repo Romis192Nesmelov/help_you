@@ -16,8 +16,20 @@ table {
 
 .modal-header {
     padding: 0;
-    margin-bottom: 30px;
+    margin-bottom: 10px;
     border: none;
+}
+
+#point-modal .modal-content {
+    padding: 20px;
+    background-color: black;
+    color: white;
+    opacity: 0.7;
+}
+
+#point-modal .image {
+    border: 2px solid white;
+    margin-bottom: 10px;
 }
 
 .text-subscribe {
@@ -35,7 +47,7 @@ table {
 }
 
 button.btn {
-    min-width: 190px;
+    width: 190px;
     height: 46px;
     font-size: 14px;
     font-weight: bold;
@@ -134,6 +146,22 @@ textarea {
     margin-top: 35px;
 }
 
+#top-line .buttons-block i {
+    font-size: 20px;
+    margin-left: 20px;
+    color: #f47734;
+}
+
+#top-line .buttons-block i .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: darkred;
+    margin-top: -5px;
+    margin-left: -5px;
+    position: absolute;
+}
+
 .main-nav {
     margin-top: 35px;
     padding: 0;
@@ -189,70 +217,9 @@ textarea {
 
 #map {
     border-radius: 10px;
+    overflow: hidden;
     border: 2px solid #f1602b;
 }
-
-/*.owl-stage-outer {*/
-/*    position: relative;*/
-/*    z-index: 999;*/
-/*}*/
-
-/*.owl-nav {*/
-/*    width: 100%;*/
-/*    height: 20px;*/
-/*    display: flex;*/
-/*    top: 50%;*/
-/*	left: 50%;*/
-/*    transform: translate(-50%,-50%);*/
-/*    position: absolute;*/
-/*    align-items: center;*/
-/*    justify-content: space-between;*/
-/*    z-index: 900;*/
-/*}*/
-
-/*.owl-nav button {*/
-/*    width: 16px;*/
-/*    height: 18px;*/
-/*}*/
-
-/*.owl-dots {*/
-/*    width: 100%;*/
-/*    position: absolute;*/
-/*    text-align: center;*/
-/*	margin-top: 10px;*/
-/*}*/
-
-/*.owl-carousel .owl-dots button.owl-dot {*/
-/*    width: 25px;*/
-/*    height: 25px;*/
-/*    border-radius: 50%;*/
-/*    margin-left: 10px;*/
-/*    background: white;*/
-/*}*/
-
-/*.owl-carousel .owl-dots button.owl-dot.active {*/
-/*    background: #b2b2b2;*/
-/*}*/
-
-/*.owl-carousel .owl-dots button.owl-dot:first-child {*/
-/*    margin-left: 0;*/
-/*}*/
-
-/*@media (min-width: 1400px) {*/
-/*    .container {*/
-/*        max-width: 1320px;*/
-/*    }*/
-/*}*/
-
-/*@media (min-width: 576px) {*/
-/*    .modal-dialog {*/
-/*        max-width: 1200px;*/
-/*    }*/
-
-/*    #nav-modal .modal-dialog {*/
-/*        max-width: 600px;*/
-/*    }*/
-/*}*/
 
 @media (max-width: 991px) {
     .navbar-collapse {
@@ -273,12 +240,23 @@ textarea {
 
 @media (max-width: 768px) {
     #top-line .buttons-block {
+        width: 300px;
         margin-top: 12px;
     }
 
-    #top-line .buttons-block > button.btn:last-child {
-        margin-left: 0;
-        margin-top: 3px;
+    #top-line .buttons-block button.btn {
+        width: 100%;
+        height: 35px;
+        font-size: 12px;
+        display: block;
+    }
+
+    #top-line .buttons-block button.btn:first-child {
+        margin-bottom: 3px;
+    }
+
+    #top-line .buttons-block i {
+        margin-left: 5px;
     }
 
     #map {
@@ -286,38 +264,51 @@ textarea {
     }
 }
 
-
 @media (max-width: 575px) {
-    #top-line .buttons-block {
-        margin-top: 25px;
-    }
-
-    #top-line .buttons-block > button.btn {
-        min-width: 100%;
-        height: 35px;
-        font-size: 12px;
-        display: block;
-    }
-}
-
-@media (max-width: 430px) {
     #top-line {
-        padding: 10px;
         height: auto;
-    }
-
-    #top-line .container {
         display: table;
+        padding-bottom: 20px;
     }
 
-    #top-line .container > div,
-    #top-line .container > nav {
-        display: table-cell;
-        vertical-align: middle;
-        padding: 0 5px;
+    #top-line .logo {
+        width: calc(30% - 20px);
+        margin-right: 5px;
     }
 
     #top-line .buttons-block {
-        width: 40%;
+        width: calc(70% - 20px);
+        margin-right: 5px;
     }
 }
+
+@media (max-width: 360px) {
+    #top-line .logo {
+        display: none;
+    }
+
+    #top-line .buttons-block {
+        width: calc(100% - 40px);
+    }
+
+}
+
+@media (max-width: 285px) {
+    #top-line .buttons-block button.btn {
+        font-size: 10px;
+        padding: 0;
+    }
+}
+
+@media (max-width: 250px) {
+    #top-line .buttons-block button.btn {
+        font-size: 8px;
+    }
+}
+
+@media (max-width: 250px) {
+    #top-line .buttons-block {
+        display: none;
+    }
+}
+
