@@ -90,6 +90,10 @@ textarea {
     background-size: auto 100%;
 }
 
+.form-group {
+    margin-bottom: 1.2rem;
+}
+
 button.btn {
     width: 190px;
     height: 40px;
@@ -99,13 +103,25 @@ button.btn {
     border-radius: 20px;
 }
 
-button.btn:focus,.button.btn:active {
+button.btn:focus,
+.button.btn:active,
+input:focus,
+input:active,
+select:focus,
+select:active {
     outline: none !important;
     box-shadow: 0 0 10px grey !important;
 }
 
+input:hover,
+select:hover,
 button.btn:hover {
     border-color: grey;
+}
+
+label {
+    font-size: 15px;
+    margin-bottom: 3px;
 }
 
 .buttons-block > button.btn:last-child {
@@ -164,7 +180,7 @@ button.btn > span {
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    background-color: #03e0cf;
+    background-color: #bc202e;
     margin-top: -5px;
     margin-left: -5px;
     position: absolute;
@@ -232,6 +248,10 @@ button.btn > span {
     margin-bottom: 3rem;
 }
 
+.rounded-block.orange {
+    background-color: #f9ae42;
+}
+
 .rounded-block.cyan {
     background-color: #b4c7e7;
 }
@@ -261,7 +281,6 @@ button.btn > span {
     height: 35px;
     border-radius: 20px;
     display: flex;
-    padding-bottom: 2px;
     justify-content: center;
     align-items: center;
     border: 2px solid black;

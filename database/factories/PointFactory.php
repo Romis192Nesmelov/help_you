@@ -21,6 +21,7 @@ class PointFactory extends Factory
             'latitude' => fake()->randomFloat(6, 55, 56),
             'longitude' => fake()->randomFloat(6, 37, 38),
             'description' => fake()->text(300),
+            'city_id' => 1
         ];
     }
 }

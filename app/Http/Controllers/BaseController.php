@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Point;
+use App\Models\City;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\View\View;
@@ -32,6 +32,7 @@ class BaseController extends Controller
 
     public function map() :View
     {
+        $this->data['cities'] = City::all();
         return $this->showView('map');
     }
 

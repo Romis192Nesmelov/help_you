@@ -10,7 +10,7 @@ class ApiController extends Controller
 {
     public function getPoints(): JsonResponse
     {
-        $points = Point::all();
+        $points = Point::where('city_id',1)->get();
         $jsonPoints = [];
         foreach ($points as $point) {
             $jsonPoints[] = [

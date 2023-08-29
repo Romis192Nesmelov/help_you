@@ -16,7 +16,7 @@
             </div>
         </div>
         <div class="col col-md-6 col-sm-12">
-            <div class="rounded-block cyan home h50">
+            <div class="rounded-block orange home h50">
                 <h1>{!! trans('content.home_head2') !!}</h1>
                 <p>{{ trans('content.home_text_block3') }}</p>
                 <div class="bottom-block d-flex justify-content-end">
