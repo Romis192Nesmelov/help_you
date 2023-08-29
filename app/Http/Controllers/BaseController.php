@@ -30,6 +30,11 @@ class BaseController extends Controller
         return $this->showView('home');
     }
 
+    public function map() :View
+    {
+        return $this->showView('map');
+    }
+
     protected function setSeo($seo): void
     {
         if ($seo) {

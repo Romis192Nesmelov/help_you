@@ -38,7 +38,6 @@
     <script type="text/javascript" src="{{ asset('js/jquery.fancybox.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/fancybox_init.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/max.height.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('js/map.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/main.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/loader.js') }}"></script>
 </head>
@@ -46,43 +45,44 @@
 <body style="overflow-y: hidden">
 <div id="loader"><div></div></div>
 
-<x-modal id="message-modal" head="{{ trans('content.message') }}">
-    <h3 class="text-center"></h3>
-</x-modal>
+{{--<x-modal id="message-modal" head="{{ trans('content.message') }}">--}}
+{{--    <h3 class="text-center"></h3>--}}
+{{--</x-modal>--}}
 
-<div id="top-line">
-    <div class="container">
-        <div class="logo"><a href="{{ route('home') }}"><img src="{{ asset('storage/images/logo.svg') }}" /></a></div>
-        <table class="buttons-block">
-            <tr>
-                <td>
-                    @include('blocks.button_block',[
-                    'id' => null,
-                    'primary' => true,
-                    'icon' => 'icon-plus-circle2',
-                    'buttonText' => trans('menu.post_a_question')
-                ])
-                    @include('blocks.button_block',[
-                        'id' => null,
-                        'primary' => false,
-                        'icon' => 'icon-enter3',
-                        'buttonText' => trans('menu.login_or_register')
-                    ])
-                </td>
-                <td>
-                    <i class="icon-bell3"><span class="dot"></span></i>
-                </td>
-            </tr>
-        </table>
-        @include('blocks.main_nav_block', [
-            'id' => 'main-nav',
-            'useHome' => false,
-            'nlAddClass' => 'brands'
-        ])
+<div class="container">
+    <div id="main-container">
+        <div id="top-line">
+            <div class="logo"><a href="{{ route('home') }}"><img src="{{ asset('storage/images/logo.svg') }}" /></a></div>
+            <table class="buttons-block">
+                <tr>
+                    <td>
+                        @include('blocks.button_block',[
+                            'id' => null,
+                            'primary' => true,
+                            'icon' => 'icon-plus-circle2',
+                            'buttonText' => trans('menu.post_a_question')
+                        ])
+                        @include('blocks.button_block',[
+                            'id' => null,
+                            'primary' => false,
+                            'icon' => 'icon-enter3',
+                            'buttonText' => trans('menu.login_or_register')
+                        ])
+                    </td>
+                    <td>
+                        <i class="fa fa-bell-o"><span class="dot"></span></i>
+                    </td>
+                </tr>
+            </table>
+            @include('blocks.main_nav_block', [
+                'id' => 'main-nav',
+                'useHome' => false,
+                'nlAddClass' => 'brands'
+            ])
+        </div>
+        @yield('content')
     </div>
 </div>
-
-@yield('content')
 
 <script>window.getPointsURL = "{{ route('get_points') }}";</script>
 </body>

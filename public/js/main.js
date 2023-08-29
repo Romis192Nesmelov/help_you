@@ -3,14 +3,14 @@ $(window).on('load', function () {
     $('input[name=phone]').mask("+7(999)999-99-99");
 
     setTimeout(function () {
-        windowResize();
-        $('body').removeAttr('style');
+        // windowResize();
         removeLoader();
     },1000);
 
     $(window).resize(function() {
-        windowResize();
+        mainHeight();
     });
+    mainHeight();
 
     // $(window).scroll(function() {
     //     fixingMainMenu();
@@ -35,28 +35,41 @@ $(window).on('load', function () {
 //     }
 // }
 
-function windowResize() {
-    mapHeight();
-    // maxHeight($('.article-announcement'), 50);
-    // maxHeight($('.action-list .action'), 30);
-    // maxHeight($('#actions-brand-block table'), 0);
-}
+// function windowResize() {
+//     maxHeight($('.article-announcement'), 50);
+//     maxHeight($('.action-list .action'), 30);
+//     maxHeight($('#actions-brand-block table'), 0);
+// }
 
-function mapHeight() {
+function mainHeight() {
     let windowHeight = $(window).height(),
-        map = $('#map'),
-        filters = $('#filters-block'),
+        body = $('body'),
+        mainContainer = $('#main-container'),
+        mainContainerHeight = windowHeight - parseInt(mainContainer.css('padding-bottom')),
         topLine = $('#top-line'),
+        h100 = $('.h100'),
+        h50 = $('.h50'),
+        gap = parseInt($('.col').css('padding-left')) * 2,
         topLineHeight = topLine.height() + parseInt(topLine.css('padding-top')) + parseInt(topLine.css('padding-bottom')) + parseInt(topLine.css('margin-bottom'));
 
+    $(h50[0]).css('margin-bottom',gap);
+
     if ($(window).width() >= 768) {
-        map.css({'height':windowHeight - topLineHeight - 60,'margin-bottom':0});
-    } else {
-        if ($(window).height() <= 600) {
-            map.css({'height':400,'margin-bottom':20});
+        if ($(window).height() <= 700) {
+            body.css('overflow-y','auto');
+            mainContainer.css('height',mainContainerHeight * ($(window).height() >= 400 ? 2 : 5));
         } else {
-            let filtersHeight = filters.height() + parseInt(filters.css('padding-top')) + parseInt(filters.css('padding-bottom'));
-            map.css({'height':windowHeight - (filtersHeight + topLineHeight + parseInt(map.css('margin-top'))) - 30,'margin-bottom':0});
+            body.css('overflow-y','hidden');
+            mainContainer.css('height',mainContainerHeight);
         }
+
+        let workZoneHeight = mainContainer.height() - topLine.height() - parseInt(topLine.css('margin-bottom'));
+        h100.css('height',workZoneHeight);
+        h50.css('height',workZoneHeight/2 - gap / 2);
+    } else {
+        body.css('overflow-y','auto');
+        mainContainer.css('height','auto');
+        h100.css({'height':windowHeight/2, 'margin-bottom':gap});
+        h50.css('height',windowHeight/2);
     }
 }

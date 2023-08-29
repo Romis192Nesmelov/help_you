@@ -1,24 +1,35 @@
 @extends('layouts.main')
 
 @section('content')
-    @csrf
-    <x-modal id="point-modal" close-white>
-        <div class="image"><img height="200" src="{{ asset('storage/images/placeholder.jpg') }}" /></div>
-        <h3></h3>
-        <p></p>
-    </x-modal>
-    <section>
-        <div class="container">
-            <div class="row d-table-lg d-table-md">
-                <div class="d-table-cell-lg d-table-cell-md col-lg-3 col-md-4 col-sm-12">
-                    <div id="filters-block">
-                        <div class="title">{{ trans('content.filter') }}</div>
+    <div class="row">
+        <div class="col col-md-6 col-sm-12">
+            <div id="map-image-block" class="rounded-block black home h100">
+                <h1>{!! trans('content.home_head1') !!}</h1>
+                <div class="bottom-block">
+                    <p>{{ trans('content.home_text_block1') }}</p>
+                    <p>{{ trans('content.home_text_block2') }}</p>
+                    <div class="d-flex justify-content-between">
+                        <a href="#">{{ trans('content.more_about_gifts') }}</a>
+                        @include('blocks.rounded_link_block', ['link' => route('map')])
                     </div>
-                </div>
-                <div class="d-table-cell-lg d-table-cell-md d-table-sm col-lg-9 col-md-8 col-sm-12">
-                    <div id="map"></div>
                 </div>
             </div>
         </div>
-    </section>
+        <div class="col col-md-6 col-sm-12">
+            <div class="rounded-block cyan home h50">
+                <h1>{!! trans('content.home_head2') !!}</h1>
+                <p>{{ trans('content.home_text_block3') }}</p>
+                <div class="bottom-block d-flex justify-content-end">
+                    @include('blocks.rounded_link_block', ['link' => '#'])
+                </div>
+            </div>
+            <div class="rounded-block black home h50">
+                <h1>{!! trans('content.home_head3') !!}</h1>
+                <p>{{ trans('content.home_text_block4') }}</p>
+                <div class="bottom-block d-flex justify-content-end">
+                    @include('blocks.rounded_link_block', ['link' => '#'])
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
