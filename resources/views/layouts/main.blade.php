@@ -52,39 +52,43 @@
 
 <div class="container">
     <div id="main-container">
-        <div id="top-line">
-            <div class="logo"><a href="{{ route('home') }}"><img src="{{ asset('storage/images/logo.svg') }}" /></a></div>
-            <table class="buttons-block">
-                <tr>
-                    <td>
-                        @include('blocks.button_block',[
-                            'id' => null,
-                            'primary' => true,
-                            'icon' => 'icon-plus-circle2',
-                            'buttonText' => trans('menu.post_a_question')
-                        ])
-                        @include('blocks.button_block',[
-                            'id' => null,
-                            'primary' => false,
-                            'icon' => 'icon-enter3',
-                            'buttonText' => trans('menu.login_or_register')
-                        ])
-                    </td>
-                    <td>
-                        <i class="fa fa-bell-o"><span class="dot"></span></i>
-                    </td>
-                </tr>
-            </table>
+        <div id="top-line" class="w-100 d-flex align-items-center justify-content-between">
+            <a class="d-none d-lg-block" href="{{ route('home') }}">
+                <div class="logo-block d-none d-lg-flex align-items-center justify-content-between">
+                    @include('blocks.logo_block')
+                    <img class="logo-text" src="{{ asset('storage/images/logo_text.svg') }}" />
+                </div>
+            </a>
             @include('blocks.main_nav_block', [
                 'id' => 'main-nav',
                 'useHome' => false,
                 'nlAddClass' => 'brands'
             ])
+
+            <div class="d-block d-lg-none">
+                @include('blocks.logo_block')
+            </div>
+            <div class="d-block d-lg-none">
+                <a href="#"><img class="account-icon" src="{{ asset('storage/images/account.svg') }}" /></a>
+            </div>
+
+            <div class="buttons-block d-none d-lg-flex align-items-center justify-content-between">
+                <i class="fa fa-bell-o"><span class="dot"></span></i>
+                @include('blocks.button_block',[
+                    'id' => null,
+                    'primary' => false,
+                    'icon' => 'icon-enter3',
+                    'buttonText' => trans('menu.login_or_register')
+                ])
+            </div>
         </div>
         @yield('content')
     </div>
 </div>
 
-<script>window.getPointsURL = "{{ route('get_points') }}";</script>
+<script>
+    window.currentURL = "{{ request()->path() }}";
+    window.getPointsURL = "{{ route('get_points') }}";
+</script>
 </body>
 </html>

@@ -22,8 +22,6 @@ function init() {
         clusterDisableClickZoom: true
     });
 
-    // Чтобы задать опции одиночным объектам и кластерам,
-    // обратимся к дочерним коллекциям ObjectManager.
     objectManager.objects.options.set('preset', 'islands#orangeDotIcon');
     objectManager.objects.events.add(['mouseenter', 'mouseleave', 'click'], onObjectEvent);
     myMap.geoObjects.add(objectManager);
@@ -36,14 +34,14 @@ function init() {
 
     function onObjectEvent(e) {
         var objectId = e.get('objectId');
-        if (e.get('type') == 'click') {
+        if (e.get('type') === 'click') {
             let pointModal = $('#point-modal'),
                 point = objectManager.objects.getById(objectId);
 
             pointModal.find('h3').html(point.name);
             pointModal.find('p').html(point.description);
             pointModal.modal('show');
-        } else if (e.get('type') == 'mouseenter') {
+        } else if (e.get('type') === 'mouseenter') {
             // Метод setObjectOptions позволяет задавать опции объекта "на лету".
             objectManager.objects.setObjectOptions(objectId, {
                 preset: 'islands#redDotIcon'

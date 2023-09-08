@@ -9,5 +9,5 @@ function addLoader() {
 
 function removeLoader() {
     $('#loader').remove();
-    // $('body').css('overflow-y','auto');
+    $('body').css('overflow-y','auto');
 }
