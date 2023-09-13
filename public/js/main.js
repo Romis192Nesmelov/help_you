@@ -1,7 +1,7 @@
 // window.stop();
 $(window).on('load', function () {
     $('input[name=phone]').mask("+7(999)999-99-99");
-    $('.styled').uniform();
+    $('input[name=code]').mask("99-99-99");
 
     setTimeout(function () {
         // windowResize();

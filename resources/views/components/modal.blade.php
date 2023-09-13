@@ -3,7 +3,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 @if ($attributes->has('head'))
-                    <h4 class="modal-title fs-5">{{ $attributes->get('head') }}</h4>
+                    <h5 class="modal-title fs-5 text-center w-100">{{ $attributes->get('head') }}</h5>
                 @endif
                 <button type="button" class="btn-close {{ $attributes->has('close-white') ? 'btn-close-white' : '' }}" data-bs-dismiss="modal" data-dismiss="modal" aria-label="{{ trans('content.close') }}"></button>
             </div>

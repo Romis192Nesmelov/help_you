@@ -1,9 +1,13 @@
-<div class="form-group mt-3">
+<div class="form-check form-switch mt-3 {{ isset($addClass) && $addClass ? $addClass : '' }}">
     <label class="checkbox-inline">
-        <input class="styled" type="checkbox" name="{{ $name }}" {{ !count($errors) ? (isset($checked) && $checked ? 'checked=checked' : '') : (old($name) == 'on' ? 'checked=checked' : '') }} {{ isset($disabled) && $disabled ? 'disabled=disabled' : '' }}>
-        @if (isset($label) && $label)
-            {!! $label !!}
-        @endif
+        <input class="form-check-input @error($name) error @enderror" id="{{ $name }}-checkbox" type="checkbox" name="{{ $name }}" {{ isset($checked) && $checked ? 'checked=checked' : '' }} {{ isset($disabled) && $disabled ? 'disabled=disabled' : '' }}>
+        <label class="form-check-label" for="{{ $name }}-checkbox">{!! $label !!}</label>
     </label>
-    @include('blocks.error_block')
+    @if (isset($ajax))
+        @include('blocks.error_block')
+    @else
+        @error($name)
+            @include('blocks.error_block')
+        @enderror
+    @endif
 </div>

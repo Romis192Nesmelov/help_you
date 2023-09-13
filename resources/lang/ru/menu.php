@@ -6,5 +6,6 @@ return [
     'how_does_it_work' => 'Как работает',
     'for_partners' => 'Партнерам',
     'post_a_question' => 'Разместить вопрос',
-    'login_or_register' => 'Вход/регистрация'
+    'login_or_register' => 'Вход/регистрация',
+    'account' => 'Личный кабинет',
 ];

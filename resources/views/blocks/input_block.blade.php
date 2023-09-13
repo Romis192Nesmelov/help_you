@@ -1,4 +1,4 @@
-<div class="form-group {{ isset($type) && $type == 'number' ? 'number' : '' }} {{ isset($label) && $label ? 'has-label' : '' }}">
+<div {{ isset($id) ? 'id='.$id : '' }} class="form-group {{ isset($type) && $type == 'number' ? 'number' : '' }} {{ isset($label) && $label ? 'has-label' : '' }} {{ $addClass ?? '' }}">
     @if (isset($label) && $label)
         <label for="{{ $name }}">{{ $label }} {!! isset($required) && $required ? '<sup>*</sup>' : '' !!}</label>
     @endif

@@ -10,7 +10,9 @@ use Illuminate\Support\Facades\Mail;
 trait HelperTrait
 {
     public $validationPhone = 'required|regex:/^((\+)?(\d)(\s)?(\()?[0-9]{3}(\))?(\s)?([0-9]{3})(\-)?([0-9]{2})(\-)?([0-9]{2}))$/';
-    public $validationPassword = 'required|confirmed|min:3|max:50';
+    public $validationPassword = 'required|min:3|max:20';
+    public $validationPasswordConfirmed = 'required|confirmed|min:3|max:20';
+    public $validationCode = 'required|regex:/^(([0-9]{2})\-([0-9]{2})-([0-9]{2}))$/';
     public $validationInteger = 'required|integer';
     public $validationNumeric = 'required|numeric';
     public $validationString = 'required|min:3|max:255';
@@ -22,22 +24,6 @@ trait HelperTrait
     public $validationJpg = 'mimes:jpg|max:2000';
     public $validationPng = 'mimes:png|max:2000';
     public $validationDate = 'regex:/^(\d{2})\/(\d{2})\/(\d{4})$/';
-    public $validationBrandId = 'required|integer|exists:brands,id';
-    public $validationCarId = 'required|integer|exists:cars,id';
-    public $validationRepairId = 'required|integer|exists:repairs,id';
-    public $validationSpareId = 'required|integer|exists:spares,id';
-    public $skippingFolders = [
-        'actions',
-        'icons',
-        'indicator',
-        'maps',
-    ];
-
-    public $lockingFolders = [
-        'about',
-        'brands',
-        'cars'
-    ];
 
     public function deleteFile($path): void
     {
@@ -59,25 +45,25 @@ trait HelperTrait
         });
     }
 
-    public function sendSms($phone, $text)
-    {
-        $data = array(
-            'user_name' => env('MOIZVONKI_USER_NAME'),
-            'api_key' => env('MOIZVONKI_API_KEY'),
-            'action' => 'calls.send_sms',
-            'to' => $phone,
-            'text' => $text
-        );
-
-        $fields = json_encode($data);
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, 'https://apollomotors.moizvonki.ru/api/v1');
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type:application/json','Content-Length:'.mb_strlen($fields,'UTF-8')]);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        return json_decode(curl_exec($ch));
-    }
+//    public function sendSms($phone, $text)
+//    {
+//        $data = array(
+//            'user_name' => env('MOIZVONKI_USER_NAME'),
+//            'api_key' => env('MOIZVONKI_API_KEY'),
+//            'action' => 'calls.send_sms',
+//            'to' => $phone,
+//            'text' => $text
+//        );
+//
+//        $fields = json_encode($data);
+//
+//        $ch = curl_init();
+//        curl_setopt($ch, CURLOPT_URL, 'https://apollomotors.moizvonki.ru/api/v1');
+//        curl_setopt($ch, CURLOPT_POST, true);
+//        curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
+//        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type:application/json','Content-Length:'.mb_strlen($fields,'UTF-8')]);
+//        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+//        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+//        return json_decode(curl_exec($ch));
+//    }
 }

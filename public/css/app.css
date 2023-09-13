@@ -4,6 +4,14 @@ body {
     /*background-color: #d0d2d6;*/
 }
 
+a {
+    color: #e65639;
+}
+
+a:hover {
+    color: #f07258;
+}
+
 table {
     border-collapse: collapse;
     border-spacing: 0;
@@ -15,7 +23,7 @@ table {
 
 .warning {
     font-weight: bold;
-    color: darkred;
+    color: red;
 }
 
 .form-group {
@@ -25,9 +33,8 @@ table {
 .form-group i {
     position: absolute;
     font-size: 18px;
-    top: 50%;
+    top: 37px;
     right: 10px;
-    transform: translateY(-50%);
     color: grey;
 }
 
@@ -35,8 +42,13 @@ table {
     padding-right: 35px;
 }
 
+.form-check-input:checked {
+    background-color: #e65639;
+    border-color: #e65639;
+}
+
 .error {
-    color: darkred;
+    color: red;
 }
 
 div.error {
@@ -46,12 +58,18 @@ div.error {
 }
 
 input.error {
-    border-color: darkred;
+    border-color: red;
 }
 
 textarea {
     resize: none;
 }
+
+.modal-content button.btn {
+    width: 100%;
+    margin-top: 15px;
+}
+
 
 /*.modal-content {*/
 /*    border-radius: 30px;*/
@@ -96,19 +114,26 @@ button.btn {
 }
 
 button.btn:focus,
-.button.btn:active,
+button.btn:active,
 input:focus,
 input:active,
 select:focus,
 select:active {
     outline: none !important;
-    box-shadow: 0 0 10px grey !important;
+    border: 2px solid #e65639 !important;
+    box-shadow: 0 0 10px #e65639 !important;
+}
+
+.btn-primary.disabled,
+.btn-primary:disabled {
+    border-color: #f07258 !important;
 }
 
 input:hover,
 select:hover,
 button.btn:hover {
-    border-color: grey;
+    border-color: #e65639;
+    box-shadow: 0 0 10px #e65639 !important;
 }
 
 label {
@@ -122,7 +147,6 @@ button.btn.btn-primary {
 }
 
 button.btn.btn-secondary {
-    width: 192px;
     color: black;
     background: none;
 }
@@ -276,8 +300,21 @@ button.btn > span {
     border: 2px solid black;
 }
 
+.rounded-block .link:hover {
+
+}
+
 .rounded-block .link-cover {
     text-decoration: none;
+}
+
+.rounded-block .link-cover:hover .link {
+    background: #e65639 !important;
+    border: 2px solid #e65639 !important;
+}
+
+.rounded-block .link-cover:hover .link i {
+    color: white !important;
 }
 
 #map-image-block {
