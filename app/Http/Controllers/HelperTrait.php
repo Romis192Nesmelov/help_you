@@ -1,9 +1,6 @@
 <?php
 
 namespace App\Http\Controllers;
-
-use App\Models\Action;
-use App\Models\Record;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Mail;
 
@@ -45,25 +42,25 @@ trait HelperTrait
         });
     }
 
-//    public function sendSms($phone, $text)
-//    {
-//        $data = array(
-//            'user_name' => env('MOIZVONKI_USER_NAME'),
-//            'api_key' => env('MOIZVONKI_API_KEY'),
-//            'action' => 'calls.send_sms',
-//            'to' => $phone,
-//            'text' => $text
-//        );
-//
-//        $fields = json_encode($data);
-//
-//        $ch = curl_init();
-//        curl_setopt($ch, CURLOPT_URL, 'https://apollomotors.moizvonki.ru/api/v1');
-//        curl_setopt($ch, CURLOPT_POST, true);
-//        curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
-//        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type:application/json','Content-Length:'.mb_strlen($fields,'UTF-8')]);
-//        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-//        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-//        return json_decode(curl_exec($ch));
-//    }
+    public function sendSms($phone, $text)
+    {
+        $data = array(
+            'user_name' => env('MOIZVONKI_USER_NAME'),
+            'api_key' => env('MOIZVONKI_API_KEY'),
+            'action' => 'calls.send_sms',
+            'to' => $phone,
+            'text' => $text
+        );
+
+        $fields = json_encode($data);
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, 'https://apollomotors.moizvonki.ru/api/v1');
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type:application/json','Content-Length:'.mb_strlen($fields,'UTF-8')]);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        return json_decode(curl_exec($ch));
+    }
 }

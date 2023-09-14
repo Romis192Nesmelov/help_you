@@ -15,7 +15,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-//Route::get('/', function () { var_dump(23423423); })->name('home');
 Route::get('/', [BaseController::class, 'index'])->name('home');
 Route::get('/map', [BaseController::class, 'map'])->name('map');
 Route::get('/about', [BaseController::class, 'index'])->name('about');

@@ -1,4 +1,4 @@
-$(window).on('load', function () {
+$(() => {
     let messageModal = $('#message-modal'),
         loginModal = $('#login-modal'),
         loginPasswordField = loginModal.find('input[name=password]'),
@@ -15,7 +15,7 @@ $(window).on('load', function () {
         resetPasswordModal = $('#restore-password-modal');
 
     //Login form
-    $('#enter-button').click(function (e) {
+    $('#enter-button').click((e) => {
         e.preventDefault();
 
         loginPasswordField.removeClass('error');
@@ -26,7 +26,7 @@ $(window).on('load', function () {
                 loginPasswordField.addClass('error');
                 loginPasswordFieldError.html(passwordMustBeEntered);
             } else {
-                getUrl(loginModal.find('form'), null, function (data) {
+                getUrl(loginModal.find('form'), null, (data) => {
                     loginModal.modal('hide');
                     loginModal.remove();
                     registerModal.remove();
@@ -42,7 +42,7 @@ $(window).on('load', function () {
         }
     });
 
-    function preValidationRegister() {
+    let preValidationRegister = () => {
         if (
             registerModal.find('input[name=phone]').val().length !== 0 &&
             registerPasswordField.val().length !== 0 &&
@@ -76,7 +76,7 @@ $(window).on('load', function () {
     }
 
     //Register form generate code
-    getRegisterCode.click(function (e) {
+    getRegisterCode.click((e) => {
         e.preventDefault();
         if (preValidationRegister()) {
             getRegisterCode.addClass('d-none');
@@ -84,7 +84,7 @@ $(window).on('load', function () {
             registerModal.find('.form-group.d-none').removeClass('d-none');
             registerModal.find('input.d-none').removeClass('d-none');
             let timer = 45;
-            let countDown = setInterval(function () {
+            let countDown = setInterval(() => {
                 if (!timer) {
                     getRegisterCode.removeClass('d-none');
                     clearInterval(countDown);
@@ -93,7 +93,7 @@ $(window).on('load', function () {
                 getRegisterCodeAgain.find('span').html(timer);
                 timer--;
             }, 1000);
-            getUrl(registerModal.find('form'), generateCodeUrl, function (data) {
+            getUrl(registerModal.find('form'), generateCodeUrl, (data) => {
                 messageModal.find('h4').html(data.message);
                 messageModal.modal('show');
             });
@@ -101,10 +101,10 @@ $(window).on('load', function () {
     });
 
     //Register form final register
-    $('#register-button').click(function (e) {
+    $('#register-button').click((e) => {
         e.preventDefault();
         if (preValidationRegister() && registerModal.find('input[name=code]').val().length) {
-            getUrl(registerModal.find('form'), null, function (data) {
+            getUrl(registerModal.find('form'), null, (data) => {
                 messageModal.find('h4').html(data.message);
                 registerModal.modal('hide');
                 messageModal.modal('show');
@@ -113,19 +113,18 @@ $(window).on('load', function () {
     });
 
     //Reset password form
-    resetPasswordModal.find('button').click(function () {
-        if (
-            resetPasswordModal.find('input[name=phone]').val().length !== 0) {
-            getUrl(resetPasswordModal.find('form'), null, function (data) {
+    resetPasswordModal.find('button').click(() => {
+        if (resetPasswordModal.find('input[name=phone]').val().length !== 0) {
+            getUrl(resetPasswordModal.find('form'), null, (data) => {
                 resetPasswordModal.modal('hide');
                 messageModal.find('h4').html(data.message);
                 messageModal.modal('show');
             });
         }
     });
-})
+});
 
-function getUrl(form, url, callBack) {
+let getUrl = (form, url, callBack) => {
     let formData = new FormData,
         allObjInForm = form.find('input, select, textarea, button');
 
@@ -136,20 +135,20 @@ function getUrl(form, url, callBack) {
     form.find('input').each(function () {
         formData.append($(this).attr('name'), $(this).val());
     });
-
+    
     $.ajax({
         url: url ? url : form.attr('action'),
         data: formData,
         processData: false,
         contentType: false,
         type: form.attr('method'),
-        success: function (data) {
+        success: (data) => {
             if (callBack) callBack(data);
             allObjInForm.removeAttr('disabled');
         },
-        error: function (data) {
+        error: (data) => {
             let response = jQuery.parseJSON(data.responseText);
-            $.each(response.errors, function (field, errorMsg) {
+            $.each(response.errors, (field, errorMsg) => {
                 form.find('input[name='+field+']').addClass('error');
                 form.find('.error.'+field).html(errorMsg[0]);
             });
