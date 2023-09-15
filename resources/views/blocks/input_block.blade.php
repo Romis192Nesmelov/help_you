@@ -1,8 +1,8 @@
-<div {{ isset($id) ? 'id='.$id : '' }} class="form-group {{ isset($type) && $type == 'number' ? 'number' : '' }} {{ isset($label) && $label ? 'has-label' : '' }} {{ $addClass ?? '' }}">
+<div {{ isset($id) ? 'id='.$id : '' }} class="form-group {{ isset($type) && $type == 'number' ? 'number' : '' }} {{ isset($label) && $label ? 'has-label' : '' }} {{ isset($addClass) && $addClass ? $addClass : '' }}">
     @if (isset($label) && $label)
         <label for="{{ $name }}">{{ $label }} {!! isset($required) && $required ? '<sup>*</sup>' : '' !!}</label>
     @endif
-    <input type="{{ isset($type) && $type ? $type : 'text' }}" name="{{ $name }}" {{ isset($step) ? 'step='.$step : '' }} value="{{ old($name, (isset($value) ? $value : '')) }}" class="form-control {{ isset($addClass) && $addClass ? $addClass : '' }} {{ isset($icon) && $icon ? 'has-icon' : '' }}@error($name) error @enderror" placeholder="{{ isset($placeholder) && $placeholder ? $placeholder : '' }}">
+    <input type="{{ isset($type) && $type ? $type : 'text' }}" name="{{ $name }}" {{ isset($step) ? 'step='.$step : '' }} value="{{ old($name, (isset($value) ? $value : '')) }}" class="form-control {{ isset($icon) && $icon ? 'has-icon' : '' }}@error($name) error @enderror" placeholder="{{ isset($placeholder) && $placeholder ? $placeholder : '' }}">
 
     @if (isset($icon) && $icon)
         <i class="{{ $icon }}"></i>

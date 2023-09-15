@@ -16,6 +16,8 @@ class AuthController extends Controller
     {
         $credentials = $request->validate(['phone' => $this->validationPhone,'password' => 'required|min:3|max:20']);
         $credentials['active'] = 1;
+        $credentials['phone'] = $this->unifyPhone($credentials['phone']);
+
         if (Auth::attempt($credentials, $request->remember == 'on')) {
             $request->session()->regenerate();
             return response()->json(['code' => 1111],200);
@@ -24,19 +26,20 @@ class AuthController extends Controller
 
     public function generateCode(Request $request): JsonResponse
     {
-        $credentials = $request->validate([
+        $request->validate([
             'phone' => $this->validationPhone,
             'password' => $this->validationPasswordConfirmed,
             'i_agree' => 'accepted'
         ]);
-        $user = User::where('phone',$request->phone)->first();
+        $phone = $this->unifyPhone($request->phone);
+        $user = User::where('phone',$phone)->first();
         if (!$user) {
             $user = User::create([
-                'phone' => $credentials['phone'],
+                'phone' => $phone,
                 'code' => $this->getCode(),
                 'active' => 0
             ]);
-            return response()->json([],200);
+            return response()->json(['message' => trans('auth.code').': '.$user->code],200);
         } elseif ($user->active) {
             return response()->json(['errors' => ['phone' => [trans('auth.user_with_this_phone_is_already_registered')]]], 400);
         } else {
@@ -54,7 +57,7 @@ class AuthController extends Controller
             'code' => $this->validationCode,
             'i_agree' => 'accepted'
         ]);
-        $user = User::where('phone',$request->phone)->first();
+        $user = User::where('phone',$this->unifyPhone($request->phone))->first();
         if ($user->code == $request->code) {
             $user->update([
                 'password' => bcrypt($credentials['password']),
@@ -69,7 +72,7 @@ class AuthController extends Controller
     public function resetPassword(Request $request): JsonResponse
     {
         $request->validate(['phone' => $this->validationPhone]);
-        $user = User::where('phone',$request->phone)->where('active',1)->first();
+        $user = User::where('phone',$this->unifyPhone($request->phone))->where('active',1)->first();
         if (!$user) return response()->json(['errors' => ['phone' => [trans('auth.wrong_phone')]]], 401);
         else {
             $password = Str::random(5);
@@ -89,5 +92,10 @@ class AuthController extends Controller
     private function getCode(): string
     {
         return rand(0,9).rand(0,9).'-'.rand(0,9).rand(0,9).'-'.rand(0,9).rand(0,9);
+    }
+
+    private function unifyPhone($phone): string
+    {
+        return '+7'.substr($phone,2);
     }
 }

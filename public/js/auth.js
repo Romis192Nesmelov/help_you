@@ -14,6 +14,18 @@ $(() => {
         registerConfirmPasswordFieldError = registerModal.find('.error.password_confirmation'),
         resetPasswordModal = $('#restore-password-modal');
 
+    $('.form-group.password i').click(function () {
+        let cover = $(this).parents('.form-group'),
+            input = cover.find('input');
+        if ($(this).hasClass('icon-eye')) {
+            input.attr('type','text');
+            $(this).removeClass('icon-eye').addClass('icon-eye-blocked');
+        } else {
+            input.attr('type','password');
+            $(this).removeClass('icon-eye-blocked').addClass('icon-eye');
+        }
+    });
+
     //Login form
     $('#enter-button').click((e) => {
         e.preventDefault();
@@ -135,7 +147,7 @@ let getUrl = (form, url, callBack) => {
     form.find('input').each(function () {
         formData.append($(this).attr('name'), $(this).val());
     });
-    
+
     $.ajax({
         url: url ? url : form.attr('action'),
         data: formData,

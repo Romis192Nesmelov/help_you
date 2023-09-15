@@ -8,5 +8,6 @@
                 @include('blocks.nav-item_block')
             @endforeach
         </ul>
+        <p class="d-block d-sm-none mt-3">fds dfs dfsdfsdfs dfs dfsdf sdf sdf sdf sdf </p>
     </div>
 </nav>

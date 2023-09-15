@@ -38,6 +38,10 @@ table {
     color: grey;
 }
 
+.form-group.password i {
+    cursor: pointer;
+}
+
 .form-group input.has-icon {
     padding-right: 35px;
 }
@@ -121,7 +125,7 @@ select:focus,
 select:active {
     outline: none !important;
     border: 2px solid #e65639 !important;
-    box-shadow: 0 0 10px #e65639 !important;
+    box-shadow: none !important;
 }
 
 .btn-primary.disabled,
@@ -133,7 +137,7 @@ input:hover,
 select:hover,
 button.btn:hover {
     border-color: #e65639;
-    box-shadow: 0 0 10px #e65639 !important;
+    box-shadow: none !important;
 }
 
 label {
@@ -164,6 +168,8 @@ button.btn > span {
 
 #top-line {
     margin-bottom: 22px;
+    position: relative;
+    z-index: 999;
 }
 
 #top-line .logo-block {
@@ -206,11 +212,6 @@ button.btn > span {
     padding: 0;
 }
 
-.navbar-expand-lg .navbar-nav .nav-item .nav-link {
-    padding-right: 20px;
-    padding-left: 20px;
-}
-
 .navbar-collapse .nav-item {
     margin-left: 0;
     font-size: 18px;
@@ -229,9 +230,20 @@ button.btn > span {
     font-weight: bold;
 }
 
-.navbar-toggler {
+.navbar-light .navbar-toggler {
     background: white;
+    box-shadow: none;
 }
+
+/*#black-background {*/
+/*    width: 100%;*/
+/*    height: 100%;*/
+/*    position: fixed;*/
+/*    top: 0;*/
+/*    left: 0;*/
+/*    background: rgba(0,0,0,.4);*/
+/*    z-index: 998;*/
+/*}*/
 
 .rounded-block {
     width: 100%;
@@ -385,14 +397,14 @@ button.btn > span {
     }
 
     #navbar-main-nav {
-        width: 180px;
-        padding: 7px 0;
+        width: 230px;
+        padding: 36px;
         position: absolute;
         background: white;
-        top: 45px;
+        top: 63px;
+        left: -.75rem;
+        box-shadow: 10px 10px 10px rgba(0,0,0,0.5); !important;
         z-index: 999;
-        border-radius: 5px;
-        box-shadow: 0 0 10px grey !important;
     }
 
     #map-image-block {

@@ -54,21 +54,22 @@
             @csrf
             @include('blocks.input_block',[
                 'name' => 'phone',
-                'placeholder' => '+7(___)___-__-__',
+                'placeholder' => '+_(___)___-__-__',
                 'label' => trans('content.phone'),
-                'icon' => 'icon-iphone',
                 'ajax' => true
             ])
             @include('blocks.input_block',[
                 'name' => 'password',
+                'addClass' => 'password',
                 'type' => 'password',
                 'label' => trans('auth.password'),
-                'icon' => 'icon-lock2',
+                'icon' => 'icon-eye',
                 'ajax' => true
             ])
             @include('blocks.button_block',[
                 'id' => 'enter-button',
                 'primary' => true,
+                'buttonType' => 'submit',
                 'icon' => 'icon-enter3',
                 'type' => 'submit',
                 'buttonText' => trans('auth.enter')
@@ -98,23 +99,24 @@
             @csrf
             @include('blocks.input_block',[
                 'name' => 'phone',
-                'placeholder' => '+7(___)___-__-__',
+                'placeholder' => '+_(___)___-__-__',
                 'label' => trans('content.phone'),
-                'icon' => 'icon-iphone',
                 'ajax' => true
             ])
             @include('blocks.input_block',[
                 'name' => 'password',
+                'addClass' => 'password',
                 'type' => 'password',
                 'label' => trans('auth.password'),
-                'icon' => 'icon-lock2',
+                'icon' => 'icon-eye',
                 'ajax' => true
             ])
             @include('blocks.input_block',[
                 'name' => 'password_confirmation',
+                'addClass' => 'password',
                 'type' => 'password',
                 'label' => trans('auth.confirm_password'),
-                'icon' => 'icon-lock2',
+                'icon' => 'icon-eye',
                 'ajax' => true
             ])
             @include('blocks.input_block',[
@@ -137,6 +139,7 @@
                 'disabled' => true,
                 'addClass' => 'mb-3 d-none',
                 'primary' => true,
+                'buttonType' => 'submit',
                 'icon' => 'icon-reset',
                 'buttonText' => trans('auth.register')
             ])
@@ -159,14 +162,14 @@
             @csrf
             @include('blocks.input_block',[
                 'name' => 'phone',
-                'placeholder' => '+7(___)___-__-__',
+                'placeholder' => '+_(___)___-__-__',
                 'label' => trans('content.phone'),
-                'icon' => 'icon-iphone',
                 'ajax' => true
             ])
             @include('blocks.button_block',[
                 'id' => null,
                 'primary' => true,
+                'buttonType' => 'submit',
                 'addClass' => 'mb-3',
                 'icon' => 'icon-user-plus',
                 'buttonText' => trans('auth.restore_password')
