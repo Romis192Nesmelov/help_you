@@ -51,6 +51,9 @@ return [
     'number_of_performers' => 'Количество исполнителей',
     'search' => 'Поиск',
 
+    'organizations' => 'Организации',
+    'info_about_company' => 'Информация о компании',
+
 //    'in_russian' => ' по русски',
 //    'in_english' => ' по по английски',
 ];

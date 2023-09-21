@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 //use App\Models\City;
+use App\Models\Partner;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
@@ -23,6 +24,18 @@ class BaseController extends Controller
         if (!Auth::guest() && (!Auth::user()->name || !Auth::user()->family || !Auth::user()->born || !Auth::user()->email))
             return redirect(route('account'));
         else return $this->showView('home');
+    }
+
+    public function partners(Request $request) :View
+    {
+        $this->activeMenu = 'for_partners';
+        if ($request->has('id')) {
+            $this->getItem('partner', new Partner(), $request->id);
+            return $this->showView('partner');
+        } else {
+            $this->getItems('partners', new Partner());
+            return $this->showView('partners');
+        }
     }
 
 //    public function map() :View
@@ -56,11 +69,15 @@ class BaseController extends Controller
         ));
     }
 
-    protected function getItem(string $itemName, Model $model, $id, $slug=null): void
+    protected function getItems(string $itemName, Model $model): void
     {
-        $item = $model->where('active',1);
-        if ($slug) $item = $item->where('slug',$slug);
-        if (!$this->data[$itemName] = $item->first()) abort(404, trans('404'));
+        $this->data[$itemName] = $model->where('active',1)->get();
+    }
+
+    protected function getItem(string $itemName, Model $model, $id): void
+    {
+        $this->data[$itemName] = $model->findOrFail($id);
+        if (!$this->data[$itemName]->active) abort(404);
     }
 
     protected function processingImage(Request $request, array $fields, string $imageField, string $pathToSave, string $imageName): array

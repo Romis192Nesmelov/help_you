@@ -12,6 +12,31 @@ a:hover {
     color: #f07258 !important;
 }
 
+a:hover > img {
+    opacity: .7;
+    filter: opacity(70%);
+}
+
+h1 {
+    width: 100%;
+    font-weight: bold;
+    font-size: 40px;
+    margin-top: 25px;
+    margin-bottom: 25px;
+    text-transform: uppercase;
+    padding-bottom: 15px;
+    border-bottom: 1px solid black;
+}
+
+h2 {
+    width: 100%;
+    color: #4D4D4D;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 20px;
+    margin-bottom: 20px;
+}
+
 table {
     border-collapse: collapse;
     border-spacing: 0;
@@ -217,22 +242,47 @@ button.btn > span {
 .rounded-block {
     width: 100%;
     border-radius: 20px;
-    color: black;
-    font-size: 20px;
-    overflow: hidden;
-    padding: 30px;
-}
-
-.rounded-block {
-    width: 100%;
     padding: 54px;
     font-size: 20px;
     background-color: #f5f3f0;
     position: relative;
 }
 
+.rounded-block h1 {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
 .rounded-block.tall {
-    height: 825px;
+    min-height: 825px;
+    height: auto;
+}
+
+.rounded-block.partner {
+    padding: 20px;
+}
+
+.rounded-block.partner p {
+    margin-bottom: 0;
+}
+
+.rounded-block.logo {
+    width: calc(20% - 20px);
+    height: 200px;
+    padding: 40px;
+    margin-left: 25px;
+    margin-bottom: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.rounded-block.logo:nth-child(5n+1) {
+    margin-left: 0;
+}
+
+.rounded-block.logo img {
+    width: 100%;
 }
 
 .rounded-block.half {
@@ -246,16 +296,6 @@ button.btn > span {
 
 .rounded-block.half:last-child {
     background-color: #e9d6be;
-    margin-bottom: 25px;
-}
-
-.rounded-block h1 {
-    width: 100%;
-    font-weight: bold;
-    font-size: 43px;
-    text-transform: uppercase;
-    padding-bottom: 15px;
-    border-bottom: 1px solid black;
 }
 
 .rounded-block h1 > div {
@@ -395,34 +435,6 @@ button.btn > span {
     padding: 0;
 }
 
-@media (max-height: 800px) {
-    .rounded-block {
-        font-size: 18px;
-        padding-top: 45px;
-        padding-bottom: 45px;
-    }
-
-    .rounded-block h1 {
-        font-size: 40px;
-    }
-
-    .rounded-block p {
-        font-size: 18px;
-    }
-
-    .rounded-block.tall {
-        height: 683px;
-    }
-
-    .rounded-block.half {
-        height: 330px;
-    }
-
-    .rounded-block h1 > div {
-        width: 100%;
-    }
-}
-
 @media (max-width: 1200px) {
     .rounded-block h1 {
         font-size: 35px;
@@ -445,7 +457,8 @@ button.btn > span {
     }
 
     .rounded-block.tall {
-        height: 415px !important;
+        min-height: 415px;
+        height: auto !important;
         margin-bottom: 25px;
     }
 
@@ -467,6 +480,56 @@ button.btn > span {
     .rounded-block p {
         font-size: 13px;
         margin-bottom: 40px;
+    }
+
+    .rounded-block.logo {
+        width: calc(50% - 13px);
+    }
+
+    .rounded-block.logo:first-child,
+    .rounded-block.logo:nth-child(2n+1) {
+        margin-left: 0 !important;
+    }
+
+    .rounded-block.logo:nth-child(5n+1) {
+        margin-left: 25px;
+    }
+}
+
+@media (max-width: 600px) {
+    .rounded-block.logo,
+    .rounded-block.logo:first-child {
+        width: calc(100% - 10px);
+        margin-left: auto !important;
+        margin-right: auto;
+    }
+}
+
+@media (max-height: 800px) {
+    .rounded-block {
+        font-size: 18px;
+        padding-top: 45px;
+        padding-bottom: 45px;
+    }
+
+    .rounded-block h1 {
+        font-size: 40px;
+    }
+
+    .rounded-block p {
+        font-size: 18px;
+    }
+
+    .rounded-block.tall {
+        min-height: 683px;
+    }
+
+    .rounded-block.half {
+        height: 330px;
+    }
+
+    .rounded-block h1 > div {
+        width: 100%;
     }
 }
 

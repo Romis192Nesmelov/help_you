@@ -198,7 +198,9 @@
             ])
 
             <div class="d-block d-lg-none">
-                @include('blocks.logo_block')
+                <a href="{{ route('home') }}">
+                    @include('blocks.logo_block')
+                </a>
             </div>
             <div class="d-block d-lg-none">
                 <a id="login-href" href="#" {{ !auth()->guest() ? 'class=d-none' : '' }} data-bs-toggle="modal" data-bs-target="#login-modal">@include('blocks.account_icon_block')</a>
