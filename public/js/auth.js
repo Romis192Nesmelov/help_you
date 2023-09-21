@@ -39,16 +39,18 @@ $(() => {
                 loginPasswordFieldError.html(passwordMustBeEntered);
             } else {
                 getUrl(loginModal.find('form'), null, (data) => {
-                    loginModal.modal('hide');
-                    loginModal.remove();
-                    registerModal.remove();
-                    resetPasswordModal.remove();
-                    $('#login-button').remove();
-                    $('#account-button').removeClass('d-none');
-                    $('#login-href').remove();
-                    $('#account-href').removeClass('d-none');
-                    $('.fa.fa-bell-o').removeClass('d-none');
-                    $('#right-button-block').removeClass('justify-content-end').addClass('justify-content-between');
+                    if (data.account) {
+                        loginModal.modal('hide');
+                        loginModal.remove();
+                        registerModal.remove();
+                        resetPasswordModal.remove();
+                        $('#login-button').remove();
+                        $('#account-button').removeClass('d-none');
+                        $('#login-href').remove();
+                        $('#account-href').removeClass('d-none');
+                        $('.fa.fa-bell-o').removeClass('d-none');
+                        $('#right-button-block').removeClass('justify-content-end').addClass('justify-content-between');
+                    } else window.location.href = accountUrl;
                 });
             }
         }
@@ -134,6 +136,9 @@ $(() => {
             });
         }
     });
+
+    let currentUrl = new URL(window.location.href);
+    if (currentUrl.searchParams.get('login')) loginModal.modal('show');
 });
 
 let getUrl = (form, url, callBack) => {

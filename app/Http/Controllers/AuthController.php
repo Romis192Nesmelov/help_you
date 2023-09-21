@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -20,7 +21,9 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials, $request->remember == 'on')) {
             $request->session()->regenerate();
-            return response()->json(['code' => 1111],200);
+            return response()->json([
+                'account' => Auth::user()->name && Auth::user()->family && Auth::user()->born && Auth::user()->email
+            ],200);
         } else return response()->json(['errors' => ['phone' => [trans('auth.failed')], 'password' => [trans('auth.failed')]]], 401);
     }
 
@@ -81,12 +84,12 @@ class AuthController extends Controller
         }
     }
 
-    public function logout(Request $request): JsonResponse
+    public function logout(Request $request): RedirectResponse
     {
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return response()->json([],200);
+        return redirect(route('home'));
     }
 
     private function getCode(): string

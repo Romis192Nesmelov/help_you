@@ -55,7 +55,7 @@
             @include('blocks.input_block',[
                 'name' => 'phone',
                 'placeholder' => '+_(___)___-__-__',
-                'label' => trans('content.phone'),
+                'label' => trans('auth.phone'),
                 'ajax' => true
             ])
             @include('blocks.input_block',[
@@ -179,7 +179,7 @@
 @endif
 
 <x-modal id="message-modal" head="{{ trans('content.message') }}">
-    <h4 class="text-center p-4"></h4>
+    <h4 class="text-center p-4">{{ session()->has('message') ? session()->get('message') : '' }}</h4>
 </x-modal>
 
 <div class="container">
@@ -188,7 +188,7 @@
             <a class="d-none d-lg-block" href="{{ route('home') }}">
                 <div class="logo-block d-none d-lg-flex align-items-center justify-content-between">
                     @include('blocks.logo_block')
-                    <img class="logo-text" src="{{ asset('storage/images/logo_text.svg') }}" />
+                    <img class="logo-text" src="{{ asset('images/logo_text.svg') }}" />
                 </div>
             </a>
             @include('blocks.main_nav_block', [
@@ -234,10 +234,12 @@
     <script>
         {{--window.getPointsURL = "{{ route('get_points') }}";--}}
         let generateCodeUrl = "{{ route('generate_code') }}",
+            accountUrl = "{{ route('account') }}",
             passwordMustBeEntered = "{{ trans('auth.password_must_be_entered') }}",
             passwordsError = "{{ trans('auth.password_mismatch') }}",
             youMustConsent = "{{ trans('auth.you_must_consent_to_the_processing_of_personal_data') }}";
     </script>
 @endif
+<script>let openMessageModalFlag = parseInt("{{ session()->has('message') }}");</script>
 </body>
 </html>

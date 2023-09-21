@@ -1,4 +1,4 @@
-<div {{ isset($id) ? 'id='.$id : '' }} class="rounded-block home {{ $addClass }}">
+<div {{ isset($id) ? 'id='.$id : '' }} class="rounded-block {{ $addClass }}">
     <h1><div>{!! $head !!}</div></h1>
     <div class="bottom-block">
         @if (is_array($content))

@@ -1,7 +1,8 @@
 // window.stop();
-$(window).on('load', function () {
+$(() => {
     $('input[name=phone]').mask("+9(999)999-99-99");
     $('input[name=code]').mask("99-99-99");
+    $('input[name=born]').mask("1999-99-99");
 
     setTimeout(function () {
         // windowResize();
@@ -35,6 +36,25 @@ $(window).on('load', function () {
 
     // Fancybox init
     bindFancybox();
+
+    // Preview avatar
+    $('#avatar-block .avatar input[type=file]').change(function () {
+        let input = $(this)[0],
+            avatar = $(this).parents('.avatar');
+
+        if (input.files[0].type.match('image.*')) {
+            let reader = new FileReader();
+            reader.onload = function (e) {
+                avatar.css('background-image', 'url(' + e.target.result + ')');
+            };
+            reader.readAsDataURL(input.files[0]);
+        } else {
+            avatar.css('background-image', 'url(/images/def_avatar.svg)');
+        }
+    });
+
+    // Open message modal
+    if (openMessageModalFlag) $('#message-modal').modal('show');
 });
 
 // function fixingMainMenu() {

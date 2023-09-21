@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BaseController;
 use Illuminate\Support\Facades\Route;
@@ -20,7 +21,15 @@ Route::get('/map', [BaseController::class, 'map'])->name('map');
 Route::get('/about', [BaseController::class, 'index'])->name('about');
 Route::get('/how_does_it_work', [BaseController::class, 'index'])->name('how_does_it_work');
 Route::get('/for_partners', [BaseController::class, 'index'])->name('for_partners');
-Route::get('/account', [BaseController::class, 'index'])->name('account');
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/account', [AccountController::class, 'account'])->name('account');
+    Route::post('/edit-account', [AccountController::class, 'editAccount'])->name('edit_account');
+    Route::get('/subscriptions', [AccountController::class, 'account'])->name('subscriptions');
+    Route::get('/my-requests', [AccountController::class, 'account'])->name('my_requests');
+    Route::get('/my-help', [AccountController::class, 'account'])->name('my_help');
+    Route::get('/incentives', [AccountController::class, 'account'])->name('incentives');
+});
 
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::post('/generate-code', [AuthController::class, 'generateCode'])->name('generate_code');

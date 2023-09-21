@@ -7,17 +7,18 @@ use Illuminate\Support\Facades\Mail;
 trait HelperTrait
 {
     public $validationPhone = 'required|regex:/^((\+)?(\d)(\s)?(\()?[0-9]{3}(\))?(\s)?([0-9]{3})(\-)?([0-9]{2})(\-)?([0-9]{2}))$/';
+    public $validationBorn = 'required|regex:/^(([1-2]\d\d\d)-(\d){2}-(\d){2})$/';
     public $validationPassword = 'required|min:3|max:20';
     public $validationPasswordConfirmed = 'required|confirmed|min:3|max:20';
     public $validationCode = 'required|regex:/^(([0-9]{2})\-([0-9]{2})-([0-9]{2}))$/';
     public $validationInteger = 'required|integer';
     public $validationNumeric = 'required|numeric';
     public $validationString = 'required|min:3|max:255';
-    public $validationText = 'required|min:5|max:3000';
+    public $validationText = 'nullable|min:5|max:3000';
     public $validationLongText = 'required|min:5|max:50000';
 //    public $validationColor = 'regex:/^(hsv\((\d+)\,\s(\d+)\%\,\s(\d+)\%\))$/';
 //    public $validationSvg = 'required|mimes:svg|max:10';
-    public $validationJpgAndPng = 'mimes:jpg,png|max:2000';
+    public $validationJpgAndPng = 'mimes:jpg,png|max:500';
     public $validationJpg = 'mimes:jpg|max:2000';
     public $validationPng = 'mimes:png|max:2000';
     public $validationDate = 'regex:/^(\d{2})\/(\d{2})\/(\d{4})$/';
@@ -27,20 +28,25 @@ trait HelperTrait
         if (file_exists(base_path('public/'.$path))) unlink(base_path('public/'.$path));
     }
 
-    public function getCutTableName(Model $item) :string
-    {
-        return substr($item->getTable(),0,-1);
-    }
+//    public function getCutTableName(Model $item) :string
+//    {
+//        return substr($item->getTable(),0,-1);
+//    }
 
-    public function sendMessage($email, $fields, $template, $pathToFile=null): void
-    {
-        Mail::send('emails.'.$template, ['fields' => $fields], function($message) use ($email, $fields, $pathToFile) {
-            $message->subject(trans('admin.message_from'));
-            $message->from(env('MAIL_TO'), 'Apollomotors');
-            $message->to($email);
-            if ($pathToFile) $message->attach($pathToFile);
-        });
-    }
+//    public function sendMessage($email, $fields, $template, $pathToFile=null): void
+//    {
+//        Mail::send('emails.'.$template, ['fields' => $fields], function($message) use ($email, $fields, $pathToFile) {
+//            $message->subject(trans('admin.message_from'));
+//            $message->from(env('MAIL_TO'), 'Help you?');
+//            $message->to($email);
+//            if ($pathToFile) $message->attach($pathToFile);
+//        });
+//    }
+
+//    public function saveCompleteMessage(): void
+//    {
+//        session()->flash('message', trans('content.save_complete'));
+//    }
 
     public function sendSms($phone, $text)
     {

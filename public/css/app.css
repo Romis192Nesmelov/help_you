@@ -9,7 +9,7 @@ a {
 }
 
 a:hover {
-    color: #f07258;
+    color: #f07258 !important;
 }
 
 table {
@@ -30,12 +30,21 @@ table {
     position: relative;
 }
 
+.form-group label {
+    padding-left: 10px;
+}
+
 .form-group i {
     position: absolute;
     font-size: 18px;
     top: 37px;
     right: 10px;
     color: grey;
+}
+
+.form-group input,
+.form-group textarea {
+    border-radius: 20px;
 }
 
 .form-group.password i {
@@ -66,6 +75,8 @@ input.error {
 }
 
 textarea {
+    width: 100%;
+    height: 345px;
     resize: none;
 }
 
@@ -73,39 +84,6 @@ textarea {
     width: 100%;
     margin-top: 15px;
 }
-
-
-/*.modal-content {*/
-/*    border-radius: 30px;*/
-/*    padding: 40px 50px;*/
-/*}*/
-
-/*.modal-header {*/
-/*    padding: 0;*/
-/*    margin-bottom: 10px;*/
-/*    border: none;*/
-/*}*/
-
-/*#point-modal .modal-content {*/
-/*    padding: 20px;*/
-/*    background-color: black;*/
-/*    color: white;*/
-/*    opacity: 0.7;*/
-/*}*/
-
-/*#point-modal .image {*/
-/*    border: 2px solid white;*/
-/*    margin-bottom: 10px;*/
-/*}*/
-
-/*#request-modal .modal-content {*/
-/*    border: none;*/
-/*    background-size: auto 100%;*/
-/*}*/
-
-/*.form-group {*/
-/*    margin-bottom: 1.2rem;*/
-/*}*/
 
 button.btn {
     width: 190px;
@@ -135,6 +113,7 @@ select:active {
 
 input:hover,
 select:hover,
+textarea:hover,
 button.btn:hover {
     border-color: #e65639;
     box-shadow: none !important;
@@ -235,16 +214,6 @@ button.btn > span {
     box-shadow: none;
 }
 
-/*#black-background {*/
-/*    width: 100%;*/
-/*    height: 100%;*/
-/*    position: fixed;*/
-/*    top: 0;*/
-/*    left: 0;*/
-/*    background: rgba(0,0,0,.4);*/
-/*    z-index: 998;*/
-/*}*/
-
 .rounded-block {
     width: 100%;
     border-radius: 20px;
@@ -254,24 +223,33 @@ button.btn > span {
     padding: 30px;
 }
 
-.rounded-block.home {
+.rounded-block {
     width: 100%;
     padding: 54px;
     font-size: 20px;
-    background-color: #e9d6be;
+    background-color: #f5f3f0;
     position: relative;
 }
 
-.rounded-block.home.half {
+.rounded-block.tall {
+    height: 825px;
+}
+
+.rounded-block.half {
     height: 400px;
 }
 
-.rounded-block.home.half:first-child {
+.rounded-block.half:first-child {
     background-color: #f2ece4;
     margin-bottom: 25px;
 }
 
-.rounded-block.home h1 {
+.rounded-block.half:last-child {
+    background-color: #e9d6be;
+    margin-bottom: 25px;
+}
+
+.rounded-block h1 {
     width: 100%;
     font-weight: bold;
     font-size: 43px;
@@ -280,25 +258,35 @@ button.btn > span {
     border-bottom: 1px solid black;
 }
 
-.rounded-block.home h1 > div {
+.rounded-block h1 > div {
     width: 50%;
 }
 
-.rounded-block.home .bottom-block {
+.rounded-block .bottom-block {
     width: calc(100% - 108px);
     position: absolute;
     bottom: 50px;
 }
 
-.rounded-block.home.black h1 {
+.rounded-block.black h1 {
     color: white;
     border-color: white;
 }
 
-.rounded-block.home p {
+.rounded-block i {
+    margin-right: 10px;
+    font-size: 18px;
+}
+
+.rounded-block p {
     width: 100%;
-    font-size: 20px;
+    font-size: 18px;
     margin-bottom: 60px;
+}
+
+.rounded-block a {
+    color: black;
+    text-decoration: none;
 }
 
 .rounded-block .link {
@@ -310,10 +298,6 @@ button.btn > span {
     align-items: center;
     color: black;
     border: 2px solid black;
-}
-
-.rounded-block .link:hover {
-
 }
 
 .rounded-block .link-cover {
@@ -329,9 +313,18 @@ button.btn > span {
     color: white !important;
 }
 
+.rounded-block ul.menu {
+    list-style: none;
+    padding: 0;
+    font-size: 18px;
+}
+
+.rounded-block ul.menu li {
+    margin-bottom: 28px;
+}
+
 #map-image-block {
-    height: 825px;
-    background: url("../storage/images/map.jpg") no-repeat;
+    background: url("../images/map.jpg") no-repeat;
     background-size: cover;
 }
 
@@ -344,6 +337,10 @@ button.btn > span {
     color: white;
 }
 
+#map-image-block a {
+    text-decoration: underline;
+}
+
 #map-image-block .link {
     border-color: white;
     background-color: white;
@@ -353,40 +350,81 @@ button.btn > span {
     color: black;
 }
 
+#avatar-block {
+    width: calc(100% + 108px);
+    margin-left: -54px;
+    position: relative;
+    padding: 0 54px 30px 54px;
+    margin-bottom: 30px;
+    border-bottom: 2px solid black;
+    display: flex;
+    align-items: center;
+    justify-content: left;
+}
+
+#avatar-block .avatar {
+    width: 65px;
+    height: 65px;
+    overflow: hidden;
+    border-radius: 50%;
+    border: 1px solid #595A5C;
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+#avatar-block .avatar.error {
+    border-color: red;
+}
+
+#avatar-block .id {
+    margin-left: 25px;
+}
+
+#avatar-block .avatar input {
+    width: 65px;
+    height: 135px;
+    position: relative;
+    top: -65px;
+    cursor: pointer;
+    opacity: 0;
+    filter: opacity(0%);
+}
+
 #map {
     padding: 0;
 }
 
 @media (max-height: 800px) {
-    .rounded-block.home {
+    .rounded-block {
         font-size: 18px;
         padding-top: 45px;
         padding-bottom: 45px;
     }
 
-    .rounded-block.home h1 {
+    .rounded-block h1 {
         font-size: 40px;
     }
 
-    .rounded-block.home p {
+    .rounded-block p {
         font-size: 18px;
     }
 
-    #map-image-block {
+    .rounded-block.tall {
         height: 683px;
     }
 
-    .rounded-block.home.half {
+    .rounded-block.half {
         height: 330px;
     }
 
-    .rounded-block.home h1 > div {
+    .rounded-block h1 > div {
         width: 100%;
     }
 }
 
 @media (max-width: 1200px) {
-    .rounded-block.home h1 {
+    .rounded-block h1 {
         font-size: 35px;
     }
 }
@@ -403,46 +441,45 @@ button.btn > span {
         background: white;
         top: 63px;
         left: -.75rem;
-        box-shadow: 10px 10px 10px rgba(0,0,0,0.5); !important;
         z-index: 999;
     }
 
-    #map-image-block {
+    .rounded-block.tall {
         height: 415px !important;
         margin-bottom: 25px;
     }
 
-    .rounded-block.home {
+    .rounded-block {
         height: 280px !important;
         font-size: 13px;
         padding: 30px;
     }
 
-    .rounded-block.home .bottom-block {
+    .rounded-block .bottom-block {
         width: calc(100% - 60px);
         bottom: 30px;
     }
 
-    .rounded-block.home h1 {
+    .rounded-block h1 {
         font-size: 23px;
     }
 
-    .rounded-block.home p {
+    .rounded-block p {
         font-size: 13px;
         margin-bottom: 40px;
     }
 }
 
 @media (max-width: 300px) {
-    .rounded-block.home {
+    .rounded-block {
         font-size: 10px;
     }
 
-    .rounded-block.home h1 {
+    .rounded-block h1 {
         font-size: 20px;
     }
 
-    .rounded-block.home p {
+    .rounded-block p {
         font-size: 10px;
         margin-bottom: 20px;
     }

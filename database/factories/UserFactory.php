@@ -20,7 +20,7 @@ class UserFactory extends Factory
         return [
             'name' => fake()->name(),
             'family' => fake()->lastName(),
-            'born' => fake()->date(),
+            'born' => fake()->date('Y-m-d'),
             'phone' => '+7(9'.rand(0,9).rand(0,9).')'.rand(0,9).rand(0,9).rand(0,9).'-'.rand(0,9).rand(0,9).'-'.rand(0,9).rand(0,9),
             'email' => fake()->unique()->safeEmail(),
 //            'email_verified_at' => now(),

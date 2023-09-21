@@ -1,1 +1,1 @@
-<img class="account-icon" src="{{ asset('storage/images/account.svg') }}" />
+<img class="account-icon" src="{{ asset('images/account.svg') }}" />

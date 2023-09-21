@@ -44,9 +44,17 @@ return [
 //    'new_email' => '. Новый E-mail: :email у id# :id',
 //    'new_password' => '. Новый пароль: :password у id# :id',
 
+    'subscriptions' => 'Подписки',
+    'my_requests' => 'Мои запросы',
+    'my_help' => 'Моя помощь',
+    'incentives' => 'Поощрения от партнеров',
+
     'name' => 'Ваше имя',
+    'family' => 'Ваша фамилия',
     'phone' => 'Телефон',
     'email' => 'E-Mail',
+    'born' => 'Дата рождения',
+    'info_about' => 'Информация о себе',
     'code' => 'Код',
     'get_code' => 'Получить код',
     'get_code_again' => 'Получить код повторно можно через <span></span> секунд',
