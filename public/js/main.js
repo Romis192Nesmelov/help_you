@@ -2,7 +2,32 @@
 $(() => {
     $('input[name=phone]').mask("+9(999)999-99-99");
     $('input[name=code]').mask("99-99-99");
-    $('input[name=born]').mask("1999-99-99");
+
+    let bornDateInput = $('input[name=born]'),
+        errorBorn = $('.error.born');
+
+    bornDateInput.mask("9999-99-99", {
+        completed: function() {
+            let born = $(this).val().split('-'),
+                currentDate = new Date(),
+                inputDate = new Date(born[0], born[1], 0);
+
+            if (
+                born[1] > 12 ||
+                born[0] >= currentDate.getFullYear() ||
+                born[2] > inputDate.getDate() ||
+                born[0] > currentDate.getFullYear() - 18 ||
+                (born[0] == currentDate.getFullYear() - 18 && born[1] < currentDate.getMonth()) ||
+                (born[0] == currentDate.getFullYear() - 18 && born[1] < currentDate.getMonth() && born[2] < currentDate.getDate())
+            ) {
+                $(this).addClass('error');
+                errorBorn.html(errorBornMessage);
+            } else {
+                $(this).removeClass('error');
+                errorBorn.html('');
+            }
+        }
+    });
 
     setTimeout(function () {
         // windowResize();

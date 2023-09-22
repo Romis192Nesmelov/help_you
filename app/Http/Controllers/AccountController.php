@@ -41,11 +41,13 @@ class AccountController extends BaseController
         if (
             !$bornDate[1] ||
             !$bornDate[2] ||
-            ((int)$bornDate[2] > cal_days_in_month(CAL_GREGORIAN, $bornDate[1], $bornDate[0])) ||
-            ((int)$bornDate[0] > (int)date('Y') - 18) ||
+            $bornDate[1] > 12 ||
+            $bornDate[0] >= (int)date('Y') ||
+            (int)$bornDate[2] > cal_days_in_month(CAL_GREGORIAN, $bornDate[1], $bornDate[0]) ||
+            (int)$bornDate[0] > (int)date('Y') - 18 ||
             ((int)$bornDate[0] == (int)date('Y') - 18 && (int)$bornDate[1] < (int)date('m')) ||
             ((int)$bornDate[0] == (int)date('Y') - 18 && (int)$bornDate[1] == (int)date('m') && (int)$bornDate[2] < (int)date('d'))
-        ) return redirect()->back()->withErrors(['born' => trans('validation.wrong_date')]);
+        ) return redirect()->back()->withErrors(['born' => trans('validation.wrong_date')])->withInput();
 
         $fields = $this->processingImage($request, $fields,'avatar', 'images/avatars/', Auth::id());
         Auth::user()->update($fields);

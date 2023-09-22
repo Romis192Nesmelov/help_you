@@ -37,7 +37,7 @@
                             'name' => $accountTtem,
                             'placeholder' => trans('auth.'.$accountTtem),
                             'label' => trans('auth.'.$accountTtem),
-                            'ajax' => false,
+                            'ajax' => true,
                             'value' => auth()->user()->$accountTtem
                         ])
                     @endforeach
@@ -61,4 +61,5 @@
             </div>
         </div>
     </form>
+    <script>let errorBornMessage = "{{ trans('validation.wrong_date') }}";</script>
 @endsection
