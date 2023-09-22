@@ -406,6 +406,7 @@ button.btn > span {
     width: 65px;
     height: 65px;
     overflow: hidden;
+    position: relative;
     border-radius: 50%;
     border: 1px solid #595A5C;
     background-position: center;
@@ -421,14 +422,21 @@ button.btn > span {
     margin-left: 25px;
 }
 
+#avatar-block .avatar img {
+    width: 65px;
+    display: none;
+    position: absolute;
+}
+
 #avatar-block .avatar input {
     width: 65px;
     height: 135px;
-    position: relative;
+    position: absolute;
     top: -65px;
     cursor: pointer;
     opacity: 0;
     filter: opacity(0%);
+    z-index: 999;
 }
 
 #map {

@@ -38,19 +38,24 @@ $(() => {
     bindFancybox();
 
     // Preview avatar
-    $('#avatar-block .avatar input[type=file]').change(function () {
-        let input = $(this)[0],
-            avatar = $(this).parents('.avatar');
+    let avatar = $('#avatar-block .avatar'),
+        hoverImg = avatar.find('img');
 
-        if (input.files[0].type.match('image.*')) {
+    avatar.find('input[type=file]').change(function () {
+        let input = $(this)[0].files[0];
+        if (input.type.match('image.*')) {
             let reader = new FileReader();
             reader.onload = function (e) {
                 avatar.css('background-image', 'url(' + e.target.result + ')');
             };
-            reader.readAsDataURL(input.files[0]);
+            reader.readAsDataURL(input);
         } else {
             avatar.css('background-image', 'url(/images/def_avatar.svg)');
         }
+    }).on('mouseover', function () {
+        hoverImg.show();
+    }).on('mouseout', function () {
+        hoverImg.hide();
     });
 
     // Open message modal

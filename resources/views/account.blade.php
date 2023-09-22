@@ -8,6 +8,7 @@
                 <div id="avatar-block">
                     <div class="d-flex flex-column align-items-center">
                         <div class="avatar @error('avatar') error @enderror" style="background-image: url({{ asset(auth()->user()->avatar ? auth()->user()->avatar : 'images/def_avatar.svg') }} );">
+                            <img src="{{ asset('images/avatar_hover.svg') }}" />
                             <input type="file" name="avatar">
                         </div>
                         @error('avatar')
