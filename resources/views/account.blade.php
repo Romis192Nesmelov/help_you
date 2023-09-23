@@ -51,6 +51,7 @@
                     ])
                     <div class="w-100 text-end mt-4">
                         @include('blocks.button_block',[
+                            'id' => 'account-save',
                             'primary' => true,
                             'buttonType' => 'submit',
                             'type' => 'submit',
@@ -62,4 +63,5 @@
         </div>
     </form>
     <script>let errorBornMessage = "{{ trans('validation.wrong_date') }}";</script>
+    <script type="text/javascript" src="{{ asset('js/account.js') }}"></script>
 @endsection
