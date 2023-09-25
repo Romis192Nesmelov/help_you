@@ -1,4 +1,4 @@
-<div class="form-group mb-3">
+<div {{ isset($id) ? 'id='.$id : '' }} class="form-group mb-3">
     @if (isset($label) && $label)
         <label for="{{ $name }}">{{ $label }}</label>
     @endif

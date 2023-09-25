@@ -52,12 +52,7 @@
     <x-modal id="login-modal" head="{{ trans('menu.login_or_register') }}">
         <form method="post" action="{{ route('login') }}" accept-charset="utf-8">
             @csrf
-            @include('blocks.input_block',[
-                'name' => 'phone',
-                'placeholder' => '+_(___)___-__-__',
-                'label' => trans('auth.phone'),
-                'ajax' => true
-            ])
+            @include('blocks.input_phone_block')
             @include('blocks.input_block',[
                 'name' => 'password',
                 'addClass' => 'password',
@@ -72,7 +67,8 @@
                 'buttonType' => 'submit',
                 'icon' => 'icon-enter3',
                 'type' => 'submit',
-                'buttonText' => trans('auth.enter')
+                'buttonText' => trans('auth.enter'),
+                'disabled' => true
             ])
             @include('blocks.button_block',[
                 'id' => null,
@@ -97,42 +93,17 @@
     <x-modal id="register-modal" head="{{ trans('auth.register') }}">
         <form method="post" action="{{ route('register') }}" accept-charset="utf-8">
             @csrf
-            @include('blocks.input_block',[
-                'name' => 'phone',
-                'placeholder' => '+_(___)___-__-__',
-                'label' => trans('content.phone'),
-                'ajax' => true
-            ])
-            @include('blocks.input_block',[
-                'name' => 'password',
-                'addClass' => 'password',
-                'type' => 'password',
-                'label' => trans('auth.password'),
-                'icon' => 'icon-eye',
-                'ajax' => true
-            ])
-            @include('blocks.input_block',[
-                'name' => 'password_confirmation',
-                'addClass' => 'password',
-                'type' => 'password',
-                'label' => trans('auth.confirm_password'),
-                'icon' => 'icon-eye',
-                'ajax' => true
-            ])
-            @include('blocks.input_block',[
-                'name' => 'code',
-                'addClass' => 'd-none',
-                'placeholder' => '__-__-__',
-                'label' => trans('auth.code'),
-                'icon' => 'icon-shield2',
-                'ajax' => true
-            ])
+            @include('blocks.input_phone_block')
+            @include('blocks.input_passwords_block')
+            @include('blocks.input_code_block')
             @include('blocks.button_block',[
                 'id' => 'get-register-code',
+                'disabled' => true,
                 'addClass' => 'mb-3',
                 'primary' => true,
                 'icon' => 'icon-key',
-                'buttonText' => trans('auth.get_code')
+                'buttonText' => trans('auth.get_code'),
+                'disabled' => true
             ])
             @include('blocks.button_block',[
                 'id' => 'register-button',
@@ -141,7 +112,8 @@
                 'primary' => true,
                 'buttonType' => 'submit',
                 'icon' => 'icon-reset',
-                'buttonText' => trans('auth.register')
+                'buttonText' => trans('auth.register'),
+                'disabled' => true
             ])
             @include('blocks.checkbox_block',[
                 'checked' => false,
@@ -152,35 +124,25 @@
             ])
             @include('blocks.forgot_password_block')
         </form>
-        <div id="get-code-again" class="w-100 text-center mb-2 d-none">
-            {!! trans('auth.get_code_again') !!}
-        </div>
+        @include('blocks.get_code_again_block')
     </x-modal>
 
     <x-modal id="restore-password-modal" head="{{ trans('auth.reset_password') }}">
         <form method="post" action="{{ route('reset_password') }}" accept-charset="utf-8">
             @csrf
-            @include('blocks.input_block',[
-                'name' => 'phone',
-                'placeholder' => '+_(___)___-__-__',
-                'label' => trans('content.phone'),
-                'ajax' => true
-            ])
+            @include('blocks.input_phone_block')
             @include('blocks.button_block',[
-                'id' => null,
+                'id' => 'reset-button',
                 'primary' => true,
                 'buttonType' => 'submit',
                 'addClass' => 'mb-3',
                 'icon' => 'icon-user-plus',
-                'buttonText' => trans('auth.restore_password')
+                'buttonText' => trans('auth.restore_password'),
+                'disabled' => true
             ])
         </form>
     </x-modal>
 @endif
-
-<x-modal id="message-modal" head="{{ trans('content.message') }}">
-    <h4 class="text-center p-4">{{ session()->has('message') ? session()->get('message') : '' }}</h4>
-</x-modal>
 
 <div class="container">
     <div id="main-container">
@@ -232,13 +194,17 @@
     </div>
 </div>
 
+<x-modal id="message-modal" head="{{ trans('content.message') }}">
+    <h4 class="text-center p-4">{{ session()->has('message') ? session()->get('message') : '' }}</h4>
+</x-modal>
+
 @if (auth()->guest())
     <script>
         {{--window.getPointsURL = "{{ route('get_points') }}";--}}
         let generateCodeUrl = "{{ route('generate_code') }}",
             accountUrl = "{{ route('account') }}",
-            passwordMustBeEntered = "{{ trans('auth.password_must_be_entered') }}",
-            passwordsError = "{{ trans('auth.password_mismatch') }}",
+            passwordsMismatch = "{{ trans('auth.password_mismatch') }}",
+            passwordCannotBeLess = "{{ trans('auth.password_cannot_be_less', ['length' => 6]) }}",
             youMustConsent = "{{ trans('auth.you_must_consent_to_the_processing_of_personal_data') }}";
     </script>
 @endif

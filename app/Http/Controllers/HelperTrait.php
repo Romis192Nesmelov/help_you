@@ -6,10 +6,10 @@ use Illuminate\Support\Facades\Mail;
 
 trait HelperTrait
 {
-    public $validationPhone = 'required|regex:/^((\+)?(\d)(\s)?(\()?[0-9]{3}(\))?(\s)?([0-9]{3})(\-)?([0-9]{2})(\-)?([0-9]{2}))$/';
+    public $validationPhone = 'regex:/^((\+)?(\d)(\s)?(\()?[0-9]{3}(\))?(\s)?([0-9]{3})(\-)?([0-9]{2})(\-)?([0-9]{2}))$/';
     public $validationBorn = 'required|regex:/^(([1-2]\d\d\d)-(\d){2}-(\d){2})$/';
     public $validationPassword = 'required|min:3|max:20';
-    public $validationPasswordConfirmed = 'required|confirmed|min:3|max:20';
+    public $validationPasswordConfirmed = 'required|confirmed|min:6|max:20';
     public $validationCode = 'required|regex:/^(([0-9]{2})\-([0-9]{2})-([0-9]{2}))$/';
     public $validationInteger = 'required|integer';
     public $validationNumeric = 'required|numeric';
@@ -18,7 +18,7 @@ trait HelperTrait
     public $validationLongText = 'required|min:5|max:50000';
 //    public $validationColor = 'regex:/^(hsv\((\d+)\,\s(\d+)\%\,\s(\d+)\%\))$/';
 //    public $validationSvg = 'required|mimes:svg|max:10';
-    public $validationJpgAndPng = 'mimes:jpg,png|max:500';
+    public $validationJpgAndPng = 'mimes:jpg,png|max:700';
     public $validationJpg = 'mimes:jpg|max:2000';
     public $validationPng = 'mimes:png|max:2000';
     public $validationDate = 'regex:/^(\d{2})\/(\d{2})\/(\d{4})$/';
@@ -47,6 +47,16 @@ trait HelperTrait
 //    {
 //        session()->flash('message', trans('content.save_complete'));
 //    }
+
+    public function generateCode(): string
+    {
+        return rand(0,9).rand(0,9).'-'.rand(0,9).rand(0,9).'-'.rand(0,9).rand(0,9);
+    }
+
+    public function unifyPhone($phone): string
+    {
+        return '+7'.substr($phone,2);
+    }
 
     public function sendSms($phone, $text)
     {

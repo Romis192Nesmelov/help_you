@@ -1,7 +1,10 @@
 // window.stop();
+window.phoneRegExp = /^((\+)?(\d)(\s)?(\()?[0-9]{3}(\))?(\s)?([0-9]{3})(\-)?([0-9]{2})(\-)?([0-9]{2}))$/gi;
+window.codeRegExp = /^((\d){2}(\-)(\d){2}(\-)(\d){2})$/gi
 $(() => {
     $('input[name=phone]').mask("+9(999)999-99-99");
     $('input[name=code]').mask("99-99-99");
+    window.messageModal = $('#message-modal');
 
     setTimeout(function () {
         // windowResize();
@@ -25,6 +28,18 @@ $(() => {
         }
     });
 
+    $('.form-group.password i').click(function () {
+        let cover = $(this).parents('.form-group'),
+            input = cover.find('input');
+        if ($(this).hasClass('icon-eye')) {
+            input.attr('type','text');
+            $(this).removeClass('icon-eye').addClass('icon-eye-blocked');
+        } else {
+            input.attr('type','password');
+            $(this).removeClass('icon-eye-blocked').addClass('icon-eye');
+        }
+    });
+
     // $(window).resize(function() {
     //     mainHeight();
     // });
@@ -35,7 +50,55 @@ $(() => {
 
     // Fancybox init
     bindFancybox();
+
+    // Open message modal
+    if (openMessageModalFlag) messageModal.modal('show');
 });
+
+let getUrl = (form, url, callBack) => {
+    let formData = new FormData();
+
+    form.find('input.error').removeClass('error');
+    form.find('div.error').html('');
+    addLoader();
+    form.find('input').each(function () {
+        if ($(this).attr('type') === 'file') formData.append($(this).attr('name'), $(this)[0].files[0]);
+        else formData.append($(this).attr('name'), $(this).val());
+    });
+
+    $.ajax({
+        url: url ? url : form.attr('action'),
+        data: formData,
+        processData: false,
+        contentType: false,
+        type: form.attr('method'),
+        success: (data) => {
+            if (callBack) callBack(data);
+            removeLoader();
+        },
+        error: (data) => {
+            let response = jQuery.parseJSON(data.responseText);
+            $.each(response.errors, (field, errorMsg) => {
+                form.find('input[name='+field+']').addClass('error');
+                form.find('.error.'+field).html(errorMsg[0]);
+            });
+            removeLoader();
+        }
+    });
+}
+
+let getCodeAgainCounter = (getCodeButton, timer) => {
+    let getRegisterCodeAgain = $('#get-code-again'),
+        countDown = setInterval(() => {
+        if (!timer) {
+            getCodeButton.removeClass('d-none');
+            clearInterval(countDown);
+        }
+        getRegisterCodeAgain.removeClass('d-none');
+        getRegisterCodeAgain.find('span').html(timer);
+        timer--;
+    }, 1000);
+};
 
 // function fixingMainMenu() {
 //     let mainMenuFix = $('#main-nav');

@@ -1,6 +1,10 @@
-<div {{ isset($id) ? 'id='.$id : '' }} class="form-group {{ isset($type) && $type == 'number' ? 'number' : '' }} {{ isset($label) && $label ? 'has-label' : '' }} {{ isset($addClass) && $addClass ? $addClass : '' }}">
+<div {{ isset($id) ? 'id='.$id : '' }} class="form-group {{ isset($label) && $label ? 'has-label' : '' }} {{ isset($addClass) && $addClass ? $addClass : '' }}">
+    @if (isset($icon) && $icon)
+        <i class="{{ $icon }}"></i>
+    @endif
+
     @if (isset($label) && $label)
-        <label for="{{ $name }}">{{ $label }} {!! isset($required) && $required ? '<sup>*</sup>' : '' !!}</label>
+        <label for="{{ $name }}">{{ $label }}</label>
     @endif
     <input
         type="{{ isset($type) && $type ? $type : 'text' }}"
@@ -8,17 +12,7 @@
         value="{{ old($name, (isset($value) ? $value : '')) }}"
         class="form-control {{ isset($icon) && $icon ? 'has-icon' : '' }}@error($name) error @enderror"
         placeholder="{{ isset($placeholder) && $placeholder ? $placeholder : '' }}"
+        {{ isset($disabled) && $disabled ? 'disabled=disabled' : '' }}
     >
-
-    @if (isset($icon) && $icon)
-        <i class="{{ $icon }}"></i>
-    @endif
-
-    @if (isset($ajax))
-        @include('blocks.error_block')
-    @else
-        @error($name)
-            @include('blocks.error_block')
-        @enderror
-    @endif
+    @include('blocks.wrap_error_block')
 </div>

@@ -30,7 +30,7 @@ class AuthController extends Controller
     public function generateCode(Request $request): JsonResponse
     {
         $request->validate([
-            'phone' => $this->validationPhone,
+            'phone' => 'required|unique:users,phone|'.$this->validationPhone,
             'password' => $this->validationPasswordConfirmed,
             'i_agree' => 'accepted'
         ]);
@@ -39,14 +39,14 @@ class AuthController extends Controller
         if (!$user) {
             $user = User::create([
                 'phone' => $phone,
-                'code' => $this->getCode(),
+                'code' => $this->generateCode(),
                 'active' => 0
             ]);
             return response()->json(['message' => trans('auth.code').': '.$user->code],200);
         } elseif ($user->active) {
             return response()->json(['errors' => ['phone' => [trans('auth.user_with_this_phone_is_already_registered')]]], 400);
         } else {
-            $user->code = $this->getCode();
+            $user->code = $this->generateCode();
             $user->save();
             return response()->json(['message' => trans('auth.code').': '.$user->code],200);
         }
@@ -55,7 +55,7 @@ class AuthController extends Controller
     public function register(Request $request): JsonResponse
     {
         $credentials = $request->validate([
-            'phone' => $this->validationPhone,
+            'phone' => 'required|unique:users,phone|'.$this->validationPhone,
             'password' => $this->validationPasswordConfirmed,
             'code' => $this->validationCode,
             'i_agree' => 'accepted'
@@ -90,15 +90,5 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         return redirect(route('home'));
-    }
-
-    private function getCode(): string
-    {
-        return rand(0,9).rand(0,9).'-'.rand(0,9).rand(0,9).'-'.rand(0,9).rand(0,9);
-    }
-
-    private function unifyPhone($phone): string
-    {
-        return '+7'.substr($phone,2);
     }
 }

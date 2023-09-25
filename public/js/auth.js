@@ -1,112 +1,124 @@
 $(() => {
-    let messageModal = $('#message-modal'),
-        loginModal = $('#login-modal'),
+    let loginModal = $('#login-modal'),
+        loginPhoneField = loginModal.find('input[name=phone]'),
         loginPasswordField = loginModal.find('input[name=password]'),
         loginPasswordFieldError = loginModal.find('.error.password'),
+        loginButton = $('#enter-button'),
+
         registerModal = $('#register-modal'),
-        getRegisterCode = $('#get-register-code'),
-        getRegisterCodeAgain = $('#get-code-again'),
+        registerPhoneField = registerModal.find('input[name=phone]'),
+        getRegisterCodeButton = $('#get-register-code'),
         registerPasswordField = registerModal.find('input[name=password]'),
         registerConfirmPasswordField = registerModal.find('input[name=password_confirmation]'),
+        registerCodeField = registerModal.find('input[name=code]'),
         registerAgree = registerModal.find('input[name=i_agree]'),
         registerPasswordFieldError = registerModal.find('.error.password'),
         registerAgreeError = registerModal.find('.error.i_agree'),
         registerConfirmPasswordFieldError = registerModal.find('.error.password_confirmation'),
-        resetPasswordModal = $('#restore-password-modal');
+        registerButton = $('#register-button'),
 
-    $('.form-group.password i').click(function () {
-        let cover = $(this).parents('.form-group'),
-            input = cover.find('input');
-        if ($(this).hasClass('icon-eye')) {
-            input.attr('type','text');
-            $(this).removeClass('icon-eye').addClass('icon-eye-blocked');
-        } else {
-            input.attr('type','password');
-            $(this).removeClass('icon-eye-blocked').addClass('icon-eye');
-        }
-    });
+        resetPasswordModal = $('#restore-password-modal'),
+        resetPhoneField = resetPasswordModal.find('input[name=phone]'),
+        resetButton = $('#reset-button');
+
+    let unlockLoginButton = () => {
+        if (loginPhoneField.val().match(phoneRegExp) && loginPasswordField.val().length) loginButton.removeAttr('disabled');
+        else loginButton.attr('disabled','disabled');
+    };
+
+    //Unlock login button
+    loginPhoneField.on('change',unlockLoginButton).keyup(unlockLoginButton);
+    loginPasswordField.on('change',unlockLoginButton).keyup(unlockLoginButton);
 
     //Login form
-    $('#enter-button').click((e) => {
+    loginButton.click((e) => {
         e.preventDefault();
 
         loginPasswordField.removeClass('error');
         loginPasswordFieldError.html('');
 
-        if (loginModal.find('input[name=phone]').val().length) {
-            if (!loginPasswordField.val().length) {
-                loginPasswordField.addClass('error');
-                loginPasswordFieldError.html(passwordMustBeEntered);
-            } else {
-                getUrl(loginModal.find('form'), null, (data) => {
-                    if (data.account) {
-                        loginModal.modal('hide');
-                        loginModal.remove();
-                        registerModal.remove();
-                        resetPasswordModal.remove();
-                        $('#login-button').remove();
-                        $('#account-button').removeClass('d-none');
-                        $('#login-href').remove();
-                        $('#account-href').removeClass('d-none');
-                        $('.fa.fa-bell-o').removeClass('d-none');
-                        $('#right-button-block').removeClass('justify-content-end').addClass('justify-content-between');
-                    } else window.location.href = accountUrl;
-                });
-            }
-        }
+        getUrl(loginModal.find('form'), null, (data) => {
+            if (data.account) {
+                loginModal.modal('hide');
+                loginModal.remove();
+                registerModal.remove();
+                resetPasswordModal.remove();
+                $('#login-button').remove();
+                $('#account-button').removeClass('d-none');
+                $('#login-href').remove();
+                $('#account-href').removeClass('d-none');
+                $('.fa.fa-bell-o').removeClass('d-none');
+                $('#right-button-block').removeClass('justify-content-end').addClass('justify-content-between');
+            } else window.location.href = accountUrl;
+        });
     });
 
-    let preValidationRegister = () => {
+    let unlockGetCodeAndRegisterButtons = () => {
         if (
-            registerModal.find('input[name=phone]').val().length !== 0 &&
-            registerPasswordField.val().length !== 0 &&
-            registerConfirmPasswordField.val().length !== 0
+            registerPhoneField.val().match(phoneRegExp) &&
+            registerPasswordField.val().length &&
+            registerConfirmPasswordField.val().length
         ) {
-            registerPasswordField.removeClass('error');
-            registerConfirmPasswordField.removeClass('error');
-            registerAgree.removeClass('error');
-
-            registerPasswordFieldError.html('');
-            registerConfirmPasswordFieldError.html('');
-            registerAgreeError.html('');
-
-            let validationFlag = true;
-            if (!registerAgree.is(':checked')) {
-                registerAgree.addClass('error');
-                registerAgreeError.html(youMustConsent);
-                validationFlag = false;
-            }
-
-            if (registerPasswordField.val() !== registerConfirmPasswordField.val()) {
-                registerPasswordField.addClass('error');
-                registerConfirmPasswordField.addClass('error');
-                registerPasswordFieldError.html(passwordsError);
-                registerConfirmPasswordFieldError.html(passwordsError);
-                validationFlag = false;
-            }
-            return validationFlag;
+            getRegisterCodeButton.removeAttr('disabled');
+            if (registerCodeField.val().match(codeRegExp)) registerButton.removeAttr('disabled');
+            else registerButton.attr('disabled','disabled');
+        } else {
+            getRegisterCodeButton.attr('disabled','disabled');
+            registerButton.attr('disabled','disabled');
         }
-        return false;
+    };
+
+    //Unlock get code button
+    registerPhoneField.on('change',unlockGetCodeAndRegisterButtons).keyup(unlockGetCodeAndRegisterButtons);
+    registerPasswordField.on('change',unlockGetCodeAndRegisterButtons).keyup(unlockGetCodeAndRegisterButtons);
+    registerConfirmPasswordField.on('change',unlockGetCodeAndRegisterButtons).keyup(unlockGetCodeAndRegisterButtons);
+    registerCodeField.on('change',unlockGetCodeAndRegisterButtons).keyup(unlockGetCodeAndRegisterButtons);
+
+    //Unlock register button
+    registerCodeField.on('change', unlockGetCodeAndRegisterButtons).keyup(unlockGetCodeAndRegisterButtons);
+
+    let preValidationRegister = () => {
+        registerPasswordField.removeClass('error');
+        registerConfirmPasswordField.removeClass('error');
+        registerAgree.removeClass('error');
+
+        registerPasswordFieldError.html('');
+        registerConfirmPasswordFieldError.html('');
+        registerAgreeError.html('');
+
+        let validationFlag = true;
+        if (!registerAgree.is(':checked')) {
+            registerAgree.addClass('error');
+            registerAgreeError.html(youMustConsent);
+            validationFlag = false;
+        }
+
+        if (registerPasswordField.val() !== registerConfirmPasswordField.val()) {
+            registerPasswordField.addClass('error');
+            registerConfirmPasswordField.addClass('error');
+            registerPasswordFieldError.html(passwordsMismatch);
+            registerConfirmPasswordFieldError.html(passwordsMismatch);
+            validationFlag = false;
+        } else if (registerPasswordField.val().length < 6) {
+            registerPasswordField.addClass('error');
+            registerConfirmPasswordField.addClass('error');
+            registerPasswordFieldError.html(passwordCannotBeLess);
+            registerConfirmPasswordFieldError.html(passwordCannotBeLess);
+            validationFlag = false;
+        }
+        return validationFlag;
     }
 
     //Register form generate code
-    getRegisterCode.click((e) => {
+    getRegisterCodeButton.click((e) => {
         e.preventDefault();
         if (preValidationRegister()) {
-            getRegisterCode.addClass('d-none');
-            $('#register-button').removeClass('d-none').removeAttr('disabled');
+            getRegisterCodeButton.addClass('d-none');
+            registerButton.removeClass('d-none');
             registerModal.find('.form-group.d-none').removeClass('d-none');
-            registerModal.find('input.d-none').removeClass('d-none');
-            let timer = 45;
-            let countDown = setInterval(() => {
-                if (!timer) {
-                    getRegisterCode.removeClass('d-none');
-                    clearInterval(countDown);
-                }
-                getRegisterCodeAgain.removeClass('d-none');
-                getRegisterCodeAgain.find('span').html(timer);
-                timer--;
-            }, 1000);
+
+            getCodeAgainCounter(getRegisterCodeButton, 45);
+
             getUrl(registerModal.find('form'), generateCodeUrl, (data) => {
                 messageModal.find('h4').html(data.message);
                 messageModal.modal('show');
@@ -115,9 +127,9 @@ $(() => {
     });
 
     //Register form final register
-    $('#register-button').click((e) => {
+    registerButton.click((e) => {
         e.preventDefault();
-        if (preValidationRegister() && registerModal.find('input[name=code]').val().length) {
+        if (preValidationRegister()) {
             getUrl(registerModal.find('form'), null, (data) => {
                 messageModal.find('h4').html(data.message);
                 registerModal.modal('hide');
@@ -126,50 +138,24 @@ $(() => {
         }
     });
 
+    let unlockResetButton = () => {
+        if (resetPhoneField.val().match(phoneRegExp)) resetButton.removeAttr('disabled');
+        else resetButton.attr('disabled','disabled');
+    };
+
+    //Unlock reset button
+    resetPhoneField.on('change',unlockResetButton).keyup(unlockResetButton);
+
     //Reset password form
-    resetPasswordModal.find('button').click(() => {
-        if (resetPasswordModal.find('input[name=phone]').val().length !== 0) {
-            getUrl(resetPasswordModal.find('form'), null, (data) => {
-                resetPasswordModal.modal('hide');
-                messageModal.find('h4').html(data.message);
-                messageModal.modal('show');
-            });
-        }
+    resetPasswordModal.find('button').click((e) => {
+        e.preventDefault();
+        getUrl(resetPasswordModal.find('form'), null, (data) => {
+            resetPasswordModal.modal('hide');
+            messageModal.find('h4').html(data.message);
+            messageModal.modal('show');
+        });
     });
 
     let currentUrl = new URL(window.location.href);
     if (currentUrl.searchParams.get('login')) loginModal.modal('show');
 });
-
-let getUrl = (form, url, callBack) => {
-    let formData = new FormData,
-        allObjInForm = form.find('input, select, textarea, button');
-
-    allObjInForm.attr('disabled','disabled');
-    form.find('input.error').removeClass('error');
-    form.find('div.error').html('');
-
-    form.find('input').each(function () {
-        formData.append($(this).attr('name'), $(this).val());
-    });
-
-    $.ajax({
-        url: url ? url : form.attr('action'),
-        data: formData,
-        processData: false,
-        contentType: false,
-        type: form.attr('method'),
-        success: (data) => {
-            if (callBack) callBack(data);
-            allObjInForm.removeAttr('disabled');
-        },
-        error: (data) => {
-            let response = jQuery.parseJSON(data.responseText);
-            $.each(response.errors, (field, errorMsg) => {
-                form.find('input[name='+field+']').addClass('error');
-                form.find('.error.'+field).html(errorMsg[0]);
-            });
-            allObjInForm.removeAttr('disabled');
-        }
-    });
-}

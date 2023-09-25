@@ -24,7 +24,11 @@ Route::get('/for_partners', [BaseController::class, 'partners'])->name('for_part
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/account', [AccountController::class, 'account'])->name('account');
+    Route::post('/get-code', [AccountController::class, 'getCode'])->name('get_code');
+    Route::post('/change-phone', [AccountController::class, 'changePhone'])->name('change_phone');
+    Route::post('/change-password', [AccountController::class, 'changePassword'])->name('change_password');
     Route::post('/edit-account', [AccountController::class, 'editAccount'])->name('edit_account');
+
     Route::get('/subscriptions', [AccountController::class, 'account'])->name('subscriptions');
     Route::get('/my-requests', [AccountController::class, 'account'])->name('my_requests');
     Route::get('/my-help', [AccountController::class, 'account'])->name('my_help');
