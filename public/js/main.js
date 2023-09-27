@@ -2,7 +2,8 @@
 window.phoneRegExp = /^((\+)?(\d)(\s)?(\()?[0-9]{3}(\))?(\s)?([0-9]{3})(\-)?([0-9]{2})(\-)?([0-9]{2}))$/gi;
 window.codeRegExp = /^((\d){2}(\-)(\d){2}(\-)(\d){2})$/gi
 $(() => {
-    $('input[name=phone]').mask("+9(999)999-99-99");
+    $.mask.definitions['n'] = "[7-8]";
+    $('input[name=phone]').mask("+n(999)999-99-99");
     $('input[name=code]').mask("99-99-99");
     window.messageModal = $('#message-modal');
 

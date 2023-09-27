@@ -2,7 +2,7 @@
 
 @section('content')
     <x-modal id="change-phone-modal" head="{{ trans('auth.change_phone') }}">
-        <form method="post" action="{{ route('change_phone') }}" accept-charset="utf-8">
+        <form method="post" action="{{ route('change_phone') }}">
             @csrf
             @include('blocks.input_phone_block')
             @include('blocks.input_code_block')
@@ -28,7 +28,7 @@
     </x-modal>
 
     <x-modal id="change-password-modal" head="{{ trans('auth.change_password') }}">
-        <form method="post" action="{{ route('change_password') }}" accept-charset="utf-8">
+        <form method="post" action="{{ route('change_password') }}">
             @csrf
             @include('blocks.input_block',[
                 'name' => 'old_password',
@@ -38,7 +38,10 @@
                 'icon' => 'icon-eye',
                 'ajax' => true
             ])
-            @include('blocks.input_passwords_block', ['label' => trans('auth.new_password')])
+            @include('blocks.input_passwords_block', [
+                'labelPassword' => trans('auth.new_password'),
+                'labelConfirmPassword' => trans('auth.new_password_confirm')
+            ])
             @include('blocks.button_block',[
                 'id' => 'change-password-button',
                 'addClass' => 'mb-3',
@@ -51,19 +54,27 @@
         </form>
     </x-modal>
 
-    <form class="row" method="post" enctype="multipart/form-data" action="{{ route('edit_account') }}" accept-charset="utf-8">
+    <form class="row" method="post" action="{{ route('edit_account') }}">
         @csrf
         <div class="col-12 col-lg-4">
             <div class="rounded-block tall">
                 <div id="avatar-block">
-                    <div class="d-flex flex-column align-items-center">
-                        <div class="avatar cir @error('avatar') error @enderror" style="background-image: url({{ asset(auth()->user()->avatar ? auth()->user()->avatar : 'images/def_avatar.svg') }} );">
-                            <img src="{{ asset('images/avatar_hover.svg') }}" />
-                            <input type="file" name="avatar">
-                        </div>
-                        @include('blocks.error_block', ['name' => 'avatar'])
-                    </div>
-                    <div class="id">ID {{ auth()->user()->id }}</div>
+                    <table>
+                        <tr>
+                            <td style="width: 70px;">
+                                <div class="avatar cir @error('avatar') error @enderror" style="background-image: url({{ asset(auth()->user()->avatar ? auth()->user()->avatar : 'images/def_avatar.svg') }} );">
+                                    <img src="{{ asset('images/avatar_hover.svg') }}" />
+                                    <input type="file" name="avatar">
+                                </div>
+                            </td>
+                            <td><div class="welcome">{!! trans('content.welcome', ['user' => auth()->user()->name ? auth()->user()->name.' '.auth()->user()->family : auth()->user()->phone ]) !!}</div></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                @include('blocks.error_block', ['name' => 'avatar'])
+                            </td>
+                        </tr>
+                    </table>
                 </div>
                 <ul class="menu">
                     @foreach ($account_menu as $itemMenu)
@@ -84,7 +95,6 @@
                         @foreach (['name','family','born','email'] as $accountTtem)
                             @include('blocks.input_block',[
                                 'name' => $accountTtem,
-                                'disabled' => $accountTtem == 'phone',
                                 'placeholder' => trans('auth.'.$accountTtem),
                                 'label' => trans('auth.'.$accountTtem),
                                 'ajax' => true,

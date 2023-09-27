@@ -1,5 +1,5 @@
 $(() => {
-    let nameField = $('input[name=name]'),
+    const nameField = $('input[name=name]'),
         errorName = $('.error.name'),
 
         familyField = $('input[name=family]'),
@@ -28,13 +28,14 @@ $(() => {
         saveButton =$('#account-save'),
         emailRegExp = /^[a-zA-Z0-9][\-_\.\+\!\#\$\%\&\'\*\/\=\?\^\`\{\|]{0,1}([a-zA-Z0-9][\-_\.\+\!\#\$\%\&\'\*\/\=\?\^\`\{\|]{0,1})*[a-zA-Z0-9]@[a-zA-Z0-9][-\.]{0,1}([a-zA-Z][-\.]{0,1})*[a-zA-Z0-9]\.[a-zA-Z0-9]{1,}([\.\-]{0,1}[a-zA-Z]){0,}[a-zA-Z0-9]{0,}$/gi
 
-    bornDateField.mask("9999-99-99");
+    $.mask.definitions['c'] = "[1-2]";
+    bornDateField.mask("99-99-9999");
 
     function preValidationChangeAccount() {
         let validationFlag = true,
             born = $(this).val().split('-'),
             currentDate = new Date(),
-            inputDate = new Date(born[0], born[1], 0);
+            inputDate = new Date(born[2], born[1], 0);
 
         $('input').removeClass('error');
         $('.error').html('');
@@ -52,12 +53,16 @@ $(() => {
         }
 
         if (
+            !born[0] ||
+            !born[1] ||
+            !born[2] ||
+            born[0] > inputDate.getDate() ||
             born[1] > 12 ||
-            born[0] >= currentDate.getFullYear() ||
-            born[2] > inputDate.getDate() ||
-            born[0] > currentDate.getFullYear() - 18 ||
-            (born[0] == currentDate.getFullYear() - 18 && born[1] < currentDate.getMonth()) ||
-            (born[0] == currentDate.getFullYear() - 18 && born[1] == currentDate.getMonth() && born[2] < currentDate.getDate())
+            born[2] <= currentDate.getFullYear() - 100 ||
+            born[2] > currentDate.getFullYear() ||
+            born[2] > currentDate.getFullYear() - 18 ||
+            (born[2] == currentDate.getFullYear() - 18 && born[1] < currentDate.getMonth()) ||
+            (born[2] == currentDate.getFullYear() - 18 && born[1] == currentDate.getMonth() && born[0] < currentDate.getDate())
         ) {
             bornDateField.addClass('error');
             errorBorn.html(errorBornMessage);
@@ -96,7 +101,7 @@ $(() => {
     };
 
     //Unlock get code button
-    phoneField.on('change', unlockGetCodeAndChangePhoneButtons).keyup(unlockGetCodeAndChangePhoneButtons);
+    phoneField.on('change', unlockGetCodeAndChangePhoneButtons);
 
     //Unlock change phone button
     codeField.on('change', unlockGetCodeAndChangePhoneButtons).keyup(unlockGetCodeAndChangePhoneButtons);

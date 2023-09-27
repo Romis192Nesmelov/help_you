@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Mail;
 trait HelperTrait
 {
     public $validationPhone = 'regex:/^((\+)?(\d)(\s)?(\()?[0-9]{3}(\))?(\s)?([0-9]{3})(\-)?([0-9]{2})(\-)?([0-9]{2}))$/';
-    public $validationBorn = 'required|regex:/^(([1-2]\d\d\d)-(\d){2}-(\d){2})$/';
+    public $validationBorn = 'required|regex:/^((\d){2}-(\d){2}-([1-2]\d\d\d))$/';
     public $validationPassword = 'required|min:3|max:20';
     public $validationPasswordConfirmed = 'required|confirmed|min:6|max:20';
     public $validationCode = 'required|regex:/^(([0-9]{2})\-([0-9]{2})-([0-9]{2}))$/';

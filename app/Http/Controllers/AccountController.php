@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -64,7 +63,6 @@ class AccountController extends BaseController
     public function editAccount(Request $request): JsonResponse
     {
         $validationArr = [
-            'avatar' => $this->validationJpgAndPng,
             'name' => $this->validationString,
             'family' => $this->validationString,
             'born' => $this->validationBorn,
@@ -73,18 +71,21 @@ class AccountController extends BaseController
             'info_about' => $this->validationText
         ];
 
+        if ($request->hasFile('avatar')) $validationArr['avatar'] = $this->validationJpgAndPng;
         $fields = $request->validate($validationArr);
 
         $bornDate = explode('-',$fields['born']);
         if (
+            !$bornDate[0] ||
             !$bornDate[1] ||
             !$bornDate[2] ||
+            (int)$bornDate[0] > cal_days_in_month(CAL_GREGORIAN, $bornDate[1], $bornDate[2]) ||
             $bornDate[1] > 12 ||
-            $bornDate[0] >= (int)date('Y') ||
-            (int)$bornDate[2] > cal_days_in_month(CAL_GREGORIAN, $bornDate[1], $bornDate[0]) ||
-            (int)$bornDate[0] > (int)date('Y') - 18 ||
-            ((int)$bornDate[0] == (int)date('Y') - 18 && (int)$bornDate[1] < (int)date('m')) ||
-            ((int)$bornDate[0] == (int)date('Y') - 18 && (int)$bornDate[1] == (int)date('m') && (int)$bornDate[2] < (int)date('d'))
+            $bornDate[2] <= (int)date('Y') - 100 ||
+            $bornDate[2] > (int)date('Y') ||
+            (int)$bornDate[2] > (int)date('Y') - 18 ||
+            ((int)$bornDate[2] == (int)date('Y') - 18 && (int)$bornDate[1] < (int)date('m')) ||
+            ((int)$bornDate[2] == (int)date('Y') - 18 && (int)$bornDate[1] == (int)date('m') && (int)$bornDate[0] < (int)date('d'))
         ) response()->json(['errors' => ['born' => [trans('validation.wrong_date')]]], 401);
 
         $fields = $this->processingImage($request, $fields,'avatar', 'images/avatars/', Auth::id());

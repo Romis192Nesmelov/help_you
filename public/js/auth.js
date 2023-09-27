@@ -1,5 +1,5 @@
 $(() => {
-    let loginModal = $('#login-modal'),
+    const loginModal = $('#login-modal'),
         loginPhoneField = loginModal.find('input[name=phone]'),
         loginPasswordField = loginModal.find('input[name=password]'),
         loginPasswordFieldError = loginModal.find('.error.password'),
@@ -22,12 +22,15 @@ $(() => {
         resetButton = $('#reset-button');
 
     let unlockLoginButton = () => {
-        if (loginPhoneField.val().match(phoneRegExp) && loginPasswordField.val().length) loginButton.removeAttr('disabled');
-        else loginButton.attr('disabled','disabled');
+        if (loginPhoneField.val().match(phoneRegExp)) {
+            if (loginPasswordField.val().length) loginButton.removeAttr('disabled');
+            else loginButton.attr('disabled','disabled');
+            registerPhoneField.val(loginPhoneField.val());
+        } else loginButton.attr('disabled','disabled');
     };
 
     //Unlock login button
-    loginPhoneField.on('change',unlockLoginButton).keyup(unlockLoginButton);
+    loginPhoneField.on('change',unlockLoginButton);
     loginPasswordField.on('change',unlockLoginButton).keyup(unlockLoginButton);
 
     //Login form
@@ -69,7 +72,7 @@ $(() => {
     };
 
     //Unlock get code button
-    registerPhoneField.on('change',unlockGetCodeAndRegisterButtons).keyup(unlockGetCodeAndRegisterButtons);
+    registerPhoneField.on('change',unlockGetCodeAndRegisterButtons);
     registerPasswordField.on('change',unlockGetCodeAndRegisterButtons).keyup(unlockGetCodeAndRegisterButtons);
     registerConfirmPasswordField.on('change',unlockGetCodeAndRegisterButtons).keyup(unlockGetCodeAndRegisterButtons);
     registerCodeField.on('change',unlockGetCodeAndRegisterButtons).keyup(unlockGetCodeAndRegisterButtons);
@@ -144,10 +147,10 @@ $(() => {
     };
 
     //Unlock reset button
-    resetPhoneField.on('change',unlockResetButton).keyup(unlockResetButton);
+    resetPhoneField.on('change',unlockResetButton);
 
     //Reset password form
-    resetPasswordModal.find('button').click((e) => {
+    resetButton.click((e) => {
         e.preventDefault();
         getUrl(resetPasswordModal.find('form'), null, (data) => {
             resetPasswordModal.modal('hide');

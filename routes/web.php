@@ -20,9 +20,10 @@ Route::get('/', [BaseController::class, 'index'])->name('home');
 Route::get('/map', [BaseController::class, 'map'])->name('map');
 Route::get('/about', [BaseController::class, 'index'])->name('about');
 Route::get('/how_does_it_work', [BaseController::class, 'index'])->name('how_does_it_work');
-Route::get('/for_partners', [BaseController::class, 'partners'])->name('for_partners');
+Route::get('/partners', [BaseController::class, 'partners'])->name('partners');
 
 Route::middleware(['auth'])->group(function () {
+    Route::get('/messages', [AccountController::class, 'account'])->name('messages');
     Route::get('/account', [AccountController::class, 'account'])->name('account');
     Route::post('/get-code', [AccountController::class, 'getCode'])->name('get_code');
     Route::post('/change-phone', [AccountController::class, 'changePhone'])->name('change_phone');

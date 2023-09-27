@@ -319,6 +319,11 @@ button.btn > span {
     bottom: 50px;
 }
 
+.rounded-block .bottom-block i {
+    margin-right: 10px !important;
+    font-size: 18px;
+}
+
 .rounded-block.black h1 {
     color: white;
     border-color: white;
@@ -407,15 +412,15 @@ button.btn > span {
     position: relative;
     padding: 0 54px 30px 54px;
     margin-bottom: 30px;
-    border-bottom: 2px solid black;
+    border-bottom: 1px solid #e65639;
     display: flex;
     align-items: center;
     justify-content: left;
 }
 
 #avatar-block .avatar.cir {
-    width: 65px;
-    height: 65px;
+    width: 70px;
+    height: 70px;
     overflow: hidden;
     position: relative;
     border-radius: 50%;
@@ -425,18 +430,19 @@ button.btn > span {
     background-repeat: no-repeat;
 }
 
-#avatar-block .id {
+#avatar-block .welcome {
+    font-size: 18px;
     margin-left: 25px;
 }
 
 #avatar-block .avatar img {
-    width: 65px;
+    width: 70px;
     display: none;
     position: absolute;
 }
 
 #avatar-block .avatar input {
-    width: 65px;
+    width: 70px;
     height: 135px;
     position: absolute;
     top: -65px;
@@ -506,8 +512,12 @@ button.btn > span {
 
     .rounded-block {
         height: 280px;
-        font-size: 13px;
+        font-size: 14px;
         padding: 30px;
+    }
+
+    .rounded-block ul.menu li {
+        font-size: 14px;
     }
 
     .rounded-block.tall {

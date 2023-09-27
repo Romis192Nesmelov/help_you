@@ -17,7 +17,7 @@ class UsersSeeder extends Seeder
         User::create([
             'name' => 'Роман',
             'family' => 'Несмелов',
-            'born' => '1976-7-14',
+            'born' => '14-07-1976',
             'phone' => '+7(926)247-77-25',
             'email' => 'romis@nesmelov.com',
             'password' => bcrypt('apg192'),

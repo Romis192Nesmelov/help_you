@@ -4,9 +4,23 @@
     </button>
     <div class="collapse navbar-collapse" id="navbar-{{ $id }}">
         <ul class="navbar-nav">
+            @if (!auth()->guest())
+                @include('blocks.nav-item_block', [
+                    'menuItemKey' => 'messages',
+                    'menuItem' => ['href' => true],
+                    'addClass' => 'd-block d-sm-none'
+                ])
+            @endif
             @foreach($menu as $menuItemKey => $menuItem)
                 @include('blocks.nav-item_block')
             @endforeach
+            @if (!auth()->guest())
+                @include('blocks.nav-item_block', [
+                    'menuItemKey' => 'account',
+                    'menuItem' => ['href' => true],
+                    'addClass' => 'd-block d-sm-none'
+                ])
+            @endif
         </ul>
     </div>
 </nav>

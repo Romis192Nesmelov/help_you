@@ -50,7 +50,7 @@
 
 @if (auth()->guest())
     <x-modal id="login-modal" head="{{ trans('menu.login_or_register') }}">
-        <form method="post" action="{{ route('login') }}" accept-charset="utf-8">
+        <form method="post" action="{{ route('login') }}">
             @csrf
             @include('blocks.input_phone_block')
             @include('blocks.input_block',[
@@ -66,7 +66,6 @@
                 'primary' => true,
                 'buttonType' => 'submit',
                 'icon' => 'icon-enter3',
-                'type' => 'submit',
                 'buttonText' => trans('auth.enter'),
                 'disabled' => true
             ])
@@ -91,7 +90,7 @@
     </x-modal>
 
     <x-modal id="register-modal" head="{{ trans('auth.register') }}">
-        <form method="post" action="{{ route('register') }}" accept-charset="utf-8">
+        <form method="post" action="{{ route('register') }}">
             @csrf
             @include('blocks.input_phone_block')
             @include('blocks.input_passwords_block')
@@ -128,17 +127,25 @@
     </x-modal>
 
     <x-modal id="restore-password-modal" head="{{ trans('auth.reset_password') }}">
-        <form method="post" action="{{ route('reset_password') }}" accept-charset="utf-8">
+        <form method="post" action="{{ route('reset_password') }}">
             @csrf
             @include('blocks.input_phone_block')
             @include('blocks.button_block',[
                 'id' => 'reset-button',
                 'primary' => true,
                 'buttonType' => 'submit',
-                'addClass' => 'mb-3',
                 'icon' => 'icon-user-plus',
                 'buttonText' => trans('auth.restore_password'),
                 'disabled' => true
+            ])
+            @include('blocks.button_block',[
+                'id' => null,
+                'primary' => false,
+                'addClass' => 'mb-3',
+                'dataTarget' => 'register-modal',
+                'dataDismiss' => true,
+                'icon' => 'icon-enter3',
+                'buttonText' => trans('auth.enter')
             ])
         </form>
     </x-modal>

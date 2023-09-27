@@ -2,7 +2,7 @@
     'name' => 'password',
     'addClass' => 'password',
     'type' => 'password',
-    'label' => $label ?? trans('auth.password'),
+    'label' => $labelPassword ?? trans('auth.password'),
     'icon' => 'icon-eye',
     'ajax' => true
 ])
@@ -10,7 +10,7 @@
     'name' => 'password_confirmation',
     'addClass' => 'password',
     'type' => 'password',
-    'label' => trans('auth.confirm_password'),
+    'label' => $labelConfirmPassword ?? trans('auth.confirm_password'),
     'icon' => 'icon-eye',
     'ajax' => true
 ])

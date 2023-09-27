@@ -28,7 +28,7 @@ class BaseController extends Controller
 
     public function partners(Request $request) :View
     {
-        $this->activeMenu = 'for_partners';
+        $this->activeMenu = 'partners';
         if ($request->has('id')) {
             $this->getItem('partner', new Partner(), $request->id);
             return $this->showView('partner');
@@ -61,7 +61,7 @@ class BaseController extends Controller
                 'menu' => [
                     'about' =>              ['href' => true],
                     'how_does_it_work' =>   ['href' => true],
-                    'for_partners' =>       ['href' => true],
+                    'partners' =>       ['href' => true],
                 ],
                 'activeMenu' => $this->activeMenu,
                 'activeSubMenu' => $this->activeSubMenu
