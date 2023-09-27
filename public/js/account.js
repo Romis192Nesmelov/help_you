@@ -33,12 +33,9 @@ $(() => {
 
     function preValidationChangeAccount() {
         let validationFlag = true,
-            born = $(this).val().split('-'),
+            born = bornDateField.val().split('-'),
             currentDate = new Date(),
             inputDate = new Date(born[2], born[1], 0);
-
-        $('input').removeClass('error');
-        $('.error').html('');
 
         if (!nameField.val().length) {
             nameField.addClass('error');
@@ -80,7 +77,7 @@ $(() => {
             return true;
         } else {
             saveButton.attr('disabled','disabled');
-            return false
+            return false;
         }
     }
 

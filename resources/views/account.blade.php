@@ -95,7 +95,7 @@
                         @foreach (['name','family','born','email'] as $accountTtem)
                             @include('blocks.input_block',[
                                 'name' => $accountTtem,
-                                'placeholder' => trans('auth.'.$accountTtem),
+                                'placeholder' => trans('auth.enter_your_'.$accountTtem),
                                 'label' => trans('auth.'.$accountTtem),
                                 'ajax' => true,
                                 'value' => auth()->user()->$accountTtem
