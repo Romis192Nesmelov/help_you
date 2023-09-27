@@ -521,6 +521,10 @@ button.btn > span {
         padding: 30px;
     }
 
+    .rounded-block.partner {
+        height: auto;
+    }
+
     .rounded-block ul.menu li {
         font-size: 14px;
     }
