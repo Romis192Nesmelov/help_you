@@ -1,7 +1,7 @@
 @extends('layouts.main')
 
 @section('content')
-    <h1>{{ trans('content.organizations') }}</h1>
+    <h1 class="h3 mt-3 mb-1">{{ trans('content.organizations') }}</h1>
     <div class="row">
         <div class="col-12 col-md-6 col-lg-2 d-flex align-items-center">
             <img src="{{ asset($partner->logo) }}" />
