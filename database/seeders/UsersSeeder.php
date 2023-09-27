@@ -14,15 +14,27 @@ class UsersSeeder extends Seeder
     public function run(): void
     {
         User::factory(50)->create();
-        User::create([
-            'name' => 'Роман',
-            'family' => 'Несмелов',
-            'born' => '14-07-1976',
-            'phone' => '+7(926)247-77-25',
-            'email' => 'romis@nesmelov.com',
-            'password' => bcrypt('apg192'),
-            'code' => '99-99-99',
-            'active' => 1
-        ]);
+        $data = [
+            [
+                'name' => 'Роман',
+                'family' => 'Несмелов',
+                'born' => '14-07-1976',
+                'phone' => '+7(926)247-77-25',
+                'email' => 'romis@nesmelov.com',
+                'password' => bcrypt('apg192'),
+                'code' => '99-99-99',
+                'active' => 1
+            ],
+            [
+                'phone' => '+7(926)206-39-77',
+                'password' => bcrypt('123456'),
+                'code' => '99-99-99',
+                'active' => 1
+            ]
+        ];
+
+        foreach ($data as $item) {
+            User::create($item);
+        }
     }
 }

@@ -39,14 +39,14 @@ class AuthController extends Controller
         if (!$user) {
             $user = User::create([
                 'phone' => $phone,
-                'code' => $this->generateCode(),
+                'code' => $this->generatingCode(),
                 'active' => 0
             ]);
             return response()->json(['message' => trans('auth.code').': '.$user->code],200);
         } elseif ($user->active) {
             return response()->json(['errors' => ['phone' => [trans('auth.user_with_this_phone_is_already_registered')]]], 400);
         } else {
-            $user->code = $this->generateCode();
+            $user->code = $this->generatingCode();
             $user->save();
             return response()->json(['message' => trans('auth.code').': '.$user->code],200);
         }

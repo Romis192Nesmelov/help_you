@@ -26,7 +26,7 @@ class AccountController extends BaseController
     public function getCode(Request $request): JsonResponse
     {
         $request->validate(['phone' => 'required|unique:users,phone|'.$this->validationPhone]);
-        Auth::user()->code = $this->generateCode();
+        Auth::user()->code = $this->generatingCode();
         Auth::user()->save();
         return response()->json(['message' => trans('auth.code').': '.Auth::user()->code],200);
     }

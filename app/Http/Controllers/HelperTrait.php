@@ -48,7 +48,7 @@ trait HelperTrait
 //        session()->flash('message', trans('content.save_complete'));
 //    }
 
-    public function generateCode(): string
+    public function generatingCode(): string
     {
         return rand(0,9).rand(0,9).'-'.rand(0,9).rand(0,9).'-'.rand(0,9).rand(0,9);
     }

@@ -41,8 +41,8 @@ $(() => {
         loginPasswordFieldError.html('');
 
         getUrl(loginModal.find('form'), null, (data) => {
+            loginModal.modal('hide');
             if (data.account) {
-                loginModal.modal('hide');
                 loginModal.remove();
                 registerModal.remove();
                 resetPasswordModal.remove();
@@ -52,7 +52,9 @@ $(() => {
                 $('#account-href').removeClass('d-none');
                 $('.fa.fa-bell-o').removeClass('d-none');
                 $('#right-button-block').removeClass('justify-content-end').addClass('justify-content-between');
-            } else window.location.href = accountUrl;
+            } else {
+                window.location.href = accountUrl;
+            }
         });
     });
 
@@ -89,11 +91,10 @@ $(() => {
         registerConfirmPasswordFieldError.html('');
         registerAgreeError.html('');
 
-        let validationFlag = true;
         if (!registerAgree.is(':checked')) {
             registerAgree.addClass('error');
             registerAgreeError.html(youMustConsent);
-            validationFlag = false;
+            return false;
         }
 
         if (registerPasswordField.val() !== registerConfirmPasswordField.val()) {
@@ -101,15 +102,15 @@ $(() => {
             registerConfirmPasswordField.addClass('error');
             registerPasswordFieldError.html(passwordsMismatch);
             registerConfirmPasswordFieldError.html(passwordsMismatch);
-            validationFlag = false;
+            return false;
         } else if (registerPasswordField.val().length < 6) {
             registerPasswordField.addClass('error');
             registerConfirmPasswordField.addClass('error');
             registerPasswordFieldError.html(passwordCannotBeLess);
             registerConfirmPasswordFieldError.html(passwordCannotBeLess);
-            validationFlag = false;
+            return false;
         }
-        return validationFlag;
+        return true;
     }
 
     //Register form generate code

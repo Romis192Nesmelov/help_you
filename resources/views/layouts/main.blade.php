@@ -100,6 +100,7 @@
                 'disabled' => true,
                 'addClass' => 'mb-3',
                 'primary' => true,
+                'buttonType' => 'submit',
                 'icon' => 'icon-key',
                 'buttonText' => trans('auth.get_code'),
                 'disabled' => true
