@@ -508,6 +508,11 @@ button.btn > span {
         top: 63px;
         left: -.75rem;
         z-index: 999;
+        -webkit-transition: height 0.1s;
+        -moz-transition: height 0.1s;
+        -ms-transition: height 0.1s;
+        -o-transition: height 0.1s;
+        transition: height 0.1s;
     }
 
     .rounded-block {

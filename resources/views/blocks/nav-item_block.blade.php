@@ -1,11 +1,3 @@
-@php
-if (isset($styles) && is_array($styles) && count($styles)) {
-    $stylesStr = '';
-    foreach ($styles as $key => $val) {
-        $stylesStr .= $key.':'.$val.(is_integer($val) ? 'px' : '').';';
-    }
-}
-@endphp
 <li id="{{ $id.'-'.$menuItemKey }}" class="nav-item{{ ($activeMenu == $menuItemKey ? ' active' : '').(isset($addClass) && $addClass ? ' '.$addClass : '').(isset($menuItem['sub']) ? '  dropdown' : '') }}" {{ isset($stylesStr) ? 'style='.$stylesStr : '' }}>
     @if (isset($menuItem['sub']))
         <a class="nav-link dropdown-toggle" href="#" id="navbar-dropdown-{{ $menuItemKey }}" role="button" data-bs-toggle="dropdown" aria-expanded="false">{{ trans('menu.'.$menuItemKey) }}</a>
