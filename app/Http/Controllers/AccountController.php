@@ -15,6 +15,7 @@ class AccountController extends BaseController
     public function account() :View
     {
         $this->data['account_menu'] = [
+            ['icon' => 'icon-bubbles4', 'name' => trans('auth.messages'), 'href' => 'messages'],
             ['icon' => 'icon-mail-read', 'name' => trans('auth.subscriptions'), 'href' => 'subscriptions'],
             ['icon' => 'icon-drawer-out', 'name' => trans('auth.my_requests'), 'href' => 'my_requests'],
             ['icon' => 'icon-lifebuoy', 'name' => trans('auth.my_help'), 'href' => 'my_help'],
