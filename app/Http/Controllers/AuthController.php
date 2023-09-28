@@ -30,7 +30,7 @@ class AuthController extends Controller
     public function generateCode(Request $request): JsonResponse
     {
         $request->validate([
-            'phone' => 'required|unique:users,phone|'.$this->validationPhone,
+            'phone' => 'required|'.$this->validationPhone,
             'password' => $this->validationPasswordConfirmed,
             'i_agree' => 'accepted'
         ]);

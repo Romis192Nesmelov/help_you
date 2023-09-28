@@ -77,10 +77,20 @@ let getUrl = (form, url, callBack) => {
             removeLoader();
         },
         error: (data) => {
-            let response = jQuery.parseJSON(data.responseText);
-            $.each(response.errors, (field, errorMsg) => {
+            let response = jQuery.parseJSON(data.responseText),
+                replaceErr = {
+                    'phone':'телефон',
+                    'email':'E-mail',
+                    'user_name':'имя'
+                };
+
+            $.each(response.errors, function (field, error) {
+                let errorMsg = error[0];
+                $.each(replaceErr, function (src,replace) {
+                    errorMsg = error[0].replace(src,replace);
+                });
                 form.find('input[name='+field+']').addClass('error');
-                form.find('.error.'+field).html(errorMsg[0]);
+                form.find('.error.'+field).html(errorMsg);
             });
             removeLoader();
         }
