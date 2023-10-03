@@ -31,11 +31,19 @@ $(() => {
     $.mask.definitions['c'] = "[1-2]";
     bornDateField.mask("99-99-9999");
 
-    function preValidationChangeAccount() {
+    let preValidationChangeAccount = () => {
         let validationFlag = true,
             born = bornDateField.val().split('-'),
-            currentDate = new Date(),
-            inputDate = new Date(born[2], born[1], 0);
+            currentDate = new Date();
+
+        nameField.removeClass('error');
+        errorName.html('');
+        familyField.removeClass('error');
+        errorFamily.html('');
+        bornDateField.removeClass('error');
+        errorBorn.html('');
+        emailField.removeClass('error');
+        errorEmail.html('');
 
         if (!nameField.val().length) {
             nameField.addClass('error');
@@ -50,13 +58,10 @@ $(() => {
         }
 
         if (
-            !born[0] ||
-            !born[1] ||
-            !born[2] ||
-            born[0] > inputDate.getDate() ||
-            born[1] > 12 ||
+            !validationDate(born) ||
             born[2] <= currentDate.getFullYear() - 100 ||
             born[2] > currentDate.getFullYear() ||
+            (born[2] >= currentDate.getFullYear() - 18 && born[1] >= currentDate.getMonth() && born[0] < currentDate.getDate()) ||
             born[2] > currentDate.getFullYear() - 18 ||
             (born[2] == currentDate.getFullYear() - 18 && born[1] < currentDate.getMonth()) ||
             (born[2] == currentDate.getFullYear() - 18 && born[1] == currentDate.getMonth() && born[0] < currentDate.getDate())

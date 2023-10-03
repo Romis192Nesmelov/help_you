@@ -379,8 +379,16 @@ button.btn > span {
     font-size: 18px;
 }
 
+.dropdown-menu {
+    padding: 15px;
+}
+
 .rounded-block ul.menu li {
     margin-bottom: 28px;
+}
+
+.rounded-block ul.menu li.active {
+    color: #e65639;
 }
 
 #map-image-block {

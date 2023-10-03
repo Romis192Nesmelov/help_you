@@ -6,7 +6,6 @@ namespace App\Http\Controllers;
 use App\Models\Partner;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\View\View;
 
@@ -15,20 +14,18 @@ class BaseController extends Controller
     use HelperTrait;
 
     protected array $data = [];
-    protected array $menu = [];
-    protected string $activeMenu = '';
+    protected string $activeMainMenu = '';
+    protected string $activeLeftMenu = '';
     protected string $activeSubMenu = '';
 
     public function index() :View|RedirectResponse
     {
-        if (!Auth::guest() && (!Auth::user()->name || !Auth::user()->family || !Auth::user()->born || !Auth::user()->email))
-            return redirect(route('account'));
-        else return $this->showView('home');
+        return $this->showView('home');
     }
 
     public function partners(Request $request) :View
     {
-        $this->activeMenu = 'partners';
+        $this->activeMainMenu = 'partners';
         if ($request->has('id')) {
             $this->getItem('partner', new Partner(), $request->id);
             return $this->showView('partner');
@@ -58,12 +55,16 @@ class BaseController extends Controller
         return view($view, array_merge(
             $this->data,
             [
-                'menu' => [
-                    'about' =>              ['href' => true],
-                    'how_does_it_work' =>   ['href' => true],
-                    'partners' =>       ['href' => true],
+                'mainMenu' => ['about', 'how_does_it_work', 'partners',],
+                'leftMenu' => [
+                    ['icon' => 'icon-bubbles4', 'key' => 'messages'],
+                    ['icon' => 'icon-mail-read', 'key' => 'subscriptions'],
+                    ['icon' => 'icon-drawer-out', 'key' => 'my_requests'],
+                    ['icon' => 'icon-lifebuoy', 'key' => 'my_help'],
+                    ['icon' => 'icon-gift', 'key' => 'incentives']
                 ],
-                'activeMenu' => $this->activeMenu,
+                'activeMainMenu' => $this->activeMainMenu,
+                'activeLeftMenu' => $this->activeLeftMenu,
                 'activeSubMenu' => $this->activeSubMenu
             ]
         ));

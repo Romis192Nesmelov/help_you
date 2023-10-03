@@ -6,18 +6,16 @@
         <ul class="navbar-nav">
             @if (!auth()->guest())
                 @include('blocks.nav-item_block', [
-                    'menuItemKey' => 'messages',
-                    'menuItem' => ['href' => true],
+                    'menuItem' => 'account.messages',
                     'addClass' => 'd-block d-sm-none'
                 ])
             @endif
-            @foreach($menu as $menuItemKey => $menuItem)
+            @foreach($mainMenu as $menuItem)
                 @include('blocks.nav-item_block')
             @endforeach
             @if (!auth()->guest())
                 @include('blocks.nav-item_block', [
-                    'menuItemKey' => 'account',
-                    'menuItem' => ['href' => true],
+                    'menuItem' => 'account.change',
                     'addClass' => 'd-block d-sm-none'
                 ])
             @endif

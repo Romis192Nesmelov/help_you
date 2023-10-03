@@ -54,7 +54,8 @@ return [
     'organizations' => 'Организации',
     'info_about_company' => 'Информация о компании',
 
-    'leave_these_fields_blank' => 'Оставьте эти поля пустыми,<br>если не хотите менять пароль',
+    'you_must_fill_required_fields' => 'Вы должны заполнить все обязательные поля!',
+
 
 //    'in_russian' => ' по русски',
 //    'in_english' => ' по по английски',

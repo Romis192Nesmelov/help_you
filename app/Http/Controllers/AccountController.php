@@ -14,13 +14,6 @@ class AccountController extends BaseController
 
     public function account() :View
     {
-        $this->data['account_menu'] = [
-            ['icon' => 'icon-bubbles4', 'name' => trans('auth.messages'), 'href' => 'messages'],
-            ['icon' => 'icon-mail-read', 'name' => trans('auth.subscriptions'), 'href' => 'subscriptions'],
-            ['icon' => 'icon-drawer-out', 'name' => trans('auth.my_requests'), 'href' => 'my_requests'],
-            ['icon' => 'icon-lifebuoy', 'name' => trans('auth.my_help'), 'href' => 'my_help'],
-            ['icon' => 'icon-gift', 'name' => trans('auth.incentives'), 'href' => 'incentives']
-        ];
         return $this->showView('account');
     }
 
@@ -83,7 +76,6 @@ class AccountController extends BaseController
             (int)$bornDate[0] > cal_days_in_month(CAL_GREGORIAN, $bornDate[1], $bornDate[2]) ||
             $bornDate[1] > 12 ||
             $bornDate[2] <= (int)date('Y') - 100 ||
-            $bornDate[2] > (int)date('Y') ||
             (int)$bornDate[2] > (int)date('Y') - 18 ||
             ((int)$bornDate[2] == (int)date('Y') - 18 && (int)$bornDate[1] < (int)date('m')) ||
             ((int)$bornDate[2] == (int)date('Y') - 18 && (int)$bornDate[1] == (int)date('m') && (int)$bornDate[0] < (int)date('d'))

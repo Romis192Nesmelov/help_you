@@ -56,15 +56,16 @@ $(() => {
 });
 
 let getUrl = (form, url, callBack) => {
-    let formData = new FormData();
+    let formData = new FormData(),
+        submitButton = form.find('button[type=submit]');
 
     form.find('input.error').removeClass('error');
     form.find('div.error').html('');
-    addLoader();
     form.find('input').each(function () {
         if ($(this).attr('type') === 'file') formData.append($(this).attr('name'), $(this)[0].files[0]);
         else formData.append($(this).attr('name'), $(this).val());
     });
+    submitButton.attr('disabled','disabled');
 
     $.ajax({
         url: url ? url : form.attr('action'),
@@ -74,7 +75,7 @@ let getUrl = (form, url, callBack) => {
         type: form.attr('method'),
         success: (data) => {
             if (callBack) callBack(data);
-            removeLoader();
+            submitButton.removeAttr('disabled');
         },
         error: (data) => {
             let response = jQuery.parseJSON(data.responseText),
@@ -92,7 +93,7 @@ let getUrl = (form, url, callBack) => {
                 form.find('input[name='+field+']').addClass('error');
                 form.find('.error.'+field).html(errorMsg);
             });
-            removeLoader();
+            submitButton.removeAttr('disabled');
         }
     });
 }
@@ -110,37 +111,7 @@ let getCodeAgainCounter = (getCodeButton, timer) => {
     }, 1000);
 };
 
-// function fixingMainMenu() {
-//     let mainMenuFix = $('#main-nav');
-//     if ($(window).scrollTop() > 250) {
-//         mainMenuFix.css({
-//             'position':'fixed',
-//             'top':0
-//         });
-//     } else {
-//         mainMenuFix.css({
-//             'position':'relative',
-//             'top':'auto'
-//         });
-//     }
-// }
-
-// function windowResize() {
-//     maxHeight($('.article-announcement'), 50);
-//     maxHeight($('.action-list .action'), 30);
-//     maxHeight($('#actions-brand-block table'), 0);
-// }
-
-// function mainHeight() {
-//     let windowHeight = $(window).height(),
-//         body = $('body'),
-//         mainContainer = $('#main-container'),
-//         mainContainerHeight = windowHeight - parseInt(mainContainer.css('padding-bottom')),
-//         topLine = $('#top-line'),
-//         h100 = $('.h100'),
-//         h50 = $('.h50'),
-//         gap = parseInt($('.col').css('padding-left')) * 2,
-//         topLineHeight = topLine.height() + parseInt(topLine.css('padding-top')) + parseInt(topLine.css('padding-bottom')) + parseInt(topLine.css('margin-bottom'));
-//
-//     $(h50[0]).css('margin-bottom',gap);
-// }
+let validationDate = (date) => {
+    let inputDate = new Date(date[2], date[1], 0);
+    return date[0] && date[1] && date[2] && date[0] <= inputDate.getDate() && date[1] <= 12;
+};

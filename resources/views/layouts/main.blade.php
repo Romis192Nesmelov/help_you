@@ -50,7 +50,7 @@
 
 @if (auth()->guest())
     <x-modal id="login-modal" head="{{ trans('menu.login_or_register') }}">
-        <form method="post" action="{{ route('login') }}">
+        <form method="post" action="{{ route('auth.login') }}">
             @csrf
             @include('blocks.input_phone_block')
             @include('blocks.input_block',[
@@ -90,7 +90,7 @@
     </x-modal>
 
     <x-modal id="register-modal" head="{{ trans('auth.register') }}">
-        <form method="post" action="{{ route('register') }}">
+        <form method="post" action="{{ route('auth.register') }}">
             @csrf
             @include('blocks.input_phone_block')
             @include('blocks.input_passwords_block')
@@ -128,7 +128,7 @@
     </x-modal>
 
     <x-modal id="restore-password-modal" head="{{ trans('auth.reset_password') }}">
-        <form method="post" action="{{ route('reset_password') }}">
+        <form method="post" action="{{ route('auth.reset_password') }}">
             @csrf
             @include('blocks.input_phone_block')
             @include('blocks.button_block',[
@@ -174,11 +174,17 @@
             </div>
             <div class="d-block d-lg-none">
                 <a id="login-href" href="#" {{ !auth()->guest() ? 'class=d-none' : '' }} data-bs-toggle="modal" data-bs-target="#login-modal">@include('blocks.account_icon_block')</a>
-                <a id="account-href" {{ auth()->guest() ? 'class=d-none' : '' }} href="{{ route('account') }}">@include('blocks.account_icon_block')</a>
+                <a id="account-href" {{ auth()->guest() ? 'class=d-none' : '' }} href="{{ route('account.change') }}">@include('blocks.account_icon_block')</a>
             </div>
 
             <div id="right-button-block" class="buttons-block d-none d-lg-flex align-items-center justify-content-{{ auth()->guest() ? 'end' : 'between' }}">
-                <i class="fa fa-bell-o {{ auth()->guest() ? 'd-none' : '' }}"><span class="dot"></span></i>
+                <a class="nav-link dropdown-toggle {{ auth()->guest() ? 'd-none' : '' }}" href="#" id="navbar-dropdown-messages" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fa fa-bell-o"><span class="dot"></span></i>
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="navbar-dropdown-messages">
+                    <li>Test</li>
+                </ul>
+
                 @include('blocks.button_block',[
                     'id' => 'login-button',
                     'addClass' => !auth()->guest() ? 'd-none' : '',
@@ -187,7 +193,7 @@
                     'icon' => 'icon-enter3',
                     'buttonText' => trans('menu.login_or_register')
                 ])
-                <a href="{{ route('account') }}">
+                <a href="{{ route('account.change') }}">
                     @include('blocks.button_block',[
                         'id' => 'account-button',
                         'addClass' => auth()->guest() ? 'd-none' : '',
@@ -209,8 +215,8 @@
 @if (auth()->guest())
     <script>
         {{--window.getPointsURL = "{{ route('get_points') }}";--}}
-        let generateCodeUrl = "{{ route('generate_code') }}",
-            accountUrl = "{{ route('account') }}",
+        let generateCodeUrl = "{{ route('auth.generate_code') }}",
+            accountUrl = "{{ route('account.change') }}",
             passwordsMismatch = "{{ trans('auth.password_mismatch') }}",
             passwordCannotBeLess = "{{ trans('auth.password_cannot_be_less', ['length' => 6]) }}",
             youMustConsent = "{{ trans('auth.you_must_consent_to_the_processing_of_personal_data') }}";

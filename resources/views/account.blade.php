@@ -2,7 +2,7 @@
 
 @section('content')
     <x-modal id="change-phone-modal" head="{{ trans('auth.change_phone') }}">
-        <form method="post" action="{{ route('change_phone') }}">
+        <form method="post" action="{{ route('account.change_phone') }}">
             @csrf
             @include('blocks.input_phone_block')
             @include('blocks.input_code_block')
@@ -28,7 +28,7 @@
     </x-modal>
 
     <x-modal id="change-password-modal" head="{{ trans('auth.change_password') }}">
-        <form method="post" action="{{ route('change_password') }}">
+        <form method="post" action="{{ route('account.change_password') }}">
             @csrf
             @include('blocks.input_block',[
                 'name' => 'old_password',
@@ -54,40 +54,9 @@
         </form>
     </x-modal>
 
-    <form class="row" method="post" action="{{ route('edit_account') }}">
+    <form class="row" method="post" action="{{ route('account.edit_account') }}">
         @csrf
-        <div class="col-12 col-lg-4">
-            <div class="rounded-block tall">
-                <div id="avatar-block">
-                    <table>
-                        <tr>
-                            <td style="width: 70px;">
-                                <div class="avatar cir @error('avatar') error @enderror" style="background-image: url({{ asset(auth()->user()->avatar ? auth()->user()->avatar : 'images/def_avatar.svg') }} );">
-                                    <img src="{{ asset('images/avatar_hover.svg') }}" />
-                                    <input type="file" name="avatar">
-                                </div>
-                            </td>
-                            <td><div class="welcome">{!! trans('content.welcome', ['user' => auth()->user()->name ? auth()->user()->name.' '.auth()->user()->family : auth()->user()->phone ]) !!}</div></td>
-                        </tr>
-                        <tr>
-                            <td colspan="2">
-                                @include('blocks.error_block', ['name' => 'avatar'])
-                            </td>
-                        </tr>
-                    </table>
-                </div>
-                <ul class="menu">
-                    @foreach ($account_menu as $itemMenu)
-                        <li><a href="{{ route($itemMenu['href']) }}"><i class="{{ $itemMenu['icon'] }}"></i>{{ $itemMenu['name'] }}</a></li>
-                    @endforeach
-                </ul>
-                <div class="bottom-block">
-                    <div class="d-flex align-items-center justify-content-left">
-                        <a href="{{ route('logout') }}"><i class="icon-exit3 me-1"></i>{{ trans('auth.logout') }}</a>
-                    </div>
-                </div>
-            </div>
-        </div>
+        @include('blocks.left_menu_block')
         <div class="col-12 col-lg-8">
             <div class="rounded-block tall">
                 <div class="row">
@@ -139,7 +108,7 @@
         </div>
     </form>
     <script>
-        let getCodeUrl = "{{ route('get_code') }}",
+        let getCodeUrl = "{{ route('account.get_code') }}",
             currentPhone = "{{ substr(auth()->user()->phone,2) }}",
             errorBornMessage = "{{ trans('validation.wrong_date') }}",
             passwordCannotBeLess = "{{ trans('auth.password_cannot_be_less', ['length' => 6]) }}",
