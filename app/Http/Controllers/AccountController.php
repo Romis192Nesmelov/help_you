@@ -60,8 +60,7 @@ class AccountController extends BaseController
             'name' => $this->validationString,
             'family' => $this->validationString,
             'born' => $this->validationBorn,
-            'email' => 'required|email|unique:users,email,'.Auth::id(),
-            'phone' => $this->validationPhone,
+            'email' => 'nullable|email|unique:users,email,'.Auth::id(),
             'info_about' => $this->validationText
         ];
 

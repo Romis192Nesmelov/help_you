@@ -8,8 +8,8 @@ $(() => {
         bornDateField = $('input[name=born]'),
         errorBorn = $('.error.born'),
 
-        emailField = $('input[name=email]'),
-        errorEmail = $('.error.email'),
+        // emailField = $('input[name=email]'),
+        // errorEmail = $('.error.email'),
 
         changePhoneModal = $('#change-phone-modal'),
         phoneField = changePhoneModal.find('input[name=phone]'),
@@ -42,8 +42,8 @@ $(() => {
         errorFamily.html('');
         bornDateField.removeClass('error');
         errorBorn.html('');
-        emailField.removeClass('error');
-        errorEmail.html('');
+        // emailField.removeClass('error');
+        // errorEmail.html('');
 
         if (!nameField.val().length) {
             nameField.addClass('error');
@@ -71,11 +71,11 @@ $(() => {
             validationFlag = false;
         }
 
-        if (!emailField.val().match(emailRegExp)) {
-            emailField.addClass('error');
-            errorEmail.html(errorWrongValue);
-            validationFlag = false;
-        }
+        // if (!emailField.val().match(emailRegExp)) {
+        //     emailField.addClass('error');
+        //     errorEmail.html(errorWrongValue);
+        //     validationFlag = false;
+        // }
 
         if (validationFlag) {
             saveButton.removeAttr('disabled');
@@ -87,7 +87,7 @@ $(() => {
     }
 
     //Unlock save button
-    $.each(['name','family','born', 'email'], (k, field) => {
+    $.each(['name','family','born'], (k, field) => {
         $('input[name='+field+']').on('change', preValidationChangeAccount).keyup(preValidationChangeAccount);
     });
 
