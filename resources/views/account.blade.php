@@ -112,7 +112,6 @@
             currentPhone = "{{ substr(auth()->user()->phone,2) }}",
             errorBornMessage = "{{ trans('validation.wrong_date') }}",
             passwordCannotBeLess = "{{ trans('auth.password_cannot_be_less', ['length' => 6]) }}",
-            errorFieldMustBeFilledIn = "{{ trans('validation.field_must_be_filled_in') }}",
             errorWrongValue = "{{ trans('validation.wrong_value') }}",
             passwordsMismatch = "{{ trans('auth.password_mismatch') }}";
     </script>

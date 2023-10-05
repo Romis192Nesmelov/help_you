@@ -222,6 +222,9 @@
             youMustConsent = "{{ trans('auth.you_must_consent_to_the_processing_of_personal_data') }}";
     </script>
 @endif
-<script>let openMessageModalFlag = parseInt("{{ session()->has('message') }}");</script>
+<script>
+    let openMessageModalFlag = parseInt("{{ session()->has('message') }}"),
+        errorFieldMustBeFilledIn = "{{ trans('validation.field_must_be_filled_in') }}";
+</script>
 </body>
 </html>

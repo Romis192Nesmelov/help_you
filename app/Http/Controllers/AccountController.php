@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Account\ChangePasswordRequest;
+use App\Http\Requests\Account\ChangePhoneRequest;
+use App\Http\Requests\Account\EditAccountRequest;
+use App\Http\Requests\Account\GetCodeRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -17,20 +21,17 @@ class AccountController extends BaseController
         return $this->showView('account');
     }
 
-    public function getCode(Request $request): JsonResponse
+    public function getCode(GetCodeRequest $request): JsonResponse
     {
-        $request->validate(['phone' => 'required|unique:users,phone|'.$this->validationPhone]);
+        $request->validated();
         Auth::user()->code = $this->generatingCode();
         Auth::user()->save();
         return response()->json(['message' => trans('auth.code').': '.Auth::user()->code],200);
     }
 
-    public function changePhone(Request $request): JsonResponse
+    public function changePhone(ChangePhoneRequest $request): JsonResponse
     {
-        $request->validate([
-            'phone' => 'required|unique:users,phone|'.$this->validationPhone,
-            'code' => $this->validationCode
-        ]);
+        $request->validated();
         if (Auth::user()->code != $request->code) return response()->json(['errors' => ['code' => [trans('auth.wrong_code')]]], 401);
         else {
             Auth::user()->phone = $request->phone;
@@ -39,12 +40,9 @@ class AccountController extends BaseController
         }
     }
 
-    public function changePassword(Request $request): JsonResponse
+    public function changePassword(ChangePasswordRequest $request): JsonResponse
     {
-        $request->validate([
-            'old_password' => $this->validationString,
-            'password' => $this->validationPasswordConfirmed,
-        ]);
+        $request->validated();
         if (!Hash::check($request->old_password, Auth::user()->password))
             return response()->json(['errors' => ['old_password' => [trans('auth.wrong_old_password')]]], 401);
         else {
@@ -54,19 +52,9 @@ class AccountController extends BaseController
         }
     }
 
-    public function editAccount(Request $request): JsonResponse
+    public function editAccount(EditAccountRequest $request): JsonResponse
     {
-        $validationArr = [
-            'name' => $this->validationString,
-            'family' => $this->validationString,
-            'born' => $this->validationBorn,
-            'email' => 'nullable|email|unique:users,email,'.Auth::id(),
-            'info_about' => $this->validationText
-        ];
-
-        if ($request->hasFile('avatar')) $validationArr['avatar'] = $this->validationJpgAndPng;
-        $fields = $request->validate($validationArr);
-
+        $fields = $request->validated();
         $bornDate = explode('-',$fields['born']);
         if (
             !$bornDate[0] ||

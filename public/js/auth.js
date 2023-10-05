@@ -50,7 +50,7 @@ $(() => {
                 $('#account-button').removeClass('d-none');
                 $('#login-href').remove();
                 $('#account-href').removeClass('d-none');
-                $('.fa.fa-bell-o').removeClass('d-none');
+                $('#navbar-dropdown-messages').removeClass('d-none');
                 $('#right-button-block').removeClass('justify-content-end').addClass('justify-content-between');
             } else {
                 window.location.href = accountUrl;
@@ -117,13 +117,11 @@ $(() => {
     getRegisterCodeButton.click((e) => {
         e.preventDefault();
         if (preValidationRegister()) {
-            getRegisterCodeButton.addClass('d-none');
-            registerButton.removeClass('d-none');
-            registerModal.find('.form-group.d-none').removeClass('d-none');
-
             getCodeAgainCounter(getRegisterCodeButton, 45);
-
             getUrl(registerModal.find('form'), generateCodeUrl, (data) => {
+                getRegisterCodeButton.addClass('d-none');
+                registerButton.removeClass('d-none');
+                registerModal.find('.form-group.d-none').removeClass('d-none');
                 messageModal.find('h4').html(data.message);
                 messageModal.modal('show');
             });

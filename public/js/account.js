@@ -1,16 +1,5 @@
 $(() => {
-    const nameField = $('input[name=name]'),
-        errorName = $('.error.name'),
-
-        familyField = $('input[name=family]'),
-        errorFamily = $('.error.family'),
-
-        bornDateField = $('input[name=born]'),
-        errorBorn = $('.error.born'),
-
-        // emailField = $('input[name=email]'),
-        // errorEmail = $('.error.email'),
-
+    const bornDateField = $('input[name=born]'),
         changePhoneModal = $('#change-phone-modal'),
         phoneField = changePhoneModal.find('input[name=phone]'),
         codeField = changePhoneModal.find('input[name=code]'),
@@ -31,31 +20,14 @@ $(() => {
     $.mask.definitions['c'] = "[1-2]";
     bornDateField.mask("99-99-9999");
 
-    let preValidationChangeAccount = () => {
-        let validationFlag = true,
+    let preValidationChangeAccount = (e) => {
+        let form = $(e.target).parents('form'),
             born = bornDateField.val().split('-'),
             currentDate = new Date();
 
-        nameField.removeClass('error');
-        errorName.html('');
-        familyField.removeClass('error');
-        errorFamily.html('');
-        bornDateField.removeClass('error');
-        errorBorn.html('');
-        // emailField.removeClass('error');
-        // errorEmail.html('');
+        resetErrors(form);
 
-        if (!nameField.val().length) {
-            nameField.addClass('error');
-            errorName.html(errorFieldMustBeFilledIn);
-            validationFlag = false;
-        }
-
-        if (!familyField.val().length) {
-            familyField.addClass('error');
-            errorFamily.html(errorFieldMustBeFilledIn);
-            validationFlag = false;
-        }
+        let validationFlag = lengthValidate(form, ['name','family','born']);
 
         if (
             !validationDate(born) ||
@@ -67,15 +39,9 @@ $(() => {
             (born[2] == currentDate.getFullYear() - 18 && born[1] == currentDate.getMonth() && born[0] < currentDate.getDate())
         ) {
             bornDateField.addClass('error');
-            errorBorn.html(errorBornMessage);
+            $('.error.born').html(errorBornMessage);
             validationFlag = false;
         }
-
-        // if (!emailField.val().match(emailRegExp)) {
-        //     emailField.addClass('error');
-        //     errorEmail.html(errorWrongValue);
-        //     validationFlag = false;
-        // }
 
         if (validationFlag) {
             saveButton.removeAttr('disabled');
@@ -145,11 +111,10 @@ $(() => {
     passwordField.on('change', unlockChangePasswordButton).keyup(unlockChangePasswordButton);
     passwordConfirmField.on('change', unlockChangePasswordButton).keyup(unlockChangePasswordButton);
 
-    let preValidationChangePassword = () => {
-        passwordField.removeClass('error');
-        errorPassword.html('');
-        passwordConfirmField.removeClass('error');
-        errorConfirmPassword.html('');
+    let preValidationChangePassword = (e) => {
+        let form = $(e.target).parents('form');
+
+        resetErrors(form);
 
         if (passwordField.val().length < 6) {
             passwordField.addClass('error');

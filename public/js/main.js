@@ -115,3 +115,21 @@ let validationDate = (date) => {
     let inputDate = new Date(date[2], date[1], 0);
     return date[0] && date[1] && date[2] && date[0] <= inputDate.getDate() && date[1] <= 12;
 };
+
+let lengthValidate = (form, fields) => {
+    let validationFlag = true;
+    $.each(fields, (k, field) => {
+        let input = form.find('input[name=' + field + ']');
+        if (!input.val().length) {
+            input.addClass('error');
+            form.find('.error.' + field).html(errorFieldMustBeFilledIn);
+            validationFlag = false;
+        }
+    });
+    return validationFlag;
+};
+
+let resetErrors = (form) => {
+    form.find('input.error').removeClass('error');
+    form.find('div.error').html('');
+};

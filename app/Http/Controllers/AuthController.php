@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Auth\GenerateCodeRequest;
+use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Requests\Auth\RegisterRequest;
+use App\Http\Requests\Auth\ResetPasswordRequest;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -13,27 +17,21 @@ class AuthController extends Controller
 {
     use HelperTrait;
 
-    public function login(Request $request): JsonResponse
+    public function login(LoginRequest $request): JsonResponse
     {
-        $credentials = $request->validate(['phone' => $this->validationPhone,'password' => 'required|min:3|max:20']);
+        $credentials = $request->validated();
         $credentials['active'] = 1;
         $credentials['phone'] = $this->unifyPhone($credentials['phone']);
 
         if (Auth::attempt($credentials, $request->remember == 'on')) {
             $request->session()->regenerate();
-            return response()->json([
-                'account' => Auth::user()->name && Auth::user()->family && Auth::user()->born && Auth::user()->email
-            ],200);
+            return response()->json(['account' => Auth::user()->name && Auth::user()->family && Auth::user()->born && Auth::user()->email],200);
         } else return response()->json(['errors' => ['phone' => [trans('auth.failed')], 'password' => [trans('auth.failed')]]], 401);
     }
 
-    public function generateCode(Request $request): JsonResponse
+    public function generateCode(GenerateCodeRequest $request): JsonResponse
     {
-        $request->validate([
-            'phone' => 'required|'.$this->validationPhone,
-            'password' => $this->validationPasswordConfirmed,
-            'i_agree' => 'accepted'
-        ]);
+        $request->validated();
         $phone = $this->unifyPhone($request->phone);
         $user = User::where('phone',$phone)->first();
         if (!$user) {
@@ -52,14 +50,9 @@ class AuthController extends Controller
         }
     }
 
-    public function register(Request $request): JsonResponse
+    public function register(RegisterRequest $request): JsonResponse
     {
-        $credentials = $request->validate([
-            'phone' => 'required|unique:users,phone|'.$this->validationPhone,
-            'password' => $this->validationPasswordConfirmed,
-            'code' => $this->validationCode,
-            'i_agree' => 'accepted'
-        ]);
+        $credentials = $request->validated();
         $user = User::where('phone',$this->unifyPhone($request->phone))->first();
         if ($user->code == $request->code) {
             $user->update([
@@ -72,9 +65,9 @@ class AuthController extends Controller
         }
     }
 
-    public function resetPassword(Request $request): JsonResponse
+    public function resetPassword(ResetPasswordRequest $request): JsonResponse
     {
-        $request->validate(['phone' => $this->validationPhone]);
+        $request->validated();
         $user = User::where('phone',$this->unifyPhone($request->phone))->where('active',1)->first();
         if (!$user) return response()->json(['errors' => ['phone' => [trans('auth.wrong_phone')]]], 401);
         else {
