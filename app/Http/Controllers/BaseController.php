@@ -11,8 +11,6 @@ use Illuminate\View\View;
 
 class BaseController extends Controller
 {
-    use HelperTrait;
-
     protected array $data = [];
     protected string $activeMainMenu = '';
     protected string $activeLeftMenu = '';

@@ -4,6 +4,8 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -47,7 +49,22 @@ class User extends Authenticatable
      */
     protected $casts = [
 //        'email_verified_at' => 'datetime',
-//        'born' => 'date:d-m-Y',
+        'born' => 'datetime:d-m-Y',
         'password' => 'hashed',
     ];
+
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    public function orderPerformer(): BelongsToMany
+    {
+        return $this->belongsToMany(Order::class);
+    }
+
+    public function ordersActive(): HasMany
+    {
+        return $this->hasMany(Order::class)->where('active',1);
+    }
 }

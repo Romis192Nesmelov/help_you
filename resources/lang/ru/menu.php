@@ -9,4 +9,5 @@ return [
     'post_a_question' => 'Разместить вопрос',
     'login_or_register' => 'Вход/регистрация',
     'account' => 'Личный кабинет',
+    'make_an_order' => 'Создать заявку',
 ];

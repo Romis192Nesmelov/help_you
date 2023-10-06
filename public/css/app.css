@@ -227,6 +227,10 @@ button.btn > span {
     padding: 0;
 }
 
+.nav-link {
+    color: #e65639;
+}
+
 .navbar-collapse .nav-item {
     margin-left: 0;
     font-size: 18px;

@@ -4,18 +4,28 @@
     </button>
     <div class="collapse navbar-collapse" id="navbar-{{ $id }}">
         <ul class="navbar-nav">
-            @if (!auth()->guest())
+            @if (auth()->check())
                 @include('blocks.nav-item_block', [
                     'menuItem' => 'account.messages',
+                    'menuName' => trans('menu.messages'),
                     'addClass' => 'd-block d-sm-none'
                 ])
             @endif
             @foreach($mainMenu as $menuItem)
-                @include('blocks.nav-item_block')
+                @include('blocks.nav-item_block',[
+                    'menuItem' => $menuItem,
+                    'menuName' => trans('menu.'.$menuItem),
+                ])
             @endforeach
-            @if (!auth()->guest())
+            @if (auth()->check())
                 @include('blocks.nav-item_block', [
                     'menuItem' => 'account.change',
+                    'menuName' => trans('menu.account'),
+                    'addClass' => 'd-block d-sm-none'
+                ])
+                @include('blocks.nav-item_block', [
+                    'menuItem' => 'new_order',
+                    'menuName' => trans('menu.make_an_order'),
                     'addClass' => 'd-block d-sm-none'
                 ])
             @endif

@@ -3,6 +3,7 @@
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BaseController;
+use App\Http\Controllers\OrderController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,14 +17,19 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-//Route::middleware(['account.completed'])->group(function () {
-//
-//});
 Route::get('/', [BaseController::class, 'index'])->name('home');
 //Route::get('/map', [BaseController::class, 'map'])->name('map');
 Route::get('/about', [BaseController::class, 'index'])->name('about');
 Route::get('/how_does_it_work', [BaseController::class, 'index'])->name('how_does_it_work');
 Route::get('/partners', [BaseController::class, 'partners'])->name('partners');
+
+Route::prefix('auth')->name('auth.')->controller(AuthController::class)->group(function () {
+    Route::post('/login', 'login')->name('login');
+    Route::post('/generate-code', 'generateCode')->name('generate_code');
+    Route::post('/register', 'register')->name('register');
+    Route::post('/reset-password', 'resetPassword')->name('reset_password');
+    Route::get('/logout', 'logout')->name('logout');
+});
 
 Route::prefix('account')->name('account.')->controller(AccountController::class)->middleware(['auth'])->group(function () {
     Route::get('/messages', 'messages')->name('messages');
@@ -40,10 +46,6 @@ Route::prefix('account')->name('account.')->controller(AccountController::class)
     Route::get('/incentives', 'account')->name('incentives');
 });
 
-Route::prefix('auth')->name('auth.')->controller(AuthController::class)->group(function () {
-    Route::post('/login', 'login')->name('login');
-    Route::post('/generate-code', 'generateCode')->name('generate_code');
-    Route::post('/register', 'register')->name('register');
-    Route::post('/reset-password', 'resetPassword')->name('reset_password');
-    Route::get('/logout', 'logout')->name('logout');
+Route::middleware(['account.completed'])->controller(OrderController::class)->group(function () {
+    Route::get('/new-order', 'newOrder')->name('new_order');
 });

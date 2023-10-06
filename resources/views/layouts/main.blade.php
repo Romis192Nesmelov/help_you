@@ -40,7 +40,7 @@
     <script type="text/javascript" src="{{ asset('js/max.height.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/main.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/loader.js') }}"></script>
-    @if (auth()->guest())
+    @if (!auth()->check())
         <script type="text/javascript" src="{{ asset('js/auth.js') }}"></script>
     @endif
 </head>
@@ -48,7 +48,7 @@
 <body style="overflow-y: hidden;">
 <div id="loader"><div></div></div>
 
-@if (auth()->guest())
+@if (!auth()->check())
     <x-modal id="login-modal" head="{{ trans('menu.login_or_register') }}">
         <form method="post" action="{{ route('auth.login') }}">
             @csrf
@@ -173,12 +173,12 @@
                 </a>
             </div>
             <div class="d-block d-lg-none">
-                <a id="login-href" href="#" {{ !auth()->guest() ? 'class=d-none' : '' }} data-bs-toggle="modal" data-bs-target="#login-modal">@include('blocks.account_icon_block')</a>
-                <a id="account-href" {{ auth()->guest() ? 'class=d-none' : '' }} href="{{ route('account.change') }}">@include('blocks.account_icon_block')</a>
+                <a id="login-href" href="#" {{ auth()->check() ? 'class=d-none' : '' }} data-bs-toggle="modal" data-bs-target="#login-modal">@include('blocks.account_icon_block')</a>
+                <a id="account-href" {{ !auth()->check() ? 'class=d-none' : '' }} href="{{ route('account.change') }}">@include('blocks.account_icon_block')</a>
             </div>
 
-            <div id="right-button-block" class="buttons-block d-none d-lg-flex align-items-center justify-content-{{ auth()->guest() ? 'end' : 'between' }}">
-                <a class="nav-link dropdown-toggle {{ auth()->guest() ? 'd-none' : '' }}" href="#" id="navbar-dropdown-messages" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <div id="right-button-block" class="buttons-block d-none d-lg-flex align-items-center justify-content-{{ !auth()->check() ? 'end' : 'between' }}">
+                <a class="nav-link dropdown-toggle {{ !auth()->check() ? 'd-none' : '' }}" href="#" id="navbar-dropdown-messages" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="fa fa-bell-o"><span class="dot"></span></i>
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="navbar-dropdown-messages">
@@ -187,7 +187,7 @@
 
                 @include('blocks.button_block',[
                     'id' => 'login-button',
-                    'addClass' => !auth()->guest() ? 'd-none' : '',
+                    'addClass' => auth()->check() ? 'd-none' : '',
                     'primary' => false,
                     'dataTarget' => 'login-modal',
                     'icon' => 'icon-enter3',
@@ -196,7 +196,7 @@
                 <a href="{{ route('account.change') }}">
                     @include('blocks.button_block',[
                         'id' => 'account-button',
-                        'addClass' => auth()->guest() ? 'd-none' : '',
+                        'addClass' => !auth()->check() ? 'd-none' : '',
                         'primary' => false,
                         'icon' => 'icon-user-lock',
                         'buttonText' => trans('menu.account')
@@ -212,7 +212,7 @@
     <h4 class="text-center p-4">{{ session()->has('message') ? session()->get('message') : '' }}</h4>
 </x-modal>
 
-@if (auth()->guest())
+@if (!auth()->check())
     <script>
         {{--window.getPointsURL = "{{ route('get_points') }}";--}}
         let generateCodeUrl = "{{ route('auth.generate_code') }}",
