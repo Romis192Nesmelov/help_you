@@ -26,8 +26,8 @@ class OrderFactory extends Factory
             'performers' => rand(1,20),
             'latitude' => fake()->randomFloat(6, 55, 56),
             'longitude' => fake()->randomFloat(6, 37, 38),
-            'start' => Carbon::now(),
-            'end' => Carbon::now()->addDays(rand(1,10)),
+            'estimated_start_time' => Carbon::now(),
+            'estimated_end_time' => Carbon::now()->addDays(rand(1,10)),
             'description' => fake()->text(300),
             'approved' => 1,
             'active' => 1
