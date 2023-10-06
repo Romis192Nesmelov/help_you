@@ -22,8 +22,8 @@ return new class extends Migration
             $table->smallInteger('performers');
             $table->double('latitude',8, 6);
             $table->double('longitude',8, 6);
-            $table->timestamp('estimated_start_time');
-            $table->timestamp('estimated_end_time');
+            $table->timestamp('estimated_start_time')->nullable();
+            $table->timestamp('estimated_end_time')->nullable();
             $table->text('description');
             $table->boolean('approved');
             $table->boolean('active');
