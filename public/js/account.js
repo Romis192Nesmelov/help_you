@@ -1,5 +1,6 @@
 $(() => {
     const bornDateField = $('input[name=born]'),
+        emailField = $('input[name=email]'),
         changePhoneModal = $('#change-phone-modal'),
         phoneField = changePhoneModal.find('input[name=phone]'),
         codeField = changePhoneModal.find('input[name=code]'),
@@ -43,6 +44,11 @@ $(() => {
             validationFlag = false;
         }
 
+        if (emailField.val().length && !emailField.val().match(emailRegExp)) {
+            emailField.addClass('error');
+            $('.error.email').html(errorWrongValue);
+        }
+
         if (validationFlag) {
             saveButton.removeAttr('disabled');
             return true;
@@ -53,7 +59,7 @@ $(() => {
     }
 
     //Unlock save button
-    $.each(['name','family','born'], (k, field) => {
+    $.each(['name','family','born', 'email'], (k, field) => {
         $('input[name='+field+']').on('change', preValidationChangeAccount).keyup(preValidationChangeAccount);
     });
 

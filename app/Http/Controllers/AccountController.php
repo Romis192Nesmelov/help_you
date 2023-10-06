@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Http\Requests\Account\ChangePasswordRequest;
 use App\Http\Requests\Account\ChangePhoneRequest;
 use App\Http\Requests\Account\EditAccountRequest;
@@ -54,18 +55,9 @@ class AccountController extends BaseController
     public function editAccount(EditAccountRequest $request): JsonResponse
     {
         $fields = $request->validated();
-        $bornDate = explode('-',$fields['born']);
-        if (
-            !$bornDate[0] ||
-            !$bornDate[1] ||
-            !$bornDate[2] ||
-            (int)$bornDate[0] > cal_days_in_month(CAL_GREGORIAN, $bornDate[1], $bornDate[2]) ||
-            $bornDate[1] > 12 ||
-            $bornDate[2] <= (int)date('Y') - 100 ||
-            (int)$bornDate[2] > (int)date('Y') - 18 ||
-            ((int)$bornDate[2] == (int)date('Y') - 18 && (int)$bornDate[1] < (int)date('m')) ||
-            ((int)$bornDate[2] == (int)date('Y') - 18 && (int)$bornDate[1] == (int)date('m') && (int)$bornDate[0] < (int)date('d'))
-        ) response()->json(['errors' => ['born' => [trans('validation.wrong_date')]]], 401);
+        $birthday = Carbon::parse($fields['born']);
+        $currentDate = Carbon::now();
+        if ($currentDate->diffInYears($birthday) < 18) response()->json(['errors' => ['born' => [trans('validation.wrong_date')]]], 401);
 
         $fields = $this->processingImage($request, $fields,'avatar', 'images/avatars/', Auth::id());
         Auth::user()->update($fields);

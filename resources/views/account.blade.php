@@ -61,13 +61,13 @@
             <div class="rounded-block tall">
                 <div class="row">
                     <div class="col-12 col-lg-6">
-                        @foreach (['name','family','born','email'] as $accountTtem)
+                        @foreach (['name','family','born','email'] as $accountItem)
                             @include('blocks.input_block',[
-                                'name' => $accountTtem,
-                                'placeholder' => trans('auth.enter_your_'.$accountTtem),
-                                'label' => trans('auth.'.$accountTtem),
+                                'name' => $accountItem,
+                                'placeholder' => trans('auth.enter_your_'.$accountItem),
+                                'label' => trans('auth.'.$accountItem),
                                 'ajax' => true,
-                                'value' => auth()->user()->$accountTtem
+                                'value' => auth()->user()->$accountItem
                             ])
                         @endforeach
                         <p id="phone-number" class="mt-3 mb-0 text-center">{{ trans('auth.phone').': '.auth()->user()->phone }}</p>
