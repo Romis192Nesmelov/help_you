@@ -3,7 +3,6 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -49,14 +48,9 @@ class User extends Authenticatable
      * @var array<string, string>
      */
     protected $casts = [
-        'born' => 'datetime',
+//        'born' => 'datetime:d-m-Y',
         'password' => 'hashed',
     ];
-
-    public function getBornAttribute($value)
-    {
-        return Carbon::parse($value)->format('d-m-Y');
-    }
 
     public function orders(): HasMany
     {

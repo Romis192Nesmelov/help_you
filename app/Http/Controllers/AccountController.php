@@ -57,7 +57,8 @@ class AccountController extends BaseController
         $fields = $request->validated();
         $birthday = Carbon::parse($fields['born']);
         $currentDate = Carbon::now();
-        if ($currentDate->diffInYears($birthday) < 18) response()->json(['errors' => ['born' => [trans('validation.wrong_date')]]], 401);
+        $age = $currentDate->diffInYears($birthday);
+        if ($age < 18 || $age > 100) return response()->json(['errors' => ['born' => [trans('validation.wrong_date')]]], 401);
 
         $fields = $this->processingImage($request, $fields,'avatar', 'images/avatars/', Auth::id());
         Auth::user()->update($fields);

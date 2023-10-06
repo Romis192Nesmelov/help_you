@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('avatar',30)->nullable();
             $table->string('name')->nullable();
             $table->string('family')->nullable();
-            $table->timestamp('born')->nullable();
+            $table->string('born',10)->nullable();
             $table->string('phone',50)->unique();
             $table->string('email')->nullable();
             $table->string('code',8)->nullable();
