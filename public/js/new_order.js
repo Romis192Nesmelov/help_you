@@ -88,11 +88,7 @@ $(document).ready(function () {
     backButton.click(() => {
         backButton.attr('disabled','disabled');
         $.get(backStepUrl, () => {
-            nextPrevStep('head1', true);
-            nextPrevStep('head2', true);
-            nextPrevStep('inputs', true);
-            nextPrevStep('image', true);
-            nextPrevStep('description', true, () => {
+            nextPrevStep(true, () => {
                 backButton.removeAttr('disabled');
                 if (step === 1) {
                     progressBarContainer.addClass('d-none');
@@ -117,11 +113,7 @@ $(document).ready(function () {
                 }
                 setProgressBar(progressBar);
                 if (step !== 4) {
-                    nextPrevStep('head1', false);
-                    nextPrevStep('head2', false);
-                    nextPrevStep('inputs', false);
-                    nextPrevStep('image', false);
-                    nextPrevStep('description', false, () => {
+                    nextPrevStep(false, () => {
                         backButton.removeAttr('disabled');
                     });
                 } else completeModal.modal('show');
@@ -133,21 +125,27 @@ $(document).ready(function () {
     addressInput.on('change', preValidation[2]).keyup(preValidation[2]);
 });
 
-let nextPrevStep = (idPart, reverse, callBack) => {
+let nextPrevStep = (reverse, callBack) => {
     let stepFadeOut = reverse ? step + 1 : step,
         stepFadeIn = reverse ? step : step + 1,
-        nodeFadeOut = $('#' + idPart + '-step' + stepFadeOut),
-        nodeFadeIn = $('#' + idPart + '-step' + stepFadeIn );
+        tags = ['head1','head2','inputs','image','description'],
+        fadeOutSting = '',
+        fadeInSting = '',
+        callBackFlag = false;
 
-    if (nodeFadeOut.length) {
-        nodeFadeOut.removeClass('d-block').fadeOut('slow',() => {
-            nodeFadeIn.removeClass('d-none').fadeIn();
-            if (callBack) callBack();
-        });
-    } else {
-        nodeFadeIn.removeClass('d-none').fadeIn();
-        if (callBack) callBack();
-    }
+    $.each(tags, (k, tag) => {
+        let comma = (k + 1 !== tags.length ? ', ' : '');
+        fadeOutSting += '#' + tag + '-step' + stepFadeOut + comma;
+        fadeInSting += '#' + tag + '-step' + stepFadeIn + comma;
+    });
+
+    $(fadeOutSting).removeClass('d-block').fadeOut('slow',() => {
+        $(fadeInSting).removeClass('d-none').fadeIn();
+        if (callBack && !callBackFlag) {
+            callBack();
+            callBackFlag = true;
+        }
+    });
 }
 
 let setProgressBar = (progressBar) => {
