@@ -12,7 +12,7 @@ class OrderController extends BaseController
 {
     public function newOrder(): View
     {
-        Session::forget('steps');
+//        Session::forget('steps');
 //        if (Session::has('steps') && count(Session::get('steps')) == 4) Session::forget('steps');
         $this->getItems('order_types', new OrderType());
         return $this->showView('new_order');
