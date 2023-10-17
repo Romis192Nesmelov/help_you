@@ -59,6 +59,7 @@ return [
         'array'   => 'Массив :attribute должен содержать не менее чем :min элементов.',
     ],
     'field_must_be_filled_in' => 'Поле должно быть заполнено!',
+    'you_must_select_one_of_the_items' => 'Вы должны выбрать один из пунктов',
     'wrong_value'          => 'Не верное значение поля',
     'not_in'               => 'Выбранное значение :attribute не является верным.',
     'numeric'              => 'Значение :attribute должно быть цифрой.',

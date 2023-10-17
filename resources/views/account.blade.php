@@ -89,7 +89,7 @@
                             'id' => 'info-about',
                             'name' => 'info_about',
                             'label' => trans('auth.info_about'),
-                            'ajax' => false,
+                            'ajax' => true,
                             'value' => auth()->user()->info_about
                         ])
                         <div class="w-100 text-end mt-4">
@@ -112,7 +112,6 @@
             currentPhone = "{{ substr(auth()->user()->phone,2) }}",
             errorBornMessage = "{{ trans('validation.wrong_date') }}",
             passwordCannotBeLess = "{{ trans('auth.password_cannot_be_less', ['length' => 6]) }}",
-            errorWrongValue = "{{ trans('validation.wrong_value') }}",
             passwordsMismatch = "{{ trans('auth.password_mismatch') }}";
     </script>
     <script type="text/javascript" src="{{ asset('js/account.js') }}"></script>

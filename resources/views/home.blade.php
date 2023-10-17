@@ -24,7 +24,7 @@
                 'addClass' => 'half',
                 'head' => trans('content.home_head3'),
                 'content' => trans('content.home_text_block4'),
-                'link' => '#'
+                'link' => route('new_order')
             ])
         </div>
     </div>

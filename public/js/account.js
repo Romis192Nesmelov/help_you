@@ -1,4 +1,4 @@
-$(() => {
+$(window).on('load', function () {
     const bornDateField = $('input[name=born]'),
         emailField = $('input[name=email]'),
         changePhoneModal = $('#change-phone-modal'),
@@ -36,8 +36,8 @@ $(() => {
             born[2] > currentDate.getFullYear() ||
             (born[2] >= currentDate.getFullYear() - 18 && born[1] >= currentDate.getMonth() && born[0] < currentDate.getDate()) ||
             born[2] > currentDate.getFullYear() - 18 ||
-            (born[2] == currentDate.getFullYear() - 18 && born[1] < currentDate.getMonth()) ||
-            (born[2] == currentDate.getFullYear() - 18 && born[1] == currentDate.getMonth() && born[0] < currentDate.getDate())
+            (born[2] === currentDate.getFullYear() - 18 && born[1] < currentDate.getMonth()) ||
+            (born[2] === currentDate.getFullYear() - 18 && born[1] === currentDate.getMonth() && born[0] < currentDate.getDate())
         ) {
             bornDateField.addClass('error');
             $('.error.born').html(errorBornMessage);

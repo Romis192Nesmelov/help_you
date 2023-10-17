@@ -224,7 +224,9 @@
 @endif
 <script>
     let openMessageModalFlag = parseInt("{{ session()->has('message') }}"),
-        errorFieldMustBeFilledIn = "{{ trans('validation.field_must_be_filled_in') }}";
+        errorFieldMustBeFilledIn = "{{ trans('validation.field_must_be_filled_in') }}",
+        errorSelectOneOfItems = "{{ trans('validation.you_must_select_one_of_the_items') }}",
+        errorWrongValue = "{{ trans('validation.wrong_value') }}";
 </script>
 </body>
 </html>

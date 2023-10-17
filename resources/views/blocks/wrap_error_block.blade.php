@@ -2,6 +2,6 @@
     @include('blocks.error_block')
 @else
     @error($name)
-    @include('blocks.error_block')
+        @include('blocks.error_block')
     @enderror
 @endif

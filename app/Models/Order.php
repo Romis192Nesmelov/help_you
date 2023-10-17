@@ -19,8 +19,6 @@ class Order extends Model
         'performers',
         'latitude',
         'longitude',
-        'estimated_start_time',
-        'estimated_end_time',
         'description',
         'approved',
         'active'

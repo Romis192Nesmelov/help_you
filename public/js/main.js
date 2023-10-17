@@ -1,7 +1,7 @@
 // window.stop();
 window.phoneRegExp = /^((\+)?(\d)(\s)?(\()?[0-9]{3}(\))?(\s)?([0-9]{3})(\-)?([0-9]{2})(\-)?([0-9]{2}))$/gi;
 window.codeRegExp = /^((\d){2}(\-)(\d){2}(\-)(\d){2})$/gi
-$(() => {
+$(window).on('load', function () {
     $.mask.definitions['n'] = "[7-8]";
     $('input[name=phone]').mask("+n(999)999-99-99");
     $('input[name=code]').mask("99-99-99");
@@ -63,6 +63,14 @@ let getUrl = (form, url, callBack) => {
     form.find('div.error').html('');
     form.find('input').each(function () {
         if ($(this).attr('type') === 'file') formData.append($(this).attr('name'), $(this)[0].files[0]);
+        else if ($(this).attr('type') === 'radio') {
+            $(this).each(function () {
+                if ($(this).is(':checked')) formData.append($(this).attr('name'), $(this).val());
+            });
+        }
+        else if ($(this).attr('type') === 'checkbox') {
+            if ($(this).is(':checked')) formData.append($(this).attr('name'), $(this).val());
+        }
         else formData.append($(this).attr('name'), $(this).val());
     });
     submitButton.attr('disabled','disabled');

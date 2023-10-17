@@ -73,6 +73,18 @@ table {
     border-radius: 20px;
 }
 
+.form-group textarea[name=description] {
+    height: 300px;
+}
+
+.form-group input[type=number] {
+    text-align: center;
+    font-weight: bold;
+    padding-top: 0;
+    padding-bottom: 0;
+    font-size: 25px;
+}
+
 .form-group.password i {
     cursor: pointer;
 }
@@ -95,6 +107,11 @@ div.error {
     padding-left: 12px;
     padding-bottom: 5px;
     font-size: 13px;
+}
+
+.checkbox-block div.error {
+    padding-left: 0;
+    margin-left: -20px;
 }
 
 div.error.avatar {
@@ -157,7 +174,7 @@ button.btn:hover {
 
 label {
     font-size: 15px;
-    margin-bottom: 3px;
+    /*margin-bottom: 3px;*/
 }
 
 button.btn.btn-primary {
@@ -261,16 +278,12 @@ button.btn > span {
     font-size: 20px;
     background-color: #f5f3f0;
     position: relative;
+    overflow: hidden;
 }
 
 .rounded-block h1 {
     margin-top: 0;
     margin-bottom: 0;
-}
-
-.rounded-block.tall {
-    min-height: 825px;
-    height: auto;
 }
 
 .rounded-block.partner {
@@ -300,8 +313,40 @@ button.btn > span {
     width: 100%;
 }
 
+.rounded-block.tall {
+    min-height: 825px;
+    height: auto;
+}
+
+.rounded-block.three-quarter {
+    min-height: 600px;
+    background-color: #f2ece4;
+    margin-bottom: 25px;
+}
+
+.rounded-block.three-quarter > img {
+    height: 100%;
+}
+
+.rounded-block.three-quarter #image-step3 {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+}
+
 .rounded-block.half {
     height: 400px;
+}
+
+.rounded-block.one-quarter {
+    height: 200px;
+    background-color: #f2ece4;
+}
+
+.rounded-block.one-quarter > p {
+    font-size: 20px;
+    text-align: left;
+    margin-bottom: 0;
 }
 
 .rounded-block.half:first-child {
@@ -353,27 +398,42 @@ button.btn > span {
     text-decoration: none;
 }
 
-.rounded-block .link {
+.rounded-block .link,
+.rounded-block button.btn.link-cover {
     width: 70px;
     height: 35px;
     border-radius: 20px;
     display: flex;
+    padding: 0 !important;
     justify-content: center;
     align-items: center;
     color: black;
     border: 2px solid black;
 }
 
+.rounded-block .link span {
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.rounded-block .link:first-child,
+.rounded-block button.btn.link-cover:first-child {
+    margin-right: 10px;
+}
+
 .rounded-block .link-cover {
     text-decoration: none;
 }
 
-.rounded-block .link-cover:hover .link {
+.rounded-block .link-cover:hover .link,
+.rounded-block button.btn.link-cover:hover {
     background: #e65639 !important;
     border: 2px solid #e65639 !important;
 }
 
-.rounded-block .link-cover:hover .link i {
+.rounded-block .link-cover:hover .link i,
+.rounded-block .link:hover span,
+.rounded-block button.btn.link-cover:hover {
     color: white !important;
 }
 
@@ -468,6 +528,34 @@ button.btn > span {
     z-index: 999;
 }
 
+.progress {
+    height: 20px;
+    border-radius: 7px;
+    margin-bottom: 30px;
+    background-color: white;
+    border: 1px solid #ced4da;
+}
+
+.progress-bar {
+    background-color: #e65639;
+}
+
+.sub-types-block {
+    overflow: hidden;
+    padding-left: 20px;
+    padding-bottom: 5px;
+}
+
+.sub-types-block .form-check {
+    height: 25px;
+    margin-bottom: 0;
+}
+
+.sub-types-block label {
+    font-size: 14px;
+    color: #808080;
+}
+
 #map {
     padding: 0;
 }
@@ -490,14 +578,25 @@ button.btn > span {
     .rounded-block.tall {
         height: auto;
         min-height: 685px;
+        margin-bottom: 25px;
+    }
+
+    .rounded-block.three-quarter {
+        height: 460px;
+        min-height: 460px
     }
 
     .rounded-block.half {
         height: 330px;
+        margin-bottom: 25px;
     }
 
     .rounded-block h1 > div {
         width: 100%;
+    }
+
+    .form-group textarea[name=description] {
+        height: 230px;
     }
 }
 
@@ -545,14 +644,21 @@ button.btn > span {
         font-size: 14px;
     }
 
-    .rounded-block.tall {
+    .rounded-block.tall,
+    .rounded-block.three-quarter {
         min-height: auto;
         height: auto;
         margin-bottom: 25px;
     }
 
-    .rounded-block.half {
+    .rounded-block.half,
+    .rounded-block.one-quarter {
         height: auto;
+    }
+
+    .rounded-block.one-quarter > p {
+        font-size: 17px;
+        text-align: center;
     }
 
     .rounded-block .bottom-block {

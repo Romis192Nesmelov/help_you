@@ -1,4 +1,4 @@
-$(() => {
+$(window).on('load', function () {
     const loginModal = $('#login-modal'),
         loginPhoneField = loginModal.find('input[name=phone]'),
         loginPasswordField = loginModal.find('input[name=password]'),
