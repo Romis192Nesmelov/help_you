@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('order_types', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->json('subtypes')->nullable();
             $table->boolean('active');
             $table->timestamps();
         });

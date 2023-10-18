@@ -4,20 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Casts\Json;
 
 class OrderType extends Model
 {
-    protected $fillable = ['name','active'];
-
-    public function subTypes(): HasMany
-    {
-        return $this->hasMany(OrderSubType::class);
-    }
-
-    public function subTypesActive(): HasMany
-    {
-        return $this->hasMany(OrderSubType::class)->where('active',1);
-    }
+    protected $fillable = ['name','subtypes','active'];
 
     public function orders(): HasMany
     {
@@ -28,4 +19,8 @@ class OrderType extends Model
     {
         return $this->hasMany(Order::class)->where('active',1)->where('approved',1);
     }
+
+    protected $casts = [
+        'subtypes' => Json::class,
+    ];
 }

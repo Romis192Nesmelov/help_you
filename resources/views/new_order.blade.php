@@ -32,21 +32,21 @@
                                             class="form-check-input"
                                             id="order-type-{{ $order_type->id }}"
                                             type="radio"
-                                            name="order_type"
-                                            value="{{ $order_type->id }}" {{ $loop->first || (session()->has('steps') && session()->get('steps')[0]['order_type'] == $order_type->id) ? 'checked' : '' }}>
+                                            name="order_type_id"
+                                            value="{{ $order_type->id }}" {{ $loop->first || (session()->has('steps') && session()->get('steps')[0]['order_type_id'] == $order_type->id) ? 'checked' : '' }}>
                                         <label class="form-check-label" for="order-type-{{ $order_type->id }}">{{ $order_type->name }}</label>
                                     </div>
-                                    @if (count($order_type->subTypesActive))
+                                    @if ($order_type->subtypes)
                                         <div class="sub-types-block checkbox-block">
-                                            @foreach($order_type->subTypesActive as $subType)
+                                            @foreach($order_type->subtypes as $subType)
                                                 @include('blocks.checkbox_block',[
-                                                    'id' => 'sub-type-'.$subType->id,
-                                                    'checked' => (session()->has('steps') && isset(session()->get('steps')[0]['subtype']) && in_array($subType->id, session()->get('steps')[0]['subtype'])),
+                                                    'id' => 'sub-type-'.$subType['id'],
+                                                    'checked' => (session()->has('steps') && isset(session()->get('steps')[0]['subtype']) && in_array($subType['id'], session()->get('steps')[0]['subtype'])),
                                                     'noGap' => true,
                                                     'checkType' => 'form-check',
-                                                    'name' => 'subtype[]',
-                                                    'value' => $subType->id,
-                                                    'label' => $subType->name,
+                                                    'name' => 'subtypes[]',
+                                                    'value' => $subType['id'],
+                                                    'label' => $subType['name'],
                                                     'ajax' => true
                                                 ])
                                             @endforeach
@@ -118,8 +118,16 @@
         </div>
     </div>
     <script>
-        let step = parseInt("{{ session()->has('steps') ? count(session()->get('steps')) : 0 }}"),
-            backStepUrl = "{{ route('prev_step') }}";
+        const nextStepUrl = "{{ route('next_step') }}",
+            backStepUrl = "{{ route('prev_step') }}",
+            yandexApiKey = "{{ env('YANDEX_API_KEY') }}",
+            errorCheckAddress = "{{ trans('validation.check_the_address') }}";
+        let step = parseInt("{{ session()->has('steps') ? count(session()->get('steps')) : 0 }}");
     </script>
+    @if (session()->has('steps') && count(session()->get('steps')) >= 3)
+        <script>let point = [parseFloat("{{ session()->get('steps')[2]['latitude'] }}"), parseFloat("{{ session()->get('steps')[2]['longitude'] }}")];</script>
+    @else
+        <script>let point = [];</script>
+    @endif
     <script type="text/javascript" src="{{ asset('js/new_order.js') }}"></script>
 @endsection

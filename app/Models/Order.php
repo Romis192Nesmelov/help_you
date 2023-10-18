@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Casts\Json;
 
 class Order extends Model
 {
@@ -16,7 +17,9 @@ class Order extends Model
         'user_id',
         'order_type_id',
         'city_id',
+        'subtypes',
         'performers',
+        'address',
         'latitude',
         'longitude',
         'description',
@@ -29,11 +32,6 @@ class Order extends Model
         return $this->belongsTo(OrderType::class);
     }
 
-    public function subTypes(): BelongsToMany
-    {
-        return $this->belongsToMany(OrderSubType::class);
-    }
-
     public function performers(): BelongsToMany
     {
         return $this->belongsToMany(User::class);
@@ -42,5 +40,24 @@ class Order extends Model
     public function images(): HasMany
     {
         return $this->hasMany(OrderImage::class);
+    }
+
+    protected $casts = [
+        'subtypes' => Json::class,
+    ];
+
+    public function getOrderSubTypesAttribute($value)
+    {
+        $orderSubTypes = OrderType::find($this->order_type_id)->subtypes;
+        $subTypes = [];
+        foreach ($this->subtypes as $id) {
+            foreach ($orderSubTypes as $orderSubType) {
+                if ($orderSubType['id'] == $id) {
+                    $subTypes[] = $orderSubType;
+                    break;
+                }
+            }
+        }
+        return $subTypes;
     }
 }

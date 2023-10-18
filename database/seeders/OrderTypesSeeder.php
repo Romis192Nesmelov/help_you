@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\OrderType;
-use App\Models\OrderSubType;
 //use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -16,10 +15,10 @@ class OrderTypesSeeder extends Seeder
     {
         $data = [
             ['name' => 'Бытовая', 'sub' => [
-                ['name' => 'Перемещение крупногабаритных вещей'],
-                ['name' => 'Вынос мусора'],
-                ['name' => 'Помощь по ремонту'],
-                ['name' => 'Выгул собак'],
+                ['id' => 1, 'name' => 'Перемещение крупногабаритных вещей'],
+                ['id' => 2, 'name' => 'Вынос мусора'],
+                ['id' => 3, 'name' => 'Помощь по ремонту'],
+                ['id' => 4, 'name' => 'Выгул собак'],
             ]],
             ['name' => 'Передача ненужных вещей'],
             ['name' => 'Уход за захоронениями']
@@ -34,11 +33,8 @@ class OrderTypesSeeder extends Seeder
             }
             $orderType = OrderType::create($item);
             if ($subTypes) {
-                foreach ($subTypes as $subItem) {
-                    $subItem['active'] = 1;
-                    $subItem['order_type_id'] = $orderType->id;
-                    OrderSubType::create($subItem);
-                }
+                $orderType->subtypes = $subTypes;
+                $orderType->save();
             }
         }
     }

@@ -49,5 +49,6 @@ Route::prefix('account')->name('account.')->controller(AccountController::class)
 Route::middleware(['auth','account.completed'])->controller(OrderController::class)->group(function () {
     Route::get('/new-order', 'newOrder')->name('new_order');
     Route::post('/next-step', 'nextStep')->name('next_step');
+    Route::get('/next-step', 'nextStep')->name('next_step');
     Route::get('/prev-step', 'prevStep')->name('prev_step');
 });

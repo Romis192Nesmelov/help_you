@@ -108,7 +108,7 @@
         </div>
     </form>
     <script>
-        let getCodeUrl = "{{ route('account.get_code') }}",
+        const getCodeUrl = "{{ route('account.get_code') }}",
             currentPhone = "{{ substr(auth()->user()->phone,2) }}",
             errorBornMessage = "{{ trans('validation.wrong_date') }}",
             passwordCannotBeLess = "{{ trans('auth.password_cannot_be_less', ['length' => 6]) }}",

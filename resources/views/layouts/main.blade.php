@@ -215,7 +215,7 @@
 @if (!auth()->check())
     <script>
         {{--window.getPointsURL = "{{ route('get_points') }}";--}}
-        let generateCodeUrl = "{{ route('auth.generate_code') }}",
+        const generateCodeUrl = "{{ route('auth.generate_code') }}",
             accountUrl = "{{ route('account.change') }}",
             passwordsMismatch = "{{ trans('auth.password_mismatch') }}",
             passwordCannotBeLess = "{{ trans('auth.password_cannot_be_less', ['length' => 6]) }}",
@@ -223,7 +223,7 @@
     </script>
 @endif
 <script>
-    let openMessageModalFlag = parseInt("{{ session()->has('message') }}"),
+    const openMessageModalFlag = parseInt("{{ session()->has('message') }}"),
         errorFieldMustBeFilledIn = "{{ trans('validation.field_must_be_filled_in') }}",
         errorSelectOneOfItems = "{{ trans('validation.you_must_select_one_of_the_items') }}",
         errorWrongValue = "{{ trans('validation.wrong_value') }}";

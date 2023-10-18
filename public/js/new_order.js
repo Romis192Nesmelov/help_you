@@ -1,3 +1,4 @@
+let objectManager;
 $(document).ready(function () {
     const progressBarContainer = $('#progress-bar'),
         progressBar = progressBarContainer.find('.progress-bar'),
@@ -104,20 +105,73 @@ $(document).ready(function () {
         e.preventDefault();
         resetErrors(form);
         if (preValidation[step]()) {
-            backButton.attr('disabled','disabled');
-            getUrl(form, null, (data) => {
-                step++;
-                if (step) {
-                    backButton.removeClass('d-none');
-                    progressBarContainer.removeClass('d-none');
-                }
-                setProgressBar(progressBar);
-                if (step !== 4) {
-                    nextPrevStep(false, () => {
-                        backButton.removeAttr('disabled');
-                    });
-                } else completeModal.modal('show');
-            });
+            if (step === 2) {
+                let address = addressInput.val().indexOf('Москва') >= 0 ? addressInput.val() : 'Москва, '+addressInput.val();
+                $.get(
+                    'https://geocode-maps.yandex.ru/1.x/',
+                    {
+                        apikey: yandexApiKey,
+                        geocode: address,
+                        format: 'json'
+                    },
+                    (data) => {
+                        if (parseInt(data.response.GeoObjectCollection.metaDataProperty.GeocoderResponseMetaData.found) === 1) {
+                            let updatedAddress = data.response.GeoObjectCollection.featureMember[0].GeoObject.name;
+
+                            if (window.placemark) window.myMap.geoObjects.remove(window.placemark)
+                            let coordinates = data.response.GeoObjectCollection.featureMember[0].GeoObject.Point.pos.split(' ')
+                            point = [parseFloat(coordinates[1]),parseFloat(coordinates[0])];
+                            let newPlacemark = getPlaceMark();
+                            window.myMap.geoObjects.add(newPlacemark)
+                            zoomAndCenterMap();
+
+                            backButton.attr('disabled','disabled');
+                            nextButton.attr('disabled','disabled');
+
+                            $.post(
+                                nextStepUrl,
+                                {
+                                    '_token': $('input[name=_token]').val(),
+                                    'address': updatedAddress,
+                                    'latitude': point[0],
+                                    'longitude': point[1]
+                                }
+                            ).done(() => {
+                                setTimeout(function () {
+                                    step++;
+                                    setProgressBar(progressBar);
+                                    nextPrevStep(false, () => {
+                                        backButton.removeAttr('disabled');
+                                        nextButton.removeAttr('disabled');
+                                    });
+                                }, 2000);
+                            });
+                        } else {
+                            addressInput.addClass('error');
+                            addressInputError.html(errorCheckAddress);
+                        }
+                    }
+                );
+            } else {
+                backButton.attr('disabled','disabled');
+                getUrl(form, null, (data) => {
+                    step++;
+                    if (step) {
+                        backButton.removeClass('d-none');
+                        progressBarContainer.removeClass('d-none');
+                    }
+                    setProgressBar(progressBar);
+                    if (step !== 4) {
+                        nextPrevStep(false, () => {
+                            backButton.removeAttr('disabled');
+                        });
+                    } else {
+                        completeModal.modal('show').on('hidden.bs.modal', () => {
+                            window.location.href = '/';
+                        })
+                    }
+                });
+            }
         }
     });
 
@@ -157,17 +211,24 @@ let setProgressBar = (progressBar) => {
 }
 
 let mapInit = () => {
-    let myMap = new ymaps.Map('image-step3', {
+    window.myMap = new ymaps.Map('image-step3', {
         center: [55.76, 37.64],
         zoom: 10
-    }, {
-        searchControlProvider: 'yandex#search'
-    }),
-    objectManager = new ymaps.ObjectManager({
-        // Чтобы метки начали кластеризоваться, выставляем опцию.
-        clusterize: false,
-        // ObjectManager принимает те же опции, что и кластеризатор.
-        gridSize: 32,
-        clusterDisableClickZoom: true
     });
+
+    if (point.length) {
+        window.placemark = getPlaceMark();
+        window.myMap.geoObjects.add(window.placemark)
+        zoomAndCenterMap();
+    }
+}
+
+let getPlaceMark = () => {
+    return new ymaps.Placemark(point, null, {
+        preset: 'islands#orangeDotIcon'
+    });
+}
+
+let zoomAndCenterMap = () => {
+    window.myMap.setCenter(point, 17);
 }
