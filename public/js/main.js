@@ -33,58 +33,59 @@ $(window).on('load', function () {
         }
     });
 
-    // Basic datatable
-    let table = $('.datatable-basic').DataTable({iDisplayLength: 8});
     setTimeout(function () {
-        windowResize(table);
         removeLoader();
     },700);
 
-    $(window).resize(function() {
-        windowResize(table);
-    });
+    // Basic datatable
+    let dataTable = $('.datatable-basic');
+    if (dataTable.length) {
+        dataTable = dataTable.DataTable({iDisplayLength: 8});
 
-    // Click to delete items
-    window.deleteId = null;
-    window.deleteTable = null;
-    window.deleteRow = null;
-
-    // Change pagination on data-tables
-    $('table.datatable-basic').on('draw.dt', function () {
-        bindDelete();
-        bindFancybox();
-    });
-    bindDelete();
-
-    // Click YES on delete modal
-    $('.delete-yes').click(function () {
-        let deleteModal = $(this).parents('.modal');
-        deleteModal.modal('hide');
-        addLoader();
-
-        $.post(deleteModal.attr('del-function'), {
-            '_token': $('input[name=_token]').val(),
-            'id': window.deleteId,
-        }, (data) => {
-            if (data.success) {
-                let contentBlock = window.deleteRow.parents('.content-block'),
-                    contentId = contentBlock.attr('id').replace('content-',''),
-                    contentContainerCounter = $('#top-submenu-'+contentId).next('sup'),
-                    contentCounter = parseInt(contentContainerCounter.html());
-
-                contentCounter--;
-                contentContainerCounter.html(contentCounter);
-                table.row(window.deleteRow).remove();
-
-                if (!contentCounter) {
-                    contentBlock.find('.no-data-block').removeClass('d-none');
-                    window.deleteRow.parents('.dataTables_wrapper').remove();
-                } else table.draw();
-
-                removeLoader();
-            }
+        // Change pagination on data-tables
+        dataTable.on('draw.dt', function () {
+            bindDelete();
+            bindFancybox();
         });
-    });
+        bindDelete();
+
+        $(window).resize(function() {
+            resizeDTable(dataTable);
+        });
+
+        // Click to delete items
+        window.deleteId = null;
+        window.deleteRow = null;
+
+        // Click YES on delete modal
+        $('.delete-yes').click(function () {
+            let deleteModal = $(this).parents('.modal');
+            deleteModal.modal('hide');
+            addLoader();
+
+            $.post(deleteModal.attr('del-function'), {
+                '_token': $('input[name=_token]').val(),
+                'id': window.deleteId,
+            }, (data) => {
+                if (data.success) {
+                    let contentBlock = window.deleteRow.parents('.content-block'),
+                        contentId = contentBlock.attr('id').replace('content-',''),
+                        contentContainerCounter = $('#top-submenu-'+contentId).next('sup'),
+                        contentCounter = parseInt(contentContainerCounter.html());
+
+                    contentCounter--;
+                    contentContainerCounter.html(contentCounter);
+                    dataTable.row(window.deleteRow).remove();
+
+                    if (!contentCounter) {
+                        contentBlock.find('.no-data-block').removeClass('d-none');
+                        window.deleteRow.parents('.dataTables_wrapper').remove();
+                    } else dataTable.draw();
+                    removeLoader();
+                }
+            });
+        });
+    }
 
     // Top menu
     let topMenu = $('.rounded-block.tall .top-submenu');
@@ -227,11 +228,11 @@ let resetErrors = (form) => {
     form.find('div.error').html('');
 };
 
-let windowResize = (table) => {
-    if ($(window).width() >= 991 && $(window).height() >= 800) table.context[0]._iDisplayLength = 8;
-    else if ($(window).width() >= 991) table.context[0]._iDisplayLength = 6;
-    else table.context[0]._iDisplayLength = 10;
-    table.draw();
+let resizeDTable = (dataTable) => {
+    if ($(window).width() >= 991 && $(window).height() >= 800) dataTable.context[0]._iDisplayLength = 8;
+    else if ($(window).width() >= 991) dataTable.context[0]._iDisplayLength = 6;
+    else dataTable.context[0]._iDisplayLength = 10;
+    dataTable.draw();
 }
 
 function bindDelete() {
