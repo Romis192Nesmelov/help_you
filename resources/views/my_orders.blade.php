@@ -25,7 +25,7 @@
                     @if (count($orders[$item]))
                         <table class="table datatable-basic">
                             @foreach($orders[$item] as $orderItem)
-                                <tr>
+                                <tr id="row-{{ $orderItem->id }}">
                                     <td class="id">{{ $orderItem->id }}</td>
                                     <td>
                                         <div class="head">{{ $orderItem->orderType->name }}</div>

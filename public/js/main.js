@@ -67,22 +67,20 @@ $(window).on('load', function () {
             'id': window.deleteId,
         }, (data) => {
             if (data.success) {
-                window.deleteRow.find('.head').addClass('error').html(deleted);
-                window.deleteRow.find('.address').remove();
-                window.deleteRow.find('td.icon').html('');
-
-                let contentBlock = window.deleteTable.parents('.content-block'),
+                let contentBlock = window.deleteRow.parents('.content-block'),
                     contentId = contentBlock.attr('id').replace('content-',''),
                     contentContainerCounter = $('#top-submenu-'+contentId).next('sup'),
                     contentCounter = parseInt(contentContainerCounter.html());
 
                 contentCounter--;
                 contentContainerCounter.html(contentCounter);
+                table.row(window.deleteRow).remove();
 
                 if (!contentCounter) {
                     contentBlock.find('.no-data-block').removeClass('d-none');
-                    window.deleteTable.parents('.dataTables_wrapper').remove();
-                }
+                    window.deleteRow.parents('.dataTables_wrapper').remove();
+                } else table.draw();
+
                 removeLoader();
             }
         });
@@ -134,14 +132,6 @@ $(window).on('load', function () {
             $(this).removeClass('icon-eye-blocked').addClass('icon-eye');
         }
     });
-
-    // $(window).resize(function() {
-    //     mainHeight();
-    // });
-
-    // $(window).scroll(function() {
-    //     fixingMainMenu();
-    // });
 
     // Fancybox init
     bindFancybox();
@@ -253,7 +243,6 @@ function bindDelete() {
 
         window.deleteId = $(this).attr('del-data');
         window.deleteRow = $(this).parents('tr');
-        window.deleteTable = $(this).parents('table');
         if (inputId.length) inputId.val(window.deleteId);
         deleteModal.modal('show');
     });

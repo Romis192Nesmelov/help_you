@@ -96,17 +96,17 @@ class BaseController extends Controller
      */
     protected function deleteSomething(Request $request, Model $model, $fileField=null): JsonResponse
     {
-//        $fields = $this->validate($request, ['id' => 'required|integer|exists:'.$model->getTable().',id']);
-//        $itemModel = $model->find($fields['id']);
-//        $this->authorize('owner', $itemModel);
-//        if ($fileField) {
-//            if (is_array($fileField)) {
-//                foreach ($fileField as $field) {
-//                    $this->deleteFile($itemModel[$field]);
-//                }
-//            } else $this->deleteFile($itemModel[$fileField]);
-//        }
-//        $itemModel->delete();
+        $fields = $this->validate($request, ['id' => 'required|integer|exists:'.$model->getTable().',id']);
+        $itemModel = $model->find($fields['id']);
+        $this->authorize('owner', $itemModel);
+        if ($fileField) {
+            if (is_array($fileField)) {
+                foreach ($fileField as $field) {
+                    $this->deleteFile($itemModel[$field]);
+                }
+            } else $this->deleteFile($itemModel[$fileField]);
+        }
+        $itemModel->delete();
         return response()->json(['success' => true]);
     }
 
