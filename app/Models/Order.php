@@ -27,6 +27,11 @@ class Order extends Model
         'active'
     ];
 
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function orderType(): BelongsTo
     {
         return $this->belongsTo(OrderType::class);

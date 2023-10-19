@@ -27,6 +27,7 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('css/icons/fontawesome/styles.min.css') }}" />
     <link rel="stylesheet" type="text/css" href="{{ asset('css/icons/icomoon/styles.css') }}" />
     <link rel="stylesheet" type="text/css" href="{{ asset('css/icons/fontawesome/styles.min.css') }}" />
+    <link rel="stylesheet" type="text/css" href="{{ asset('css/datatables.css') }}" />
     <link rel="stylesheet" type="text/css" href="{{ asset('css/jquery.fancybox.min.css') }}" />
     <link rel="stylesheet" type="text/css" href="{{ asset('css/loader.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('css/app.css') }}" />
@@ -34,6 +35,7 @@
     <script src="https://code.jquery.com/jquery-3.6.3.js" integrity="sha256-nQLuAZGRRcILA+6dMBOvcRh5Pe310sBpanc6+QBmyVM=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     <script src="https://api-maps.yandex.ru/2.1/?apikey=fa455148-7970-4574-b087-4f913652328d&lang=ru_RU" type="text/javascript"></script>
+    <script type="text/javascript" src="{{ asset('js/datatables.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/jquery.maskedinput.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/jquery.fancybox.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/fancybox_init.js') }}"></script>
@@ -226,7 +228,8 @@
     const openMessageModalFlag = parseInt("{{ session()->has('message') }}"),
         errorFieldMustBeFilledIn = "{{ trans('validation.field_must_be_filled_in') }}",
         errorSelectOneOfItems = "{{ trans('validation.you_must_select_one_of_the_items') }}",
-        errorWrongValue = "{{ trans('validation.wrong_value') }}";
+        errorWrongValue = "{{ trans('validation.wrong_value') }}",
+        deleted = "{{ trans('content.deleted') }}";
 </script>
 </body>
 </html>

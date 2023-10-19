@@ -144,7 +144,7 @@ $(document).ready(function () {
                                         backButton.removeAttr('disabled');
                                         nextButton.removeAttr('disabled');
                                     });
-                                }, 2000);
+                                }, 1500);
                             });
                         } else {
                             addressInput.addClass('error');

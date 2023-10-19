@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Http\Controllers;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Mail;
 
 trait HelperTrait
@@ -22,11 +21,6 @@ trait HelperTrait
     public $validationJpg = 'mimes:jpg|max:2000';
     public $validationPng = 'mimes:png|max:2000';
     public $validationDate = 'regex:/^(\d{2})\/(\d{2})\/(\d{4})$/';
-
-    public function deleteFile($path): void
-    {
-        if (file_exists(base_path('public/'.$path))) unlink(base_path('public/'.$path));
-    }
 
 //    public function getCutTableName(Model $item) :string
 //    {

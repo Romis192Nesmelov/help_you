@@ -41,13 +41,14 @@ Route::prefix('account')->name('account.')->controller(AccountController::class)
 
     Route::get('/messages', 'messages')->name('messages');
     Route::get('/subscriptions', 'account')->name('subscriptions');
-    Route::get('/my-requests', 'account')->name('my_requests');
+    Route::get('/my-orders', 'myOrders')->name('my_orders');
     Route::get('/my-help', 'account')->name('my_help');
     Route::get('/incentives', 'account')->name('incentives');
 });
 
 Route::middleware(['auth','account.completed'])->controller(OrderController::class)->group(function () {
     Route::get('/new-order', 'newOrder')->name('new_order');
+    Route::post('/delete-order', 'deleteOrder')->name('delete_order');
     Route::post('/next-step', 'nextStep')->name('next_step');
     Route::get('/next-step', 'nextStep')->name('next_step');
     Route::get('/prev-step', 'prevStep')->name('prev_step');

@@ -14,7 +14,7 @@ class OrderTypesSeeder extends Seeder
     public function run(): void
     {
         $data = [
-            ['name' => 'Бытовая', 'sub' => [
+            ['name' => 'Бытовая помощь', 'sub' => [
                 ['id' => 1, 'name' => 'Перемещение крупногабаритных вещей'],
                 ['id' => 2, 'name' => 'Вынос мусора'],
                 ['id' => 3, 'name' => 'Помощь по ремонту'],

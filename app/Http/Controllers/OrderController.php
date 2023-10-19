@@ -6,6 +6,7 @@ use App\Http\Requests\Order\NextStepRequest;
 use App\Models\Order;
 use App\Models\OrderType;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Illuminate\View\View;
@@ -62,5 +63,14 @@ class OrderController extends BaseController
             Session::put('steps',$steps);
         }
         return response()->json([],200);
+    }
+
+    /**
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function deleteOrder(Request $request): JsonResponse
+    {
+        return $this->deleteSomething($request, new Order());
     }
 }

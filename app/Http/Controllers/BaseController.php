@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 //use App\Models\City;
 use App\Models\Partner;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Database\Eloquent\Model;
@@ -57,7 +58,7 @@ class BaseController extends Controller
                 'leftMenu' => [
                     ['icon' => 'icon-bubbles4', 'key' => 'messages'],
                     ['icon' => 'icon-mail-read', 'key' => 'subscriptions'],
-                    ['icon' => 'icon-drawer-out', 'key' => 'my_requests'],
+                    ['icon' => 'icon-drawer-out', 'key' => 'my_orders'],
                     ['icon' => 'icon-lifebuoy', 'key' => 'my_help'],
                     ['icon' => 'icon-gift', 'key' => 'incentives']
                 ],
@@ -87,5 +88,30 @@ class BaseController extends Controller
             $request->file($imageField)->move(base_path('public/'.$pathToSave), $imageName);
         }
         return $fields;
+    }
+
+    /**
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    protected function deleteSomething(Request $request, Model $model, $fileField=null): JsonResponse
+    {
+//        $fields = $this->validate($request, ['id' => 'required|integer|exists:'.$model->getTable().',id']);
+//        $itemModel = $model->find($fields['id']);
+//        $this->authorize('owner', $itemModel);
+//        if ($fileField) {
+//            if (is_array($fileField)) {
+//                foreach ($fileField as $field) {
+//                    $this->deleteFile($itemModel[$field]);
+//                }
+//            } else $this->deleteFile($itemModel[$fileField]);
+//        }
+//        $itemModel->delete();
+        return response()->json(['success' => true]);
+    }
+
+    protected function deleteFile($path): void
+    {
+        if (file_exists(base_path('public/'.$path))) unlink(base_path('public/'.$path));
     }
 }

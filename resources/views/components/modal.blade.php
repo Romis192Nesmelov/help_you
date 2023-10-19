@@ -11,20 +11,20 @@
                 {{ $slot }}
             </div>
             @if ($attributes->has('footer') && $attributes->get('footer'))
-                <div class="modal-footer">
+                <div class="modal-footer d-flex justify-content-center">
                     @if ($attributes->has('yes_button') && $attributes->get('yes_button'))
                         @include('blocks.button_block',[
                             'id' => null,
                             'buttonType' => 'button',
                             'primary' => true,
-                            'addClass' => 'm-auto mt-3 delete-yes',
+                            'addClass' => 'w-25 mt-3 delete-yes',
                             'buttonText' => trans('content.yes')
                         ])
                         @include('blocks.button_block',[
                             'id' => null,
                             'primary' => true,
                             'dataDismiss' => true,
-                            'addClass' => 'm-auto mt-3',
+                            'addClass' => 'w-25 mt-3',
                             'buttonText' => trans('content.no')
                         ])
                     @else
@@ -32,7 +32,7 @@
                             'id' => null,
                             'primary' => true,
                             'dataDismiss' => true,
-                            'addClass' => 'm-auto mt-3',
+                            'addClass' => 'w-50 m-auto mt-3',
                             'buttonText' => trans('content.close')
                         ])
                     @endif

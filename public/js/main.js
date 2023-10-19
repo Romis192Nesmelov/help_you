@@ -7,10 +7,105 @@ $(window).on('load', function () {
     $('input[name=code]').mask("99-99-99");
     window.messageModal = $('#message-modal');
 
+    // Setting datatable defaults
+    $.extend( $.fn.dataTable.defaults, {
+        autoWidth: false,
+        columnDefs: [{
+            targets: [3]
+        }],
+        order: [],
+        dom: '<"datatable-header"fl><"datatable-scroll"t><"datatable-footer"ip>',
+        bLengthChange: false,
+        info: false,
+        language: {
+            search: '<span>Фильтр:</span> _INPUT_',
+            lengthMenu: '<span>Показывать:</span> _MENU_',
+            paginate: { 'next': '&rarr;', 'previous': '&larr;' },
+            thousands:      ',',
+            loadingRecords: 'Загрузка...',
+            zeroRecords:    'Нет данных',
+        },
+        drawCallback: function () {
+            $(this).find('tbody tr').slice(-3).find('.dropdown, .btn-group').addClass('dropup');
+        },
+        preDrawCallback: function() {
+            $(this).find('tbody tr').slice(-3).find('.dropdown, .btn-group').removeClass('dropup');
+        }
+    });
+
+    // Basic datatable
+    let table = $('.datatable-basic').DataTable({iDisplayLength: 8});
     setTimeout(function () {
-        // windowResize();
+        windowResize(table);
         removeLoader();
-    },1000);
+    },700);
+
+    $(window).resize(function() {
+        windowResize(table);
+    });
+
+    // Click to delete items
+    window.deleteId = null;
+    window.deleteTable = null;
+    window.deleteRow = null;
+
+    // Change pagination on data-tables
+    $('table.datatable-basic').on('draw.dt', function () {
+        bindDelete();
+        bindFancybox();
+    });
+    bindDelete();
+
+    // Click YES on delete modal
+    $('.delete-yes').click(function () {
+        let deleteModal = $(this).parents('.modal');
+        deleteModal.modal('hide');
+        addLoader();
+
+        $.post(deleteModal.attr('del-function'), {
+            '_token': $('input[name=_token]').val(),
+            'id': window.deleteId,
+        }, (data) => {
+            if (data.success) {
+                window.deleteRow.find('.head').addClass('error').html(deleted);
+                window.deleteRow.find('.address').remove();
+                window.deleteRow.find('td.icon').html('');
+
+                let contentBlock = window.deleteTable.parents('.content-block'),
+                    contentId = contentBlock.attr('id').replace('content-',''),
+                    contentContainerCounter = $('#top-submenu-'+contentId).next('sup'),
+                    contentCounter = parseInt(contentContainerCounter.html());
+
+                contentCounter--;
+                contentContainerCounter.html(contentCounter);
+
+                if (!contentCounter) {
+                    contentBlock.find('.no-data-block').removeClass('d-none');
+                    window.deleteTable.parents('.dataTables_wrapper').remove();
+                }
+                removeLoader();
+            }
+        });
+    });
+
+    // Top menu
+    let topMenu = $('.rounded-block.tall .top-submenu');
+    topMenu.find('a').click(function () {
+        let parent = $(this).parents('.tab');
+        if (!parent.hasClass('active')) {
+            let currentActiveTab = topMenu.find('.tab.active'),
+                currentActiveTabId = currentActiveTab.find('a').attr('id').replace('top-submenu-',''),
+                currentContent = $('#content-'+currentActiveTabId),
+                newActiveIdTabId = $(this).attr('id').replace('top-submenu-',''),
+                newContent = $('#content-'+newActiveIdTabId);
+
+            currentActiveTab.removeClass('active');
+            parent.addClass('active');
+            currentContent.fadeOut(() => {
+                newContent.css('display','none').fadeIn();
+            });
+        }
+    });
 
     $('#main-nav .navbar-toggler').click(function () {
         if (!$(this).hasClass('collapsed')) {
@@ -141,3 +236,25 @@ let resetErrors = (form) => {
     form.find('input.error').removeClass('error');
     form.find('div.error').html('');
 };
+
+let windowResize = (table) => {
+    if ($(window).width() >= 991 && $(window).height() >= 800) table.context[0]._iDisplayLength = 8;
+    else if ($(window).width() >= 991) table.context[0]._iDisplayLength = 6;
+    else table.context[0]._iDisplayLength = 10;
+    table.draw();
+}
+
+function bindDelete() {
+    let deleteIcon = $('.icon-close2');
+    deleteIcon.unbind();
+    deleteIcon.click(function () {
+        let deleteModal = $('#' + $(this).attr('modal-data')),
+            inputId = deleteModal.find('input[name=id]');
+
+        window.deleteId = $(this).attr('del-data');
+        window.deleteRow = $(this).parents('tr');
+        window.deleteTable = $(this).parents('table');
+        if (inputId.length) inputId.val(window.deleteId);
+        deleteModal.modal('show');
+    });
+}

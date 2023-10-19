@@ -48,9 +48,13 @@ return [
 
     'messages' => 'Сообщения',
     'subscriptions' => 'Подписки',
-    'my_requests' => 'Мои запросы',
+    'my_orders' => 'Мои запросы',
     'my_help' => 'Моя помощь',
     'incentives' => 'Поощрения от партнеров',
+
+    'active_orders' => 'Активные',
+    'approving_orders' => 'На модерации',
+    'archive_orders' => 'Архив',
 
     'name' => 'Ваше имя',
     'enter_your_name' => 'Введите ваше имя',

@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\Request;
+use App\Models\Order;
 use Carbon\Carbon;
 use App\Http\Requests\Account\ChangePasswordRequest;
 use App\Http\Requests\Account\ChangePhoneRequest;
@@ -18,7 +21,19 @@ class AccountController extends BaseController
 
     public function account() :View
     {
+        $this->data['active_left_menu'] = null;
         return $this->showView('account');
+    }
+
+    public function myOrders(): View
+    {
+        $this->data['orders'] = [
+            'active' => $this->getOrder(1,1),
+            'approving' => $this->getOrder(0,1),
+            'archive' => $this->getOrder(1,0)
+        ];
+        $this->data['active_left_menu'] = 'my_orders';
+        return $this->showView('my_orders');
     }
 
     public function getCode(GetCodeRequest $request): JsonResponse
@@ -63,5 +78,15 @@ class AccountController extends BaseController
         $fields = $this->processingImage($request, $fields,'avatar', 'images/avatars/', Auth::id());
         Auth::user()->update($fields);
         return response()->json(['message' => trans('content.save_complete')],200);
+    }
+
+    private function getOrder($approved, $active): Collection
+    {
+        return Order::with('orderType')
+            ->where('user_id',Auth::id())
+            ->where('approved',$approved)
+            ->where('active',$active)
+            ->orderByDesc('created_at')
+            ->get();
     }
 }
