@@ -87,9 +87,10 @@ $(window).on('load', function () {
         });
     }
 
-    // Top menu
+    // Top menu tabs
     let topMenu = $('.rounded-block.tall .top-submenu');
-    topMenu.find('a').click(function () {
+    topMenu.find('a').click(function (e) {
+        e.preventDefault();
         let parent = $(this).parents('.tab');
         if (!parent.hasClass('active')) {
             let currentActiveTab = topMenu.find('.tab.active'),

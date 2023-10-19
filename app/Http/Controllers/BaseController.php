@@ -106,7 +106,7 @@ class BaseController extends Controller
                 }
             } else $this->deleteFile($itemModel[$fileField]);
         }
-        $itemModel->delete();
+//        $itemModel->delete();
         return response()->json(['success' => true]);
     }
 

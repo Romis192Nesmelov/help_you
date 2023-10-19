@@ -37,14 +37,12 @@
                             @endforeach
                         </table>
                     @endif
-                    <div class="no-data-block h-100 d-flex justify-content-center align-items-center {{ count($orders[$item]) ? 'd-none' : '' }}">
-                        <h4 class="text-uppercase text-secondary">{{ trans('content.no_data') }}</h4>
-                    </div>
+                    <h4 class="no-data-block text-uppercase text-secondary {{ count($orders[$item]) ? 'd-none' : '' }}">{{ trans('content.no_data') }}</h4>
                 </div>
             @endforeach
             <a href="{{ route('new_order') }}">
                 @include('blocks.button_block',[
-                    'id' => 'new-order',
+                    'addClass' => 'absolute-bottom',
                     'primary' => true,
                     'buttonText' => trans('content.home_head3')
                 ])
