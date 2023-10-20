@@ -527,6 +527,10 @@ table.datatable-basic td.icon {
     width: 7%;
 }
 
+.rounded-block.tall .datatable-scroll {
+    height: 520px;
+}
+
 .rounded-block.tall .absolute-bottom {
     position: absolute;
     bottom: 55px;
@@ -663,6 +667,10 @@ table.datatable-basic td.icon {
         height: 500px;
     }
 
+    .rounded-block.tall .datatable-scroll {
+        height: 400px;
+    }
+
     .rounded-block.three-quarter {
         height: 460px;
         min-height: 460px
@@ -733,6 +741,10 @@ table.datatable-basic td.icon {
     .rounded-block.tall .content-block {
         height: auto;
         min-height: 200px;
+    }
+
+    .rounded-block.tall .datatable-scroll {
+        height: auto;
     }
 
     .rounded-block.tall,

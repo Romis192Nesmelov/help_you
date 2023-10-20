@@ -21,6 +21,13 @@ $(window).on('load', function () {
         resetPhoneField = resetPasswordModal.find('input[name=phone]'),
         resetButton = $('#reset-button');
 
+    // Click to another links on home page
+    $('.link-cover').click((e) => {
+        e.preventDefault();
+        localStorage.setItem('want_url',$(e.target).parents('a').attr('href'));
+        loginModal.modal('show');
+    });
+
     let unlockLoginButton = () => {
         if (loginPhoneField.val().match(phoneRegExp)) {
             if (loginPasswordField.val().length) loginButton.removeAttr('disabled');
@@ -52,6 +59,8 @@ $(window).on('load', function () {
                 $('#account-href').removeClass('d-none');
                 $('#navbar-dropdown-messages').removeClass('d-none');
                 $('#right-button-block').removeClass('justify-content-end').addClass('justify-content-between');
+                let wnantUrl = localStorage.getItem('want_url');
+                if (wnantUrl) window.location.href = wnantUrl;
             } else {
                 window.location.href = accountUrl;
             }
