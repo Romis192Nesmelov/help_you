@@ -20,7 +20,7 @@ return new class extends Migration
             $table->foreignIdFor(OrderType::class)->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreignIdFor(City::class)->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->json('subtypes')->nullable();
-            $table->smallInteger('performers');
+            $table->smallInteger('need_performers');
             $table->string('address');
             $table->double('latitude',8, 6);
             $table->double('longitude',8, 6);

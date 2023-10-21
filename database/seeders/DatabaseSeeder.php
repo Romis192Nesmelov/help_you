@@ -19,5 +19,6 @@ class DatabaseSeeder extends Seeder
         Partner::factory(13)->create();
         $this->call(OrderTypesSeeder::class);
         Order::factory(100)->create();
+        $this->call(OrdersSeeder::class);
     }
 }

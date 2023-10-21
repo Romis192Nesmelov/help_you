@@ -13,6 +13,19 @@ use Illuminate\View\View;
 
 class OrderController extends BaseController
 {
+    public function orders(): View
+    {
+        $this->getItems('orders', new Order(), ['approved' => 1, 'user_id_not' => Auth::id()]);
+        $subTypes = OrderType::where('subtypes','!=',null)->pluck('subtypes');
+        $this->data['subtypes'] = [];
+        foreach ($subTypes as $subTypeItem) {
+            foreach ($subTypeItem as $subType) {
+                $this->data['subtypes'][] = $subType;
+            }
+        }
+        return $this->showView('orders');
+    }
+
     public function newOrder(): View
     {
         $this->getItems('order_types', new OrderType());

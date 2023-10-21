@@ -1,4 +1,3 @@
-let objectManager;
 $(document).ready(function () {
     const progressBarContainer = $('#progress-bar'),
         progressBar = progressBarContainer.find('.progress-bar'),
@@ -45,7 +44,14 @@ $(document).ready(function () {
             }
         ];
 
-    ymaps.ready(mapInit);
+    ymaps.ready(mapInitWithContainer);
+    setTimeout(function () {
+        if (point.length) {
+            window.placemark = getPlaceMark(point,{});
+            window.myMap.geoObjects.add(window.placemark)
+            zoomAndCenterMap();
+        }
+    }, 500);
 
     $('input[name=order_type]').change(function () {
         let thisRadioGroup = $(this).parents('.radio-group'),
@@ -121,7 +127,7 @@ $(document).ready(function () {
                             if (window.placemark) window.myMap.geoObjects.remove(window.placemark)
                             let coordinates = data.response.GeoObjectCollection.featureMember[0].GeoObject.Point.pos.split(' ')
                             point = [parseFloat(coordinates[1]),parseFloat(coordinates[0])];
-                            let newPlacemark = getPlaceMark();
+                            let newPlacemark = getPlaceMark(point,{});
                             window.myMap.geoObjects.add(newPlacemark)
                             zoomAndCenterMap();
 
@@ -210,25 +216,6 @@ let setProgressBar = (progressBar) => {
     },'fast');
 }
 
-let mapInit = () => {
-    window.myMap = new ymaps.Map('image-step3', {
-        center: [55.76, 37.64],
-        zoom: 10
-    });
-
-    if (point.length) {
-        window.placemark = getPlaceMark();
-        window.myMap.geoObjects.add(window.placemark)
-        zoomAndCenterMap();
-    }
-}
-
-let getPlaceMark = () => {
-    return new ymaps.Placemark(point, null, {
-        preset: 'islands#orangeDotIcon'
-    });
-}
-
-let zoomAndCenterMap = () => {
-    window.myMap.setCenter(point, 17);
+function mapInitWithContainer() {
+    mapInit('image-step3');
 }

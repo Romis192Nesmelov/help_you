@@ -69,9 +69,28 @@ class BaseController extends Controller
         ));
     }
 
-    protected function getItems(string $itemName, Model $model): void
+    protected function getItems(string $itemName, Model $model, array $addConditions=[]): void
     {
-        $this->data[$itemName] = $model->where('active',1)->get();
+        $item = $model->where('active',1);
+        if (count($addConditions)) {
+            foreach ($addConditions as $condition => $value) {
+                $signEloquent = false;
+                $signs = ['_not' => '!=','_above' => '>','_less' => '<'];
+                foreach ($signs as $prefix => $sign) {
+                    if (strpos($condition, $prefix)) {
+                        $condition = str_replace($prefix, '', $condition);
+                        $signEloquent = $sign;
+                        if ($prefix != '_not' && strpos($condition, '_equal')) {
+                            $condition = str_replace('equal_', '', $condition);
+                            $signEloquent .= '=';
+                        }
+                    }
+                }
+                if ($signEloquent) $item = $model->where($condition,$signEloquent,$value);
+                else $item = $model->where($condition,$value);
+            }
+        }
+        $this->data[$itemName] = $item->get();
     }
 
     protected function getItem(string $itemName, Model $model, $id): void
@@ -106,7 +125,7 @@ class BaseController extends Controller
                 }
             } else $this->deleteFile($itemModel[$fileField]);
         }
-//        $itemModel->delete();
+        $itemModel->delete();
         return response()->json(['success' => true]);
     }
 

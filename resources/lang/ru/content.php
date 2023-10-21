@@ -14,6 +14,7 @@ return [
     'website_message' => 'Сообщение с сайта ',
     'save_complete' => 'Сохранение произведено!',
     'warning' => 'Внимание!',
+    'absent' => 'Отсутствует',
 
     '404' => 'Страница не найдена',
     '403' => 'Доступ запрещен',
@@ -50,7 +51,8 @@ return [
     'city' => 'Город',
     'request_type' => 'Тип заявки',
     'type' => 'Тип :type',
-    'number_of_performers' => 'Количество исполнителей',
+    'need_performers' => 'Требуется исполнителей:',
+    'ready_to_help' => 'Готовы помочь:',
     'search' => 'Поиск',
 
     'organizations' => 'Организации',
@@ -59,6 +61,10 @@ return [
     'you_must_fill_required_fields' => 'Вы должны заполнить все обязательные поля!',
     'do_you_really_want_to_delete_this_order' => 'Вы действительно хотите удалить эту заявку?',
     'deleted' => 'Удалено',
+
+    'order_number' => 'Заяка №<span id="order-number">:number</span> от <span id="order-date">:date</span>',
+    'born_date' => 'Дата рожения: <span id="born-date">:born</span>',
+    'respond_to_an_order' => 'Откликнуться на заявку',
 
 
 //    'in_russian' => ' по русски',

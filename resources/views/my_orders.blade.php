@@ -50,5 +50,4 @@
         </div>
     </div>
 </div>
-{{--    <script type="text/javascript" src="{{ asset('js/account.js') }}"></script>--}}
 @endsection

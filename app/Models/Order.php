@@ -18,7 +18,7 @@ class Order extends Model
         'order_type_id',
         'city_id',
         'subtypes',
-        'performers',
+        'need_performers',
         'address',
         'latitude',
         'longitude',
@@ -55,14 +55,16 @@ class Order extends Model
     {
         $orderSubTypes = OrderType::find($this->order_type_id)->subtypes;
         $subTypes = [];
-        foreach ($this->subtypes as $id) {
-            foreach ($orderSubTypes as $orderSubType) {
-                if ($orderSubType['id'] == $id) {
-                    $subTypes[] = $orderSubType;
-                    break;
+        if ($this->subtypes) {
+            foreach ($this->subtypes as $id) {
+                foreach ($orderSubTypes as $orderSubType) {
+                    if ($orderSubType['id'] == $id) {
+                        $subTypes[] = $orderSubType;
+                        break;
+                    }
                 }
             }
-        }
-        return $subTypes;
+            return $subTypes;
+        } else return null;
     }
 }

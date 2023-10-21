@@ -80,7 +80,10 @@ $(window).on('load', function () {
                     if (!contentCounter) {
                         contentBlock.find('.no-data-block').removeClass('d-none');
                         window.deleteRow.parents('.dataTables_wrapper').remove();
-                    } else dataTable.draw();
+                    } else {
+                        dataTable.draw();
+                        bindDelete();
+                    }
                     removeLoader();
                 }
             });
@@ -234,9 +237,10 @@ let resizeDTable = (dataTable) => {
     else if ($(window).width() >= 991) dataTable.context[0]._iDisplayLength = 6;
     else dataTable.context[0]._iDisplayLength = 10;
     dataTable.draw();
+    bindDelete();
 }
 
-function bindDelete() {
+let bindDelete = () => {
     let deleteIcon = $('.icon-close2');
     deleteIcon.unbind();
     deleteIcon.click(function () {
@@ -248,4 +252,22 @@ function bindDelete() {
         if (inputId.length) inputId.val(window.deleteId);
         deleteModal.modal('show');
     });
+}
+
+let mapInit = (container) => {
+    window.myMap = new ymaps.Map(container, {
+        center: [55.76, 37.64],
+        zoom: 10,
+        controls: []
+    });
+}
+
+let getPlaceMark = (point, data) => {
+    return new ymaps.Placemark(point, data, {
+        preset: 'islands#redDotIcon'
+    });
+}
+
+let zoomAndCenterMap = () => {
+    window.myMap.setCenter(point, 17);
 }
