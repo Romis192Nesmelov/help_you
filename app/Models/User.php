@@ -59,11 +59,50 @@ class User extends Authenticatable
 
     public function orderPerformer(): BelongsToMany
     {
-        return $this->belongsToMany(Order::class);
+        return $this->belongsToMany(Order::class)->orderByDesc('created_at');
+    }
+
+    public function orderActivePerformer(): BelongsToMany
+    {
+        return $this->belongsToMany(Order::class)
+            ->where('active',1)
+            ->orderByDesc('created_at');
+    }
+
+    public function orderArchivePerformer(): BelongsToMany
+    {
+        return $this->belongsToMany(Order::class)
+            ->where('active',0)
+            ->orderByDesc('created_at');
+    }
+
+    public function ordersApproving(): HasMany
+    {
+        return $this->hasMany(Order::class)
+            ->where('approved',0)
+            ->orderByDesc('created_at');
     }
 
     public function ordersActive(): HasMany
     {
-        return $this->hasMany(Order::class)->where('active',1);
+        return $this->hasMany(Order::class)
+            ->where('active',1)
+            ->orderByDesc('created_at');
+    }
+
+    public function ordersActiveAndApproving(): HasMany
+    {
+        return $this->hasMany(Order::class)
+            ->where('active',1)
+            ->where('approved',1)
+            ->orderByDesc('created_at');
+    }
+
+    public function ordersArchive(): HasMany
+    {
+        return $this->hasMany(Order::class)
+            ->where('active',0)
+            ->where('approved',1)
+            ->orderByDesc('created_at');
     }
 }

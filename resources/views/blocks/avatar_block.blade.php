@@ -1,4 +1,4 @@
-<div id="avatar-block">
+<div id="avatar-block" {{ isset($addClass) && $addClass ? 'class='.$addClass : '' }}>
     <table>
         <tr>
             <td style="width: 70px;">

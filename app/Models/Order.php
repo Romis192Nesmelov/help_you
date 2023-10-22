@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Casts\Json;
+use Illuminate\Support\Facades\Auth;
 
 class Order extends Model
 {
@@ -45,6 +47,25 @@ class Order extends Model
     public function images(): HasMany
     {
         return $this->hasMany(OrderImage::class);
+    }
+
+    public function scopeDefault(Builder $query): void
+    {
+        $query
+            ->where('active',1)
+            ->where('approved',1)
+            ->where('user_id','!=',Auth::id());
+    }
+
+    public function scopeFiltered(Builder $query): void
+    {
+        $query->when(request('order_type'), function (Builder $q) {
+            $q->where('order_type_id',request('order_type'));
+        });
+
+        $query->when(request('performers'), function (Builder $q) {
+            $q->where('need_performers',request('performers'));
+        });
     }
 
     protected $casts = [

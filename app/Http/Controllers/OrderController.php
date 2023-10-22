@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Order\DeleteResponseRequest;
 use App\Http\Requests\Order\NextStepRequest;
+use App\Http\Requests\Order\OrderResponseRequest;
 use App\Models\Order;
 use App\Models\OrderType;
+use App\Models\OrderUser;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,15 +18,30 @@ class OrderController extends BaseController
 {
     public function orders(): View
     {
-        $this->getItems('orders', new Order(), ['approved' => 1, 'user_id_not' => Auth::id()]);
-        $subTypes = OrderType::where('subtypes','!=',null)->pluck('subtypes');
-        $this->data['subtypes'] = [];
-        foreach ($subTypes as $subTypeItem) {
-            foreach ($subTypeItem as $subType) {
-                $this->data['subtypes'][] = $subType;
-            }
-        }
+        $this->getItems('order_types', new OrderType());
         return $this->showView('orders');
+    }
+
+    public function getOrders(): JsonResponse
+    {
+        return response()->json(
+            Order::query()
+            ->default()
+            ->filtered()
+            ->with('orderType')
+            ->with('user')
+            ->with('performers')
+            ->get(),
+            200
+        );
+    }
+
+    public function orderResponse(OrderResponseRequest $request): JsonResponse
+    {
+        $fields = $request->validated();
+        $fields['user_id'] = Auth::id();
+        OrderUser::create($fields);
+        return response()->json([],200);
     }
 
     public function newOrder(): View
@@ -85,5 +103,12 @@ class OrderController extends BaseController
     public function deleteOrder(Request $request): JsonResponse
     {
         return $this->deleteSomething($request, new Order());
+    }
+
+    public function deleteResponse(DeleteResponseRequest $request): JsonResponse
+    {
+        $orderUser = OrderUser::where('order_id',$request->id)->where('user_id',Auth::id())->first();
+        $orderUser->delete();
+        return response()->json(['success' => true],200);
     }
 }

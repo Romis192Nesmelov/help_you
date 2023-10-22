@@ -45,13 +45,6 @@ $(document).ready(function () {
         ];
 
     ymaps.ready(mapInitWithContainer);
-    setTimeout(function () {
-        if (point.length) {
-            window.placemark = getPlaceMark(point,{});
-            window.myMap.geoObjects.add(window.placemark)
-            zoomAndCenterMap();
-        }
-    }, 500);
 
     $('input[name=order_type]').change(function () {
         let thisRadioGroup = $(this).parents('.radio-group'),
@@ -124,8 +117,8 @@ $(document).ready(function () {
                         if (parseInt(data.response.GeoObjectCollection.metaDataProperty.GeocoderResponseMetaData.found) === 1) {
                             let updatedAddress = data.response.GeoObjectCollection.featureMember[0].GeoObject.name;
 
-                            if (window.placemark) window.myMap.geoObjects.remove(window.placemark)
-                            let coordinates = data.response.GeoObjectCollection.featureMember[0].GeoObject.Point.pos.split(' ')
+                            if (window.placemark) window.myMap.geoObjects.remove(window.placemark);
+                            let coordinates = data.response.GeoObjectCollection.featureMember[0].GeoObject.Point.pos.split(' ');
                             point = [parseFloat(coordinates[1]),parseFloat(coordinates[0])];
                             let newPlacemark = getPlaceMark(point,{});
                             window.myMap.geoObjects.add(newPlacemark)
@@ -218,4 +211,9 @@ let setProgressBar = (progressBar) => {
 
 function mapInitWithContainer() {
     mapInit('image-step3');
+    if (point.length) {
+        window.placemark = getPlaceMark(point,{});
+        window.myMap.geoObjects.add(window.placemark)
+        zoomAndCenterMap();
+    }
 }

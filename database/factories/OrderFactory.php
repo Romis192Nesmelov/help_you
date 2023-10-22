@@ -24,7 +24,7 @@ class OrderFactory extends Factory
             'order_type_id' => OrderType::all()->random()->id,
             'city_id' => 1,
             'need_performers' => rand(1,20),
-            'address' => fake()->text(50),
+            'address' => fake()->address(),
             'latitude' => fake()->randomFloat(6, 55, 56),
             'longitude' => fake()->randomFloat(6, 37, 38),
 //            'estimated_start_time' => Carbon::now(),

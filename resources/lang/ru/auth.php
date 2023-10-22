@@ -53,6 +53,7 @@ return [
     'incentives' => 'Поощрения от партнеров',
 
     'active_orders' => 'Активные',
+    'completed_orders' => 'Завершенные',
     'approving_orders' => 'На модерации',
     'archive_orders' => 'Архив',
 

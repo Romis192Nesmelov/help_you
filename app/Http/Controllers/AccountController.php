@@ -28,12 +28,22 @@ class AccountController extends BaseController
     public function myOrders(): View
     {
         $this->data['orders'] = [
-            'active' => $this->getOrder(1,1),
-            'approving' => $this->getOrder(0,1),
-            'archive' => $this->getOrder(1,0)
+            'active' => Auth::user()->ordersActiveAndApproving,
+            'approving' => Auth::user()->ordersApproving,
+            'archive' => Auth::user()->ordersArchive
         ];
         $this->data['active_left_menu'] = 'my_orders';
         return $this->showView('my_orders');
+    }
+
+    public function myHelp(): View
+    {
+        $this->data['orders'] = [
+            'active' => Auth::user()->orderActivePerformer,
+            'archive' => Auth::user()->orderArchivePerformer
+        ];
+        $this->data['active_left_menu'] = 'my_help';
+        return $this->showView('my_help');
     }
 
     public function getCode(GetCodeRequest $request): JsonResponse
@@ -78,15 +88,5 @@ class AccountController extends BaseController
         $fields = $this->processingImage($request, $fields,'avatar', 'images/avatars/', Auth::id());
         Auth::user()->update($fields);
         return response()->json(['message' => trans('content.save_complete')],200);
-    }
-
-    private function getOrder($approved, $active): Collection
-    {
-        return Order::with('orderType')
-            ->where('user_id',Auth::id())
-            ->where('approved',$approved)
-            ->where('active',$active)
-            ->orderByDesc('created_at')
-            ->get();
     }
 }

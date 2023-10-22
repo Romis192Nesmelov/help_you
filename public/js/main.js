@@ -151,7 +151,7 @@ let getUrl = (form, url, callBack) => {
 
     form.find('input.error').removeClass('error');
     form.find('div.error').html('');
-    form.find('input').each(function () {
+    form.find('input, select').each(function () {
         if ($(this).attr('type') === 'file') formData.append($(this).attr('name'), $(this)[0].files[0]);
         else if ($(this).attr('type') === 'radio') {
             $(this).each(function () {
@@ -161,7 +161,10 @@ let getUrl = (form, url, callBack) => {
         else if ($(this).attr('type') === 'checkbox') {
             if ($(this).is(':checked')) formData.append($(this).attr('name'), $(this).val());
         }
-        else formData.append($(this).attr('name'), $(this).val());
+        else {
+            // console.log($(this).attr('name') + '==' + $(this).val());
+            formData.append($(this).attr('name'), $(this).val());
+        }
     });
     submitButton.attr('disabled','disabled');
 

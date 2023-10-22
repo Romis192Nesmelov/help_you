@@ -4,6 +4,27 @@ body {
     /*background-color: #d0d2d6;*/
 }
 
+.text-orange {
+    color: #e65639;
+}
+
+.bg-orange,
+.bg-gray {
+    width: 100%;
+    padding: 10px 0;
+    text-align: center;
+    color: white;
+    background-color: #e65639;
+}
+
+.bg-gray {
+    width: 100%;
+    padding: 10px 0;
+    text-align: center;
+    color: white;
+    background-color: #707070FF;
+}
+
 a,
 td.icon i {
     color: #e65639;
@@ -40,6 +61,20 @@ h2 {
     margin-bottom: 20px;
 }
 
+ul.subtypes li {
+    font-size: 16px;
+    list-style: none;
+    color: grey;
+}
+
+ul.subtypes li::before {
+    content: "\2022";
+    color: #e65639;
+    font-weight: bold;
+    display: inline-block;
+    width: 1em;
+}
+
 table {
     border-collapse: collapse;
     border-spacing: 0;
@@ -72,6 +107,7 @@ table {
 }
 
 .form-group input,
+.form-group select,
 .form-group textarea {
     border-radius: 20px;
 }
@@ -518,7 +554,7 @@ table.datatable-basic td .head {
     font-size: 16px;
 }
 
-table.datatable-basic td .address {
+table.datatable-basic td .content {
     font-size: 13px;
     color: grey;
 }
@@ -627,7 +663,8 @@ table.datatable-basic td.icon {
     color: grey;
 }
 
-#order-modal #avatar-block {
+#order-modal #avatar-block,
+#order-respond-modal #avatar-block {
     width: 100%;
     padding: 0 0 20px 20px;
     margin: 0;

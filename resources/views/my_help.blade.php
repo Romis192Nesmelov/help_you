@@ -3,8 +3,8 @@
 @section('content')
 
 @include('blocks.modal_delete_block',[
-    'action' => 'delete_order',
-    'head' => trans('content.do_you_really_want_to_delete_this_order')
+    'action' => 'delete_response',
+    'head' => trans('content.do_you_really_want_to_withdraw_your_response')
 ])
 
 <div class="row">
@@ -13,13 +13,13 @@
         <div class="rounded-block tall">
             <h2>{{ trans('auth.my_orders') }}</h2>
             @include('blocks.top_sub_menu_block',[
-                'menus' => ['active','approving','archive'],
+                'menus' => ['active','archive'],
                 'suffix' => '_orders',
                 'items' => $orders
             ])
             @include('blocks.tab_orders_block', [
-                'menus' => ['active','approving','archive'],
-                'useButton' => true
+                'menus' => ['active','archive'],
+                'useButton' => false
             ])
         </div>
     </div>
