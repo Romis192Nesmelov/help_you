@@ -28,4 +28,7 @@
             ])
         </div>
     </div>
+    @if (!auth()->check())
+        <script>let getPrevUrl = "{{ route('prev_url') }}";</script>
+    @endif
 @endsection

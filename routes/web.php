@@ -17,11 +17,13 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', [BaseController::class, 'index'])->name('home');
-//Route::get('/map', [BaseController::class, 'map'])->name('map');
-Route::get('/about', [BaseController::class, 'index'])->name('about');
-Route::get('/how_does_it_work', [BaseController::class, 'index'])->name('how_does_it_work');
-Route::get('/partners', [BaseController::class, 'partners'])->name('partners');
+Route::controller(BaseController::class)->group(function () {
+    Route::get('/', 'index')->name('home');
+    Route::get('/about', 'index')->name('about');
+    Route::get('/how_does_it_work', 'index')->name('how_does_it_work');
+    Route::get('/partners', 'partners')->name('partners');
+    Route::get('/prev-url', 'prevUrl')->name('prev_url');
+});
 
 Route::prefix('auth')->name('auth.')->controller(AuthController::class)->group(function () {
     Route::post('/login', 'login')->name('login');
@@ -48,6 +50,7 @@ Route::prefix('account')->name('account.')->controller(AccountController::class)
 
 Route::middleware(['auth','account.completed'])->controller(OrderController::class)->group(function () {
     Route::get('/orders', 'orders')->name('orders');
+    Route::post('/get-preview', 'getPreview')->name('get_preview');
     Route::post('/get-orders', 'getOrders')->name('get_orders');
     Route::post('/order-response', 'orderResponse')->name('order_response');
     Route::get('/new-order', 'newOrder')->name('new_order');

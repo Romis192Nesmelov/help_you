@@ -165,8 +165,11 @@ $(document).ready(function () {
                             backButton.removeAttr('disabled');
                         });
                     } else {
+                        setTimeout(function () {
+                            window.location.href = orderPreviewUrl;
+                        }, 3000);
                         completeModal.modal('show').on('hidden.bs.modal', () => {
-                            window.location.href = '/';
+                            window.location.href = orderPreviewUrl;
                         })
                     }
                 });

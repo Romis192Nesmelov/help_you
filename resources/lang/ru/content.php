@@ -77,7 +77,8 @@ return [
 
     'thanks_to_respond' => 'Спасибо, что откликнулись на заяку №<span class="order-number">:number</span><br>от <span class="order-date">:date</span>',
     'waiting_for_you_at_the_address' => 'ждет вас по адресу:',
-    'you_can_discuss_details_in_chat' => 'Подробности вы можете обсудить в чате.'
+    'you_can_discuss_details_in_chat' => 'Подробности вы можете обсудить в чате.',
+    'show_default_map' => 'Показать общую карту'
 
 //    'in_russian' => ' по русски',
 //    'in_english' => ' по по английски',

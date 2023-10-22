@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers;
 
-//use App\Models\City;
 use App\Models\Partner;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Session;
 
 class BaseController extends Controller
 {
@@ -17,7 +16,7 @@ class BaseController extends Controller
     protected string $activeLeftMenu = '';
     protected string $activeSubMenu = '';
 
-    public function index() :View|RedirectResponse
+    public function index() :View
     {
         return $this->showView('home');
     }
@@ -34,20 +33,10 @@ class BaseController extends Controller
         }
     }
 
-//    public function map() :View
-//    {
-//        $this->data['cities'] = City::all();
-//        return $this->showView('map');
-//    }
-
-//    protected function setSeo($seo): void
-//    {
-//        if ($seo) {
-//            foreach (['title', 'keywords', 'description'] as $item) {
-//                $this->data[$item] = $seo[$item];
-//            }
-//        }
-//    }
+    public function prevUrl(): JsonResponse
+    {
+        return response()->json(['url' => Session::get('prev_url')],200);
+    }
 
     protected function showView($view) :View
     {
@@ -107,7 +96,7 @@ class BaseController extends Controller
             } else $this->deleteFile($itemModel[$fileField]);
         }
         $itemModel->delete();
-        return response()->json(['success' => true],200);
+        return response()->json([],200);
     }
 
     protected function deleteFile($path): void

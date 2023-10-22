@@ -40,7 +40,7 @@
 <div class="row">
     <div class="col-12 col-lg-3">
         <div class="rounded-block tall">
-            <form method="post" action="{{ route('get_orders') }}">
+            <form method="post" action="{{ $order_preview ? route('get_preview') : route('get_orders') }}">
                 @csrf
                 <h2>{{ trans('content.filters') }}</h2>
                 @include('blocks.select_block',[
@@ -65,19 +65,27 @@
                         'primary' => true,
                         'buttonText' => trans('content.apply')
                     ])
+                    @if ($order_preview)
+                        @include('blocks.button_block',[
+                            'id' => 'show-default',
+                            'primary' => true,
+                            'addClass' => 'mt-2',
+                            'buttonText' => trans('content.show_default_map')
+                        ])
+                    @endif
                 </div>
             </form>
         </div>
     </div>
     <div class="col-12 col-lg-9">
-        <div id="map" class="rounded-block tall">
-
-        </div>
+        <div id="map" class="rounded-block tall"></div>
     </div>
 </div>
 <script type="text/javascript" src="{{ asset('js/orders.js') }}"></script>
 <script>
     let orderResponseUrl = "{{ route('order_response') }}",
-        absentDescr = "{{ trans('content.absent') }}";
+        getOrdersUrl =  "{{ route('get_orders') }}",
+        absentDescr = "{{ trans('content.absent') }}",
+        userId = parseInt("{{ auth()->id() }}");
 </script>
 @endsection

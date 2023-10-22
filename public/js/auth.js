@@ -22,11 +22,11 @@ $(window).on('load', function () {
         resetButton = $('#reset-button');
 
     // Click to another links on home page
-    $('.link-cover').click((e) => {
-        e.preventDefault();
-        localStorage.setItem('want_url',$(e.target).parents('a').attr('href'));
-        loginModal.modal('show');
-    });
+    // $('.link-cover').click((e) => {
+    //     e.preventDefault();
+    //     localStorage.setItem('want_url',$(e.target).parents('a').attr('href'));
+    //     loginModal.modal('show');
+    // });
 
     let unlockLoginButton = () => {
         if (loginPhoneField.val().match(phoneRegExp)) {
@@ -59,8 +59,14 @@ $(window).on('load', function () {
                 $('#account-href').removeClass('d-none');
                 $('#navbar-dropdown-messages').removeClass('d-none');
                 $('#right-button-block').removeClass('justify-content-end').addClass('justify-content-between');
-                let wnantUrl = localStorage.getItem('want_url');
-                if (wnantUrl) window.location.href = wnantUrl;
+                // let wnantUrl = localStorage.getItem('want_url');
+                // if (wnantUrl) window.location.href = wnantUrl;
+                $.get(
+                    getPrevUrl,
+                    (data) => {
+                        window.location.href = data.url;
+                    }
+                );
             } else {
                 window.location.href = accountUrl;
             }

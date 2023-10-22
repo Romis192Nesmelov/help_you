@@ -58,7 +58,7 @@
                     </div>
                     <div id="inputs-step2" class="{{ getStepClass(2) }}">
                         @include('blocks.input_block',[
-                            'name' => 'performers',
+                            'name' => 'need_performers',
                             'min' => 1,
                             'max' => 20,
                             'type' => 'number',
@@ -120,6 +120,7 @@
     <script>
         const nextStepUrl = "{{ route('next_step') }}",
             backStepUrl = "{{ route('prev_step') }}",
+            orderPreviewUrl  = "{{ route('orders',['preview' => 1]) }}",
             yandexApiKey = "{{ env('YANDEX_API_KEY') }}",
             errorCheckAddress = "{{ trans('validation.check_the_address') }}";
         let step = parseInt("{{ session()->has('steps') ? count(session()->get('steps')) : 0 }}");

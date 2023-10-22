@@ -9,6 +9,14 @@ $(document).ready(function () {
         getPoints();
     });
 
+    $('#show-default').click(function (e) {
+        e.preventDefault();
+        $('form').attr('action',getOrdersUrl);
+        window.myMap.geoObjects.removeAll();
+        getPoints();
+        $(this).remove();
+    });
+
     $('#respond-button').click(function (e) {
         e.preventDefault();
         window.orderModal.modal('hide');
@@ -34,50 +42,52 @@ let mapInitWithContainer = () => {
 let getPoints = () => {
     getUrl($('form'), null, (data) => {
         window.placemarks = [];
-        $.each(data, function (k,point) {
-            if (point.need_performers > point.performers.length) {
-                let createdAt = new Date(point.created_at);
-                window.placemarks.push(getPlaceMark([point.latitude, point.longitude], {
-                    placemarkId: k,
-                    balloonContentHeader: '<a data-id="' + k + '" class="list-item">' + point.order_type.name + '</a>',
-                    balloonContentBody: point.address,
-                    orderId: point.id,
-                    orderType: point.order_type.name,
-                    orderSubTypes: point.order_type.subtypes,
-                    subtypes: point.subtypes,
-                    need_performers: point.need_performers,
-                    performers: point.performers.length,
-                    user: point.user,
-                    date: createdAt.toLocaleDateString('ru-RU'),
-                    description: point.description
-                }));
-            }
-        });
+        if (data.length) {
+            $.each(data, function (k,point) {
+                if (point.need_performers > point.performers.length) {
+                    let createdAt = new Date(point.created_at);
+                    window.placemarks.push(getPlaceMark([point.latitude, point.longitude], {
+                        placemarkId: k,
+                        balloonContentHeader: '<a data-id="' + k + '" class="list-item">' + point.order_type.name + '</a>',
+                        balloonContentBody: point.address,
+                        orderId: point.id,
+                        orderType: point.order_type.name,
+                        orderSubTypes: point.order_type.subtypes,
+                        subtypes: point.subtypes,
+                        need_performers: point.need_performers,
+                        performers: point.performers.length,
+                        user: point.user,
+                        date: createdAt.toLocaleDateString('ru-RU'),
+                        description: point.description
+                    }));
+                }
+            });
 
-        // Создаем собственный макет с информацией о выбранном геообъекте.
-        let customBalloonContentLayout = ymaps.templateLayoutFactory.createClass([
-            '<ul class=list>',
-            // Выводим в цикле список всех геообъектов.
-            '{% for geoObject in properties.geoObjects %}',
-            '<li><div class="balloon-head">{{ geoObject.properties.balloonContentHeader|raw }}</div><div class="balloon-content">{{ geoObject.properties.balloonContentBody|raw }}</div></li>',
-            '{% endfor %}',
-            '</ul>'
-        ].join(''));
+            // Создаем собственный макет с информацией о выбранном геообъекте.
+            let customBalloonContentLayout = ymaps.templateLayoutFactory.createClass([
+                '<ul class=list>',
+                // Выводим в цикле список всех геообъектов.
+                '{% for geoObject in properties.geoObjects %}',
+                '<li><div class="balloon-head">{{ geoObject.properties.balloonContentHeader|raw }}</div><div class="balloon-content">{{ geoObject.properties.balloonContentBody|raw }}</div></li>',
+                '{% endfor %}',
+                '</ul>'
+            ].join(''));
 
-        window.clusterer = new ymaps.Clusterer({
-            preset: 'islands#invertedRedClusterIcons',
-            clusterDisableClickZoom: true,
-            clusterOpenBalloonOnClick: true,
-            // Устанавливаем режим открытия балуна.
-            // В данном примере балун никогда не будет открываться в режиме панели.
-            clusterBalloonPanelMaxMapArea: 0,
-            // По умолчанию опции балуна balloonMaxWidth и balloonMaxHeight не установлены для кластеризатора,
-            // так как все стандартные макеты имеют определенные размеры.
-            clusterBalloonMaxHeight: 200,
-            // Устанавливаем собственный макет контента балуна.
-            clusterBalloonContentLayout: customBalloonContentLayout,
-        });
-        addPointsToMap();
+            window.clusterer = new ymaps.Clusterer({
+                preset: 'islands#invertedRedClusterIcons',
+                clusterDisableClickZoom: true,
+                clusterOpenBalloonOnClick: true,
+                // Устанавливаем режим открытия балуна.
+                // В данном примере балун никогда не будет открываться в режиме панели.
+                clusterBalloonPanelMaxMapArea: 0,
+                // По умолчанию опции балуна balloonMaxWidth и balloonMaxHeight не установлены для кластеризатора,
+                // так как все стандартные макеты имеют определенные размеры.
+                clusterBalloonMaxHeight: 200,
+                // Устанавливаем собственный макет контента балуна.
+                clusterBalloonContentLayout: customBalloonContentLayout,
+            });
+            addPointsToMap();
+        }
     });
 }
 
@@ -95,7 +105,8 @@ let bindOrderClick = () => {
             user = properties.get('user'),
             description = properties.get('description'),
             orderSubTypes = properties.get('orderSubTypes'),
-            currentSubTypes = properties.get('subtypes');
+            currentSubTypes = properties.get('subtypes'),
+            respondButton = $('#respond-button');
 
         window.selectedPoint = point;
 
@@ -121,6 +132,10 @@ let bindOrderClick = () => {
         $('#need-performers').html(properties.get('need_performers'));
         $('#ready-to-help').html(properties.get('performers'));
         $('#order-description').html(description ? description : absentDescr);
+
+        if (userId === user.id) respondButton.attr('disabled','disabled');
+        else respondButton.removeAttr('disabled');
+
         window.orderModal.modal('show');
     });
 }

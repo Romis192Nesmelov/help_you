@@ -16,9 +16,10 @@ use Illuminate\View\View;
 
 class OrderController extends BaseController
 {
-    public function orders(): View
+    public function orders(Request $request): View
     {
         $this->getItems('order_types', new OrderType());
+        $this->data['order_preview'] = $request->has('preview') && $request->preview;
         return $this->showView('orders');
     }
 
@@ -36,12 +37,34 @@ class OrderController extends BaseController
         );
     }
 
+    public function getPreview(): JsonResponse
+    {
+        return response()->json(
+            Order::query()
+                ->where('user_id',Auth::id())
+                ->where('active',1)
+                ->where('approved',0)
+                ->filtered()
+                ->with('orderType')
+                ->with('user')
+                ->with('performers')
+                ->latest('created_at')
+                ->limit(1)
+                ->get(),
+            200
+        );
+    }
+
     public function orderResponse(OrderResponseRequest $request): JsonResponse
     {
         $fields = $request->validated();
         $fields['user_id'] = Auth::id();
-        OrderUser::create($fields);
-        return response()->json([],200);
+        $order = Order::find($fields['order_id']);
+        if ($order->user_id == Auth::id()) return response()->json([],403);
+        else {
+            OrderUser::create($fields);
+            return response()->json([],200);
+        }
     }
 
     public function newOrder(): View
@@ -109,6 +132,6 @@ class OrderController extends BaseController
     {
         $orderUser = OrderUser::where('order_id',$request->id)->where('user_id',Auth::id())->first();
         $orderUser->delete();
-        return response()->json(['success' => true],200);
+        return response()->json([],200);
     }
 }
