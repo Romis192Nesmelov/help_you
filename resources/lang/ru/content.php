@@ -69,7 +69,7 @@ return [
     'deleted' => 'Удалено',
 
     'order_number' => 'Заяка №<span class="order-number">:number</span> от <span class="order-date">:date</span>',
-    'born_date' => 'Дата рожения: <span id="born-date">:born</span>',
+    'born_date' => 'Дата рожения: <span class="born-date">:born</span>',
     'respond_to_an_order' => 'Откликнуться на заявку',
 
     'order_types' => 'Виды помощи',
@@ -78,7 +78,9 @@ return [
     'thanks_to_respond' => 'Спасибо, что откликнулись на заяку №<span class="order-number">:number</span><br>от <span class="order-date">:date</span>',
     'waiting_for_you_at_the_address' => 'ждет вас по адресу:',
     'you_can_discuss_details_in_chat' => 'Подробности вы можете обсудить в чате.',
-    'show_default_map' => 'Показать общую карту'
+    'show_default_map' => 'Показать общую карту',
+    'subscribe' => 'Подписаться',
+    'unsubscribe' => 'Отписаться'
 
 //    'in_russian' => ' по русски',
 //    'in_english' => ' по по английски',

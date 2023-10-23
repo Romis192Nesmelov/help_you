@@ -11,6 +11,6 @@ class City extends Model
 
     public function points(): HasMany
     {
-        return $this->hasMany(Point::class);
+        return $this->hasMany(Order::class);
     }
 }

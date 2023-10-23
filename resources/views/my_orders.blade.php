@@ -3,7 +3,7 @@
 @section('content')
 
 @include('blocks.modal_delete_block',[
-    'action' => 'delete_order',
+    'action' => 'order.delete_order',
     'head' => trans('content.do_you_really_want_to_delete_this_order')
 ])
 

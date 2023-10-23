@@ -47,7 +47,7 @@ return [
 //    'new_password' => '. Новый пароль: :password у id# :id',
 
     'messages' => 'Сообщения',
-    'subscriptions' => 'Подписки',
+    'my_subscriptions' => 'Мои подписки',
     'my_orders' => 'Мои запросы',
     'my_help' => 'Моя помощь',
     'incentives' => 'Поощрения от партнеров',

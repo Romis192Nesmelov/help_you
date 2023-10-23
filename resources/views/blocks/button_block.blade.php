@@ -23,7 +23,7 @@
     @endif
 >
     @if (isset($icon))
-        <span class="{{ $icon }}"></span>
+        <i class="{{ $icon }}"></i>
     @endif
-    {{ $buttonText }}
+    <span>{{ $buttonText }}</span>
 </button>

@@ -21,7 +21,7 @@
                     <h2 id="head2-step{{ $i }}" class="{{ getStepClass($i) }}">{{ trans('new_order.h2_step'.$i) }}</h2>
                 @endfor
 
-                <form method="post" action="{{ route('next_step') }}">
+                <form method="post" action="{{ route('order.next_step') }}">
                     @csrf
                     <div id="inputs-step1" class="{{ getStepClass(1) }}">
                         <div class="ps-3">
@@ -118,9 +118,9 @@
         </div>
     </div>
     <script>
-        const nextStepUrl = "{{ route('next_step') }}",
-            backStepUrl = "{{ route('prev_step') }}",
-            orderPreviewUrl  = "{{ route('orders',['preview' => 1]) }}",
+        const nextStepUrl = "{{ route('order.next_step') }}",
+            backStepUrl = "{{ route('order.prev_step') }}",
+            orderPreviewUrl  = "{{ route('order.orders',['preview' => 1]) }}",
             yandexApiKey = "{{ env('YANDEX_API_KEY') }}",
             errorCheckAddress = "{{ trans('validation.check_the_address') }}";
         let step = parseInt("{{ session()->has('steps') ? count(session()->get('steps')) : 0 }}");

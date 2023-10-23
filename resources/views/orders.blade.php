@@ -4,7 +4,7 @@
 <x-modal id="order-modal">
     <h5 class="bg-gray">{!! trans('content.order_number') !!}</h5>
     <hr/>
-    @include('blocks.avatar_block',['accountMode' => false])
+    @include('blocks.avatar_block',['accountMode' => false, 'born' => true])
     <h2 class="order-type mt-3 bg-orange"></h2>
     <ul class="subtypes"></ul>
     <hr>
@@ -40,7 +40,7 @@
 <div class="row">
     <div class="col-12 col-lg-3">
         <div class="rounded-block tall">
-            <form method="post" action="{{ $order_preview ? route('get_preview') : route('get_orders') }}">
+            <form method="post" action="{{ $order_preview ? route('order.get_preview') : route('order.get_orders') }}">
                 @csrf
                 <h2>{{ trans('content.filters') }}</h2>
                 @include('blocks.select_block',[
@@ -83,9 +83,12 @@
 </div>
 <script type="text/javascript" src="{{ asset('js/orders.js') }}"></script>
 <script>
-    let orderResponseUrl = "{{ route('order_response') }}",
-        getOrdersUrl =  "{{ route('get_orders') }}",
+    let orderResponseUrl = "{{ route('order.order_response') }}",
+        subscribeUrl = "{{ route('account.subscription') }}",
+        getOrdersUrl =  "{{ route('order.get_orders') }}",
         absentDescr = "{{ trans('content.absent') }}",
+        subscribe = "{{ trans('content.subscribe') }}",
+        unsubscribe = "{{ trans('content.unsubscribe') }}",
         userId = parseInt("{{ auth()->id() }}");
 </script>
 @endsection

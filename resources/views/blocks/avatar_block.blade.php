@@ -23,6 +23,17 @@
                     <div class="born">{!! trans('content.born_date') !!}</div>
                 @endif
             </td>
+            @if (!$accountMode)
+                <td>
+                    @include('blocks.button_block',[
+                        'id' => 'subscribe-button',
+                        'addClass' => 'mt-0',
+                        'icon' => 'icon-bell-check',
+                        'primary' => true,
+                        'buttonText' => trans('content.subscribe')
+                    ])
+                </td>
+            @endif
         </tr>
         @if ($accountMode)
             <tr>

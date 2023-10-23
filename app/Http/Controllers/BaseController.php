@@ -46,7 +46,7 @@ class BaseController extends Controller
                 'mainMenu' => ['about', 'how_does_it_work', 'partners',],
                 'leftMenu' => [
                     ['icon' => 'icon-bubbles4', 'key' => 'messages'],
-                    ['icon' => 'icon-mail-read', 'key' => 'subscriptions'],
+                    ['icon' => 'icon-mail-read', 'key' => 'my_subscriptions'],
                     ['icon' => 'icon-drawer-out', 'key' => 'my_orders'],
                     ['icon' => 'icon-lifebuoy', 'key' => 'my_help'],
                     ['icon' => 'icon-gift', 'key' => 'incentives']

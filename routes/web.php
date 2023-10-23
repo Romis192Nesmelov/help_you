@@ -42,21 +42,21 @@ Route::prefix('account')->name('account.')->controller(AccountController::class)
     Route::post('/edit-account', 'editAccount')->name('edit_account');
 
     Route::get('/messages', 'messages')->name('messages');
-    Route::get('/subscriptions', 'account')->name('subscriptions');
+    Route::get('/my-subscriptions', 'mySubscriptions')->name('my_subscriptions');
     Route::get('/my-orders', 'myOrders')->name('my_orders');
     Route::get('/my-help', 'myHelp')->name('my_help');
     Route::get('/incentives', 'account')->name('incentives');
+    Route::get('/subscription', 'subscription')->name('subscription');
 });
 
-Route::middleware(['auth','account.completed'])->controller(OrderController::class)->group(function () {
+Route::middleware(['auth','account.completed'])->name('order.')->controller(OrderController::class)->group(function () {
     Route::get('/orders', 'orders')->name('orders');
     Route::post('/get-preview', 'getPreview')->name('get_preview');
     Route::post('/get-orders', 'getOrders')->name('get_orders');
     Route::post('/order-response', 'orderResponse')->name('order_response');
     Route::get('/new-order', 'newOrder')->name('new_order');
-    Route::post('/delete-order', 'deleteOrder')->name('delete_order');
-    Route::post('/delete-response', 'deleteResponse')->name('delete_response');
     Route::post('/next-step', 'nextStep')->name('next_step');
-    Route::get('/next-step', 'nextStep')->name('next_step');
     Route::get('/prev-step', 'prevStep')->name('prev_step');
+    Route::post('/delete-response', 'deleteResponse')->name('delete_response');
+    Route::post('/delete-order', 'deleteOrder')->name('delete_order');
 });

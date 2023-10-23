@@ -20,5 +20,6 @@ class DatabaseSeeder extends Seeder
         $this->call(OrderTypesSeeder::class);
         Order::factory(100)->create();
         $this->call(OrdersSeeder::class);
+        $this->call(SubscriptionTypesSeeder::class);
     }
 }

@@ -15,6 +15,7 @@ body {
     text-align: center;
     color: white;
     background-color: #e65639;
+    border-radius: 10px;
 }
 
 .bg-gray {
@@ -225,12 +226,18 @@ button.btn.btn-primary {
     background: #e65639;
 }
 
+button.btn.btn-gray {
+    color: white;
+    background: gray;
+    border-color: darkgray;
+}
+
 button.btn.btn-secondary {
     color: black;
     background: none;
 }
 
-button.btn > span {
+button.btn > i {
     margin-right: 5px;
 }
 
@@ -666,8 +673,13 @@ table.datatable-basic td.icon {
 #order-modal #avatar-block,
 #order-respond-modal #avatar-block {
     width: 100%;
-    padding: 0 0 20px 20px;
+    padding: 0;
     margin: 0;
+}
+
+#order-modal #avatar-block table,
+#order-respond-modal #avatar-block table {
+    width: 100%;
 }
 
 #order-modal ul {

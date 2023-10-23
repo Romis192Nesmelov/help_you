@@ -18,13 +18,13 @@
                 'addClass' => 'half',
                 'head' => trans('content.home_head2'),
                 'content' => trans('content.home_text_block3'),
-                'link' => route('orders')
+                'link' => route('order.orders')
             ])
             @include('blocks.rounded_home_block',[
                 'addClass' => 'half',
                 'head' => trans('content.home_head3'),
                 'content' => trans('content.home_text_block4'),
-                'link' => route('new_order')
+                'link' => route('order.new_order')
             ])
         </div>
     </div>

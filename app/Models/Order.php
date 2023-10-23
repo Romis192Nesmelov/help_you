@@ -29,6 +29,11 @@ class Order extends Model
         'active'
     ];
 
+    public function city(): BelongsTo
+    {
+        return $this->belongsTo(City::class);
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -47,6 +52,11 @@ class Order extends Model
     public function images(): HasMany
     {
         return $this->hasMany(OrderImage::class);
+    }
+
+    public function readSubscribers(): HasMany
+    {
+        return $this->hasMany(ReadOrder::class);
     }
 
     public function scopeDefault(Builder $query): void

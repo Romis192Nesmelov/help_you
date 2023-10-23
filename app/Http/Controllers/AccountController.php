@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Http\Request;
-use App\Models\Order;
-use Carbon\Carbon;
 use App\Http\Requests\Account\ChangePasswordRequest;
 use App\Http\Requests\Account\ChangePhoneRequest;
 use App\Http\Requests\Account\EditAccountRequest;
 use App\Http\Requests\Account\GetCodeRequest;
+use App\Http\Requests\Account\SubscriptionRequest;
+use App\Models\Subscription;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -23,6 +22,13 @@ class AccountController extends BaseController
     {
         $this->data['active_left_menu'] = null;
         return $this->showView('account');
+    }
+
+    public function mySubscriptions()
+    {
+        $this->data['subscriptions'] = Subscription::query()->default()->get();
+        $this->data['active_left_menu'] = 'my_subscriptions';
+        return $this->showView('my_subscriptions');
     }
 
     public function myOrders(): View
@@ -88,5 +94,22 @@ class AccountController extends BaseController
         $fields = $this->processingImage($request, $fields,'avatar', 'images/avatars/', Auth::id());
         Auth::user()->update($fields);
         return response()->json(['message' => trans('content.save_complete')],200);
+    }
+
+    public function subscription(SubscriptionRequest $request): JsonResponse
+    {
+        if (Auth::id() == $request->user_id) return response()->json([],403);
+        $subscription = Subscription::where('subscriber_id',Auth::id())->where('user_id',$request->user_id)->first();
+        if ($subscription) {
+            $subscription->delete();
+            $revert = false;
+        } else {
+            Subscription::create([
+                'subscriber_id' => Auth::id(),
+                'user_id' => $request->user_id
+            ]);
+            $revert = true;
+        }
+        return response()->json(['revert' => $revert],200);
     }
 }

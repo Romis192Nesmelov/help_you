@@ -13,7 +13,7 @@
     </div>
 @endforeach
 @if ($useButton)
-    <a href="{{ route('new_order') }}">
+    <a href="{{ route('order.new_order') }}">
         @include('blocks.button_block',[
             'addClass' => 'absolute-bottom',
             'primary' => true,

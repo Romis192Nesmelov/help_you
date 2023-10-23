@@ -8,6 +8,7 @@ use App\Http\Requests\Order\OrderResponseRequest;
 use App\Models\Order;
 use App\Models\OrderType;
 use App\Models\OrderUser;
+use App\Models\Subscription;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -25,22 +26,27 @@ class OrderController extends BaseController
 
     public function getOrders(): JsonResponse
     {
-        return response()->json(
-            Order::query()
-            ->default()
-            ->filtered()
-            ->with('orderType')
-            ->with('user')
-            ->with('performers')
-            ->get(),
+        return response()->json([
+            'orders' => Order::query()
+                ->default()
+                ->filtered()
+                ->with('orderType')
+                ->with('user')
+                ->with('performers')
+                ->get(),
+            'subscriptions' => Subscription::query()
+                ->select('user_id')
+                ->default()
+                ->get()
+        ],
             200
         );
     }
 
     public function getPreview(): JsonResponse
     {
-        return response()->json(
-            Order::query()
+        return response()->json([
+            'orders' => Order::query()
                 ->where('user_id',Auth::id())
                 ->where('active',1)
                 ->where('approved',0)
@@ -51,6 +57,8 @@ class OrderController extends BaseController
                 ->latest('created_at')
                 ->limit(1)
                 ->get(),
+            'subscriptions' => []
+        ],
             200
         );
     }

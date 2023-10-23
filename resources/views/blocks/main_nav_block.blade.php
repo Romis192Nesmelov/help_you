@@ -24,7 +24,7 @@
                     'addClass' => 'd-block d-sm-none'
                 ])
                 @include('blocks.nav-item_block', [
-                    'menuItem' => 'new_order',
+                    'menuItem' => 'order.new_order',
                     'menuName' => trans('menu.make_an_order'),
                     'addClass' => 'd-block d-sm-none'
                 ])

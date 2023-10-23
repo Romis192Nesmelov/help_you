@@ -2,22 +2,27 @@ $(document).ready(function () {
     ymaps.ready(mapInitWithContainer);
     window.orderModal = $('#order-modal');
     window.selectedPoint = null;
+    window.tokenField = $('input[name=_token]').val(),
+    window.showDefButton = $('#show-default');
+    window.respondButton = $('#respond-button');
+    window.subscribeButton = $('#subscribe-button');
 
-    $('#apply-button').click(function (e) {
+    $('#apply-button').click((e) => {
         e.preventDefault();
         window.myMap.geoObjects.removeAll();
         getPoints();
     });
 
-    $('#show-default').click(function (e) {
+    window.showDefButton.click((e) => {
         e.preventDefault();
+        // console.log($(this).attr('id'));
         $('form').attr('action',getOrdersUrl);
         window.myMap.geoObjects.removeAll();
         getPoints();
-        $(this).remove();
+        window.showDefButton.remove();
     });
 
-    $('#respond-button').click(function (e) {
+    window.respondButton.click((e) => {
         e.preventDefault();
         window.orderModal.modal('hide');
         $('#order-respond-modal').modal('show');
@@ -25,11 +30,22 @@ $(document).ready(function () {
         $.post(
             orderResponseUrl,
             {
-                '_token': $('input[name=_token]').val(),
+                '_token': window.tokenField,
                 'order_id': properties.get('orderId'),
             }
         ).done(() => {
             window.clusterer.remove(window.selectedPoint);
+        });
+    });
+
+    window.subscribeButton.click((e) => {
+        e.preventDefault();
+        let button = $(this);
+        $.get(
+            subscribeUrl,
+            {'user_id': window.selectedPoint.properties.get('user').id}
+        ).done((data) => {
+            revertSubscribeButton(data.revert);
         });
     });
 });
@@ -42,8 +58,13 @@ let mapInitWithContainer = () => {
 let getPoints = () => {
     getUrl($('form'), null, (data) => {
         window.placemarks = [];
-        if (data.length) {
-            $.each(data, function (k,point) {
+        let orders = data.orders;
+        window.subscriptions = [];
+        $.each(data.subscriptions, function (k,item) {
+            window.subscriptions.push(item.user_id);
+        });
+        if (orders.length) {
+            $.each(orders, function (k,point) {
                 if (point.need_performers > point.performers.length) {
                     let createdAt = new Date(point.created_at);
                     window.placemarks.push(getPlaceMark([point.latitude, point.longitude], {
@@ -105,8 +126,7 @@ let bindOrderClick = () => {
             user = properties.get('user'),
             description = properties.get('description'),
             orderSubTypes = properties.get('orderSubTypes'),
-            currentSubTypes = properties.get('subtypes'),
-            respondButton = $('#respond-button');
+            currentSubTypes = properties.get('subtypes');
 
         window.selectedPoint = point;
 
@@ -126,16 +146,47 @@ let bindOrderClick = () => {
         $('.order-date').html(properties.get('date'));
         if (user.avatar) $('.avatar.cir').css('background-image','url("/' + user.avatar + '")');
         $('.user-name').html(user.name);
-        $('.born').html(user.born);
+        $('.born-date').html(user.born);
         $('.order-type').html(properties.get('orderType'));
         $('.order-address').html(properties.get('balloonContentBody'));
         $('#need-performers').html(properties.get('need_performers'));
         $('#ready-to-help').html(properties.get('performers'));
         $('#order-description').html(description ? description : absentDescr);
 
-        if (userId === user.id) respondButton.attr('disabled','disabled');
-        else respondButton.removeAttr('disabled');
+        if (userId === user.id) {
+            window.respondButton.attr('disabled','disabled');
+            window.subscribeButton.hide();
+        } else {
+            window.respondButton.removeAttr('disabled');
+            window.subscribeButton.show();
+        }
 
+        changeSubscribeButton(window.subscriptions.includes(user.id));
         window.orderModal.modal('show');
     });
+}
+
+let revertSubscribeButton = (revert) => {
+    window.subscribeButton.fadeOut(() => {
+        changeSubscribeButton(revert);
+        window.subscribeButton.fadeIn();
+    });
+}
+
+let changeSubscribeButton = (revert) => {
+    let icon, buttonName, removeClass, addClass;
+    if (revert) {
+        icon = 'icon-bell-cross';
+        buttonName = unsubscribe;
+        removeClass = 'btn-primary';
+        addClass = 'btn-gray';
+    } else {
+        icon = 'icon-bell-check';
+        buttonName = subscribe;
+        removeClass = 'btn-gray';
+        addClass = 'btn-primary';
+    }
+    window.subscribeButton.find('i').prop('className', icon);
+    window.subscribeButton.find('span').html(buttonName);
+    window.subscribeButton.removeClass(removeClass).addClass(addClass);
 }

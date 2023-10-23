@@ -52,6 +52,16 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
+    public function subscriptions(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'subscriptions', 'subscriber_id');
+    }
+
+    public function subscribers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'subscriptions', 'user_id');
+    }
+
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class);
