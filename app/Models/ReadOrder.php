@@ -19,6 +19,6 @@ class ReadOrder extends Model
 
     public function order(): BelongsTo
     {
-        return $this->belongsTo(Order::class)->where('approved',1)->where('active',1);
+        return $this->belongsTo(Order::class);
     }
 }

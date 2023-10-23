@@ -1,7 +1,7 @@
 <div id="avatar-block" {{ isset($addClass) && $addClass ? 'class='.$addClass : '' }}>
     <table>
         <tr>
-            <td style="width: 70px;">
+            <td class="cell-avatar">
                 @if ($accountMode)
                     <div class="avatar cir @error('avatar') error @enderror" style="background-image: url({{ asset(auth()->user()->avatar ? auth()->user()->avatar : 'images/def_avatar.svg') }} );">
                         <img src="{{ asset('images/avatar_hover.svg') }}" />

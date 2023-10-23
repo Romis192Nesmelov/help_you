@@ -34,13 +34,14 @@ Route::prefix('auth')->name('auth.')->controller(AuthController::class)->group(f
 });
 
 Route::prefix('account')->name('account.')->controller(AccountController::class)->middleware(['auth'])->group(function () {
-    Route::get('/messages', 'messages')->name('messages');
-    Route::get('/change', 'account')->name('change');
     Route::post('/get-code', 'getCode')->name('get_code');
     Route::post('/change-phone', 'changePhone')->name('change_phone');
     Route::post('/change-password', 'changePassword')->name('change_password');
     Route::post('/edit-account', 'editAccount')->name('edit_account');
+    Route::post('/delete-subscription', 'deleteSubscription')->name('delete_subscription');
 
+    Route::get('/messages', 'messages')->name('messages');
+    Route::get('/change', 'account')->name('change');
     Route::get('/messages', 'messages')->name('messages');
     Route::get('/my-subscriptions', 'mySubscriptions')->name('my_subscriptions');
     Route::get('/my-orders', 'myOrders')->name('my_orders');

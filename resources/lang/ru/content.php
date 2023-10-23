@@ -10,7 +10,7 @@ return [
     'name' => 'Имя',
     'name1' => 'Наименование',
     'address' => 'Адрес',
-    'by_address' => 'По адрес',
+    'by_address' => 'По адресу',
     'map' => 'Карта',
     'message' => 'Сообщение',
     'website_message' => 'Сообщение с сайта ',
@@ -66,6 +66,7 @@ return [
     'you_must_fill_required_fields' => 'Вы должны заполнить все обязательные поля!',
     'do_you_really_want_to_delete_this_order' => 'Вы действительно хотите удалить эту заявку?',
     'do_you_really_want_to_withdraw_your_response' => 'Вы действительно хотите отозвать свой отклик?',
+    'do_you_really_want_to_unsubscribe' => 'Вы действительно хотите отписаться от этого пользователя?',
     'deleted' => 'Удалено',
 
     'order_number' => 'Заяка №<span class="order-number">:number</span> от <span class="order-date">:date</span>',

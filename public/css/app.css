@@ -570,7 +570,7 @@ table.datatable-basic td.icon {
     width: 7%;
 }
 
-.rounded-block.tall .datatable-scroll {
+.rounded-block.tall .content-block .datatable-scroll {
     height: 520px;
 }
 
@@ -630,7 +630,11 @@ table.datatable-basic td.icon {
     justify-content: left;
 }
 
-#avatar-block .avatar.cir {
+td.cell-avatar {
+    width: 70px;
+}
+
+.avatar.cir {
     width: 70px;
     height: 70px;
     overflow: hidden;
@@ -642,13 +646,13 @@ table.datatable-basic td.icon {
     background-repeat: no-repeat;
 }
 
-#avatar-block .avatar img {
+.avatar img {
     width: 70px;
     display: none;
     position: absolute;
 }
 
-#avatar-block .avatar input {
+.avatar input {
     width: 70px;
     height: 135px;
     position: absolute;
@@ -659,12 +663,12 @@ table.datatable-basic td.icon {
     z-index: 999;
 }
 
-#avatar-block .user-name {
+.user-name {
     font-size: 18px;
     margin-left: 25px;
 }
 
-#avatar-block .born {
+.born {
     font-size: 16px;
     margin-left: 25px;
     color: grey;
@@ -673,7 +677,7 @@ table.datatable-basic td.icon {
 #order-modal #avatar-block,
 #order-respond-modal #avatar-block {
     width: 100%;
-    padding: 0;
+    padding: 0 0 15px 0;
     margin: 0;
 }
 
@@ -743,8 +747,8 @@ table.datatable-basic td.icon {
         height: 500px;
     }
 
-    .rounded-block.tall .datatable-scroll {
-        height: 400px;
+    .rounded-block.tall .content-block .datatable-scroll {
+        height: 400px !important;
     }
 
     .rounded-block.three-quarter {
@@ -819,7 +823,7 @@ table.datatable-basic td.icon {
         min-height: 200px;
     }
 
-    .rounded-block.tall .datatable-scroll {
+    .rounded-block.tall .content-block .datatable-scroll {
         height: auto;
     }
 

@@ -3,7 +3,7 @@
 @section('content')
 
 @include('blocks.modal_delete_block',[
-    'action' => 'delete_response',
+    'action' => 'order.delete_response',
     'head' => trans('content.do_you_really_want_to_withdraw_your_response')
 ])
 

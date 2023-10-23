@@ -9,6 +9,7 @@ use App\Http\Requests\Account\GetCodeRequest;
 use App\Http\Requests\Account\SubscriptionRequest;
 use App\Models\Subscription;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -111,5 +112,14 @@ class AccountController extends BaseController
             $revert = true;
         }
         return response()->json(['revert' => $revert],200);
+    }
+
+    /**
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function deleteSubscription(Request $request): JsonResponse
+    {
+        return $this->deleteSomething($request, new Subscription());
     }
 }
