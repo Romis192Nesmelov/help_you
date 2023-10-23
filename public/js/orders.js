@@ -40,12 +40,13 @@ $(document).ready(function () {
 
     window.subscribeButton.click((e) => {
         e.preventDefault();
-        let button = $(this);
+        let userId = window.selectedPoint.properties.get('user').id;
         $.get(
             subscribeUrl,
-            {'user_id': window.selectedPoint.properties.get('user').id}
+            {'user_id': userId}
         ).done((data) => {
             revertSubscribeButton(data.revert);
+            window.subscriptions.push(userId);
         });
     });
 });
