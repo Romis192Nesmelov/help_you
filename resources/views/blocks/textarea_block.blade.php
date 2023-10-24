@@ -2,7 +2,7 @@
     @if (isset($label) && $label)
         <label for="{{ $name }}">{{ $label }}</label>
     @endif
-    <textarea name="{{ $name }}" class="form-control @error($name) error @enderror" placeholder="{{ isset($placeholder) && $placeholder ? $placeholder : '' }}">{{ old($name, '') }}</textarea>
+    <textarea name="{{ $name }}" class="form-control @error($name) error @enderror" placeholder="{{ isset($placeholder) && $placeholder ? $placeholder : '' }}">{{ old($name, ($value ?? '')) }}</textarea>
     @if (isset($ajax) && $ajax)
         @include('blocks.error_block')
     @else

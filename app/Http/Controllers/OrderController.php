@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Order\DeleteResponseRequest;
 use App\Http\Requests\Order\NextStepRequest;
+use App\Http\Requests\Order\OrderRequest;
 use App\Http\Requests\Order\OrderResponseRequest;
 use App\Http\Requests\Order\ReadOrderRequest;
 use App\Models\Order;
@@ -22,7 +23,7 @@ class OrderController extends BaseController
     public function newOrder(): View
     {
         $this->getItems('order_types', new OrderType());
-        return $this->showView('new_order');
+        return $this->showView('edit_order');
     }
 
     public function orders(Request $request): View
@@ -30,6 +31,18 @@ class OrderController extends BaseController
         $this->getItems('order_types', new OrderType());
         $this->data['order_preview'] = $request->has('preview') && $request->preview;
         return $this->showView('orders');
+    }
+
+    /**
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
+    public function editOrder(OrderRequest $request): View
+    {
+//        Session::forget('steps');
+        $this->data['order'] = Order::find($request->id);
+        $this->authorize('owner', $this->data['order']);
+        $this->getItems('order_types', new OrderType());
+        return $this->showView('edit_order');
     }
 
     public function readOrder(ReadOrderRequest $request): JsonResponse
@@ -119,7 +132,13 @@ class OrderController extends BaseController
                 }
                 $fields = array_merge($fields,$step);
             }
-            $order = Order::create($fields);
+
+            if ($request->has('id')) {
+                $order = Order::find($request->id);
+                $this->authorize('owner', $order);
+                $order->update($fields);
+            } else $order = Order::create($fields);
+
             return response()->json(['order' => $order],200);
         } else {
             Session::put('steps',$steps);

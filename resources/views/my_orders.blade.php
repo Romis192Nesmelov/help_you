@@ -19,7 +19,8 @@
             ])
             @include('blocks.tab_orders_block', [
                 'menus' => ['active','approving','archive'],
-                'useButton' => true
+                'useButton' => true,
+                'editRoute' => 'order.edit_order'
             ])
         </div>
     </div>

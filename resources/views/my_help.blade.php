@@ -19,7 +19,8 @@
             ])
             @include('blocks.tab_orders_block', [
                 'menus' => ['active','archive'],
-                'useButton' => false
+                'useButton' => false,
+                'editRoute' => null
             ])
         </div>
     </div>

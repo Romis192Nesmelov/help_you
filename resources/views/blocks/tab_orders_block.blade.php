@@ -5,8 +5,7 @@
                 'items' => $orders[$item],
                 'relationHead' => 'orderType',
                 'headName' => 'name',
-                'contentName' => 'address',
-                'editRoute' => '#'
+                'contentName' => 'address'
             ])
         @endif
         <h4 class="no-data-block text-uppercase text-secondary {{ count($orders[$item]) ? 'd-none' : '' }}">{{ trans('content.no_data') }}</h4>

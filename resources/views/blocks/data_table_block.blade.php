@@ -7,7 +7,7 @@
                 <div class="content">{{ isset($relationContent) ? $item->$relationContent->$contentName : $item->$contentName }}</div>
             </td>
             @if (isset($editRoute))
-                @include('blocks.edit_dt_row_block')
+                @include('blocks.edit_dt_row_block',['id' => $item->id])
             @else
                 <td></td>
             @endif

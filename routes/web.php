@@ -53,6 +53,7 @@ Route::prefix('account')->name('account.')->controller(AccountController::class)
 Route::middleware(['auth','account.completed'])->name('order.')->controller(OrderController::class)->group(function () {
     Route::get('/new-order', 'newOrder')->name('new_order');
     Route::get('/orders', 'orders')->name('orders');
+    Route::get('/edit-order', 'editOrder')->name('edit_order');
     Route::get('/read-order', 'readOrder')->name('read_order');
 
     Route::post('/get-orders', 'getOrders')->name('get_orders');

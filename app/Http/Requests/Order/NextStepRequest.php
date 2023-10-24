@@ -13,7 +13,7 @@ class NextStepRequest extends FormRequest
         ['order_type_id' => 'required|exists:order_types,id', 'subtypes' => 'nullable|array'],
         ['need_performers' => 'required|integer|min:1|max:20'],
         ['address' => 'required|string|min:5|max:200', 'latitude' => 'required|numeric', 'longitude' => 'required|numeric'],
-        ['description' => 'nullable|string|min:5|max:3000']
+        ['description' => 'nullable|string|min:5|max:3000', 'id' => 'nullable|exists:orders,id']
     ];
 
     /**

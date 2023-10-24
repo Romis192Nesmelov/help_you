@@ -18,10 +18,15 @@ class OrderFactory extends Factory
      */
     public function definition(): array
     {
+        $orderType = OrderType::all()->random()->id;
+        if ($orderType == 1) {
+            $subtypes = [rand(1,4)];
+        } else $subtypes = null;
         return [
             'user_id' => User::all()->random()->id,
-            'order_type_id' => OrderType::all()->random()->id,
+            'order_type_id' => $orderType,
             'city_id' => 1,
+            'subtypes' => $subtypes,
             'need_performers' => rand(1,20),
             'address' => fake()->address(),
             'latitude' => fake()->randomFloat(6, 55, 56),
