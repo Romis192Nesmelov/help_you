@@ -64,7 +64,7 @@ $(window).on('load', function () {
                 $.get(
                     getPrevUrl,
                     (data) => {
-                        window.location.href = data.url;
+                        if (data.url) window.location.href = data.url;
                     }
                 );
             } else {
