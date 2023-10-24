@@ -51,13 +51,17 @@ Route::prefix('account')->name('account.')->controller(AccountController::class)
 });
 
 Route::middleware(['auth','account.completed'])->name('order.')->controller(OrderController::class)->group(function () {
-    Route::get('/orders', 'orders')->name('orders');
-    Route::post('/get-preview', 'getPreview')->name('get_preview');
-    Route::post('/get-orders', 'getOrders')->name('get_orders');
-    Route::post('/order-response', 'orderResponse')->name('order_response');
     Route::get('/new-order', 'newOrder')->name('new_order');
+    Route::get('/orders', 'orders')->name('orders');
+    Route::get('/read-order', 'readOrder')->name('read_order');
+
+    Route::post('/get-orders', 'getOrders')->name('get_orders');
+    Route::post('/get-preview', 'getPreview')->name('get_preview');
+    Route::post('/order-response', 'orderResponse')->name('order_response');
+
     Route::post('/next-step', 'nextStep')->name('next_step');
     Route::get('/prev-step', 'prevStep')->name('prev_step');
-    Route::post('/delete-response', 'deleteResponse')->name('delete_response');
+
     Route::post('/delete-order', 'deleteOrder')->name('delete_order');
+    Route::post('/delete-response', 'deleteResponse')->name('delete_response');
 });

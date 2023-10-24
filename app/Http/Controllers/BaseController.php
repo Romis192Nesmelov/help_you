@@ -83,11 +83,11 @@ class BaseController extends Controller
      * @throws \Illuminate\Auth\Access\AuthorizationException
      * @throws \Illuminate\Validation\ValidationException
      */
-    protected function deleteSomething(Request $request, Model $model, $fileField=null): JsonResponse
+    protected function deleteSomething(Request $request, Model $model, $gate=false, $fileField=null): JsonResponse
     {
         $fields = $this->validate($request, ['id' => 'required|integer|exists:'.$model->getTable().',id']);
         $itemModel = $model->find($fields['id']);
-        $this->authorize('owner', $itemModel);
+        $this->authorize($gate, $itemModel);
         if ($fileField) {
             if (is_array($fileField)) {
                 foreach ($fileField as $field) {

@@ -37,56 +37,15 @@ $(window).on('load', function () {
         removeLoader();
     },700);
 
-    // Basic datatable
-    let dataTable = $('.datatable-basic');
-    if (dataTable.length) {
-        dataTable = dataTable.DataTable({iDisplayLength: 8});
+    // Datatable
+    let baseDataTable = dataTableAttributes($('.datatable-basic.default'), 8);
+    let subscrDataTable = dataTableAttributes($('.datatable-basic.subscriptions'), 6);
+    if (baseDataTable) clickYesDeleteOnModal(baseDataTable, true);
+    if (subscrDataTable) clickYesDeleteOnModal(subscrDataTable, false);
 
-        // Change pagination on data-tables
-        dataTable.on('draw.dt', function () {
-            bindDelete();
-            bindFancybox();
-        });
-        bindDelete();
-
-        $(window).resize(function() {
-            resizeDTable(dataTable);
-        });
-
-        // Click to delete items
-        window.deleteId = null;
-        window.deleteRow = null;
-
-        // Click YES on delete modal
-        $('.delete-yes').click(function () {
-            let deleteModal = $(this).parents('.modal');
-            deleteModal.modal('hide');
-            addLoader();
-
-            $.post(deleteModal.attr('del-function'), {
-                '_token': $('input[name=_token]').val(),
-                'id': window.deleteId,
-            }, () => {
-                let contentBlock = window.deleteRow.parents('.content-block'),
-                    contentId = contentBlock.attr('id').replace('content-',''),
-                    contentContainerCounter = $('#top-submenu-'+contentId).next('sup'),
-                    contentCounter = parseInt(contentContainerCounter.html());
-
-                contentCounter--;
-                contentContainerCounter.html(contentCounter);
-                dataTable.row(window.deleteRow).remove();
-
-                if (!contentCounter) {
-                    contentBlock.find('.no-data-block').removeClass('d-none');
-                    window.deleteRow.parents('.dataTables_wrapper').remove();
-                } else {
-                    dataTable.draw();
-                    bindDelete();
-                }
-                removeLoader();
-            });
-        });
-    }
+    // Click to delete items
+    window.deleteId = null;
+    window.deleteRow = null;
 
     // Top menu tabs
     let topMenu = $('.rounded-block.tall .top-submenu');
@@ -242,14 +201,17 @@ let resizeDTable = (dataTable) => {
 }
 
 let bindDelete = () => {
-    let deleteIcon = $('.icon-close2');
+    let deleteIcon = $('.icon-close2, .icon-bell-cross');
     deleteIcon.unbind();
     deleteIcon.click(function () {
-        let deleteModal = $('#' + $(this).attr('modal-data')),
-            inputId = deleteModal.find('input[name=id]');
-
         window.deleteId = $(this).attr('del-data');
-        window.deleteRow = $(this).parents('tr');
+        let deleteModal = $('#'+$(this).attr('modal-data')),
+            inputId = deleteModal.find('input[name=id]'),
+            possibleParentRow = $('#row-'+window.deleteId),
+            altParentRow = $('.row-'+window.deleteId);
+
+        window.deleteRow = possibleParentRow.length ? possibleParentRow : altParentRow;
+
         if (inputId.length) inputId.val(window.deleteId);
         deleteModal.modal('show');
     });
@@ -271,4 +233,62 @@ let getPlaceMark = (point, data) => {
 
 let zoomAndCenterMap = () => {
     window.myMap.setCenter(point, 17);
+}
+
+let dataTableAttributes = (dataTable, rows) => {
+    if (dataTable.length) {
+        dataTable = dataTable.DataTable({iDisplayLength: rows});
+
+        // Change pagination on data-tables
+        dataTable.on('draw.dt', function () {
+            bindDelete();
+            bindFancybox();
+        });
+        bindDelete();
+
+        $(window).resize(function () {
+            resizeDTable(dataTable);
+        });
+        return dataTable
+    } else return false;
+}
+
+let clickYesDeleteOnModal = (dataTable, useCounter) => {
+    // Click YES on delete modal
+    $('.delete-yes').click(function () {
+        let deleteModal = $(this).parents('.modal');
+        deleteModal.modal('hide');
+        addLoader();
+
+        $.post(deleteModal.attr('del-function'), {
+            '_token': $('input[name=_token]').val(),
+            'id': window.deleteId,
+        }, () => {
+            let contentBlock = window.deleteRow.parents('.content-block');
+            if (useCounter) {
+                let contentId = contentBlock.attr('id').replace('content-',''),
+                    contentContainerCounter = $('#top-submenu-'+contentId).next('sup'),
+                    contentCounter = parseInt(contentContainerCounter.html());
+
+                contentCounter--;
+                contentContainerCounter.html(contentCounter);
+            }
+
+            if (window.deleteRow.length > 1) {
+                window.deleteRow.each(function () {
+                    dataTable.row($(this)).remove();
+                });
+            } else dataTable.row(window.deleteRow).remove();
+            console.log(dataTable.rows().count());
+
+            if (!dataTable.rows().count()) {
+                contentBlock.find('.no-data-block').removeClass('d-none');
+                window.deleteRow.parents('.dataTables_wrapper').remove();
+            } else {
+                dataTable.draw();
+                bindDelete();
+            }
+            removeLoader();
+        });
+    });
 }

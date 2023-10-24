@@ -29,7 +29,7 @@ class OrderFactory extends Factory
 //            'estimated_start_time' => Carbon::now(),
 //            'estimated_end_time' => Carbon::now()->addDays(rand(1,10)),
             'description' => fake()->text(300),
-            'approved' => rand(0,1),
+            'approved' => 1,
             'active' => 1
         ];
     }

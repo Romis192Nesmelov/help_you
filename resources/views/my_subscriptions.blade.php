@@ -12,33 +12,32 @@
     <div class="col-12 col-lg-8">
         <div class="rounded-block tall">
             <h2>{{ trans('auth.my_subscriptions') }}</h2>
-{{--            @if (count($subscriptions))--}}
-{{--                <table class="table datatable-basic">--}}
-{{--                    @foreach ($subscriptions as $subscription)--}}
-{{--                        @foreach ($subscription->readOrders as $readOrder)--}}
-{{--                            <tr class="row-{{ $subscription->id }}">--}}
-{{--                                <td class="id">{{ $readOrder->id }}</td>--}}
-{{--                                <td class="cell-avatar">--}}
-{{--                                    <div class="avatar cir" style="background-image: url({{ asset($subscription->user->avatar ?? 'images/def_avatar.svg') }} );"></div>--}}
-{{--                                </td>--}}
-{{--                                <td>--}}
-{{--                                    <div class="head">{{ $subscription->user->name.' '.$subscription->user->family }}</div>--}}
-{{--                                    <div class="content">{!! trans('content.born_date',['born' => $subscription->user->born]) !!}</div>--}}
-{{--                                </td>--}}
-{{--                                <td>--}}
-{{--                                    <div class="head">{{ $readOrder->order->orderType->name }}</div>--}}
-{{--                                    <div class="content">{{ trans('content.address').': '.$readOrder->order->address }}</div>--}}
-{{--                                </td>--}}
-{{--    --}}{{--                            @include('blocks.del_dt_row_block', ['id' => $subscription->id])--}}
-{{--                            </tr>--}}
-{{--                        @endforeach--}}
-{{--                    @endforeach--}}
-{{--                </table>--}}
-{{--            @else--}}
-            <div class="content-block">
-                <h4 class="no-data-block text-uppercase text-secondary">{{ trans('content.no_data') }}</h4>
+            <div class="content-block simple">
+                @if (count($subscriptions))
+                    <table class="table datatable-basic subscriptions">
+                        @foreach ($subscriptions as $subscription)
+                            @foreach ($subscription->orders as $order)
+                                <tr class="row-{{ $subscription->id }}">
+                                    <td class="cell-avatar">
+                                        <div class="avatar cir" style="background-image: url({{ asset($subscription->user->avatar ?? 'images/def_avatar.svg') }} );"></div>
+                                    </td>
+                                    <td>
+                                        <div class="head">{{ $subscription->user->name.' '.$subscription->user->family }}</div>
+                                        <div class="content">{!! trans('content.born_date',['born' => $subscription->user->born]) !!}</div>
+                                    </td>
+                                    <td>
+                                        <div class="head"><a href="{{ route('order.orders',['id' => $order->id]) }}">{{ $order->orderType->name }}</a></div>
+                                        <div class="content">{{ trans('content.address').': '.$order->address }}</div>
+                                    </td>
+                                    @include('blocks.del_dt_row_block', ['id' => $subscription->id, 'icon' => 'icon-bell-cross'])
+                                </tr>
+                            @endforeach
+                        @endforeach
+                    </table>
+                @else
+                    <h4 class="no-data-block text-uppercase text-secondary">{{ trans('content.no_data') }}</h4>
+                @endif
             </div>
-{{--            @endif--}}
         </div>
     </div>
 </div>

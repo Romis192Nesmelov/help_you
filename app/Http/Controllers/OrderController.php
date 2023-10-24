@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Order\DeleteResponseRequest;
 use App\Http\Requests\Order\NextStepRequest;
 use App\Http\Requests\Order\OrderResponseRequest;
+use App\Http\Requests\Order\ReadOrderRequest;
 use App\Models\Order;
 use App\Models\OrderType;
 use App\Models\OrderUser;
+use App\Models\ReadOrder;
 use App\Models\Subscription;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -17,11 +19,26 @@ use Illuminate\View\View;
 
 class OrderController extends BaseController
 {
+    public function newOrder(): View
+    {
+        $this->getItems('order_types', new OrderType());
+        return $this->showView('new_order');
+    }
+
     public function orders(Request $request): View
     {
         $this->getItems('order_types', new OrderType());
         $this->data['order_preview'] = $request->has('preview') && $request->preview;
         return $this->showView('orders');
+    }
+
+    public function readOrder(ReadOrderRequest $request): JsonResponse
+    {
+        $readOrder = ReadOrder::where('order_id',$request->order_id)->first();
+        $this->authorize('subscriber', $readOrder->subscription);
+        $readOrder->read = true;
+        $readOrder->save();
+        return response()->json([],200);
     }
 
     public function getOrders(): JsonResponse
@@ -35,7 +52,7 @@ class OrderController extends BaseController
                 ->with('performers')
                 ->get(),
             'subscriptions' => Subscription::query()
-                ->select('user_id')
+                ->with('orders')
                 ->default()
                 ->get()
         ],
@@ -73,12 +90,6 @@ class OrderController extends BaseController
             OrderUser::create($fields);
             return response()->json([],200);
         }
-    }
-
-    public function newOrder(): View
-    {
-        $this->getItems('order_types', new OrderType());
-        return $this->showView('new_order');
     }
 
     public function nextStep(NextStepRequest $request): JsonResponse
@@ -133,7 +144,7 @@ class OrderController extends BaseController
      */
     public function deleteOrder(Request $request): JsonResponse
     {
-        return $this->deleteSomething($request, new Order());
+        return $this->deleteSomething($request, new Order(), 'owner');
     }
 
     public function deleteResponse(DeleteResponseRequest $request): JsonResponse

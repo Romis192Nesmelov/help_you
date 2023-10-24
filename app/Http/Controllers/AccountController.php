@@ -120,6 +120,6 @@ class AccountController extends BaseController
      */
     public function deleteSubscription(Request $request): JsonResponse
     {
-        return $this->deleteSomething($request, new Subscription());
+        return $this->deleteSomething($request, new Subscription(), 'subscriber');
     }
 }

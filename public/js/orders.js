@@ -61,9 +61,17 @@ let getPoints = () => {
         window.placemarks = [];
         let orders = data.orders;
         window.subscriptions = [];
-        $.each(data.subscriptions, function (k,item) {
-            window.subscriptions.push(item.user_id);
-        });
+        window.unreadOrders = [];
+        if (data.subscriptions.length) {
+            $.each(data.subscriptions, function (k,subscription) {
+                window.subscriptions.push(subscription.user_id);
+                if (subscription.orders.length) {
+                    $.each(subscription.orders, function (k,order) {
+                        window.unreadOrders.push(order.id);
+                    });
+                }
+            });
+        }
         if (orders.length) {
             $.each(orders, function (k,point) {
                 if (point.need_performers > point.performers.length) {
@@ -82,6 +90,10 @@ let getPoints = () => {
                         date: createdAt.toLocaleDateString('ru-RU'),
                         description: point.description
                     }));
+
+                    if (openOrderId && openOrderId === point.id) {
+                        openOrderModal(window.placemarks[k]);
+                    }
                 }
             });
 
@@ -121,50 +133,67 @@ let addPointsToMap = () => {
 
 let bindOrderClick = () => {
     $(document).on('click', 'a.list-item', function() {
-        let point = window.placemarks[$(this).data().id],
-            orderSuBTypeList = orderModal.find('ul'),
-            properties = point.properties,
-            user = properties.get('user'),
-            description = properties.get('description'),
-            orderSubTypes = properties.get('orderSubTypes'),
-            currentSubTypes = properties.get('subtypes');
+        openOrderModal(window.placemarks[$(this).data().id]);
+    });
+}
 
-        window.selectedPoint = point;
+let openOrderModal = (point) => {
+    let orderSuBTypeList = orderModal.find('ul'),
+        properties = point.properties,
+        orderId = properties.get('orderId'),
+        user = properties.get('user'),
+        description = properties.get('description'),
+        orderSubTypes = properties.get('orderSubTypes'),
+        currentSubTypes = properties.get('subtypes');
 
-        orderSuBTypeList.html('');
+    window.selectedPoint = point;
 
-        if (orderSubTypes && currentSubTypes) {
-            for (let i=0; i < orderSubTypes.length; i++) {
-                for (let ic=0; ic < currentSubTypes.length; ic++) {
-                    if (orderSubTypes[i].id === currentSubTypes[ic]) {
-                        orderSuBTypeList.append($('<li></li>').html(orderSubTypes[i].name));
-                        break;
-                    }
+    orderSuBTypeList.html('');
+
+    if (orderSubTypes && currentSubTypes) {
+        for (let i=0; i < orderSubTypes.length; i++) {
+            for (let ic=0; ic < currentSubTypes.length; ic++) {
+                if (orderSubTypes[i].id === currentSubTypes[ic]) {
+                    orderSuBTypeList.append($('<li></li>').html(orderSubTypes[i].name));
+                    break;
                 }
             }
         }
-        $('.order-number').html(properties.get('orderId'));
-        $('.order-date').html(properties.get('date'));
-        if (user.avatar) $('.avatar.cir').css('background-image','url("/' + user.avatar + '")');
-        $('.user-name').html(user.name);
-        $('.born-date').html(user.born);
-        $('.order-type').html(properties.get('orderType'));
-        $('.order-address').html(properties.get('balloonContentBody'));
-        $('#need-performers').html(properties.get('need_performers'));
-        $('#ready-to-help').html(properties.get('performers'));
-        $('#order-description').html(description ? description : absentDescr);
+    }
+    $('.order-number').html(orderId);
+    $('.order-date').html(properties.get('date'));
+    if (user.avatar) $('.avatar.cir').css('background-image','url("/' + user.avatar + '")');
+    $('.user-name').html(user.name);
+    $('.born-date').html(user.born);
+    $('.order-type').html(properties.get('orderType'));
+    $('.order-address').html(properties.get('balloonContentBody'));
+    $('#need-performers').html(properties.get('need_performers'));
+    $('#ready-to-help').html(properties.get('performers'));
+    $('#order-description').html(description ? description : absentDescr);
 
-        if (userId === user.id) {
-            window.respondButton.attr('disabled','disabled');
-            window.subscribeButton.hide();
-        } else {
-            window.respondButton.removeAttr('disabled');
-            window.subscribeButton.show();
-        }
+    if (userId === user.id) {
+        window.respondButton.attr('disabled','disabled');
+        window.subscribeButton.hide();
+    } else {
+        window.respondButton.removeAttr('disabled');
+        window.subscribeButton.show();
+    }
 
-        changeSubscribeButton(window.subscriptions.includes(user.id));
-        window.orderModal.modal('show');
-    });
+    // If user.id exist in subscriptions list
+    changeSubscribeButton(window.subscriptions.includes(user.id));
+
+    // If order.id exist in unread list
+    let indexOrderId = window.unreadOrders.indexOf(orderId);
+    if (indexOrderId !== -1) {
+        $.get(
+            orderReadOrderUrl,
+            {'order_id': orderId}
+        ).done(() => {
+            window.unreadOrders.splice(indexOrderId, 1);
+        });
+    }
+
+    window.orderModal.modal('show');
 }
 
 let revertSubscribeButton = (revert) => {

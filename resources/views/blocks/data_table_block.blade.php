@@ -1,4 +1,4 @@
-<table class="table datatable-basic">
+<table class="table datatable-basic default">
     @foreach($items as $item)
         <tr id="row-{{ $item->id }}">
             <td class="id">{{ $item->id }}</td>
@@ -6,7 +6,7 @@
                 <div class="head">{{ isset($relationHead) ? $item->$relationHead->$headName : $item->$headName }}</div>
                 <div class="content">{{ isset($relationContent) ? $item->$relationContent->$contentName : $item->$contentName }}</div>
             </td>
-            @if (isset($$editRoute))
+            @if (isset($editRoute))
                 @include('blocks.edit_dt_row_block')
             @else
                 <td></td>

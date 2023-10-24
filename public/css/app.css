@@ -377,6 +377,10 @@ button.btn > i {
     flex-wrap: wrap;
 }
 
+.rounded-block.tall .content-block.simple {
+    height: 675px;
+}
+
 .rounded-block.tall .content-block .dataTables_wrapper {
     width: 100%;
     align-self: flex-start;
@@ -574,6 +578,10 @@ table.datatable-basic td.icon {
     height: 520px;
 }
 
+.rounded-block.tall .content-block.simple .datatable-scroll {
+    height: 575px;
+}
+
 .rounded-block.tall .absolute-bottom {
     position: absolute;
     bottom: 55px;
@@ -647,7 +655,7 @@ td.cell-avatar {
 }
 
 .avatar img {
-    width: 70px;
+    width: 100%;
     display: none;
     position: absolute;
 }
@@ -747,6 +755,10 @@ td.cell-avatar {
         height: 500px;
     }
 
+    .rounded-block.tall .content-block.simple {
+        height: 550px;
+    }
+
     .rounded-block.tall .content-block .datatable-scroll {
         height: 400px !important;
     }
@@ -818,7 +830,8 @@ td.cell-avatar {
         font-size: 14px;
     }
 
-    .rounded-block.tall .content-block {
+    .rounded-block.tall .content-block,
+    .rounded-block.tall .content-block-simple {
         height: auto;
         min-height: 200px;
     }

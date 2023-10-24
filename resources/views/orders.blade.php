@@ -83,12 +83,14 @@
 </div>
 <script type="text/javascript" src="{{ asset('js/orders.js') }}"></script>
 <script>
-    let orderResponseUrl = "{{ route('order.order_response') }}",
+    const orderResponseUrl = "{{ route('order.order_response') }}",
+        orderReadOrderUrl = "{{ route('order.read_order') }}",
         subscribeUrl = "{{ route('account.subscription') }}",
         getOrdersUrl =  "{{ route('order.get_orders') }}",
         absentDescr = "{{ trans('content.absent') }}",
         subscribe = "{{ trans('content.subscribe') }}",
         unsubscribe = "{{ trans('content.unsubscribe') }}",
-        userId = parseInt("{{ auth()->id() }}");
+        userId = parseInt("{{ auth()->id() }}"),
+        openOrderId = parseInt("{{ request()->id }}");
 </script>
 @endsection
