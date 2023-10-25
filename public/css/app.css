@@ -511,8 +511,27 @@ button.btn > i {
     font-size: 18px;
 }
 
-.dropdown-menu {
+ul.dropdown-menu {
     padding: 15px;
+    overflow-y: scroll;
+    max-height: 450px;
+}
+
+ul.dropdown-menu li > div {
+    line-height: 1.2em;
+}
+
+ul.dropdown-menu li > div > a {
+    font-size: 15px;
+}
+
+ul.dropdown-menu li > div > span {
+    font-size: 13px;
+}
+
+ul.dropdown-menu hr {
+    margin-top: 3px;
+    margin-bottom: 3px;
 }
 
 .rounded-block ul.menu li {

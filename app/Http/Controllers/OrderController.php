@@ -26,10 +26,9 @@ class OrderController extends BaseController
         return $this->showView('edit_order');
     }
 
-    public function orders(Request $request): View
+    public function orders(): View
     {
         $this->getItems('order_types', new OrderType());
-        $this->data['order_preview'] = $request->has('preview') && $request->preview;
         return $this->showView('orders');
     }
 
@@ -52,6 +51,16 @@ class OrderController extends BaseController
         $readOrder->read = true;
         $readOrder->save();
         return response()->json([],200);
+    }
+
+    public function getSubscriptionsNews(): JsonResponse
+    {
+        return response()->json([
+            'subscriptions' => Subscription::query()
+                ->with('orders.user')
+                ->default()
+                ->get()
+        ]);
     }
 
     public function getOrders(): JsonResponse

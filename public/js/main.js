@@ -100,6 +100,9 @@ $(window).on('load', function () {
 
     // Open message modal
     if (openMessageModalFlag) messageModal.modal('show');
+
+    // If user auth get news
+    if (isAuth) getSubscriptionsNews();
 });
 
 let getUrl = (form, url, callBack) => {
@@ -131,6 +134,7 @@ let getUrl = (form, url, callBack) => {
         processData: false,
         contentType: false,
         type: form.attr('method'),
+        cache: false,
         success: (data) => {
             if (callBack) callBack(data);
             submitButton.removeAttr('disabled');
@@ -290,5 +294,31 @@ let clickYesDeleteOnModal = (dataTable, useCounter) => {
             }
             removeLoader();
         });
+    });
+}
+
+let getSubscriptionsNews = () => {
+    $.get(
+        newSubscriptionOrdersUrl
+    ).done((data) => {
+        if (data.subscriptions.length) {
+            $('#right-button-block .fa.fa-bell-o').append(
+                $('<span></span>').addClass('dot')
+            );
+            $.each(data.subscriptions, function (k,subscription) {
+                $.each(subscription.orders, function (k,order) {
+                    $('#dropdown').append(
+                        $('<li></li>').append(
+                            $('<div></div>')
+                                .append(
+                                    $('<a></a>').attr('href', ordersUrl+'/?id='+order.id).html(newOrderFrom + '<br>')
+                                ).append(
+                                $('<span></span>').html(order.user.name + ' ' + order.user.family)
+                            )
+                        ).append('<hr>')
+                    );
+                });
+            });
+        }
     });
 }

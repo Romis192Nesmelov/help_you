@@ -81,7 +81,9 @@ return [
     'you_can_discuss_details_in_chat' => 'Подробности вы можете обсудить в чате.',
     'show_default_map' => 'Показать общую карту',
     'subscribe' => 'Подписаться',
-    'unsubscribe' => 'Отписаться'
+    'unsubscribe' => 'Отписаться',
+
+    'new_order_from' => 'Новая заяка от:',
 
 //    'in_russian' => ' по русски',
 //    'in_english' => ' по по английски',

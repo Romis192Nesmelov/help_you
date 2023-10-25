@@ -59,14 +59,17 @@ $(window).on('load', function () {
                 $('#account-href').removeClass('d-none');
                 $('#navbar-dropdown-messages').removeClass('d-none');
                 $('#right-button-block').removeClass('justify-content-end').addClass('justify-content-between');
-                // let wnantUrl = localStorage.getItem('want_url');
-                // if (wnantUrl) window.location.href = wnantUrl;
+
+                // Goto prev url
                 $.get(
                     getPrevUrl,
                     (data) => {
                         if (data.url) window.location.href = data.url;
                     }
                 );
+                // Getting news for dropdown
+                getSubscriptionsNews();
+
             } else {
                 window.location.href = accountUrl;
             }

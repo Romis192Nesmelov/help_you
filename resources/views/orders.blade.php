@@ -40,7 +40,7 @@
 <div class="row">
     <div class="col-12 col-lg-3">
         <div class="rounded-block tall">
-            <form method="post" action="{{ $order_preview ? route('order.get_preview') : route('order.get_orders') }}">
+            <form method="post" action="{{ request()->has('preview') && request()->input('preview') ? route('order.get_preview') : route('order.get_orders') }}">
                 @csrf
                 <h2>{{ trans('content.filters') }}</h2>
                 @include('blocks.select_block',[
@@ -65,7 +65,7 @@
                         'primary' => true,
                         'buttonText' => trans('content.apply')
                     ])
-                    @if ($order_preview)
+                    @if (request()->has('preview') && request()->input('preview'))
                         @include('blocks.button_block',[
                             'id' => 'show-default',
                             'primary' => true,

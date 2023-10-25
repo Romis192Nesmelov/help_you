@@ -180,12 +180,10 @@
             </div>
 
             <div id="right-button-block" class="buttons-block d-none d-lg-flex align-items-center justify-content-{{ !auth()->check() ? 'end' : 'between' }}">
-                <a class="nav-link dropdown-toggle {{ !auth()->check() ? 'd-none' : '' }}" href="#" id="navbar-dropdown-messages" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="fa fa-bell-o"><span class="dot"></span></i>
+                <a class="nav-link dropdown-toggle {{ !auth()->check() ? 'd-none' : '' }}" id="navbar-dropdown-messages" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fa fa-bell-o"></i>
                 </a>
-                <ul class="dropdown-menu" aria-labelledby="navbar-dropdown-messages">
-                    <li>Test</li>
-                </ul>
+                <ul id="dropdown" class="dropdown-menu" aria-labelledby="navbar-dropdown-messages"></ul>
 
                 @include('blocks.button_block',[
                     'id' => 'login-button',
@@ -225,10 +223,14 @@
     </script>
 @endif
 <script>
-    const openMessageModalFlag = parseInt("{{ session()->has('message') }}"),
+    const newSubscriptionOrdersUrl = "{{ route('order.get_subscriptions_news') }}",
+        ordersUrl = "{{ route('order.orders') }}",
+        newOrderFrom = "{{ trans('content.new_order_from') }}",
+        openMessageModalFlag = parseInt("{{ session()->has('message') }}"),
         errorFieldMustBeFilledIn = "{{ trans('validation.field_must_be_filled_in') }}",
         errorSelectOneOfItems = "{{ trans('validation.you_must_select_one_of_the_items') }}",
-        errorWrongValue = "{{ trans('validation.wrong_value') }}";
+        errorWrongValue = "{{ trans('validation.wrong_value') }}",
+        isAuth = parseInt("{{ auth()->check() }}");
 </script>
 </body>
 </html>
