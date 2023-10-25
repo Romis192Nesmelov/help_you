@@ -100,9 +100,6 @@ $(window).on('load', function () {
 
     // Open message modal
     if (openMessageModalFlag) messageModal.modal('show');
-
-    // If user auth get news
-    if (isAuth) getSubscriptionsNews();
 });
 
 let getUrl = (form, url, callBack) => {
@@ -297,10 +294,8 @@ let clickYesDeleteOnModal = (dataTable, useCounter) => {
     });
 }
 
-let getSubscriptionsNews = () => {
-    $.get(
-        newSubscriptionOrdersUrl
-    ).done((data) => {
+let getSubscriptionsNews = (subscriptionsUrl, ordersUrl, newOrderFrom) => {
+    $.get(subscriptionsUrl).done((data) => {
         if (data.subscriptions.length) {
             $('#right-button-block .fa.fa-bell-o').append(
                 $('<span></span>').addClass('dot')

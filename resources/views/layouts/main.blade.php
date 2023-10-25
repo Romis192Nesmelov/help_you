@@ -221,16 +221,14 @@
             passwordCannotBeLess = "{{ trans('auth.password_cannot_be_less', ['length' => 6]) }}",
             youMustConsent = "{{ trans('auth.you_must_consent_to_the_processing_of_personal_data') }}";
     </script>
+@else
+    <script>getSubscriptionsNews("{{ route('order.get_subscriptions_news') }}","{{ route('order.orders') }}","{{ trans('content.new_order_from') }}");</script>
 @endif
 <script>
-    const newSubscriptionOrdersUrl = "{{ route('order.get_subscriptions_news') }}",
-        ordersUrl = "{{ route('order.orders') }}",
-        newOrderFrom = "{{ trans('content.new_order_from') }}",
-        openMessageModalFlag = parseInt("{{ session()->has('message') }}"),
+    const openMessageModalFlag = parseInt("{{ session()->has('message') }}"),
         errorFieldMustBeFilledIn = "{{ trans('validation.field_must_be_filled_in') }}",
         errorSelectOneOfItems = "{{ trans('validation.you_must_select_one_of_the_items') }}",
-        errorWrongValue = "{{ trans('validation.wrong_value') }}",
-        isAuth = parseInt("{{ auth()->check() }}");
+        errorWrongValue = "{{ trans('validation.wrong_value') }}";
 </script>
 </body>
 </html>
