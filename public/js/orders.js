@@ -190,6 +190,7 @@ let openOrderModal = (point) => {
             {'order_id': orderId}
         ).done(() => {
             window.unreadOrders.splice(indexOrderId, 1);
+            $('#unread-order-' + orderId).remove();
         });
     }
 

@@ -303,7 +303,7 @@ let getSubscriptionsNews = (subscriptionsUrl, ordersUrl, newOrderFrom) => {
             $.each(data.subscriptions, function (k,subscription) {
                 $.each(subscription.orders, function (k,order) {
                     $('#dropdown').append(
-                        $('<li></li>').append(
+                        $('<li></li>').attr('id','unread-order-' + order.id).append(
                             $('<div></div>')
                                 .append(
                                     $('<a></a>').attr('href', ordersUrl+'/?id='+order.id).html(newOrderFrom + '<br>')
