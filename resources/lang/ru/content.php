@@ -79,7 +79,7 @@ return [
     'number_of_performers_from' => 'Человек от',
     'number_of_performers_to' => 'Человек до',
 
-    'thanks_to_respond' => 'Спасибо, что откликнулись на заяку №<span class="order-number">:number</span><br>от <span class="order-date">:date</span>',
+    'thanks_to_respond' => 'Спасибо, что откликнулись<br>на заяку №<span class="order-number">:number</span> от <span class="order-date">:date</span>',
     'waiting_for_you_at_the_address' => 'Вас ждут вас по адресу:',
     'you_can_discuss_details_in_chat' => 'Подробности вы можете обсудить в чате.',
     'show_default_map' => 'Показать общую карту',

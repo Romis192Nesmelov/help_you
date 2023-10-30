@@ -261,15 +261,18 @@ const setBindsAndOpen = () => {
         e.preventDefault();
         let point = getPlaceMarkOnMap($(this)),
             properties = point.properties,
+            orderId = properties.get('orderId'),
             orderRespondModal = $('#order-respond-modal');
 
         $.post(
             orderResponseUrl,
             {
                 '_token': window.tokenField,
-                'order_id': properties.get('orderId'),
+                'order_id': orderId,
             }
         ).done(() => {
+            orderRespondModal.find('.order-number').html(orderId);
+            orderRespondModal.find('.order-date').html(properties.get('date'));
             orderRespondModal.find('.order-type').html(properties.get('orderType'));
             orderRespondModal.find('.order-address').html(properties.get('address'));
             orderRespondModal.modal('show');
