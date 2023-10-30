@@ -54,7 +54,7 @@
         </form>
     </x-modal>
 
-    <form class="row" method="post" action="{{ route('account.edit_account') }}">
+    <form class="row" enctype="multipart/form-data" method="post" action="{{ route('account.edit_account') }}">
         @csrf
         @include('blocks.left_menu_block')
         <div class="col-12 col-lg-8">

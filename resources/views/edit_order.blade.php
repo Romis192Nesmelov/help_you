@@ -27,7 +27,7 @@
                     <h2 id="head2-step{{ $i }}" class="{{ getStepClass($i) }}">{{ trans('edit_order.h2_step'.$i) }}</h2>
                 @endfor
 
-                <form method="post" action="{{ route('order.next_step') }}">
+                <form method="post" enctype="multipart/form-data" action="{{ route('order.next_step') }}">
                     @csrf
                     @if (isset($order))
                         <input type="hidden" name="id" value="{{ $order->id }}">
@@ -100,8 +100,18 @@
                             'ajax' => true,
                             'value' => isset($order) ? $order->description : (session()->has('steps') && count(session()->get('steps')) == 4 ? session()->get('steps')[3]['description'] : ''),
                         ])
+                        <div class="row">
+                            <label>{{ trans('content.add_order_photo') }}</label>
+                            @for ($i=1;$i<=3;$i++)
+                                <div class="col-lg-4 col-md-4 col-sm-12">
+                                    @include('blocks.order_photo_block',[
+                                        'name' => 'photo'.$i,
+                                        'image' => isset($order) && count($order->images) >= $i ? $order->images[$i-1]->image : null
+                                    ])
+                                </div>
+                            @endfor
+                        </div>
                     </div>
-
                     <div class="bottom-block">
                         <div class="d-flex align-items-center justify-content-center justify-content-md-end">
                             @include('blocks.button_block',[

@@ -1,4 +1,4 @@
-function addLoader() {
+const addLoader = () => {
     $('body').prepend(
         $('<div></div>').attr('id','loader').append($('<div></div>'))
     ).css({
@@ -7,7 +7,7 @@ function addLoader() {
     });
 }
 
-function removeLoader() {
+const removeLoader = () => {
     $('#loader').remove();
     $('body').css('overflow-y','auto');
 }

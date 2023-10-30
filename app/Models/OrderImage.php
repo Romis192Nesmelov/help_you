@@ -8,7 +8,6 @@ class OrderImage extends Model
 {
     protected $fillable = [
         'image',
-        'main',
         'order_id'
     ];
 

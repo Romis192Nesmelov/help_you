@@ -29,6 +29,8 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('css/icons/fontawesome/styles.min.css') }}" />
     <link rel="stylesheet" type="text/css" href="{{ asset('css/datatables.css') }}" />
     <link rel="stylesheet" type="text/css" href="{{ asset('css/jquery.fancybox.min.css') }}" />
+    <link rel="stylesheet" type="text/css" href="{{ asset('css/owl.carousel.min.css') }}" />
+    <link rel="stylesheet" type="text/css" href="{{ asset('css/jquery.mCustomScrollbar.css') }}" />
     <link rel="stylesheet" type="text/css" href="{{ asset('css/loader.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('css/app.css') }}" />
 
@@ -39,6 +41,8 @@
     <script type="text/javascript" src="{{ asset('js/jquery.maskedinput.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/jquery.fancybox.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/fancybox_init.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('js/owl.carousel.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('js/jquery.mCustomScrollbar.concat.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/max.height.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/main.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/loader.js') }}"></script>
@@ -175,24 +179,28 @@
                 </a>
             </div>
             <div class="d-block d-lg-none">
-                <a id="login-href" href="#" {{ auth()->check() ? 'class=d-none' : '' }} data-bs-toggle="modal" data-bs-target="#login-modal">@include('blocks.account_icon_block')</a>
                 <a id="account-href" {{ !auth()->check() ? 'class=d-none' : '' }} href="{{ route('account.change') }}">@include('blocks.account_icon_block')</a>
+                @if (!auth()->check())
+                    <a id="login-href" href="#" {{ auth()->check() ? 'class=d-none' : '' }} data-bs-toggle="modal" data-bs-target="#login-modal">@include('blocks.account_icon_block')</a>
+                @endif
             </div>
 
-            <div id="right-button-block" class="buttons-block d-none d-lg-flex align-items-center justify-content-{{ !auth()->check() ? 'end' : 'between' }}">
+            <div id="right-button-block" class="buttons-block d-none d-lg-flex align-items-center justify-content-{{ !auth()->check() ? 'end' : 'between' }}" {{ request()->path() == '/' ? 'style=width:250px;' : '' }}>
                 <a class="nav-link dropdown-toggle {{ !auth()->check() ? 'd-none' : '' }}" id="navbar-dropdown-messages" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="fa fa-bell-o"></i>
                 </a>
-                <ul id="dropdown" class="dropdown-menu" aria-labelledby="navbar-dropdown-messages"></ul>
-
-                @include('blocks.button_block',[
-                    'id' => 'login-button',
-                    'addClass' => auth()->check() ? 'd-none' : '',
-                    'primary' => false,
-                    'dataTarget' => 'login-modal',
-                    'icon' => 'icon-enter3',
-                    'buttonText' => trans('menu.login_or_register')
-                ])
+                <div class="dropdown-menu" aria-labelledby="navbar-dropdown-messages">
+                    <ul id="dropdown"></ul>
+                </div>
+                @if (auth()->check() && request()->path() != '/')
+                    <a href="{{ route('order.new_order') }}">
+                        @include('blocks.button_block',[
+                            'primary' => false,
+                            'icon' => 'icon-magazine',
+                            'buttonText' => trans('content.home_head3')
+                        ])
+                    </a>
+                @endif
                 <a href="{{ route('account.change') }}">
                     @include('blocks.button_block',[
                         'id' => 'account-button',
@@ -202,6 +210,17 @@
                         'buttonText' => trans('menu.account')
                     ])
                 </a>
+                @if (!auth()->check())
+                    @include('blocks.button_block',[
+                    'id' => 'login-button',
+                    'addAttr' => ['style' => 'width:200px'],
+                    'addClass' => auth()->check() ? 'd-none' : '',
+                    'primary' => false,
+                    'dataTarget' => 'login-modal',
+                    'icon' => 'icon-enter3',
+                    'buttonText' => trans('menu.login_or_register')
+                ])
+                @endif
             </div>
         </div>
         @yield('content')

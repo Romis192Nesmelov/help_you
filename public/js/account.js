@@ -1,4 +1,4 @@
-$(window).on('load', function () {
+$(document).ready(function () {
     const bornDateField = $('input[name=born]'),
         emailField = $('input[name=email]'),
         changePhoneModal = $('#change-phone-modal'),
@@ -21,7 +21,7 @@ $(window).on('load', function () {
     $.mask.definitions['c'] = "[1-2]";
     bornDateField.mask("99-99-9999");
 
-    let preValidationChangeAccount = (e) => {
+    const preValidationChangeAccount = (e) => {
         let form = $(e.target).parents('form'),
             born = bornDateField.val().split('-'),
             currentDate = new Date();
@@ -63,7 +63,7 @@ $(window).on('load', function () {
         $('input[name='+field+']').on('change', preValidationChangeAccount).keyup(preValidationChangeAccount);
     });
 
-    let unlockGetCodeAndChangePhoneButtons = () => {
+    const unlockGetCodeAndChangePhoneButtons = () => {
         if (phoneField.val().match(phoneRegExp) && phoneField.val().substr(2) !== currentPhone) {
             getCodeButton.removeAttr('disabled');
             if (codeField.val().match(codeRegExp)) changePhoneButton.removeAttr('disabled');
@@ -106,7 +106,7 @@ $(window).on('load', function () {
         });
     });
 
-    let unlockChangePasswordButton = () => {
+    const unlockChangePasswordButton = () => {
         if (oldPassword.val().length && passwordField.val().length && passwordConfirmField.val().length)
             changePasswordButton.removeAttr('disabled');
         else changePasswordButton.attr('disabled','disabled');
@@ -117,7 +117,7 @@ $(window).on('load', function () {
     passwordField.on('change', unlockChangePasswordButton).keyup(unlockChangePasswordButton);
     passwordConfirmField.on('change', unlockChangePasswordButton).keyup(unlockChangePasswordButton);
 
-    let preValidationChangePassword = (e) => {
+    const preValidationChangePassword = (e) => {
         let form = $(e.target).parents('form');
 
         resetErrors(form);
@@ -159,23 +159,5 @@ $(window).on('load', function () {
     });
 
     // Preview avatar
-    let avatar = $('#avatar-block .avatar.cir'),
-        hoverImg = avatar.find('img');
-
-    avatar.find('input[type=file]').change(function () {
-        let input = $(this)[0].files[0];
-        if (input.type.match('image.*')) {
-            let reader = new FileReader();
-            reader.onload = function (e) {
-                avatar.css('background-image', 'url(' + e.target.result + ')');
-            };
-            reader.readAsDataURL(input);
-        } else {
-            avatar.css('background-image', 'url(/images/def_avatar.svg)');
-        }
-    }).on('mouseover', function () {
-        hoverImg.show();
-    }).on('mouseout', function () {
-        hoverImg.hide();
-    });
+    imagePreview($('#avatar-block .avatar.cir'), '/images/def_avatar.svg');
 });

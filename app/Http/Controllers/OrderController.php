@@ -8,6 +8,7 @@ use App\Http\Requests\Order\OrderRequest;
 use App\Http\Requests\Order\OrderResponseRequest;
 use App\Http\Requests\Order\ReadOrderRequest;
 use App\Models\Order;
+use App\Models\OrderImage;
 use App\Models\OrderType;
 use App\Models\OrderUser;
 use App\Models\ReadOrder;
@@ -37,7 +38,6 @@ class OrderController extends BaseController
      */
     public function editOrder(OrderRequest $request): View
     {
-//        Session::forget('steps');
         $this->data['order'] = Order::find($request->id);
         $this->authorize('owner', $this->data['order']);
         $this->getItems('order_types', new OrderType());
@@ -70,6 +70,7 @@ class OrderController extends BaseController
                 ->default()
                 ->filtered()
                 ->with('orderType')
+                ->with('images')
                 ->with('user')
                 ->with('performers')
                 ->get(),
@@ -87,10 +88,11 @@ class OrderController extends BaseController
         return response()->json([
             'orders' => Order::query()
                 ->where('user_id',Auth::id())
-                ->where('active',1)
+                ->where('status',2)
                 ->where('approved',0)
                 ->filtered()
                 ->with('orderType')
+                ->with('images')
                 ->with('user')
                 ->with('performers')
                 ->latest('created_at')
@@ -110,10 +112,18 @@ class OrderController extends BaseController
         if ($order->user_id == Auth::id()) return response()->json([],403);
         else {
             OrderUser::create($fields);
+            $order = $order->refresh();
+            if ($order->performers->count() >= $order->need_performers) {
+                $order->status = 1;
+                $order->save();
+            }
             return response()->json([],200);
         }
     }
 
+    /**
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
     public function nextStep(NextStepRequest $request): JsonResponse
     {
         $fields = $request->validated();
@@ -128,10 +138,10 @@ class OrderController extends BaseController
             $fields = [
                 'city_id' => 1,
                 'user_id' => Auth::id(),
-                'active' => 1,
+                'status' => 2,
                 'approved' => 0
             ];
-            foreach ($steps as $k => $step) {
+            foreach ($steps as $step) {
                 if (isset($step['subtypes'])) {
                     $subtypes = [];
                     foreach ($step['subtypes'] as $subtype) {
@@ -147,6 +157,17 @@ class OrderController extends BaseController
                 $this->authorize('owner', $order);
                 $order->update($fields);
             } else $order = Order::create($fields);
+
+            for ($i=1;$i<=3;$i++) {
+                $fieldName = 'photo'.$i;
+                $imageFields = $this->processingImage($request, [], $fieldName, 'images/orders_images/', 'order'.$order->id.'_'.$i);
+                if (count($imageFields)) {
+                    OrderImage::create([
+                        'image' => $imageFields[$fieldName],
+                        'order_id' => $order->id
+                    ]);
+                }
+            }
 
             return response()->json(['order' => $order],200);
         } else {

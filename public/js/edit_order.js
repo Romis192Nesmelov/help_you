@@ -4,6 +4,7 @@ $(document).ready(function () {
         form = $('form'),
         nextButton = $('#next'),
         backButton = $('#back'),
+
         performersInput = $('input[name=performers]'),
         performersInputError = $('.error.performers'),
         addressInput = $('input[name=address]'),
@@ -11,10 +12,10 @@ $(document).ready(function () {
         completeModal = $('#complete-modal'),
         preValidation = [
             () => {
-                let subTypesBlock = $('input[name=order_type]:checked').parents('.radio-group').find('.sub-types-block');
+                let subTypesBlock = $('input[name=order_type_id]:checked').parents('.radio-group').find('.sub-types-block');
                 if (subTypesBlock.length && !subTypesBlock.find('input[type=checkbox]:checked').length) {
                     subTypesBlock.find('input[type=checkbox]').addClass('error');
-                    subTypesBlock.find('.error.subtype').last().html(errorSelectOneOfItems);
+                    subTypesBlock.find('.error.subtypes').last().html(errorSelectOneOfItems);
                     subTypesBlock.css('height',subTypesBlock.height() + 27);
                     return false;
                 } else return true
@@ -46,7 +47,7 @@ $(document).ready(function () {
 
     ymaps.ready(mapInitWithContainer);
 
-    $('input[name=order_type]').change(function () {
+    $('input[name=order_type_id]').change(function () {
         let thisRadioGroup = $(this).parents('.radio-group'),
             thisSubTypesBlocks = thisRadioGroup.find('.sub-types-block'),
             anotherSubTypesBlocks = $('.radio-group').not(thisRadioGroup).find('.sub-types-block');
@@ -69,7 +70,7 @@ $(document).ready(function () {
                 'opacity':1
             });
 
-            let addHeight = thisSubTypesBlocks.find('.error.subtype').last().html().length ? 32 : 5
+            let addHeight = thisSubTypesBlocks.find('.error.subtypes').last().html() ? 32 : 5
             thisSubTypesBlocks.animate({
                 'height':heightBlock + addHeight
             },'slow');
@@ -153,7 +154,7 @@ $(document).ready(function () {
                 );
             } else {
                 backButton.attr('disabled','disabled');
-                getUrl(form, null, (data) => {
+                getUrl(form, null, () => {
                     step++;
                     if (step) {
                         backButton.removeClass('d-none');
@@ -179,9 +180,10 @@ $(document).ready(function () {
 
     performersInput.on('change', preValidation[1]).keyup(preValidation[1]);
     addressInput.on('change', preValidation[2]).keyup(preValidation[2]);
+    imagePreview($('.order-photo'));
 });
 
-let nextPrevStep = (reverse, callBack) => {
+const nextPrevStep = (reverse, callBack) => {
     let stepFadeOut = reverse ? step + 1 : step,
         stepFadeIn = reverse ? step : step + 1,
         tags = ['head1','head2','inputs','image','description'],
@@ -204,7 +206,7 @@ let nextPrevStep = (reverse, callBack) => {
     });
 }
 
-let setProgressBar = (progressBar) => {
+const setProgressBar = (progressBar) => {
     let progress = step * 25 + '%';
     progressBar.html(progress);
     progressBar.animate({
@@ -212,7 +214,7 @@ let setProgressBar = (progressBar) => {
     },'fast');
 }
 
-function mapInitWithContainer() {
+const mapInitWithContainer = () => {
     mapInit('image-step3');
     if (point.length) {
         window.placemark = getPlaceMark(point,{});

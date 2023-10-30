@@ -8,7 +8,7 @@
                 @include('blocks.nav-item_block', [
                     'menuItem' => 'account.messages',
                     'menuName' => trans('menu.messages'),
-                    'addClass' => 'd-block d-sm-none'
+                    'addClass' => 'd-block d-lg-none'
                 ])
             @endif
             @foreach($mainMenu as $menuItem)
@@ -21,12 +21,12 @@
                 @include('blocks.nav-item_block', [
                     'menuItem' => 'account.change',
                     'menuName' => trans('menu.account'),
-                    'addClass' => 'd-block d-sm-none'
+                    'addClass' => 'd-block d-lg-none'
                 ])
                 @include('blocks.nav-item_block', [
                     'menuItem' => 'order.new_order',
                     'menuName' => trans('menu.make_an_order'),
-                    'addClass' => 'd-block d-sm-none'
+                    'addClass' => 'd-block d-lg-none'
                 ])
             @endif
         </ul>

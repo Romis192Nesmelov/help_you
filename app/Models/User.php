@@ -75,14 +75,14 @@ class User extends Authenticatable
     public function orderActivePerformer(): BelongsToMany
     {
         return $this->belongsToMany(Order::class)
-            ->where('active',1)
+            ->where('status','>',0)
             ->orderByDesc('created_at');
     }
 
     public function orderArchivePerformer(): BelongsToMany
     {
         return $this->belongsToMany(Order::class)
-            ->where('active',0)
+            ->where('status',0)
             ->orderByDesc('created_at');
     }
 
@@ -96,14 +96,14 @@ class User extends Authenticatable
     public function ordersActive(): HasMany
     {
         return $this->hasMany(Order::class)
-            ->where('active',1)
+            ->where('status','>',0)
             ->orderByDesc('created_at');
     }
 
     public function ordersActiveAndApproving(): HasMany
     {
         return $this->hasMany(Order::class)
-            ->where('active',1)
+            ->where('status','>',0)
             ->where('approved',1)
             ->orderByDesc('created_at');
     }
@@ -111,7 +111,7 @@ class User extends Authenticatable
     public function ordersArchive(): HasMany
     {
         return $this->hasMany(Order::class)
-            ->where('active',0)
+            ->where('status',0)
             ->where('approved',1)
             ->orderByDesc('created_at');
     }

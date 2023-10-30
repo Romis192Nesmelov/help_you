@@ -1,6 +1,6 @@
 <div class="col-12 col-lg-4">
     <div class="rounded-block tall">
-        @include('blocks.avatar_block',['accountMode' => true])
+        @include('blocks.avatar_block')
         <ul class="menu">
             @foreach ($leftMenu as $itemMenu)
                 <li {{ $active_left_menu == $itemMenu['key'] ? 'class=active' : '' }}><a href="{{ route('account.'.$itemMenu['key']) }}"><i class="{{ $itemMenu['icon'] }}"></i>{{ trans('auth.'.$itemMenu['key']) }}</a></li>

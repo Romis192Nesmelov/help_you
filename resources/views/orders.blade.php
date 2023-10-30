@@ -1,96 +1,125 @@
 @extends('layouts.main')
 
 @section('content')
-<x-modal id="order-modal">
-    <h5 class="bg-gray">{!! trans('content.order_number') !!}</h5>
-    <hr/>
-    @include('blocks.avatar_block',['accountMode' => false, 'born' => true])
-    <h2 class="order-type mt-3 bg-orange"></h2>
-    <ul class="subtypes"></ul>
-    <hr>
-    <p class="text-center mb-0"><b>{{ trans('content.address') }}:</b></p>
-    <h5 class="order-address mb-3 text-center"></h5>
-    <p class="bg-gray">
-        <b>{{ trans('content.need_performers') }}</b> <span id="need-performers"></span><br>
-        <b>{{ trans('content.ready_to_help') }}</b> <span id="ready-to-help"></span>
-    </p>
-    <h6 class="text-center">{{ trans('content.description') }}</h6>
-    <p id="order-description" class="fst-italic"></p>
-    <hr>
-    @include('blocks.button_block',[
-        'id' => 'respond-button',
-        'primary' => true,
-        'buttonText' => trans('content.respond_to_an_order')
-    ])
-</x-modal>
-
 <x-modal id="order-respond-modal">
     <h5 class="bg-gray">{!! trans('content.thanks_to_respond') !!}</h5>
     <hr>
-    <h2 class="order-type bg-orange mt-3"></h2>
-    @include('blocks.avatar_block',['accountMode' => false])
-    <p class="text-center"><b>{{ trans('content.waiting_for_you_at_the_address') }}</b></p>
-    <h5 class="order-address text-center mt-0"></h5>
+    <h2 class="order-type text-center mt-3"></h2>
+    <p class="small text-center"><b>{{ trans('content.waiting_for_you_at_the_address') }}</b></p>
+    <h6 class="order-address text-center mt-0"></h6>
     <hr>
     <p>{{ trans('content.you_can_discuss_details_in_chat') }}</p>
     <hr>
     <h1 class="text-orange text-center">{{ trans('content.thank_you') }}</h1>
 </x-modal>
 
-<div class="row">
-    <div class="col-12 col-lg-3">
-        <div class="rounded-block tall">
-            <form method="post" action="{{ request()->has('preview') && request()->input('preview') ? route('order.get_preview') : route('order.get_orders') }}">
-                @csrf
-                <h2>{{ trans('content.filters') }}</h2>
-                @include('blocks.select_block',[
-                    'addClass' => 'mb-4',
-                    'firstEmpty' => trans('content.all'),
-                    'label' => trans('content.order_types'),
-                    'name' => 'order_type',
-                    'values' => $order_types,
-                    'option' => 'name'
-                ])
-                @include('blocks.select_block',[
-                    'addClass' => 'mb-4',
-                    'firstEmpty' => trans('content.any'),
-                    'label' => trans('content.number_of_performers'),
-                    'name' => 'performers',
-                    'values' => range(1, 20)
-                ])
-                <div class="bottom-block">
-                    @include('blocks.button_block',[
-                        'id' => 'apply-button',
-                        'buttonType'=> 'submit',
-                        'primary' => true,
-                        'buttonText' => trans('content.apply')
-                    ])
-                    @if (request()->has('preview') && request()->input('preview'))
-                        @include('blocks.button_block',[
-                            'id' => 'show-default',
-                            'primary' => true,
-                            'addClass' => 'mt-2',
-                            'buttonText' => trans('content.show_default_map')
-                        ])
-                    @endif
-                </div>
-            </form>
+<div class="rounded-block mb-2 p-3 h-auto">
+    <form method="post" class="row" action="{{ request()->has('preview') && request()->input('preview') ? route('order.get_preview') : route('order.get_orders') }}">
+        @csrf
+        <div class="col-lg-2 col-sm-12 col-12">
+            @include('blocks.select_block',[
+                'firstEmpty' => trans('content.all'),
+                'label' => trans('content.order_types'),
+                'name' => 'order_type',
+                'values' => $order_types,
+                'option' => 'name'
+            ])
+        </div>
+        <div class="col-lg-2 col-sm-6 col-12">
+            @include('blocks.select_block',[
+                'label' => trans('content.number_of_performers_from'),
+                'name' => 'performers_from',
+                'values' => range(1, 19)
+            ])
+        </div>
+        <div class="col-lg-2 col-sm-6 col-12">
+            @include('blocks.select_block',[
+                'label' => trans('content.number_of_performers_to'),
+                'name' => 'performers_to',
+                'values' => range(1, 20),
+                'selected' => 20
+            ])
+        </div>
+        <div class="col-lg-2 col-sm-12 col-12 d-flex align-items-end justify-content-center">
+            @include('blocks.button_block',[
+                'id' => 'apply-button',
+                'addClass' => 'w-100 mt-lg-0 mt-3',
+                'buttonType'=> 'submit',
+                'primary' => true,
+                'buttonText' => trans('content.apply')
+            ])
+        </div>
+        <div class="col-lg-4 col-12 mt-lg-0 mt-2 d-flex align-items-end justify-content-center">
+            @include('blocks.input_block',[
+                'name' => 'search',
+                'addClass' => 'w-100',
+                'type' => 'text',
+                'label' => trans('content.search'),
+                'icon' => 'icon-search4'
+            ])
+        </div>
+    </form>
+</div>
+<div id="map-container" class="rounded-block">
+    <div id="map"></div>
+    <div id="selected-points">
+        <i class="icon-close2"></i>
+        <div id="points-container">
+
+{{--            <div class="mb-3">--}}
+{{--                <h6 class="text-center">Заявка от</h6>--}}
+{{--                --}}
+{{--                <div class="w-100 d-flex align-items-center justify-content-between">--}}
+{{--                    <div class="d-flex align-items-center justify-content-center">--}}
+{{--                        <div class="avatar cir" style="background-image: url({{ asset(auth()->user()->avatar ? auth()->user()->avatar : 'images/def_avatar.svg') }} );"></div>--}}
+{{--                        <div>--}}
+{{--                            <div class="user-name">Несмелов Роман</div>--}}
+{{--                            <div class="born">14-07-1976</div>--}}
+{{--                        </div>--}}
+{{--                    </div>--}}
+
+{{--                    <button id="subscribe-button" type="button" class="btn btn-primary small mt-0">--}}
+{{--                        <i class="icon-bell-check"></i>--}}
+{{--                        <span>Подписаться</span>--}}
+{{--                    </button>--}}
+{{--                    --}}
+{{--                </div>--}}
+
+{{--                <div class="images owl-carousel d-none">--}}
+{{--                    <div class="image"></div>--}}
+{{--                </div>--}}
+
+{{--                <h2 class="order-type text-center mt-3 mb-1">Какой-то типа</h2>--}}
+{{--                <ul class="subtypes"></ul>--}}
+{{--                <p class="mb-1 text-center">{{ trans('content.address') }}: <span class="order-address"></span></p>--}}
+{{--                <p class="small text-center fst-italic mt-2 mb-0">{{ trans('content.description') }}:</p>--}}
+{{--                <p class="text-center order-description fst-italic mb-1"></p>--}}
+{{--                <p class="small text-center fst-italic mb-2">{{ trans('content.need_performers') }} 1; {{ trans('content.ready_to_help') }} 2</p>--}}
+{{--                --}}
+{{--                <button type="button" class="btn btn-primary w-100">--}}
+{{--                    <span>Откликнуться на заявку</span>--}}
+{{--                </button>--}}
+{{--            </div>--}}
+
+{{--            <hr>--}}
         </div>
     </div>
-    <div class="col-12 col-lg-9">
-        <div id="map" class="rounded-block tall"></div>
-    </div>
-</div>
-<script type="text/javascript" src="{{ asset('js/orders.js') }}"></script>
 <script>
     const orderResponseUrl = "{{ route('order.order_response') }}",
         orderReadOrderUrl = "{{ route('order.read_order') }}",
         subscribeUrl = "{{ route('account.subscription') }}",
-        getOrdersUrl =  "{{ route('order.get_orders') }}",
-        absentDescr = "{{ trans('content.absent') }}",
-        subscribe = "{{ trans('content.subscribe') }}",
-        unsubscribe = "{{ trans('content.unsubscribe') }}",
-        userId = parseInt("{{ auth()->id() }}"),
-        openOrderId = parseInt("{{ request()->id }}");
+        getOrdersUrl = "{{ route('order.get_orders') }}",
+        orderNumber = "{{ trans('content.order_number') }}",
+        fromText = "{{ trans('content.from') }}",
+        toSubscribe = "{{ trans('content.subscribe') }}",
+        toUnsubscribe = "{{ trans('content.unsubscribe') }}",
+        address = "{{ trans('content.address') }}",
+        descriptionText = "{{ trans('content.description') }}",
+        needPerformers = "{{ trans('content.need_performers') }}",
+        readyToHelp = "{{ trans('content.ready_to_help') }}",
+        respondToAnOrder = "{{ trans('content.respond_to_an_order') }}",
+        userId = parseInt("{{ auth()->id() }}");
+        window.openOrderId = parseInt("{{ request()->id }}");
 </script>
+<script type="text/javascript" src="{{ asset('js/orders.js') }}"></script>
 @endsection

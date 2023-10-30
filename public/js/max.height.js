@@ -1,4 +1,4 @@
-function maxHeight(objs, padBottom) {
+const maxHeight = (objs, padBottom) => {
     if ($(window).width() > 650) {
         var maxHeight = 0;
         objs.each(function() {

@@ -25,7 +25,7 @@ class AccountController extends BaseController
         return $this->showView('account');
     }
 
-    public function mySubscriptions()
+    public function mySubscriptions() :View
     {
         $this->data['subscriptions'] = Subscription::query()->default()->get();
         $this->data['active_left_menu'] = 'my_subscriptions';
@@ -103,15 +103,15 @@ class AccountController extends BaseController
         $subscription = Subscription::where('subscriber_id',Auth::id())->where('user_id',$request->user_id)->first();
         if ($subscription) {
             $subscription->delete();
-            $revert = false;
+            $subscriptionExist = false;
         } else {
             Subscription::create([
                 'subscriber_id' => Auth::id(),
                 'user_id' => $request->user_id
             ]);
-            $revert = true;
+            $subscriptionExist = true;
         }
-        return response()->json(['revert' => $revert],200);
+        return response()->json(['subscription' => $subscriptionExist],200);
     }
 
     /**

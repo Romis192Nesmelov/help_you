@@ -26,7 +26,7 @@ return new class extends Migration
             $table->double('longitude',8, 6);
             $table->text('description')->nullable();
             $table->boolean('approved');
-            $table->boolean('active');
+            $table->tinyInteger('status');
             $table->timestamps();
         });
     }

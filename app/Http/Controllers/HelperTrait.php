@@ -5,22 +5,22 @@ use Illuminate\Support\Facades\Mail;
 
 trait HelperTrait
 {
-    public $validationPhone = 'regex:/^((\+)?(\d)(\s)?(\()?[0-9]{3}(\))?(\s)?([0-9]{3})(\-)?([0-9]{2})(\-)?([0-9]{2}))$/';
-    public $validationBorn = 'required|regex:/^((\d){2}-(\d){2}-([1-2]\d\d\d))$/';
-    public $validationPassword = 'required|min:3|max:20';
-    public $validationPasswordConfirmed = 'required|confirmed|min:6|max:20';
-    public $validationCode = 'required|regex:/^(([0-9]{2})\-([0-9]{2})-([0-9]{2}))$/';
-    public $validationInteger = 'required|integer';
-    public $validationNumeric = 'required|numeric';
-    public $validationString = 'required|min:3|max:255';
-    public $validationText = 'nullable|min:5|max:3000';
-    public $validationLongText = 'required|min:5|max:50000';
-//    public $validationColor = 'regex:/^(hsv\((\d+)\,\s(\d+)\%\,\s(\d+)\%\))$/';
-//    public $validationSvg = 'required|mimes:svg|max:10';
-    public $validationJpgAndPng = 'mimes:jpg,png|max:700';
-    public $validationJpg = 'mimes:jpg|max:2000';
-    public $validationPng = 'mimes:png|max:2000';
-    public $validationDate = 'regex:/^(\d{2})\/(\d{2})\/(\d{4})$/';
+    public string $validationPhone = 'regex:/^((\+)?(\d)(\s)?(\()?[0-9]{3}(\))?(\s)?([0-9]{3})(\-)?([0-9]{2})(\-)?([0-9]{2}))$/';
+    public string $validationBorn = 'required|regex:/^((\d){2}-(\d){2}-([1-2]\d\d\d))$/';
+    public string $validationPassword = 'required|min:3|max:20';
+    public string $validationPasswordConfirmed = 'required|confirmed|min:6|max:20';
+    public string $validationCode = 'required|regex:/^(([0-9]{2})\-([0-9]{2})-([0-9]{2}))$/';
+    public string $validationInteger = 'required|integer';
+    public string $validationNumeric = 'required|numeric';
+    public string $validationString = 'required|min:3|max:255';
+    public string $validationText = 'nullable|min:5|max:3000';
+    public string $validationLongText = 'required|min:5|max:50000';
+    public string $validationColor = 'regex:/^(hsv\((\d+)\,\s(\d+)\%\,\s(\d+)\%\))$/';
+    public string $validationSvg = 'required|mimes:svg|max:10';
+    public string $validationJpgAndPng = 'mimes:jpg,png|max:700';
+    public string $validationJpg = 'mimes:jpg|max:2000';
+    public string $validationPng = 'mimes:png|max:2000';
+    public string $validationDate = 'regex:/^(\d{2})\/(\d{2})\/(\d{4})$/';
 
 //    public function getCutTableName(Model $item) :string
 //    {

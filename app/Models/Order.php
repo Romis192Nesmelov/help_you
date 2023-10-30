@@ -26,7 +26,7 @@ class Order extends Model
         'longitude',
         'description',
         'approved',
-        'active'
+        'status'
     ];
 
     public function city(): BelongsTo
@@ -36,7 +36,7 @@ class Order extends Model
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class)->select('id','avatar','family','name','born');
     }
 
     public function orderType(): BelongsTo
@@ -62,7 +62,7 @@ class Order extends Model
     public function scopeDefault(Builder $query): void
     {
         $query
-            ->where('active',1)
+            ->where('status',2)
             ->where('approved',1)
             ->where('user_id','!=',Auth::id());
     }
@@ -74,7 +74,7 @@ class Order extends Model
         });
 
         $query->when(request('performers'), function (Builder $q) {
-            $q->where('need_performers',request('performers'));
+            $q->whereBetween('need_performers',[request('performers_from'),request('performers_to')]);
         });
     }
 

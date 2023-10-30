@@ -1,4 +1,4 @@
-$(window).on('load', function () {
+$(document).ready(function () {
     const loginModal = $('#login-modal'),
         loginPhoneField = loginModal.find('input[name=phone]'),
         loginPasswordField = loginModal.find('input[name=password]'),
@@ -21,14 +21,7 @@ $(window).on('load', function () {
         resetPhoneField = resetPasswordModal.find('input[name=phone]'),
         resetButton = $('#reset-button');
 
-    // Click to another links on home page
-    // $('.link-cover').click((e) => {
-    //     e.preventDefault();
-    //     localStorage.setItem('want_url',$(e.target).parents('a').attr('href'));
-    //     loginModal.modal('show');
-    // });
-
-    let unlockLoginButton = () => {
+    const unlockLoginButton = () => {
         if (loginPhoneField.val().match(phoneRegExp)) {
             if (loginPasswordField.val().length) loginButton.removeAttr('disabled');
             else loginButton.attr('disabled','disabled');
@@ -76,7 +69,7 @@ $(window).on('load', function () {
         });
     });
 
-    let unlockGetCodeAndRegisterButtons = () => {
+    const unlockGetCodeAndRegisterButtons = () => {
         if (
             registerPhoneField.val().match(phoneRegExp) &&
             registerPasswordField.val().length &&
@@ -100,7 +93,7 @@ $(window).on('load', function () {
     //Unlock register button
     registerCodeField.on('change', unlockGetCodeAndRegisterButtons).keyup(unlockGetCodeAndRegisterButtons);
 
-    let preValidationRegister = () => {
+    const preValidationRegister = () => {
         registerPasswordField.removeClass('error');
         registerConfirmPasswordField.removeClass('error');
         registerAgree.removeClass('error');
@@ -158,7 +151,7 @@ $(window).on('load', function () {
         }
     });
 
-    let unlockResetButton = () => {
+    const unlockResetButton = () => {
         if (resetPhoneField.val().match(phoneRegExp)) resetButton.removeAttr('disabled');
         else resetButton.attr('disabled','disabled');
     };

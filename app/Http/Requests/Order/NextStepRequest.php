@@ -1,19 +1,17 @@
 <?php
 
 namespace App\Http\Requests\Order;
-
-use App\Models\OrderType;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Session;
 
 
 class NextStepRequest extends FormRequest
 {
-    public $stepsRules = [
+    public array $stepsRules = [
         ['order_type_id' => 'required|exists:order_types,id', 'subtypes' => 'nullable|array'],
         ['need_performers' => 'required|integer|min:1|max:20'],
         ['address' => 'required|string|min:5|max:200', 'latitude' => 'required|numeric', 'longitude' => 'required|numeric'],
-        ['description' => 'nullable|string|min:5|max:3000', 'id' => 'nullable|exists:orders,id']
+        ['id' => 'nullable|exists:orders,id', 'description' => 'nullable|string|min:5|max:3000']
     ];
 
     /**
@@ -32,6 +30,15 @@ class NextStepRequest extends FormRequest
     public function rules(): array
     {
         $step = Session::has('steps') ? count(Session::get('steps')) : 0;
-        return $this->stepsRules[$step];
+        $rules = $this->stepsRules[$step];
+        if ($step == 3) {
+            for ($i=1;$i<=3;$i++) {
+                $fileName = 'photo'.$i;
+                if (request()->hasFile($fileName)) {
+                    $rules[$fileName] = 'image|max:700';
+                }
+            }
+        }
+        return $rules;
     }
 }

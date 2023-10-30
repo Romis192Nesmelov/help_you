@@ -69,21 +69,25 @@ return [
     'do_you_really_want_to_unsubscribe' => 'Вы действительно хотите отписаться от этого пользователя?',
     'deleted' => 'Удалено',
 
-    'order_number' => 'Заяка №<span class="order-number">:number</span> от <span class="order-date">:date</span>',
-    'born_date' => 'Дата рожения: <span class="born-date">:born</span>',
+    'order_number' => 'Заяка №',
+    'from' => ' от ',
+    'born_date' => 'д/р: <span class="born-date">:born</span>',
     'respond_to_an_order' => 'Откликнуться на заявку',
 
     'order_types' => 'Виды помощи',
     'number_of_performers' => 'Количество исполнителей',
+    'number_of_performers_from' => 'Человек от',
+    'number_of_performers_to' => 'Человек до',
 
     'thanks_to_respond' => 'Спасибо, что откликнулись на заяку №<span class="order-number">:number</span><br>от <span class="order-date">:date</span>',
-    'waiting_for_you_at_the_address' => 'ждет вас по адресу:',
+    'waiting_for_you_at_the_address' => 'Вас ждут вас по адресу:',
     'you_can_discuss_details_in_chat' => 'Подробности вы можете обсудить в чате.',
     'show_default_map' => 'Показать общую карту',
     'subscribe' => 'Подписаться',
     'unsubscribe' => 'Отписаться',
 
     'new_order_from' => 'Новая заяка от:',
+    'add_order_photo' => 'Добавьте изображения',
 
 //    'in_russian' => ' по русски',
 //    'in_english' => ' по по английски',

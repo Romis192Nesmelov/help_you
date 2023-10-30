@@ -9,7 +9,7 @@
             @if (isset($editRoute))
                 @include('blocks.edit_dt_row_block',['id' => $item->id])
             @else
-                <td></td>
+                <td class="d-none"></td>
             @endif
             @include('blocks.del_dt_row_block', ['id' => $item->id])
         </tr>

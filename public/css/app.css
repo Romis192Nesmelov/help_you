@@ -27,13 +27,15 @@ body {
 }
 
 a,
-td.icon i {
+td.icon i,
+i.icon-close2 {
     color: #e65639;
     cursor: pointer;
 }
 
 a:hover,
-td.icon i:hover {
+td.icon i:hover,
+i.icon-close2:hover {
     color: #f07258 !important;
 }
 
@@ -107,6 +109,10 @@ table {
     color: grey;
 }
 
+.form-group.has-label i {
+    margin-top: 40px;
+}
+
 .form-group input,
 .form-group select,
 .form-group textarea {
@@ -114,7 +120,41 @@ table {
 }
 
 .form-group textarea[name=description] {
-    height: 300px;
+    height: 180px;
+}
+
+.order-photo {
+    width: 100%;
+    height: 150px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 3px dashed #818181;
+    background-size: cover;
+    background-position: 50% 50%;
+}
+
+.order-photo i {
+    font-size: 25px;
+    color: #818181;
+}
+
+.order-photo img {
+    width: 100%;
+    left: 0;
+    display: none;
+    position: absolute;
+}
+
+.order-photo input {
+    width: 110%;
+    height: 210px;
+    margin-top: -60px;
+    margin-left: -5%;
+    position: absolute;
+    cursor: pointer;
 }
 
 .form-group input[type=number] {
@@ -140,6 +180,7 @@ table {
 
 .error {
     color: red;
+    border-color: red;
 }
 
 div.error {
@@ -181,7 +222,7 @@ textarea {
 }
 
 button.btn {
-    width: 190px;
+    width: 180px;
     height: 40px;
     font-size: 14px;
     font-weight: bold;
@@ -226,6 +267,11 @@ button.btn.btn-primary {
     background: #e65639;
 }
 
+button.btn.small {
+    width: 120px;
+    height: 60px;
+}
+
 button.btn.btn-gray {
     color: white;
     background: gray;
@@ -255,7 +301,7 @@ button.btn > i {
 }
 
 #top-line .logo-block {
-    width: 190px;
+    width: 180px;
 }
 
 #top-line .logo {
@@ -272,7 +318,7 @@ button.btn > i {
 }
 
 #top-line .buttons-block {
-    width: 250px;
+    width: 440px;
 }
 
 #top-line .buttons-block i {
@@ -368,6 +414,51 @@ button.btn > i {
     height: auto;
 }
 
+#map-container {
+    padding: 0;
+    min-height: 725px;
+    position: relative;
+}
+
+#map {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+}
+
+#selected-points {
+    width: 450px;
+    height: 100%;
+    overflow-y: hidden;
+    position: absolute;
+    padding: 25px 15px;
+    margin-left: -500px;
+    background-color: #f5f3f0;
+    box-shadow: 5px 0 10px gray;
+    z-index: 999;
+}
+
+#selected-points i.icon-close2 {
+    position: absolute;
+    font-size: 25px;
+    top: 0;
+    right: 5px;
+    cursor: pointer;
+    z-index: 999;
+}
+
+#selected-points .images {
+    width: 100%;
+    height: 250px;
+}
+
+#selected-points .images .image {
+    width: 100%;
+    height: 250px;
+    background-size: cover;
+    background-position: center center;
+}
+
 .rounded-block.tall .content-block {
     width: 100%;
     height: 625px;
@@ -461,6 +552,10 @@ button.btn > i {
     margin-bottom: 60px;
 }
 
+.rounded-block p.small {
+    font-size: 15px;
+}
+
 .rounded-block a {
     color: black;
     text-decoration: none;
@@ -511,25 +606,28 @@ button.btn > i {
     font-size: 18px;
 }
 
-ul.dropdown-menu {
-    padding: 15px;
-    overflow-y: scroll;
+.dropdown-menu {
     max-height: 450px;
+    overflow-y: hidden;
 }
 
-ul.dropdown-menu li > div {
+#dropdown {
+    margin-left: 10px;
+}
+
+#dropdown li > div {
     line-height: 1.2em;
 }
 
-ul.dropdown-menu li > div > a {
+#dropdown li > div > a {
     font-size: 15px;
 }
 
-ul.dropdown-menu li > div > span {
+#dropdown li > div > span {
     font-size: 13px;
 }
 
-ul.dropdown-menu hr {
+#dropdown hr {
     margin-top: 3px;
     margin-bottom: 3px;
 }
@@ -701,20 +799,16 @@ td.cell-avatar {
     color: grey;
 }
 
-#order-modal #avatar-block,
+#map-container #avatar-block,
 #order-respond-modal #avatar-block {
     width: 100%;
     padding: 0 0 15px 0;
     margin: 0;
 }
 
-#order-modal #avatar-block table,
+#map-container #avatar-block table,
 #order-respond-modal #avatar-block table {
     width: 100%;
-}
-
-#order-modal ul {
-    margin-left: 25px;
 }
 
 .progress {
@@ -745,10 +839,6 @@ td.cell-avatar {
     color: #808080;
 }
 
-#map {
-    padding: 0;
-}
-
 @media (max-height: 800px) and (min-width: 991px) {
     .rounded-block {
         font-size: 18px;
@@ -767,6 +857,11 @@ td.cell-avatar {
     .rounded-block.tall {
         height: auto;
         min-height: 685px;
+        margin-bottom: 25px;
+    }
+
+    #map-container {
+        min-height: 585px;
         margin-bottom: 25px;
     }
 
@@ -801,7 +896,7 @@ td.cell-avatar {
     }
 
     .form-group textarea[name=description] {
-        height: 230px;
+        height: 110px;
     }
 }
 
@@ -833,6 +928,10 @@ td.cell-avatar {
         -ms-transition: height 0.1s;
         -o-transition: height 0.1s;
         transition: height 0.1s;
+    }
+
+    .form-group.has-label i {
+        margin-top: 31px;
     }
 
     .rounded-block {
@@ -928,6 +1027,10 @@ td.cell-avatar {
         margin-top: auto;
         margin-left: 50%;
         transform: translateX(-50%);
+    }
+
+    #selected-points {
+        width: 100%;
     }
 }
 

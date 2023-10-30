@@ -1,7 +1,7 @@
 // window.stop();
 window.phoneRegExp = /^((\+)?(\d)(\s)?(\()?[0-9]{3}(\))?(\s)?([0-9]{3})(\-)?([0-9]{2})(\-)?([0-9]{2}))$/gi;
 window.codeRegExp = /^((\d){2}(\-)(\d){2}(\-)(\d){2})$/gi
-$(window).on('load', function () {
+$(document).ready(function () {
     $.mask.definitions['n'] = "[7-8]";
     $('input[name=phone]').mask("+n(999)999-99-99");
     $('input[name=code]').mask("99-99-99");
@@ -38,8 +38,8 @@ $(window).on('load', function () {
     },700);
 
     // Datatable
-    let baseDataTable = dataTableAttributes($('.datatable-basic.default'), 8);
-    let subscrDataTable = dataTableAttributes($('.datatable-basic.subscriptions'), 6);
+    const baseDataTable = dataTableAttributes($('.datatable-basic.default'), 8);
+    const subscrDataTable = dataTableAttributes($('.datatable-basic.subscriptions'), 6);
     if (baseDataTable) clickYesDeleteOnModal(baseDataTable, true);
     if (subscrDataTable) clickYesDeleteOnModal(subscrDataTable, false);
 
@@ -48,10 +48,10 @@ $(window).on('load', function () {
     window.deleteRow = null;
 
     // Top menu tabs
-    let topMenu = $('.rounded-block.tall .top-submenu');
+    const topMenu = $('.rounded-block.tall .top-submenu');
     topMenu.find('a').click(function (e) {
         e.preventDefault();
-        let parent = $(this).parents('.tab');
+        const parent = $(this).parents('.tab');
         if (!parent.hasClass('active')) {
             let currentActiveTab = topMenu.find('.tab.active'),
                 currentActiveTabId = currentActiveTab.find('a').attr('id').replace('top-submenu-',''),
@@ -100,15 +100,22 @@ $(window).on('load', function () {
 
     // Open message modal
     if (openMessageModalFlag) messageModal.modal('show');
+
+    // Custom scroll dropdown menu
+    $('.dropdown-menu').mCustomScrollbar({
+        axis: 'y',
+        theme: 'light-3',
+        alwaysShowScrollbar: 1
+    });
 });
 
-let getUrl = (form, url, callBack) => {
+const getUrl = (form, url, callBack) => {
     let formData = new FormData(),
         submitButton = form.find('button[type=submit]');
 
     form.find('input.error').removeClass('error');
     form.find('div.error').html('');
-    form.find('input, select').each(function () {
+    form.find('input, select, textarea').each(function () {
         if ($(this).attr('type') === 'file') formData.append($(this).attr('name'), $(this)[0].files[0]);
         else if ($(this).attr('type') === 'radio') {
             $(this).each(function () {
@@ -157,7 +164,7 @@ let getUrl = (form, url, callBack) => {
     });
 }
 
-let getCodeAgainCounter = (getCodeButton, timer) => {
+const getCodeAgainCounter = (getCodeButton, timer) => {
     let getRegisterCodeAgain = $('#get-code-again'),
         countDown = setInterval(() => {
         if (!timer) {
@@ -170,12 +177,12 @@ let getCodeAgainCounter = (getCodeButton, timer) => {
     }, 1000);
 };
 
-let validationDate = (date) => {
+const validationDate = (date) => {
     let inputDate = new Date(date[2], date[1], 0);
     return date[0] && date[1] && date[2] && date[0] <= inputDate.getDate() && date[1] <= 12;
 };
 
-let lengthValidate = (form, fields) => {
+const lengthValidate = (form, fields) => {
     let validationFlag = true;
     $.each(fields, (k, field) => {
         let input = form.find('input[name=' + field + ']');
@@ -188,12 +195,12 @@ let lengthValidate = (form, fields) => {
     return validationFlag;
 };
 
-let resetErrors = (form) => {
+const resetErrors = (form) => {
     form.find('input.error').removeClass('error');
     form.find('div.error').html('');
 };
 
-let resizeDTable = (dataTable) => {
+const resizeDTable = (dataTable) => {
     if ($(window).width() >= 991 && $(window).height() >= 800) dataTable.context[0]._iDisplayLength = 8;
     else if ($(window).width() >= 991) dataTable.context[0]._iDisplayLength = 6;
     else dataTable.context[0]._iDisplayLength = 10;
@@ -201,7 +208,7 @@ let resizeDTable = (dataTable) => {
     bindDelete();
 }
 
-let bindDelete = () => {
+const bindDelete = () => {
     let deleteIcon = $('.icon-close2, .icon-bell-cross');
     deleteIcon.unbind();
     deleteIcon.click(function () {
@@ -218,7 +225,7 @@ let bindDelete = () => {
     });
 }
 
-let mapInit = (container) => {
+const mapInit = (container) => {
     window.myMap = new ymaps.Map(container, {
         center: [55.76, 37.64],
         zoom: 10,
@@ -226,17 +233,17 @@ let mapInit = (container) => {
     });
 }
 
-let getPlaceMark = (point, data) => {
+const getPlaceMark = (point, data) => {
     return new ymaps.Placemark(point, data, {
-        preset: 'islands#redDotIcon'
+        preset: 'islands#darkOrangeCircleDotIcon'
     });
 }
 
-let zoomAndCenterMap = () => {
+const zoomAndCenterMap = () => {
     window.myMap.setCenter(point, 17);
 }
 
-let dataTableAttributes = (dataTable, rows) => {
+const dataTableAttributes = (dataTable, rows) => {
     if (dataTable.length) {
         dataTable = dataTable.DataTable({iDisplayLength: rows});
 
@@ -254,7 +261,7 @@ let dataTableAttributes = (dataTable, rows) => {
     } else return false;
 }
 
-let clickYesDeleteOnModal = (dataTable, useCounter) => {
+const clickYesDeleteOnModal = (dataTable, useCounter) => {
     // Click YES on delete modal
     $('.delete-yes').click(function () {
         let deleteModal = $(this).parents('.modal');
@@ -294,7 +301,7 @@ let clickYesDeleteOnModal = (dataTable, useCounter) => {
     });
 }
 
-let getSubscriptionsNews = (subscriptionsUrl, ordersUrl, newOrderFrom) => {
+const getSubscriptionsNews = (subscriptionsUrl, ordersUrl, newOrderFrom) => {
     $.get(subscriptionsUrl).done((data) => {
         if (data.subscriptions.length) {
             $('#right-button-block .fa.fa-bell-o').append(
@@ -316,4 +323,45 @@ let getSubscriptionsNews = (subscriptionsUrl, ordersUrl, newOrderFrom) => {
             });
         }
     });
+}
+
+const imagePreview = (container, defImage) => {
+    container.each(function () {
+        let currentContainer = $(this),
+            hoverImg = currentContainer.find('img');
+
+        currentContainer.find('input[type=file]').change(function () {
+            let input = $(this)[0].files[0];
+            if (input.type.match('image.*')) {
+                let reader = new FileReader();
+                reader.onload = function (e) {
+                    currentContainer.css('background-image', 'url(' + e.target.result + ')');
+                };
+                reader.readAsDataURL(input);
+                currentContainer.find('i').hide();
+            } else if (defImage) {
+                currentContainer.css('background-image', 'url('+defImage+')');
+            }
+        }).on('mouseover', function () {
+            hoverImg.show();
+        }).on('mouseout', function () {
+            hoverImg.hide();
+        });
+    });
+}
+
+const owlSettings = (margin, nav, timeout, responsive, autoplay) => {
+    let navButtonBlack1 = '<img src="/images/arrow_left.svg" />',
+        navButtonBlack2 = '<img src="/images/arrow_right.svg" />';
+
+    return {
+        margin: margin,
+        loop: true,
+        nav: nav,
+        autoplay: autoplay,
+        autoplayTimeout: timeout,
+        dots: !nav,
+        responsive: responsive,
+        navText: [navButtonBlack1, navButtonBlack2]
+    }
 }
