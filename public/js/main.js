@@ -270,27 +270,20 @@ const clickYesDeleteOnModal = (dataTable, useCounter) => {
         addLoader();
 
         $.post(deleteModal.attr('del-function'), {
-            '_token': $('input[name=_token]').val(),
+            '_token': window.tokenField,
             'id': window.deleteId,
         }, () => {
-            let contentBlock = window.deleteRow.parents('.content-block');
-            if (useCounter) {
-                let contentId = contentBlock.attr('id').replace('content-',''),
-                    contentContainerCounter = $('#top-submenu-'+contentId).next('sup'),
-                    contentCounter = parseInt(contentContainerCounter.html());
-
-                contentCounter--;
-                contentContainerCounter.html(contentCounter);
-            }
-            deleteDataTableRows(dataTable, window.deleteRow);
+            deleteDataTableRows(dataTable, window.deleteRow, useCounter);
             removeLoader();
         });
     });
 }
 
-const deleteDataTableRows = (dataTable, row) => {
+const deleteDataTableRows = (dataTable, row, useCounter) => {
     let baseTable = row.parents('.datatable-basic.default'),
         contentBlockTab = row.parents('.content-block');
+
+    if (useCounter) changeDataCounter(contentBlockTab, -1);
 
     if (row.length > 1) {
         row.each(function () {
@@ -305,6 +298,36 @@ const deleteDataTableRows = (dataTable, row) => {
         if (contentBlockTab) contentBlockTab.find('h4').removeClass('d-none');
     }
     bindDelete();
+}
+
+const addDataTableRow = (contentBlockTab, row, useCounter) => {
+    if (useCounter) changeDataCounter(contentBlockTab, 1);
+    let dataTable = contentBlockTab.find('table.datatable-basic.default');
+
+    if (!dataTable.length) {
+        contentBlockTab.find('h4').addClass('d-none');
+        let newTable = $('<table></table>').addClass('table datatable-basic default');
+        contentBlockTab.prepend(newTable);
+        dataTable = dataTableAttributes(newTable, 8);
+    } else {
+        dataTable = dataTable.DataTable();
+    }
+
+    if (row.length > 1) {
+        row.each(function () {
+            dataTable.row.add($(this));
+        });
+    } else dataTable.row.add(row);
+    dataTable.draw();
+}
+
+const changeDataCounter = (contentBlockTab, increment) => {
+    let contentId = contentBlockTab.attr('id').replace('content-',''),
+        containerCounter = $('#top-submenu-'+contentId).next('sup'),
+        counterVal = parseInt(containerCounter.html());
+
+    counterVal += increment;
+    containerCounter.html(counterVal);
 }
 
 const getSubscriptionsNews = (subscriptionsUrl, ordersUrl, newOrderFrom) => {
