@@ -252,7 +252,6 @@ const dataTableAttributes = (dataTable, rows) => {
         // Change pagination on data-tables
         dataTable.on('draw.dt', function () {
             bindDelete();
-            bindFancybox();
         });
         bindDelete();
 
@@ -283,23 +282,29 @@ const clickYesDeleteOnModal = (dataTable, useCounter) => {
                 contentCounter--;
                 contentContainerCounter.html(contentCounter);
             }
-
-            if (window.deleteRow.length > 1) {
-                window.deleteRow.each(function () {
-                    dataTable.row($(this)).remove();
-                });
-            } else dataTable.row(window.deleteRow).remove();
-
-            if (!dataTable.rows().count()) {
-                contentBlock.find('.no-data-block').removeClass('d-none');
-                window.deleteRow.parents('.dataTables_wrapper').remove();
-            } else {
-                dataTable.draw();
-                bindDelete();
-            }
+            deleteDataTableRows(dataTable, window.deleteRow);
             removeLoader();
         });
     });
+}
+
+const deleteDataTableRows = (dataTable, row) => {
+    let baseTable = row.parents('.datatable-basic.default'),
+        contentBlockTab = row.parents('.content-block');
+
+    if (row.length > 1) {
+        row.each(function () {
+            dataTable.row($(this)).remove();
+        });
+    } else dataTable.row(row).remove();
+    dataTable.draw();
+
+    if (!dataTable.rows().count()) {
+        dataTable.destroy();
+        baseTable.remove();
+        if (contentBlockTab) contentBlockTab.find('h4').removeClass('d-none');
+    }
+    bindDelete();
 }
 
 const getSubscriptionsNews = (subscriptionsUrl, ordersUrl, newOrderFrom) => {

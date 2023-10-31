@@ -42,26 +42,20 @@ $(document).ready(function () {
             //     $('<i></i>').addClass('icon-close2').attr('del-data','delete-modal').attr('del-data',window.orderId)
             // );
 
-            activeTable.row(window.tableRow).remove();
-            activeTable.draw();
-            if (!activeTable.rows().count()) {
-                activeTable.destroy();
-                $('.datatable-basic').remove();
-                contentBlockActive.find('h4').removeClass('d-none');
+            deleteDataTableRows(activeTable, window.tableRow);
 
-                if (!archiveTable.length) {
-                    contentBlockArchive.find('h4').addClass('d-none');
-                    let newTable = $('<table></table>').addClass('table datatable-basic default');
-                    contentBlockArchive.prepend(newTable);
-                    archiveTable = dataTableAttributes(newTable, 8);
-                } else {
-                    archiveTable = archiveTable.DataTable();
-                }
-                archiveTable.row.add(window.tableRow);
-                archiveTable.draw();
-
-                orderClosedModal.modal('show');
+            if (!archiveTable.length) {
+                contentBlockArchive.find('h4').addClass('d-none');
+                let newTable = $('<table></table>').addClass('table datatable-basic default');
+                contentBlockArchive.prepend(newTable);
+                archiveTable = dataTableAttributes(newTable, 8);
+            } else {
+                archiveTable = archiveTable.DataTable();
             }
+
+            archiveTable.row.add(window.tableRow);
+            archiveTable.draw();
+            orderClosedModal.modal('show');
         });
     });
 });
