@@ -212,6 +212,14 @@ const resizeDTable = (dataTable, rows) => {
     bindDelete();
 }
 
+const bindChangePagination = (dataTable) => {
+    const paginationEvent = ('draw.dt');
+    dataTable.off(paginationEvent);
+    dataTable.on(paginationEvent, function () {
+        bindDelete();
+    });
+}
+
 const bindDelete = () => {
     let deleteIcon = $('.icon-close2, .icon-bell-cross');
     deleteIcon.unbind();
@@ -252,9 +260,7 @@ const dataTableAttributes = (dataTable, rows) => {
         dataTable = dataTable.DataTable({iDisplayLength: rows});
 
         // Change pagination on data-tables
-        dataTable.on('draw.dt', function () {
-            bindDelete();
-        });
+        bindChangePagination(dataTable);
         bindDelete();
 
         $(window).resize(function () {
@@ -300,6 +306,7 @@ const deleteDataTableRows = (contentBlockTab, row, useCounter) => {
     }
 
     dataTable.draw();
+    bindChangePagination(dataTable);
     bindDelete();
 }
 
@@ -323,6 +330,7 @@ const addDataTableRow = (contentBlockTab, row, useCounter) => {
     } else dataTable.row.add(row);
 
     dataTable.draw();
+    bindChangePagination(dataTable);
     bindDelete();
 }
 
