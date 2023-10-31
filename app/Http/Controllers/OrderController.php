@@ -208,8 +208,8 @@ class OrderController extends BaseController
     {
         $order = Order::find($request->id);
         $this->authorize('owner', $order);
-//        $order->status = 0;
-//        $order->save();
+        $order->status = 0;
+        $order->save();
         return response()->json([],200);
     }
 
