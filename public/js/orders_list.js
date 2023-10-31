@@ -1,8 +1,7 @@
 $(document).ready(function () {
     const modalConfirm = $('#order-closing-confirm-modal'),
         orderClosedModal = $('#order-closed-modal'),
-        contentBlockActive = $('#content-active'),
-        ordersActiveTable = contentBlockActive.find('table.datatable-basic.default');
+        ordersActiveTable = $('#content-active').find('table.datatable-basic.default');
 
     // Change pagination on data-tables
     ordersActiveTable.on('draw.dt', function () {
@@ -13,8 +12,7 @@ $(document).ready(function () {
     modalConfirm.find('button.close-yes').click(function (e) {
         e.preventDefault();
         modalConfirm.modal('hide');
-        let activeTable = ordersActiveTable.DataTable(),
-            deleteCell = window.tableRow.find('.close-order-cell');
+        let deleteCell = window.tableRow.find('.close-order-cell');
 
         $.post(
             closeOrderUrl,
@@ -27,7 +25,7 @@ $(document).ready(function () {
             deleteCell.removeClass('close-order-cell').addClass('empty');
             deleteCell.find('button').remove();
 
-            deleteDataTableRows(activeTable, window.tableRow, true);
+            deleteDataTableRows($('#content-active'), window.tableRow, true);
             addDataTableRow($('#content-archive'), window.tableRow, true);
             orderClosedModal.modal('show');
         });

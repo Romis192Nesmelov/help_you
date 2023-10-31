@@ -1,6 +1,7 @@
 // window.stop();
 window.phoneRegExp = /^((\+)?(\d)(\s)?(\()?[0-9]{3}(\))?(\s)?([0-9]{3})(\-)?([0-9]{2})(\-)?([0-9]{2}))$/gi;
 window.codeRegExp = /^((\d){2}(\-)(\d){2}(\-)(\d){2})$/gi
+window.dataTableClasses = '.table.datatable-basic.default';
 
 $(document).ready(function () {
     $.mask.definitions['n'] = "[7-8]";
@@ -206,6 +207,7 @@ const resizeDTable = (dataTable, rows) => {
     if ($(window).width() >= 991 && $(window).height() >= 800) dataTable.context[0]._iDisplayLength = rows;
     else if ($(window).width() >= 991) dataTable.context[0]._iDisplayLength = rows - 2;
     else dataTable.context[0]._iDisplayLength = rows + 2;
+
     dataTable.draw();
     bindDelete();
 }
@@ -279,9 +281,9 @@ const clickYesDeleteOnModal = (dataTable, useCounter) => {
     });
 }
 
-const deleteDataTableRows = (dataTable, row, useCounter) => {
+const deleteDataTableRows = (contentBlockTab, row, useCounter) => {
     let baseTable = row.parents('.datatable-basic.default'),
-        contentBlockTab = row.parents('.content-block');
+        dataTable = contentBlockTab.find('table'+window.dataTableClasses).DataTable();
 
     if (useCounter) changeDataCounter(contentBlockTab, -1);
 
@@ -290,23 +292,24 @@ const deleteDataTableRows = (dataTable, row, useCounter) => {
             dataTable.row($(this)).remove();
         });
     } else dataTable.row(row).remove();
-    dataTable.draw();
 
     if (!dataTable.rows().count()) {
         dataTable.destroy();
         baseTable.remove();
         if (contentBlockTab) contentBlockTab.find('h4').removeClass('d-none');
     }
+
+    dataTable.draw();
     bindDelete();
 }
 
 const addDataTableRow = (contentBlockTab, row, useCounter) => {
     if (useCounter) changeDataCounter(contentBlockTab, 1);
-    let dataTable = contentBlockTab.find('table.datatable-basic.default');
+    let dataTable = contentBlockTab.find('table'+window.dataTableClasses);
 
     if (!dataTable.length) {
         contentBlockTab.find('h4').addClass('d-none');
-        let newTable = $('<table></table>').addClass('table datatable-basic default');
+        let newTable = $('<table></table>').addClass(window.dataTableClasses.replaceAll('.',' ').trim());
         contentBlockTab.prepend(newTable);
         dataTable = dataTableAttributes(newTable, 8);
     } else {
@@ -318,7 +321,9 @@ const addDataTableRow = (contentBlockTab, row, useCounter) => {
             dataTable.row.add($(this));
         });
     } else dataTable.row.add(row);
+
     dataTable.draw();
+    bindDelete();
 }
 
 const changeDataCounter = (contentBlockTab, increment) => {
