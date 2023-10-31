@@ -1,7 +1,8 @@
 @props([
     'head' => false,
     'footer' => false,
-    'yes_button' => false
+    'yes_button' => false,
+    'yes_button_class' => 'delete-yes'
 ])
 
 <div {{ $attributes->class('modal fade') }} tabindex="-1" aria-labelledby="{{ $attributes->get('id') }}Label" aria-hidden="true">
@@ -23,7 +24,7 @@
                             'id' => null,
                             'buttonType' => 'button',
                             'primary' => true,
-                            'addClass' => 'w-25 mt-3 delete-yes',
+                            'addClass' => 'w-25 mt-3 '.$yes_button_class,
                             'buttonText' => trans('content.yes')
                         ])
                         @include('blocks.button_block',[

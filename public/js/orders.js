@@ -2,7 +2,6 @@ $(document).ready(function () {
     ymaps.ready(mapInitWithContainer);
     window.selectedPoints = $('#selected-points');
     window.selectedPoint = null;
-    window.tokenField = $('input[name=_token]').val();
     window.respondButton = $('#respond-button');
     window.pointsContainer = $('#points-container');
     window.selectedPointsOpened = false;
@@ -14,7 +13,10 @@ $(document).ready(function () {
     });
 
     $('#selected-points i.icon-close2, #map').click(() => {
-        if (window.selectedPointsOpened) removeSelectedPoints();
+        if (window.selectedPointsOpened) {
+            removeSelectedPoints();
+            window.myMap.balloon.close();
+        }
     });
 });
 
@@ -24,7 +26,8 @@ const mapInitWithContainer = () => {
 }
 
 const getPoints = () => {
-    getUrl($('form'), null, (data) => {
+    getUrl($('form'), (getPreviewFlag ? getPreviewUrl : null), (data) => {
+        getPreviewFlag = false;
         window.placemarks = [];
         let orders = data.orders;
         window.subscriptions = [];
@@ -44,8 +47,8 @@ const getPoints = () => {
                 let createdAt = new Date(point.created_at);
                 window.placemarks.push(getPlaceMark([point.latitude, point.longitude], {
                     placemarkId: k,
-                    // balloonContentHeader: '<a data-id="' + k + '" class="list-item">' + point.order_type.name + '</a>',
-                    // balloonContentBody: point.address,
+                    balloonContentHeader: point.order_type.name,
+                    balloonContentBody: point.address,
                     orderId: point.id,
                     name: point.order_type.name,
                     address: point.address,
@@ -67,19 +70,19 @@ const getPoints = () => {
             });
 
             // Создаем собственный макет с информацией о выбранном геообъекте.
-            // let customBalloonContentLayout = ymaps.templateLayoutFactory.createClass([
-            //     '<ul class=list>',
-            //     // Выводим в цикле список всех геообъектов.
-            //     '{% for geoObject in properties.geoObjects %}',
-            //     '<li><div class="balloon-head">{{ geoObject.properties.balloonContentHeader|raw }}</div><div class="balloon-content">{{ geoObject.properties.balloonContentBody|raw }}</div></li>',
-            //     '{% endfor %}',
-            //     '</ul>'
-            // ].join(''));
+            let customBalloonContentLayout = ymaps.templateLayoutFactory.createClass([
+                '<ul class=list>',
+                // Выводим в цикле список всех геообъектов.
+                '{% for geoObject in properties.geoObjects %}',
+                '<li><div class="balloon-head">{{ geoObject.properties.balloonContentHeader|raw }}</div><div class="balloon-content">{{ geoObject.properties.balloonContentBody|raw }}</div></li>',
+                '{% endfor %}',
+                '</ul>'
+            ].join(''));
 
             window.clusterer = new ymaps.Clusterer({
                 preset: 'islands#darkOrangeClusterIcons',
                 clusterDisableClickZoom: true,
-                clusterOpenBalloonOnClick: false,
+                clusterOpenBalloonOnClick: true,
                 // Устанавливаем режим открытия балуна.
                 // В данном примере балун никогда не будет открываться в режиме панели.
                 clusterBalloonPanelMaxMapArea: 0,
@@ -87,7 +90,7 @@ const getPoints = () => {
                 // так как все стандартные макеты имеют определенные размеры.
                 clusterBalloonMaxHeight: 200,
                 // Устанавливаем собственный макет контента балуна.
-                // clusterBalloonContentLayout: customBalloonContentLayout,
+                clusterBalloonContentLayout: customBalloonContentLayout,
             });
 
             // Click on cluster
@@ -175,7 +178,9 @@ const showOrder = (point) => {
         let imagesContainer = $('<div></div>').addClass('images owl-carousel mt-3');
         $.each(images, function (k, image) {
             imagesContainer.append(
-                $('<div></div>').addClass('image').css('background-image','url(/'+image.image+')')
+                $('<a></a>').addClass('fancybox').attr('href',image.image).append(
+                    $('<div></div>').addClass('image').css('background-image','url(/'+image.image+')')
+                )
             );
         });
         orderContainer.append(imagesContainer);
@@ -221,6 +226,7 @@ const showOrder = (point) => {
 
     orderContainer.append($('<hr>'));
     window.pointsContainer.append(orderContainer);
+    bindFancybox();
 }
 
 const removeSelectedPoints = (callBack) => {
@@ -268,7 +274,7 @@ const setBindsAndOpen = () => {
             orderResponseUrl,
             {
                 '_token': window.tokenField,
-                'order_id': orderId,
+                'id': orderId,
             }
         ).done(() => {
             orderRespondModal.find('.order-number').html(orderId);

@@ -272,6 +272,13 @@ button.btn.small {
     height: 60px;
 }
 
+button.btn.micro {
+    width: 90px;
+    height: 30px;
+    padding: 3px;
+    font-size: 12px;
+}
+
 button.btn.btn-gray {
     color: white;
     background: gray;
@@ -687,8 +694,32 @@ table.datatable-basic td .content {
     color: grey;
 }
 
+table.datatable-basic td .label {
+    padding: 5px;
+    border-radius: 5px;
+    font-size: 12px;
+    color: white;
+}
+
+table.datatable-basic td .label.open {
+    background-color: #008e7c;
+}
+
+table.datatable-basic td .label.in-progress {
+    background-color: #e65639;
+}
+
+table.datatable-basic td .label.closed {
+    background-color: #6a6a6a;
+}
+
 table.datatable-basic td.icon {
     width: 7%;
+}
+
+table.datatable-basic td.empty {
+    width: 0;
+    padding: 0;
 }
 
 .rounded-block.tall .content-block .datatable-scroll {

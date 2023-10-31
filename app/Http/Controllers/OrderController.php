@@ -2,10 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\Order\DeleteResponseRequest;
 use App\Http\Requests\Order\NextStepRequest;
 use App\Http\Requests\Order\OrderRequest;
-use App\Http\Requests\Order\OrderResponseRequest;
 use App\Http\Requests\Order\ReadOrderRequest;
 use App\Models\Order;
 use App\Models\OrderImage;
@@ -14,7 +12,6 @@ use App\Models\OrderUser;
 use App\Models\ReadOrder;
 use App\Models\Subscription;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Illuminate\View\View;
@@ -104,11 +101,11 @@ class OrderController extends BaseController
         );
     }
 
-    public function orderResponse(OrderResponseRequest $request): JsonResponse
+    public function orderResponse(OrderRequest $request): JsonResponse
     {
         $fields = $request->validated();
         $fields['user_id'] = Auth::id();
-        $order = Order::find($fields['order_id']);
+        $order = Order::find($fields['id']);
         if ($order->user_id == Auth::id()) return response()->json([],403);
         else {
             OrderUser::create($fields);
@@ -189,14 +186,34 @@ class OrderController extends BaseController
 
     /**
      * @throws \Illuminate\Auth\Access\AuthorizationException
-     * @throws \Illuminate\Validation\ValidationException
      */
-    public function deleteOrder(Request $request): JsonResponse
+    public function deleteOrder(OrderRequest $request): JsonResponse
     {
-        return $this->deleteSomething($request, new Order(), 'owner');
+        $order = Order::find($request->id);
+        $this->authorize('owner', $order);
+        if ($order->status >= 1) return response()->json([],403);
+        else {
+            foreach ($order->images as $image) {
+                $this->deleteFile($image->image);
+            }
+            $order->delete();
+            return response()->json([],200);
+        }
     }
 
-    public function deleteResponse(DeleteResponseRequest $request): JsonResponse
+    /**
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
+    public function closeOrder(OrderRequest $request): JsonResponse
+    {
+        $order = Order::find($request->id);
+        $this->authorize('owner', $order);
+        $order->status = 0;
+        $order->save();
+        return response()->json([],200);
+    }
+
+    public function deleteResponse(OrderRequest $request): JsonResponse
     {
         $orderUser = OrderUser::where('order_id',$request->id)->where('user_id',Auth::id())->first();
         $orderUser->delete();

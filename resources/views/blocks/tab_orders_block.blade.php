@@ -1,14 +1,15 @@
-@foreach ($menus as $item)
-    <div id="content-{{ $item }}" class="content-block" {{ !$loop->first ? 'style=display:none' : '' }}>
-        @if (count($orders[$item]))
+@foreach ($menus as $menuItem)
+    <div id="content-{{ $menuItem }}" class="content-block" {{ !$loop->first ? 'style=display:none' : '' }}>
+        @if (count($orders[$menuItem]))
             @include('blocks.data_table_block',[
-                'items' => $orders[$item],
+                'items' => $orders[$menuItem],
                 'relationHead' => 'orderType',
                 'headName' => 'name',
-                'contentName' => 'address'
+                'contentName' => 'address',
+                'statusField' => 'status'
             ])
         @endif
-        <h4 class="no-data-block text-uppercase text-secondary {{ count($orders[$item]) ? 'd-none' : '' }}">{{ trans('content.no_data') }}</h4>
+        <h4 class="no-data-block text-uppercase text-secondary {{ count($orders[$menuItem]) ? 'd-none' : '' }}">{{ trans('content.no_data') }}</h4>
     </div>
 @endforeach
 @if ($useButton)

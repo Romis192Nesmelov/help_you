@@ -131,7 +131,7 @@ $(document).ready(function () {
                             $.post(
                                 nextStepUrl,
                                 {
-                                    '_token': $('input[name=_token]').val(),
+                                    '_token': window.tokenField,
                                     'address': updatedAddress,
                                     'latitude': point[0],
                                     'longitude': point[1]

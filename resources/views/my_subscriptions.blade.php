@@ -18,6 +18,7 @@
                         @foreach ($subscriptions as $subscription)
                             @foreach ($subscription->orders as $order)
                                 <tr class="row-{{ $subscription->id }}">
+                                    <td class="id">{{ $subscription->id }}</td>
                                     <td class="cell-avatar">
                                         <div class="avatar cir" style="background-image: url({{ asset($subscription->user->avatar ?? 'images/def_avatar.svg') }} );"></div>
                                     </td>

@@ -1,17 +1,19 @@
 // window.stop();
 window.phoneRegExp = /^((\+)?(\d)(\s)?(\()?[0-9]{3}(\))?(\s)?([0-9]{3})(\-)?([0-9]{2})(\-)?([0-9]{2}))$/gi;
 window.codeRegExp = /^((\d){2}(\-)(\d){2}(\-)(\d){2})$/gi
+
 $(document).ready(function () {
     $.mask.definitions['n'] = "[7-8]";
     $('input[name=phone]').mask("+n(999)999-99-99");
     $('input[name=code]').mask("99-99-99");
     window.messageModal = $('#message-modal');
+    window.tokenField = $('input[name=_token]').val();
 
     // Setting datatable defaults
     $.extend( $.fn.dataTable.defaults, {
         autoWidth: false,
         columnDefs: [{
-            targets: [3]
+            targets: [4]
         }],
         order: [],
         dom: '<"datatable-header"fl><"datatable-scroll"t><"datatable-footer"ip>',
@@ -200,10 +202,10 @@ const resetErrors = (form) => {
     form.find('div.error').html('');
 };
 
-const resizeDTable = (dataTable) => {
-    if ($(window).width() >= 991 && $(window).height() >= 800) dataTable.context[0]._iDisplayLength = 8;
-    else if ($(window).width() >= 991) dataTable.context[0]._iDisplayLength = 6;
-    else dataTable.context[0]._iDisplayLength = 10;
+const resizeDTable = (dataTable, rows) => {
+    if ($(window).width() >= 991 && $(window).height() >= 800) dataTable.context[0]._iDisplayLength = rows;
+    else if ($(window).width() >= 991) dataTable.context[0]._iDisplayLength = rows - 2;
+    else dataTable.context[0]._iDisplayLength = rows + 2;
     dataTable.draw();
     bindDelete();
 }
@@ -255,7 +257,7 @@ const dataTableAttributes = (dataTable, rows) => {
         bindDelete();
 
         $(window).resize(function () {
-            resizeDTable(dataTable);
+            resizeDTable(dataTable, rows);
         });
         return dataTable
     } else return false;
@@ -287,7 +289,6 @@ const clickYesDeleteOnModal = (dataTable, useCounter) => {
                     dataTable.row($(this)).remove();
                 });
             } else dataTable.row(window.deleteRow).remove();
-            console.log(dataTable.rows().count());
 
             if (!dataTable.rows().count()) {
                 contentBlock.find('.no-data-block').removeClass('d-none');

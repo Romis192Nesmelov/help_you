@@ -105,8 +105,10 @@
         </div>
     </div>
 <script>
+    let getPreviewFlag = parseInt("{{ request()->has('preview') && request()->input('preview') }}");
     const orderResponseUrl = "{{ route('order.order_response') }}",
         orderReadOrderUrl = "{{ route('order.read_order') }}",
+        getPreviewUrl = "{{ route('order.get_preview') }}",
         subscribeUrl = "{{ route('account.subscription') }}",
         getOrdersUrl = "{{ route('order.get_orders') }}",
         orderNumber = "{{ trans('content.order_number') }}",
