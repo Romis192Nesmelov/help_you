@@ -36,6 +36,7 @@ class OrderController extends BaseController
     public function editOrder(OrderRequest $request): View
     {
         $this->data['order'] = Order::find($request->id);
+        if ($this->data['order'] == 1) abort(403);
         $this->authorize('owner', $this->data['order']);
         $this->getItems('order_types', new OrderType());
         return $this->showView('edit_order');

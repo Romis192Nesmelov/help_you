@@ -6,7 +6,7 @@
                 <div class="head">{{ isset($relationHead) ? $item->$relationHead->$headName : $item->$headName }}</div>
                 <div class="content">{{ isset($relationContent) ? $item->$relationContent->$contentName : $item->$contentName }}</div>
             </td>
-            @if (isset($editRoute))
+            @if (isset($editRoute) && isset($statusField) && $statusField && $item[$statusField] != 1)
                 @include('blocks.edit_dt_row_block',['id' => $item->id])
             @else
                 <td class="empty"></td>
