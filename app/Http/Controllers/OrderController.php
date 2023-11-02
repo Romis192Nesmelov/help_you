@@ -103,9 +103,9 @@ class OrderController extends BaseController
 
     public function orderResponse(OrderRequest $request): JsonResponse
     {
-        $fields = $request->validated();
+        $fields['order_id'] = $request->id;
         $fields['user_id'] = Auth::id();
-        $order = Order::find($fields['id']);
+        $order = Order::find($request->id);
         if ($order->user_id == Auth::id()) return response()->json([],403);
         else {
             OrderUser::create($fields);

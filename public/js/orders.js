@@ -269,7 +269,6 @@ const setBindsAndOpen = () => {
             properties = point.properties,
             orderId = properties.get('orderId'),
             orderRespondModal = $('#order-respond-modal');
-
         $.post(
             orderResponseUrl,
             {
@@ -283,6 +282,7 @@ const setBindsAndOpen = () => {
             orderRespondModal.find('.order-address').html(properties.get('address'));
             orderRespondModal.modal('show');
             window.clusterer.remove(point);
+            removeSelectedPoints();
         });
     });
 
