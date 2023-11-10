@@ -14,7 +14,7 @@
 </x-modal>
 
 <div class="rounded-block mb-2 p-3 h-auto">
-    <form method="post" class="row" action="{{ request()->has('preview') && request()->input('preview') ? route('order.get_preview') : route('order.get_orders') }}">
+    <form method="post" class="row" action="{{ route('order.get_orders') }}">
         @csrf
         <div class="col-lg-2 col-sm-12 col-12">
             @include('blocks.select_block',[
@@ -25,20 +25,23 @@
                 'option' => 'name'
             ])
         </div>
-        <div class="col-lg-2 col-sm-6 col-12">
-            @include('blocks.select_block',[
-                'label' => trans('content.number_of_performers_from'),
-                'name' => 'performers_from',
-                'values' => range(1, 19)
-            ])
-        </div>
-        <div class="col-lg-2 col-sm-6 col-12">
-            @include('blocks.select_block',[
-                'label' => trans('content.number_of_performers_to'),
-                'name' => 'performers_to',
-                'values' => range(1, 20),
-                'selected' => 20
-            ])
+        <div class="col-lg-4 col-12 row d-flex align-items-end">
+            <label>{{ trans('content.number_of_performers') }}</label>
+            <div class="col-sm-6 col-12">
+                @include('blocks.select_block',[
+                    'prefix' => trans('content.from'),
+                    'name' => 'performers_from',
+                    'values' => range(1, 19)
+                ])
+            </div>
+            <div class="col-sm-6 col-12">
+                @include('blocks.select_block',[
+                    'prefix' => trans('content.to'),
+                    'name' => 'performers_to',
+                    'values' => range(1, 20),
+                    'selected' => 20
+                ])
+            </div>
         </div>
         <div class="col-lg-2 col-sm-12 col-12 d-flex align-items-end justify-content-center">
             @include('blocks.button_block',[

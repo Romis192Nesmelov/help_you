@@ -17,7 +17,7 @@ trait HelperTrait
     public string $validationLongText = 'required|min:5|max:50000';
     public string $validationColor = 'regex:/^(hsv\((\d+)\,\s(\d+)\%\,\s(\d+)\%\))$/';
     public string $validationSvg = 'required|mimes:svg|max:10';
-    public string $validationJpgAndPng = 'mimes:jpg,png|max:700';
+    public string $validationJpgAndPng = 'mimes:jpg,png|max:2000';
     public string $validationJpg = 'mimes:jpg|max:2000';
     public string $validationPng = 'mimes:png|max:2000';
     public string $validationDate = 'regex:/^(\d{2})\/(\d{2})\/(\d{4})$/';

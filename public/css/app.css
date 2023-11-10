@@ -4,6 +4,35 @@ body {
     /*background-color: #d0d2d6;*/
 }
 
+.mCSB_scrollTools .mCSB_draggerContainer,
+.mCS-light-3.mCSB_scrollTools .mCSB_draggerRail, .mCS-dark-3.mCSB_scrollTools .mCSB_draggerRail {
+    background-color: white;
+}
+
+.mCSB_scrollTools .mCSB_dragger .mCSB_dragger_bar,
+.mCSB_scrollTools .mCSB_dragger:hover .mCSB_dragger_bar,
+.mCSB_scrollTools .mCSB_dragger:active .mCSB_dragger_bar,
+.mCSB_scrollTools .mCSB_dragger.mCSB_dragger_onDrag .mCSB_dragger_bar {
+    background-color: #c4c4c4;
+    border-radius: 10px;
+}
+
+.owl-nav {
+    width: 100%;
+    position: absolute;
+    top: 50%;
+    display: flex;
+    justify-content: space-between;
+    transform: translateY(-50%);
+}
+
+.owl-carousel .owl-nav button {
+    width: 15px;
+    margin-left: 7px;
+    margin-right: 7px;
+    filter: drop-shadow(1px 1px 1px #000);
+}
+
 .text-orange {
     color: #e65639;
 }
@@ -136,7 +165,20 @@ table {
     background-position: 50% 50%;
 }
 
-.order-photo i {
+.order-photo i.icon-close2 {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    display: none;
+    font-size: 25px;
+    z-index: 999;
+}
+
+.order-photo i.icon-close2:hover {
+    opacity: .5;
+}
+
+.order-photo i.icon-file-plus2 {
     font-size: 25px;
     color: #818181;
 }
@@ -268,8 +310,10 @@ button.btn.btn-primary {
 }
 
 button.btn.small {
-    width: 120px;
+    width: 100px;
     height: 60px;
+    padding: 5px;
+    font-size: 12px;
 }
 
 button.btn.micro {
@@ -280,8 +324,7 @@ button.btn.micro {
 }
 
 button.btn.btn-gray {
-    color: white;
-    background: gray;
+    background-color: #dfdfdf;
     border-color: darkgray;
 }
 

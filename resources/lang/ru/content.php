@@ -73,8 +73,9 @@ return [
 
     'order_number' => 'Заяка №',
     'from' => ' от ',
+    'to' => 'до',
     'born_date' => 'д/р: <span class="born-date">:born</span>',
-    'respond_to_an_order' => 'Откликнуться на заявку',
+    'respond_to_an_order' => 'Откликнуться',
 
     'order_types' => 'Виды помощи',
     'number_of_performers' => 'Количество исполнителей',

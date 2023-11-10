@@ -192,7 +192,7 @@ class OrderController extends BaseController
     {
         $order = Order::find($request->id);
         $this->authorize('owner', $order);
-        if ($order->status >= 1) return response()->json([],403);
+        if ($order->status <= 1) return response()->json([],403);
         else {
             foreach ($order->images as $image) {
                 $this->deleteFile($image->image);

@@ -5,6 +5,8 @@ $(document).ready(function () {
     window.respondButton = $('#respond-button');
     window.pointsContainer = $('#points-container');
     window.selectedPointsOpened = false;
+    window.removingInProgress = false;
+    window.cickedTarget = null;
 
     $('#apply-button').click((e) => {
         e.preventDefault();
@@ -15,7 +17,7 @@ $(document).ready(function () {
     $('#selected-points i.icon-close2, #map').click(() => {
         if (window.selectedPointsOpened) {
             removeSelectedPoints();
-            window.myMap.balloon.close();
+            // window.myMap.balloon.close();
         }
     });
 });
@@ -26,6 +28,7 @@ const mapInitWithContainer = () => {
 }
 
 const getPoints = () => {
+    // console.log(getPreviewFlag);
     getUrl($('form'), (getPreviewFlag ? getPreviewUrl : null), (data) => {
         getPreviewFlag = false;
         window.placemarks = [];
@@ -47,8 +50,8 @@ const getPoints = () => {
                 let createdAt = new Date(point.created_at);
                 window.placemarks.push(getPlaceMark([point.latitude, point.longitude], {
                     placemarkId: k,
-                    balloonContentHeader: point.order_type.name,
-                    balloonContentBody: point.address,
+                    // balloonContentHeader: point.order_type.name,
+                    // balloonContentBody: point.address,
                     orderId: point.id,
                     name: point.order_type.name,
                     address: point.address,
@@ -70,19 +73,19 @@ const getPoints = () => {
             });
 
             // Создаем собственный макет с информацией о выбранном геообъекте.
-            let customBalloonContentLayout = ymaps.templateLayoutFactory.createClass([
-                '<ul class=list>',
-                // Выводим в цикле список всех геообъектов.
-                '{% for geoObject in properties.geoObjects %}',
-                '<li><div class="balloon-head">{{ geoObject.properties.balloonContentHeader|raw }}</div><div class="balloon-content">{{ geoObject.properties.balloonContentBody|raw }}</div></li>',
-                '{% endfor %}',
-                '</ul>'
-            ].join(''));
+            // let customBalloonContentLayout = ymaps.templateLayoutFactory.createClass([
+            //     '<ul class=list>',
+            //     // Выводим в цикле список всех геообъектов.
+            //     '{% for geoObject in properties.geoObjects %}',
+            //     '<li><div class="balloon-head">{{ geoObject.properties.balloonContentHeader|raw }}</div><div class="balloon-content">{{ geoObject.properties.balloonContentBody|raw }}</div></li>',
+            //     '{% endfor %}',
+            //     '</ul>'
+            // ].join(''));
 
             window.clusterer = new ymaps.Clusterer({
                 preset: 'islands#darkOrangeClusterIcons',
                 clusterDisableClickZoom: true,
-                clusterOpenBalloonOnClick: true,
+                clusterOpenBalloonOnClick: false,
                 // Устанавливаем режим открытия балуна.
                 // В данном примере балун никогда не будет открываться в режиме панели.
                 clusterBalloonPanelMaxMapArea: 0,
@@ -90,7 +93,7 @@ const getPoints = () => {
                 // так как все стандартные макеты имеют определенные размеры.
                 clusterBalloonMaxHeight: 200,
                 // Устанавливаем собственный макет контента балуна.
-                clusterBalloonContentLayout: customBalloonContentLayout,
+                // clusterBalloonContentLayout: customBalloonContentLayout,
             });
 
             // Click on cluster
@@ -101,16 +104,17 @@ const getPoints = () => {
             // });
 
             window.myMap.geoObjects.events.add('click', function (e) {
-                var objects = e.get('target').properties.get('geoObjects');
-                if (objects) {
+                var target = e.get('target');
+
+                target.options.set('iconColor', '#bc202e');
+                if (target.properties.get('geoObjects')) {
                     if (window.selectedPointsOpened) {
-                        removeSelectedPoints(() => { clickedToCluster(objects); });
-                    } else clickedToCluster(objects);
+                        removeSelectedPoints(target,() => { clickedToCluster(target);});
+                    } else clickedToCluster(target);
                 } else {
-                    var point = e.get('target');
                     if (window.selectedPointsOpened) {
-                        removeSelectedPoints(() => { clickedToPoint(point); });
-                    } else clickedToPoint(point);
+                        removeSelectedPoints(target,() => { clickedToPoint(target);});
+                    } else clickedToPoint(target);
                 }
             });
             addPointsToMap();
@@ -139,7 +143,7 @@ const showOrder = (point) => {
             subscribeBellClass = 'icon-bell-cross',
             subscribeButtonText = toUnsubscribe;
     } else {
-        subscribeButtonClass = 'btn-primary';
+        subscribeButtonClass = 'btn-secondary';
         subscribeBellClass = 'icon-bell-check';
         subscribeButtonText = toSubscribe;
     }
@@ -154,7 +158,7 @@ const showOrder = (point) => {
                         .append(
                             $('<div></div>').addClass('avatar cir').css('background-image','url('+avatar+')')
                         ).append(
-                            $('<div></div>')
+                            $('<div></div>').addClass('w-75')
                                 .append(
                                     $('<div></div>').addClass('user-name').html(user.family+' '+user.name)
                                 ).append(
@@ -187,7 +191,7 @@ const showOrder = (point) => {
         enablePointImagesCarousel(imagesContainer,images.length > 1);
     }
 
-    orderContainer.append($('<h2></h2>').addClass('order-type text-center mt-3 mb-1').html(properties.get('orderType')));
+    orderContainer.append($('<h2></h2>').addClass('order-type text-left mt-3 mb-1').html(properties.get('orderType')));
 
     if (orderSubTypes && currentSubTypes) {
         let subTypesContainer = $('<ul></ul>').addClass('subtypes');
@@ -202,20 +206,20 @@ const showOrder = (point) => {
         orderContainer.append(subTypesContainer);
     }
 
-    orderContainer.append($('<p></p>').addClass('mb-1 text-center').html(address+': ' + properties.get('address')));
+    orderContainer.append($('<p></p>').addClass('mb-1 text-left').html(address+': ' + properties.get('address')));
 
     if (description) {
         orderContainer
             .append(
-                $('<p></p>').addClass('small text-center fst-italic mt-2 mb-0').html(descriptionText)
+                $('<p></p>').addClass('small text-left mt-2 mb-0').html(descriptionText)
             ).append(
-                $('<p></p>').addClass('text-center order-description fst-italic mb-1').html(description)
+                $('<p></p>').addClass('text-left order-description mb-1').html(description)
             );
     }
 
     orderContainer
         .append(
-            $('<p></p>').addClass('small text-center fst-italic mb-2').html(
+            $('<p></p>').addClass('small text-left mb-2').html(
                 needPerformers + ' ' + properties.get('need_performers') + ' ' + readyToHelp + properties.get('performers')
             )
         );
@@ -229,22 +233,32 @@ const showOrder = (point) => {
     bindFancybox();
 }
 
-const removeSelectedPoints = (callBack) => {
-    window.selectedPoints.animate({'margin-left': -1 * (window.selectedPoints.width() + 40)}, 'slow', function () {
-        window.selectedPointsOpened = false;
-        if (callBack) callBack();
-    });
+const removeSelectedPoints = (target, callBack) => {
+    if (!window.removingInProgress) {
+        window.removingInProgress = true;
+        if ( (window.cickedTarget && !target) || (window.cickedTarget && target && window.cickedTarget !== target) ) {
+            window.cickedTarget.options.set('iconColor', '#e6761b');
+        }
+
+        window.selectedPoints.animate({'margin-left': -1 * (window.selectedPoints.width() + 40)}, 'slow', function () {
+            window.selectedPointsOpened = false;
+            window.removingInProgress = false;
+            if (callBack) callBack();
+        });
+    }
 }
 
-const clickedToCluster = (objects) => {
+const clickedToCluster = (target, objects) => {
+    window.cickedTarget = target;
     purgePointsContainer();
-    $.each(objects, function (k, object) {
+    $.each(target.properties.get('geoObjects'), function (k, object) {
         showOrder(object);
     });
     setBindsAndOpen();
 }
 
 const clickedToPoint = (point) => {
+    window.cickedTarget = point;
     purgePointsContainer();
     showOrder(point);
     setBindsAndOpen();
@@ -298,7 +312,7 @@ const setBindsAndOpen = () => {
             {'user_id': userId}
         ).done((data) => {
             button.fadeOut(() => {
-                button.toggleClass('btn-gray',data.subscription).toggleClass('btn-primary',!data.subscription);
+                button.toggleClass('btn-gray',data.subscription).toggleClass('btn-secondary',!data.subscription);
                 button.find('i').toggleClass('icon-bell-cross',data.subscription).toggleClass('icon-bell-check',!data.subscription);
                 button.find('span').html(data.subscription ? toUnsubscribe : toSubscribe);
                 button.fadeIn();
@@ -318,7 +332,7 @@ const setBindsAndOpen = () => {
 const enablePointImagesCarousel = (container, autoplay) => {
     container.owlCarousel(owlSettings(
         10,
-        false,
+        autoplay,
         6000,
         {0: {items: 1}},
         autoplay

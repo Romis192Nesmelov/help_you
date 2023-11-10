@@ -281,7 +281,7 @@ const clickYesDeleteOnModal = (dataTable, useCounter) => {
             '_token': window.tokenField,
             'id': window.deleteId,
         }, () => {
-            deleteDataTableRows(dataTable, window.deleteRow, useCounter);
+            deleteDataTableRows(window.deleteRow.parents('.content-block'), window.deleteRow, useCounter);
             removeLoader();
         });
     });
@@ -370,9 +370,12 @@ const getSubscriptionsNews = (subscriptionsUrl, ordersUrl, newOrderFrom) => {
 const imagePreview = (container, defImage) => {
     container.each(function () {
         let currentContainer = $(this),
-            hoverImg = currentContainer.find('img');
+            hoverImg = currentContainer.find('img'),
+            inputFile = currentContainer.find('input[type=file]'),
+            addFileIcon = currentContainer.find('i.icon-file-plus2'),
+            clearInputIcon = currentContainer.find('i.icon-close2');
 
-        currentContainer.find('input[type=file]').change(function () {
+        inputFile.change(function () {
             let input = $(this)[0].files[0];
             if (input.type.match('image.*')) {
                 let reader = new FileReader();
@@ -380,7 +383,8 @@ const imagePreview = (container, defImage) => {
                     currentContainer.css('background-image', 'url(' + e.target.result + ')');
                 };
                 reader.readAsDataURL(input);
-                currentContainer.find('i').hide();
+                addFileIcon.hide();
+                clearInputIcon.show();
             } else if (defImage) {
                 currentContainer.css('background-image', 'url('+defImage+')');
             }
@@ -388,6 +392,14 @@ const imagePreview = (container, defImage) => {
             hoverImg.show();
         }).on('mouseout', function () {
             hoverImg.hide();
+        });
+
+        clearInputIcon.click(function (e) {
+            inputFile.val('');
+            if (defImage) currentContainer.css('background-image', 'url('+defImage+')');
+            else currentContainer.css('background-image', '');
+            addFileIcon.show();
+            clearInputIcon.hide();
         });
     });
 }
