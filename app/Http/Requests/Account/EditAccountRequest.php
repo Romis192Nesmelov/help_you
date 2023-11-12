@@ -26,6 +26,9 @@ class EditAccountRequest extends FormRequest
     public function rules(): array
     {
         $validationArr = [
+            'avatar_size' => 'nullable|integer',
+            'avatar_position_x' => 'nullable',
+            'avatar_position_y' => 'nullable',
             'name' => $this->validationString,
             'family' => $this->validationString,
             'born' => $this->validationBorn,

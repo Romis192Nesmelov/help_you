@@ -90,6 +90,7 @@ return [
     'settings_head1' => 'Вы можете изменить свое имя и e-mail',
     'settings_head2' => 'Вы можете изменить свой пароль',
     'change_phone' => 'Изменить телефон',
+    'tune_avatar' => 'Настроить аватар',
     'change_password' => 'Изменить пароль',
     'phone_has_been_changed' => 'Телефон был успешно изменен!',
     'password_has_been_changed' => 'Пароль был успешно изменен!',

@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('avatar',30)->nullable();
+            $table->json('avatar_props')->nullable();
             $table->string('name')->nullable();
             $table->string('family')->nullable();
             $table->string('born',10)->nullable();

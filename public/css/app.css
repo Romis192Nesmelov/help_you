@@ -17,6 +17,70 @@ body {
     border-radius: 10px;
 }
 
+.ui-slider {
+    position: relative;
+    text-align: left;
+    background-color: #eeeeee;
+    border-radius: 100px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.1);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.1);
+}
+
+.ui-slider-horizontal {
+    height: 6px;
+}
+
+.ui-slider .ui-slider-handle {
+    position: absolute;
+    z-index: 2;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    border-radius: 50%;
+    background-color: #fcfcfc;
+    border: 1px solid #bbb;
+    outline: 0;
+}
+
+.ui-slider .ui-slider-handle.ui-state-hover,
+.ui-slider .ui-slider-handle.ui-state-focus {
+    background-color: #f8f8f8;
+}
+
+.ui-slider .ui-slider-handle.ui-state-hover:after,
+.ui-slider .ui-slider-handle.ui-state-focus:after {
+    opacity: 0.9;
+    filter: alpha(opacity=90);
+}
+
+.ui-slider .ui-slider-handle.ui-state-active {
+    background-color: #fefefe;
+}
+
+.ui-slider .ui-slider-handle.ui-state-active:after {
+    opacity: 0.9;
+    filter: alpha(opacity=90);
+}
+
+.ui-slider .ui-slider-handle:after {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -3px;
+    margin-left: -3px;
+    background-color: #546E7A;
+    border-radius: 50%;
+}
+
+.ui-slider-horizontal .ui-slider-handle {
+    top: -6px;
+    margin-left: -9px;
+}
+
 .owl-nav {
     width: 100%;
     position: absolute;
@@ -829,10 +893,6 @@ table.datatable-basic td.empty {
     justify-content: left;
 }
 
-td.cell-avatar {
-    width: 70px;
-}
-
 .avatar.cir {
     width: 70px;
     height: 70px;
@@ -840,9 +900,35 @@ td.cell-avatar {
     position: relative;
     border-radius: 50%;
     border: 1px solid #595A5C;
-    background-position: center;
-    background-size: cover;
+    background-position: left top;
+    background-size: 100%;
     background-repeat: no-repeat;
+}
+
+.avatar.cir.big {
+    width: 200px;
+    height: 200px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#avatar-container {
+    width: 500px;
+    height: 500px;
+    display: flex;
+    position: absolute;
+    justify-content: start;
+    align-items: start;
+}
+
+#avatar-container img {
+    top: 150px;
+    left: 150px;
+    display: block;
+    position: relative;
+    cursor: pointer;
 }
 
 .avatar img {

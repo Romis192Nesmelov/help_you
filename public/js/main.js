@@ -367,7 +367,7 @@ const getSubscriptionsNews = (subscriptionsUrl, ordersUrl, newOrderFrom) => {
     });
 }
 
-const imagePreview = (container, defImage) => {
+const imagePreview = (container, defImage, callBack) => {
     container.each(function () {
         let currentContainer = $(this),
             hoverImg = currentContainer.find('img'),
@@ -377,14 +377,17 @@ const imagePreview = (container, defImage) => {
 
         inputFile.change(function () {
             let input = $(this)[0].files[0];
+
             if (input.type.match('image.*')) {
                 let reader = new FileReader();
                 reader.onload = function (e) {
                     currentContainer.css('background-image', 'url(' + e.target.result + ')');
+                    if (callBack) callBack(e.target.result);
                 };
                 reader.readAsDataURL(input);
                 addFileIcon.hide();
                 clearInputIcon.show();
+
             } else if (defImage) {
                 currentContainer.css('background-image', 'url('+defImage+')');
             }

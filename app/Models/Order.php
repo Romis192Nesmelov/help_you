@@ -36,7 +36,7 @@ class Order extends Model
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class)->select('id','avatar','family','name','born');
+        return $this->belongsTo(User::class)->select('id','avatar','avatar_props','family','name','born');
     }
 
     public function orderType(): BelongsTo
@@ -82,7 +82,7 @@ class Order extends Model
         'subtypes' => Json::class,
     ];
 
-    public function getOrderSubTypesAttribute($value)
+    public function getOrderSubTypesAttribute($value): array|null
     {
         $orderSubTypes = OrderType::find($this->order_type_id)->subtypes;
         $subTypes = [];

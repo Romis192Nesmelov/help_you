@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Casts\Json;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -21,6 +22,7 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'avatar',
+        'avatar_props',
         'name',
         'family',
         'born',
@@ -49,6 +51,7 @@ class User extends Authenticatable
      */
     protected $casts = [
 //        'born' => 'datetime:d-m-Y',
+        'avatar_props' => Json::class,
         'password' => 'hashed',
     ];
 

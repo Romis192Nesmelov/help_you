@@ -14,9 +14,14 @@ $(document).ready(function () {
         passwordConfirmField = changePasswordModal.find('input[name=password_confirmation]'),
         errorConfirmPassword = changePasswordModal.find('.error.password_confirmation'),
         changePasswordButton = $('#change-password-button'),
+        avatarBlock = $('#avatar-block .avatar.cir'),
 
         saveButton =$('#account-save'),
         emailRegExp = /^[a-zA-Z0-9][\-_\.\+\!\#\$\%\&\'\*\/\=\?\^\`\{\|]{0,1}([a-zA-Z0-9][\-_\.\+\!\#\$\%\&\'\*\/\=\?\^\`\{\|]{0,1})*[a-zA-Z0-9]@[a-zA-Z0-9][-\.]{0,1}([a-zA-Z][-\.]{0,1})*[a-zA-Z0-9]\.[a-zA-Z0-9]{1,}([\.\-]{0,1}[a-zA-Z]){0,}[a-zA-Z0-9]{0,}$/gi
+
+    window.avatarImage = null;
+    window.avatarSize = 100;
+    window.avatarHeight = 0;
 
     $.mask.definitions['c'] = "[1-2]";
     bornDateField.mask("99-99-9999");
@@ -147,7 +152,7 @@ $(document).ready(function () {
         }
     });
 
-    //Save account form
+    // Save account form
     saveButton.click((e) => {
         e.preventDefault();
         if (preValidationChangeAccount) {
@@ -158,6 +163,60 @@ $(document).ready(function () {
         }
     });
 
-    // Preview avatar
-    imagePreview($('#avatar-block .avatar.cir'), '/images/def_avatar.svg');
+    // Init slider
+    $(".ui-slider-value").slider({
+        value: 0,
+        min: -100,
+        max: 100,
+        slide: function (event, ui) {
+            window.avatarSize = ui.value;
+            if (!window.avatarHeight) window.avatarHeight = window.avatarImage.height();
+            window.avatarImage.css({
+                'width': 200 + ui.value * 2,
+                'height': window.avatarHeight + (window.avatarHeight / 100 * ui.value)
+            });
+            window.avatarImage.css({
+                // 'top': (200 - window.avatarImage.height()) / 2 + 150,
+                'left': (200 - window.avatarImage.width()) / 2 + 150
+            });
+        }
+    });
+
+    // Preview and edit avatar
+    let tuneAvatarModal = $('#tune-avatar-modal');
+    imagePreview(avatarBlock, '/images/def_avatar.svg', (targetImage) => {
+        let avatarCir = $('.avatar.cir.big'),
+        avatarContainer = $('#avatar-container');
+        window.avatarImage = $('<img />').attr({
+            'id':'tuning-avatar',
+            'src':targetImage
+        }).css('width',avatarCir.width());
+
+        avatarContainer.html('');
+        avatarContainer.append(window.avatarImage);
+        // window.avatarHeight = window.avatarImage.height();
+        avatarImage.draggable({
+            containment: "#avatar-container"
+        });
+        tuneAvatarModal.modal('show');
+    });
+
+    // Save tune avatar
+    $('#save-tune-avatar').click(() => {
+        let posX = (parseInt(window.avatarImage.css('left')) - 150) / 200 * 100 * 0.7,
+            posY = (parseInt(window.avatarImage.css('top')) - 150) / 200 * 100 * 0.7,
+            size = (100 + window.avatarSize);
+
+        if (posX || posY || size) {
+            $('#avatar-block .avatar.cir').css({
+                'background-position-x': posX,
+                'background-position-y': posY,
+                'background-size': size + '%'
+            });
+            $('input[name=avatar_size]').val(size);
+            $('input[name=avatar_position_x]').val(posX);
+            $('input[name=avatar_position_y]').val(posY);
+        }
+        tuneAvatarModal.modal('hide');
+    });
 });

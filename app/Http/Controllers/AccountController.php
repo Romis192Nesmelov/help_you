@@ -91,7 +91,13 @@ class AccountController extends BaseController
         $currentDate = Carbon::now();
         $age = $currentDate->diffInYears($birthday);
         if ($age < 18 || $age > 100) return response()->json(['errors' => ['born' => [trans('validation.wrong_date')]]], 401);
-
+        $fields['avatar_props'] = [];
+        foreach (['size','position_x','position_y'] as $avatarProp) {
+            $fieldProp = 'avatar_'.$avatarProp;
+            $prop = $fields[$fieldProp];
+            if ($prop) $fields['avatar_props']['background-'.str_replace('_','-',$avatarProp)] = $avatarProp == 'size' ? ((int)$prop).'%' : ((float)$prop).'px';
+            unset($fields[$fieldProp]);
+        }
         $fields = $this->processingImage($request, $fields,'avatar', 'images/avatars/', Auth::id());
         Auth::user()->update($fields);
         return response()->json(['message' => trans('content.save_complete')],200);

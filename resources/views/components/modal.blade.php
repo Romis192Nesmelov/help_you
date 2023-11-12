@@ -2,7 +2,9 @@
     'head' => false,
     'footer' => false,
     'yes_button' => false,
-    'yes_button_class' => 'delete-yes'
+    'yes_button_id' => null,
+    'yes_button_class' => 'delete-yes',
+    'yes_button_text' => trans('content.yes')
 ])
 
 <div {{ $attributes->class('modal fade') }} tabindex="-1" aria-labelledby="{{ $attributes->get('id') }}Label" aria-hidden="true">
@@ -21,11 +23,11 @@
                 <div class="modal-footer d-flex justify-content-center">
                     @if ($yes_button)
                         @include('blocks.button_block',[
-                            'id' => null,
+                            'id' => $yes_button_id,
                             'buttonType' => 'button',
                             'primary' => true,
                             'addClass' => 'w-25 mt-3 '.$yes_button_class,
-                            'buttonText' => trans('content.yes')
+                            'buttonText' => $yes_button_text
                         ])
                         @include('blocks.button_block',[
                             'id' => null,

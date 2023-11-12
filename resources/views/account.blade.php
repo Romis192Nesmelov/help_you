@@ -54,8 +54,31 @@
         </form>
     </x-modal>
 
+    <x-modal
+        id="tune-avatar-modal"
+        head="{{ trans('auth.tune_avatar') }}"
+        footer="1"
+        yes_button="1"
+        yes_button_id="save-tune-avatar"
+        yes_button_text="{{ trans('content.save') }}"
+    >
+        <div class="w-100 d-flex align-items-center justify-content-center">
+            <div class="avatar cir big">
+                <div id="avatar-container"></div>
+            </div>
+        </div>
+        <div class="w-100 d-flex justify-content-center">
+            <div class="w-75 mt-3 ui-slider-value"></div>
+        </div>
+    </x-modal>
+
     <form class="row" enctype="multipart/form-data" method="post" action="{{ route('account.edit_account') }}">
         @csrf
+
+        <input type="hidden" name="avatar_size">
+        <input type="hidden" name="avatar_position_x">
+        <input type="hidden" name="avatar_position_y">
+
         @include('blocks.left_menu_block')
         <div class="col-12 col-lg-8">
             <div class="rounded-block tall">

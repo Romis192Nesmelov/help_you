@@ -148,6 +148,13 @@ const showOrder = (point) => {
         subscribeButtonText = toSubscribe;
     }
 
+    let avatarProps = {'background-image':'url('+avatar+')'};
+    if (user.avatar_props) {
+        $.each(user.avatar_props, function (prop, value) {
+            avatarProps[prop] = value;
+        });
+    }
+
     orderContainer
         .append(
             $('<h6></h6>').addClass('text-center').html(orderNumber + properties.get('orderId') + fromText+properties.get('date'))
@@ -156,9 +163,9 @@ const showOrder = (point) => {
                 .append(
                     $('<div></div>').addClass('d-flex align-items-center justify-content-center')
                         .append(
-                            $('<div></div>').addClass('avatar cir').css('background-image','url('+avatar+')')
+                            $('<div></div>').addClass('avatar cir').css(avatarProps)
                         ).append(
-                            $('<div></div>').addClass('w-75')
+                            $('<div></div>').css('width',215)
                                 .append(
                                     $('<div></div>').addClass('user-name').html(user.family+' '+user.name)
                                 ).append(
