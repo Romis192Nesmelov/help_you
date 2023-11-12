@@ -5,7 +5,6 @@ $(document).ready(function () {
     window.respondButton = $('#respond-button');
     window.pointsContainer = $('#points-container');
     window.selectedPointsOpened = false;
-    window.removingInProgress = false;
     window.cickedTarget = null;
 
     $('#apply-button').click((e) => {
@@ -14,7 +13,7 @@ $(document).ready(function () {
         getPoints();
     });
 
-    $('#selected-points i.icon-close2, #map').click(() => {
+    $('#selected-points i.icon-close2').click(() => {
         if (window.selectedPointsOpened) {
             removeSelectedPoints();
             // window.myMap.balloon.close();
@@ -241,15 +240,11 @@ const showOrder = (point) => {
 }
 
 const removeSelectedPoints = (target, callBack) => {
-    if (!window.removingInProgress) {
-        window.removingInProgress = true;
-        if ( (window.cickedTarget && !target) || (window.cickedTarget && target && window.cickedTarget !== target) ) {
-            window.cickedTarget.options.set('iconColor', '#e6761b');
-        }
+    if ( (window.cickedTarget && !target) || (window.cickedTarget && target && window.cickedTarget !== target) ) {
+        window.cickedTarget.options.set('iconColor', '#e6761b');
 
         window.selectedPoints.animate({'margin-left': -1 * (window.selectedPoints.width() + 40)}, 'slow', function () {
             window.selectedPointsOpened = false;
-            window.removingInProgress = false;
             if (callBack) callBack();
         });
     }
