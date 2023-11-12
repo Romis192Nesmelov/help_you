@@ -900,7 +900,7 @@ table.datatable-basic td.empty {
     position: relative;
     border-radius: 50%;
     border: 1px solid #595A5C;
-    background-position: left top;
+    background-position: center center;
     background-size: 100%;
     background-repeat: no-repeat;
 }
@@ -919,13 +919,13 @@ table.datatable-basic td.empty {
     height: 500px;
     display: flex;
     position: absolute;
-    justify-content: start;
-    align-items: start;
+    justify-content: center;
+    align-items: center;
 }
 
 #avatar-container img {
-    top: 150px;
-    left: 150px;
+    /*top: 150px;*/
+    /*left: 150px;*/
     display: block;
     position: relative;
     cursor: pointer;

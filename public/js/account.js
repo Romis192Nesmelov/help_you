@@ -15,6 +15,7 @@ $(document).ready(function () {
         errorConfirmPassword = changePasswordModal.find('.error.password_confirmation'),
         changePasswordButton = $('#change-password-button'),
         avatarBlock = $('#avatar-block .avatar.cir'),
+        avatarContainer = $('#avatar-container'),
 
         saveButton =$('#account-save'),
         emailRegExp = /^[a-zA-Z0-9][\-_\.\+\!\#\$\%\&\'\*\/\=\?\^\`\{\|]{0,1}([a-zA-Z0-9][\-_\.\+\!\#\$\%\&\'\*\/\=\?\^\`\{\|]{0,1})*[a-zA-Z0-9]@[a-zA-Z0-9][-\.]{0,1}([a-zA-Z][-\.]{0,1})*[a-zA-Z0-9]\.[a-zA-Z0-9]{1,}([\.\-]{0,1}[a-zA-Z]){0,}[a-zA-Z0-9]{0,}$/gi
@@ -170,13 +171,18 @@ $(document).ready(function () {
         max: 100,
         slide: function (event, ui) {
             window.avatarSize = ui.value;
+            avatarContainer.css({
+                'justify-content': 'start',
+                'align-items': 'start'
+            });
+
             if (!window.avatarHeight) window.avatarHeight = window.avatarImage.height();
             window.avatarImage.css({
                 'width': 200 + ui.value * 2,
                 'height': window.avatarHeight + (window.avatarHeight / 100 * ui.value)
             });
             window.avatarImage.css({
-                // 'top': (200 - window.avatarImage.height()) / 2 + 150,
+                'top': (200 - window.avatarImage.height()) / 2 + 150,
                 'left': (200 - window.avatarImage.width()) / 2 + 150
             });
         }
@@ -185,15 +191,23 @@ $(document).ready(function () {
     // Preview and edit avatar
     let tuneAvatarModal = $('#tune-avatar-modal');
     imagePreview(avatarBlock, '/images/def_avatar.svg', (targetImage) => {
-        let avatarCir = $('.avatar.cir.big'),
-        avatarContainer = $('#avatar-container');
+        let avatarCir = $('.avatar.cir'),
+            avatarCirBig = $('.avatar.cir.big');
+
+        avatarCir.css({
+            'background-size': '100%',
+            'background-position-x': 'center',
+            'background-position-y': 'center',
+        });
+
         window.avatarImage = $('<img />').attr({
             'id':'tuning-avatar',
             'src':targetImage
-        }).css('width',avatarCir.width());
+        }).css('width',avatarCirBig.width());
 
         avatarContainer.html('');
         avatarContainer.append(window.avatarImage);
+        // window.avatarImage.css('top',(200 - window.avatarImage.height()) / 2 + 150);
         // window.avatarHeight = window.avatarImage.height();
         avatarImage.draggable({
             containment: "#avatar-container"

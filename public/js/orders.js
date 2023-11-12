@@ -156,7 +156,7 @@ const showOrder = (point) => {
 
     orderContainer
         .append(
-            $('<h6></h6>').addClass('text-center').html(orderNumber + properties.get('orderId') + fromText+properties.get('date'))
+            $('<h6></h6>').addClass('text-left').html(orderNumber + properties.get('orderId') + fromText+properties.get('date'))
         ).append(
             $('<div></div>').addClass('w-100 d-flex align-items-center justify-content-between')
                 .append(
