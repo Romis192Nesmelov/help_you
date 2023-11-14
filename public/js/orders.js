@@ -347,11 +347,14 @@ const setBindsAndOpen = () => {
 
     // Copy order href
     $('.cb-copy').click(function () {
-        let orderId = $(this).attr('order_id');
-        navigator.clipboard.writeText(ordersUrl + '?id=' + orderId).then(() => {
-            window.messageModal.find('h4').html(hrefIsCopied);
-            window.messageModal.modal('show');
-        });
+        let orderId = $(this).attr('order_id'),
+            href = ordersUrl + '?id=' + orderId;
+        if (navigator.clipboard) {
+            window.navigator.clipboard.writeText(href).then(() => {
+                window.messageModal.find('h4').html(hrefIsCopied);
+                window.messageModal.modal('show');
+            });
+        }
     });
 
 }
