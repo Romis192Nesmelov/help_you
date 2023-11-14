@@ -10,7 +10,7 @@
                 'content' => [trans('content.home_text_block1'), trans('content.home_text_block2')],
                 'addLink' => '#',
                 'addLinkText' => trans('content.more_about_gifts'),
-                'link' => '#'
+                'link' => route('how_does_it_work')
             ])
         </div>
         <div class="col-12 col-lg-6">
