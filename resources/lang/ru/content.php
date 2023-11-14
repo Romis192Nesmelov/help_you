@@ -96,7 +96,7 @@ return [
     'unsubscribe' => 'Отписаться',
 
     'new_order_from' => 'Новая заяка от:',
-    'add_order_photo' => 'Добавьте изображения',
+    'add_order_photo' => 'Добавте изображения',
 
     'status_0' => 'Закрыта',
     'status_1' => 'Выполняется',
