@@ -18,6 +18,7 @@ class OrderImagesSeeder extends Seeder
         foreach ($orders as $order) {
             for ($i=1;$i<=3;$i++) {
                 OrderImage::create([
+                    'position' => $i,
                     'image' => 'images/orders_images/random_order_image'.$i.'.jpg',
                     'order_id' => $order->id
                 ]);

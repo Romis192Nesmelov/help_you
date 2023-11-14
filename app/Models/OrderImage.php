@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class OrderImage extends Model
 {
     protected $fillable = [
+        'position',
         'image',
         'order_id'
     ];

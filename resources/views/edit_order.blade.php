@@ -52,8 +52,8 @@
                                         >
                                         <label class="form-check-label" for="order-type-{{ $order_type->id }}">{{ $order_type->name }}</label>
                                     </div>
-                                    @if ($order_type->subtypes)
-                                        <div class="sub-types-block">
+                                    @if ($order_type->subtypes->count())
+                                        <div class="sub-types-block" style="{{ isset($order) && $order->order_type_id == $order_type->id ? 'opacity:1;height:auto' : 'opacity:0;height:0' }}">
                                             @include('blocks.radiobox_block',[
                                                 'addClass' => 'small',
                                                 'items' => $order_type->subtypesActive,
@@ -86,11 +86,7 @@
                                 @php $orderImage = null; @endphp
                                 @if (isset($order) && $order->images->count())
                                     @foreach ($order->images as $image)
-                                        @php
-                                            $fileInfo = pathinfo($image->image);
-                                            $imagePosition = (int)str_replace('order'.$order->id.'_','',$fileInfo['filename']);
-                                        @endphp
-                                        @if ($imagePosition == $i)
+                                        @if ($image->position == $i)
                                             @php $orderImage = $image->image; @endphp
                                             @break
                                         @endif

@@ -182,6 +182,7 @@ class OrderController extends BaseController
                 $imageFields = $this->processingImage($request, [], $fieldName, 'images/orders_images/', 'order'.$order->id.'_'.$i);
                 if (count($imageFields)) {
                     OrderImage::create([
+                        'position' => $i,
                         'image' => $imageFields[$fieldName],
                         'order_id' => $order->id
                     ]);

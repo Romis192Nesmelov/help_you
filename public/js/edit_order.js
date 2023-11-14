@@ -57,6 +57,7 @@ $(document).ready(function () {
                 'display':'table',
                 'opacity':0
             });
+
             let heightBlock = thisSubTypesBlocks.height();
             thisSubTypesBlocks.css({
                 'display':'block',
@@ -64,9 +65,8 @@ $(document).ready(function () {
                 'opacity':1
             });
 
-            let addHeight = thisSubTypesBlocks.find('.error.subtypes').last().html() ? 32 : 5
             thisSubTypesBlocks.animate({
-                'height':heightBlock + addHeight
+                'height':heightBlock
             },'slow');
         }
     });
