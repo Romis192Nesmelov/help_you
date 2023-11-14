@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Order\DelOrderImageRequest;
 use App\Http\Requests\Order\NextStepRequest;
 use App\Http\Requests\Order\OrderRequest;
 use App\Http\Requests\Order\ReadOrderRequest;
@@ -164,11 +165,11 @@ class OrderController extends BaseController
 
             $orderType = OrderType::find($steps[0]['order_type_id']);
             if (!$orderType->subtypes->count()) unset($fields['subtype_id']);
-
             if ($request->has('id')) {
                 $order = Order::find($request->id);
                 $this->authorize('owner', $order);
                 $order->update($fields);
+
             } else $order = Order::create($fields);
 
             for ($i=1;$i<=3;$i++) {
@@ -213,6 +214,20 @@ class OrderController extends BaseController
             $order->delete();
             return response()->json([],200);
         }
+    }
+
+    /**
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
+    public function deleteOrderIMage(DelOrderImageRequest $request): JsonResponse
+    {
+        $order = Order::find($request->id);
+        $this->authorize('owner', $order);
+        $fileName = 'images/orders_images/order'.$order->id.'_'.$request->pos.'.jpg';
+        $orderImage = OrderImage::where('image',$fileName)->first();
+        $orderImage->delete();
+        $this->deleteFile($fileName);
+        return response()->json([],200);
     }
 
     /**

@@ -154,6 +154,7 @@
         const nextStepUrl = "{{ route('order.next_step') }}",
             backStepUrl = "{{ route('order.prev_step') }}",
             orderPreviewUrl  = "{{ route('order.orders',['preview' => 1]) }}",
+            deleteOrderImageUrl = "{{ route('order.delete_order_image') }}",
             yandexApiKey = "{{ env('YANDEX_API_KEY') }}",
             errorCheckAddress = "{{ trans('validation.check_the_address') }}";
         let step = parseInt("{{ session()->has('steps') ? count(session()->get('steps')) : 0 }}");
@@ -162,9 +163,16 @@
     @if (session()->has('steps') && count(session()->get('steps')) >= 3)
         <script>let point = [parseFloat("{{ session()->get('steps')[2]['latitude'] }}"), parseFloat("{{ session()->get('steps')[2]['longitude'] }}")];</script>
     @elseif (isset($order))
-        <script>let point = [parseFloat("{{ $order->latitude }}"), parseFloat("{{ $order->longitude }}")];</script>
+        <script>
+            let point = [parseFloat("{{ $order->latitude }}"), parseFloat("{{ $order->longitude }}")]
+            const orderId = parseInt({{ $order->id }});
+                editOrderFlag = true;
+        </script>
     @else
-        <script>let point = [];</script>
+        <script>
+            let point = [];
+            const orderId = null;
+        </script>
     @endif
 
     <script type="text/javascript" src="{{ asset('js/edit_order.js') }}"></script>

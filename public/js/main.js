@@ -401,7 +401,9 @@ const imagePreview = (container, defImage, callBack) => {
             inputFile.val('');
             if (defImage) currentContainer.css('background-image', 'url('+defImage+')');
             else currentContainer.css('background-image', '');
+            addFileIcon.removeClass('d-none');
             addFileIcon.show();
+            clearInputIcon.removeClass('d-block');
             clearInputIcon.hide();
         });
     });

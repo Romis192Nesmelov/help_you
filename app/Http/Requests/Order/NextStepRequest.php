@@ -31,11 +31,11 @@ class NextStepRequest extends FormRequest
     {
         $step = Session::has('steps') ? count(Session::get('steps')) : 0;
         $rules = $this->stepsRules[$step];
-        if ($step == 3) {
+        if ($step == 1) {
             for ($i=1;$i<=3;$i++) {
                 $fileName = 'photo'.$i;
                 if (request()->hasFile($fileName)) {
-                    $rules[$fileName] = 'image|max:700';
+                    $rules[$fileName] = 'mimes:jpg|max:2000';
                 }
             }
         }

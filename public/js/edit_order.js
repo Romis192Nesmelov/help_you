@@ -175,6 +175,21 @@ $(document).ready(function () {
     performersInput.on('change', preValidation[1]).keyup(preValidation[1]);
     addressInput.on('change', preValidation[2]).keyup(preValidation[2]);
     imagePreview($('.order-photo'));
+
+    // Delete image in edit order
+    if (orderId) {
+        $('.order-photo .icon-close2.d-block').click(function () {
+            let photoPos = parseInt($(this).parents('.order-photo').find('input[type=file]').attr('name').replace('photo',''));
+            $.post(
+                deleteOrderImageUrl,
+                {
+                    '_token': window.tokenField,
+                    'id': orderId,
+                    'pos': photoPos
+                }
+            );
+        });
+    }
 });
 
 const nextPrevStep = (reverse, callBack) => {
