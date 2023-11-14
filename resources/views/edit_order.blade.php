@@ -53,22 +53,15 @@
                                         <label class="form-check-label" for="order-type-{{ $order_type->id }}">{{ $order_type->name }}</label>
                                     </div>
                                     @if ($order_type->subtypes)
-                                        <div class="sub-types-block checkbox-block">
-                                            @foreach($order_type->subtypes as $subType)
-                                                @include('blocks.checkbox_block',[
-                                                    'id' => 'sub-type-'.$subType['id'],
-                                                    'checked' => (
-                                                        (isset($order) && in_array($subType['id'], $order->subtypes)) ||
-                                                        (session()->has('steps') && isset(session()->get('steps')[0]['subtype']) && in_array($subType['id'], session()->get('steps')[0]['subtype']))
-                                                    ),
-                                                    'noGap' => true,
-                                                    'checkType' => 'form-check',
-                                                    'name' => 'subtypes[]',
-                                                    'value' => $subType['id'],
-                                                    'label' => $subType['name'],
-                                                    'ajax' => true
-                                                ])
-                                            @endforeach
+                                        <div class="sub-types-block">
+                                            @include('blocks.radiobox_block',[
+                                                'addClass' => 'small',
+                                                'items' => $order_type->subtypesActive,
+                                                'idPrefix' => 'sub_type',
+                                                'name' => 'subtype_id',
+                                                'checked' => (isset($order) && $order->subtype_id ? $order->subtype_id : (session()->has('steps') ? session()->get('steps')[0]['subtype_id'] : null)),
+                                                'option' => 'name'
+                                            ])
                                         </div>
                                     @endif
                                 </div>
@@ -85,6 +78,19 @@
                             'value' => isset($order) ? $order->need_performers : (session()->has('steps') && count(session()->get('steps')) >= 2 ? session()->get('steps')[1]['need_performers'] : 1),
                             'ajax' => true
                         ])
+
+                        <h2 class="mt-4">{{ trans('content.add_order_photo') }}</h2>
+                        <div class="row">
+{{--                            <label>{{ trans('content.add_order_photo') }}</label>--}}
+                            @for ($i=1;$i<=3;$i++)
+                                <div class="col-lg-4 col-md-4 col-sm-12">
+                                    @include('blocks.order_photo_block',[
+                                        'name' => 'photo'.$i,
+                                        'image' => isset($order) && count($order->images) >= $i ? $order->images[$i-1]->image : null
+                                    ])
+                                </div>
+                            @endfor
+                        </div>
                     </div>
                     <div id="inputs-step3" class="{{ getStepClass(3) }}">
                         @include('blocks.input_block',[
@@ -96,21 +102,19 @@
                     </div>
                     <div id="inputs-step4" class="{{ getStepClass(4) }}">
                         @include('blocks.textarea_block',[
-                            'name' => 'description',
+                            'name' => 'description_short',
+                            'label' => trans('edit_order.description_short'),
+                            'max' => 200,
                             'ajax' => true,
-                            'value' => isset($order) ? $order->description : (session()->has('steps') && count(session()->get('steps')) == 4 ? session()->get('steps')[3]['description'] : ''),
+                            'value' => isset($order) ? $order->description_short : (session()->has('steps') && count(session()->get('steps')) == 4 ? session()->get('steps')[3]['description_short'] : ''),
                         ])
-                        <div class="row">
-                            <label>{{ trans('content.add_order_photo') }}</label>
-                            @for ($i=1;$i<=3;$i++)
-                                <div class="col-lg-4 col-md-4 col-sm-12">
-                                    @include('blocks.order_photo_block',[
-                                        'name' => 'photo'.$i,
-                                        'image' => isset($order) && count($order->images) >= $i ? $order->images[$i-1]->image : null
-                                    ])
-                                </div>
-                            @endfor
-                        </div>
+                        @include('blocks.textarea_block',[
+                            'name' => 'description_full',
+                            'label' => trans('edit_order.description_full'),
+                            'max' => 1000,
+                            'ajax' => true,
+                            'value' => isset($order) ? $order->description_full : (session()->has('steps') && count(session()->get('steps')) == 4 ? session()->get('steps')[3]['description_full'] : ''),
+                        ])
                     </div>
                     <div class="bottom-block">
                         <div class="d-flex align-items-center justify-content-center justify-content-md-end">

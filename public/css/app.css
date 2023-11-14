@@ -197,8 +197,8 @@ table {
     position: absolute;
     font-size: 18px;
     top: auto;
-    margin-top: 35px;
-    right: 10px;
+    margin-top: 10px;
+    right: 25px;
     color: grey;
 }
 
@@ -212,8 +212,12 @@ table {
     border-radius: 20px;
 }
 
-.form-group textarea[name=description] {
-    height: 180px;
+.form-group textarea[name=description_short] {
+    height: 90px;
+}
+
+.form-group textarea[name=description_full] {
+    height: 230px;
 }
 
 .order-photo {
@@ -282,6 +286,11 @@ table {
 .form-check-input:checked {
     background-color: #e65639;
     border-color: #e65639;
+}
+
+.form-check-input.small {
+    width: .3em;
+    height: .3em;
 }
 
 .error {
@@ -545,8 +554,8 @@ button.btn > i {
     height: 100%;
     overflow-y: hidden;
     position: absolute;
-    padding: 25px 15px;
-    margin-left: -500px;
+    padding: 25px;
+    margin-left: -550px;
     background-color: #f5f3f0;
     box-shadow: 5px 0 10px gray;
     z-index: 999;
@@ -559,6 +568,22 @@ button.btn > i {
     right: 5px;
     cursor: pointer;
     z-index: 999;
+}
+
+#selected-points .order-number {
+    padding-left: 95px;
+    font-size: 18px;
+}
+
+#selected-points .subscribe-icon {
+    font-size: 25px;
+    margin-right: 5px;
+    cursor: pointer;
+}
+
+#selected-points a,
+#selected-points .subscribe-icon:hover {
+    color: #e65639;
 }
 
 #selected-points .images {
@@ -1055,8 +1080,8 @@ table.datatable-basic td.empty {
         bottom: 45px;
     }
 
-    .form-group textarea[name=description] {
-        height: 110px;
+    .form-group textarea[name=description_full] {
+        height: 115px;
     }
 }
 
@@ -1191,6 +1216,7 @@ table.datatable-basic td.empty {
 
     #selected-points {
         width: 100%;
+        margin-left: -105%;
     }
 }
 

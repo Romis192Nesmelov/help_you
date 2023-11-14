@@ -13,20 +13,22 @@
     <h1 class="text-orange text-center">{{ trans('content.thank_you') }}</h1>
 </x-modal>
 
+<x-modal id="order-full-description-modal" head=" "><p class="p-3"></p></x-modal>
+
 <div class="rounded-block mb-2 p-3 h-auto">
-    <form method="post" class="row" action="{{ route('order.get_orders') }}">
+    <form method="post" class="row d-flex justify-content-center ps-3 pe-3" action="{{ route('order.get_orders') }}">
         @csrf
-        <div class="col-lg-2 col-sm-12 col-12">
+        <div class="col-lg-2 col-sm-12 col-12 row d-flex align-items-end m-0 p-0">
+            <label class="ms-3">{{ trans('content.order_types') }}</label>
             @include('blocks.select_block',[
                 'firstEmpty' => trans('content.all'),
-                'label' => trans('content.order_types'),
                 'name' => 'order_type',
                 'values' => $order_types,
                 'option' => 'name'
             ])
         </div>
-        <div class="col-lg-4 col-12 row d-flex align-items-end">
-            <label>{{ trans('content.number_of_performers') }}</label>
+        <div class="col-lg-4 col-12 row d-flex align-items-end m-0 p-0">
+            <label class="ms-3">{{ trans('content.number_of_performers') }}</label>
             <div class="col-sm-6 col-12">
                 @include('blocks.select_block',[
                     'prefix' => trans('content.from'),
@@ -43,7 +45,7 @@
                 ])
             </div>
         </div>
-        <div class="col-lg-2 col-sm-12 col-12 d-flex align-items-end justify-content-center">
+        <div class="col-lg-2 col-sm-12 col-12 d-flex align-items-end m-0">
             @include('blocks.button_block',[
                 'id' => 'apply-button',
                 'addClass' => 'w-100 mt-lg-0 mt-3',
@@ -52,12 +54,12 @@
                 'buttonText' => trans('content.apply')
             ])
         </div>
-        <div class="col-lg-4 col-12 mt-lg-0 mt-2 d-flex align-items-end justify-content-center">
+        <div class="col-lg-4 col-12 mt-lg-0 mt-2 row d-flex align-items-end m-0 p-0">
+            <label class="ms-3">{{ trans('content.search') }}</label>
             @include('blocks.input_block',[
                 'name' => 'search',
                 'addClass' => 'w-100',
                 'type' => 'text',
-                'label' => trans('content.search'),
                 'icon' => 'icon-search4'
             ])
         </div>
@@ -113,16 +115,20 @@
         orderReadOrderUrl = "{{ route('order.read_order') }}",
         getPreviewUrl = "{{ route('order.get_preview') }}",
         subscribeUrl = "{{ route('account.subscription') }}",
+        ordersUrl = "{{ route('order.orders') }}",
         getOrdersUrl = "{{ route('order.get_orders') }}",
+        getUserAgeUrl = "{{ route('order.get_user_age') }}",
         orderNumber = "{{ trans('content.order_number') }}",
         fromText = "{{ trans('content.from') }}",
-        toSubscribe = "{{ trans('content.subscribe') }}",
-        toUnsubscribe = "{{ trans('content.unsubscribe') }}",
+        outOfText = "{{ trans('content.out_of') }}",
         address = "{{ trans('content.address') }}",
-        descriptionText = "{{ trans('content.description') }}",
-        needPerformers = "{{ trans('content.need_performers') }}",
-        readyToHelp = "{{ trans('content.ready_to_help') }}",
+        descriptionShortText = "{{ trans('content.description_short') }}",
+        descriptionFullText = "{{ trans('content.description_full') }}",
+        descriptionFullOfOrderText = "{{ trans('content.description_full_of_order') }}",
+        numberOfPerformersText = "{{ trans('content.number_of_performers') }}",
         respondToAnOrder = "{{ trans('content.respond_to_an_order') }}",
+        copyOrderHrefToClipboard = "{{ trans('content.copy_order_href_to_clipboard') }}",
+        hrefIsCopied = "{{ trans('content.href_is_copied') }}",
         userId = parseInt("{{ auth()->id() }}");
         window.openOrderId = parseInt("{{ request()->id }}");
 </script>

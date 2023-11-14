@@ -10,6 +10,16 @@ class OrderType extends Model
 {
     protected $fillable = ['name','subtypes','active'];
 
+    public function subtypes(): HasMany
+    {
+        return $this->hasMany(Subtype::class);
+    }
+
+    public function subtypesActive(): HasMany
+    {
+        return $this->hasMany(Subtype::class)->where('active',1);
+    }
+
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class);
@@ -20,7 +30,7 @@ class OrderType extends Model
         return $this->hasMany(Order::class)->where('active',1)->where('approved',1);
     }
 
-    protected $casts = [
-        'subtypes' => Json::class,
-    ];
+//    protected $casts = [
+//        'subtypes' => Json::class,
+//    ];
 }

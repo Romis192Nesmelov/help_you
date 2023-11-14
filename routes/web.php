@@ -57,6 +57,8 @@ Route::middleware(['auth','account.completed'])->name('order.')->controller(Orde
     Route::get('/read-order', 'readOrder')->name('read_order');
     Route::get('/get-subscriptions-news', 'getSubscriptionsNews')->name('get_subscriptions_news');
 
+    Route::get('/get-user-age', 'getUserAge')->name('get_user_age');
+
     Route::post('/get-orders', 'getOrders')->name('get_orders');
     Route::post('/get-preview', 'getPreview')->name('get_preview');
     Route::post('/order-response', 'orderResponse')->name('order_response');

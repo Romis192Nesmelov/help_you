@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Casts\Json;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -117,5 +118,10 @@ class User extends Authenticatable
             ->where('status',0)
             ->where('approved',1)
             ->orderByDesc('created_at');
+    }
+
+    public function years(): int
+    {
+        return Carbon::parse($this->born)->age;
     }
 }

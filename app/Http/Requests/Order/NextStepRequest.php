@@ -8,10 +8,10 @@ use Illuminate\Support\Facades\Session;
 class NextStepRequest extends FormRequest
 {
     public array $stepsRules = [
-        ['order_type_id' => 'required|exists:order_types,id', 'subtypes' => 'nullable|array'],
+        ['order_type_id' => 'required|exists:order_types,id', 'subtype_id' => 'nullable|exists:subtypes,id'],
         ['need_performers' => 'required|integer|min:1|max:20'],
         ['address' => 'required|string|min:5|max:200', 'latitude' => 'required|numeric', 'longitude' => 'required|numeric'],
-        ['id' => 'nullable|exists:orders,id', 'description' => 'nullable|string|min:5|max:3000']
+        ['id' => 'nullable|exists:orders,id', 'description_short' => 'nullable|string|min:5|max:200', 'description_full' => 'nullable|string|min:5|max:1000']
     ];
 
     /**

@@ -27,7 +27,6 @@ const mapInitWithContainer = () => {
 }
 
 const getPoints = () => {
-    // console.log(getPreviewFlag);
     getUrl($('form'), (getPreviewFlag ? getPreviewUrl : null), (data) => {
         getPreviewFlag = false;
         window.placemarks = [];
@@ -62,12 +61,16 @@ const getPoints = () => {
                     performers: point.performers.length,
                     user: point.user,
                     date: createdAt.toLocaleDateString('ru-RU'),
-                    description: point.description
+                    description_short: point.description_short,
+                    description_full: point.description_full
                 }));
 
                 if (window.openOrderId && window.openOrderId === point.id) {
                     window.openOrderId = null;
+                    window.cickedTarget = window.placemarks[k];
+                    window.placemarks[k].options.set('iconColor', '#bc202e');
                     showOrder(window.placemarks[k]);
+                    setBindsAndOpen();
                 }
             });
 
@@ -133,30 +136,30 @@ const showOrder = (point) => {
         user = properties.get('user'),
         avatar = user.avatar ? user.avatar : '/images/def_avatar.svg',
         images = properties.get('images'),
-        description = properties.get('description'),
+        descriptionShort = properties.get('description_short'),
+        descriptionFull = properties.get('description_full'),
         orderContainer = $('<div></div>').addClass('order-block mb-3').attr('id','order-'+properties.get('placemarkId'));
 
     // Check subscriptions
-    if (window.subscriptions.includes(user.id)) {
-        var subscribeButtonClass = 'btn-gray',
-            subscribeBellClass = 'icon-bell-cross',
-            subscribeButtonText = toUnsubscribe;
-    } else {
-        subscribeButtonClass = 'btn-secondary';
-        subscribeBellClass = 'icon-bell-check';
-        subscribeButtonText = toSubscribe;
-    }
+    let subscribeBellClass = window.subscriptions.includes(user.id) ? 'icon-bell-cross' : 'icon-bell-check',
+        avatarProps = {'background-image':'url('+avatar+')'};
 
-    let avatarProps = {'background-image':'url('+avatar+')'};
     if (user.avatar_props) {
         $.each(user.avatar_props, function (prop, value) {
             avatarProps[prop] = value;
         });
     }
 
+    $.get(
+        getUserAgeUrl,
+        {'id': user.id}
+    ).done((data) => {
+        window.useAge = data.age;
+    });
+
     orderContainer
         .append(
-            $('<h6></h6>').addClass('text-left').html(orderNumber + properties.get('orderId') + fromText+properties.get('date'))
+            $('<h6></h6>').addClass('order-number').html(orderNumber + properties.get('orderId') + fromText + properties.get('date'))
         ).append(
             $('<div></div>').addClass('w-100 d-flex align-items-center justify-content-between')
                 .append(
@@ -168,20 +171,11 @@ const showOrder = (point) => {
                                 .append(
                                     $('<div></div>').addClass('user-name').html(user.family+' '+user.name)
                                 ).append(
-                                    $('<div></div>').addClass('born').html(user.born)
+                                    $('<div></div>').addClass('born').html(window.useAge)
                                 )
                         )
                 )
-                .append(
-                    $('<button></button>').addClass('subscribe-button btn small mt-0').addClass(subscribeButtonClass)
-                        .append(
-                            $('<i></i>').addClass(subscribeBellClass)
-                        ).append(
-                            $('<br/>')
-                        ).append(
-                            $('<span></span>').html(subscribeButtonText)
-                        )
-                )
+                .append($('<i></i>').addClass('subscribe-icon ' + subscribeBellClass))
         );
 
     if (images.length) {
@@ -197,7 +191,7 @@ const showOrder = (point) => {
         enablePointImagesCarousel(imagesContainer,images.length > 1);
     }
 
-    orderContainer.append($('<h2></h2>').addClass('order-type text-left mt-3 mb-1').html(properties.get('orderType')));
+    orderContainer.append($('<h2></h2>').addClass('order-type text-dark text-left mt-3 mb-4').html(properties.get('orderType')));
 
     if (orderSubTypes && currentSubTypes) {
         let subTypesContainer = $('<ul></ul>').addClass('subtypes');
@@ -212,27 +206,40 @@ const showOrder = (point) => {
         orderContainer.append(subTypesContainer);
     }
 
-    orderContainer.append($('<p></p>').addClass('mb-1 text-left').html(address+': ' + properties.get('address')));
+    orderContainer.append($('<p></p>').addClass('mb-1 text-left').html('<b>' + address +'</b>: ' + properties.get('address')));
 
-    if (description) {
+    if (descriptionShort) {
         orderContainer
             .append(
-                $('<p></p>').addClass('small text-left mt-2 mb-0').html(descriptionText)
+                $('<p></p>').addClass('fw-bold text-left mt-2 mb-0').html(descriptionShortText + ':')
             ).append(
-                $('<p></p>').addClass('text-left order-description mb-1').html(description)
+                $('<p></p>').addClass('text-left order-description mb-1').html(descriptionShort)
             );
+    }
+
+    if (descriptionFull) {
+        orderContainer
+            .append(
+                $('<p></p>').addClass('fw-bold text-left mt-0 mb-2')
+                    .append($('<a></a>').addClass('description-full').html(descriptionFullText + ' »'))
+                );
     }
 
     orderContainer
         .append(
-            $('<p></p>').addClass('small text-left mb-2').html(
-                needPerformers + ' ' + properties.get('need_performers') + ' ' + readyToHelp + properties.get('performers')
+            $('<p></p>').addClass('text-left mb-2').html(
+                '<b>' + numberOfPerformersText + ':</b> ' + properties.get('performers') + outOfText + properties.get('need_performers')
             )
         );
 
     if (userId !== user.id) {
         orderContainer.append($('<button></button>').addClass('respond-button btn btn-primary w-100').attr('type','button').append($('<span></span>').html(respondToAnOrder)));
     }
+
+    orderContainer.append($('<button></button>').addClass('cb-copy btn btn-primary w-100 mt-3').attr({
+        'type':'button',
+        'order_id':properties.get('orderId')
+    }).append($('<span></span>').html(copyOrderHrefToClipboard)));
 
     orderContainer.append($('<hr>'));
     window.pointsContainer.append(orderContainer);
@@ -243,7 +250,7 @@ const removeSelectedPoints = (target, callBack) => {
     if ( (window.cickedTarget && !target) || (window.cickedTarget && target && window.cickedTarget !== target) ) {
         window.cickedTarget.options.set('iconColor', '#e6761b');
 
-        window.selectedPoints.animate({'margin-left': -1 * (window.selectedPoints.width() + 40)}, 'slow', function () {
+        window.selectedPoints.animate({'margin-left': -1 * (window.selectedPoints.width() + 150)}, 'slow', function () {
             window.selectedPointsOpened = false;
             if (callBack) callBack();
         });
@@ -303,7 +310,7 @@ const setBindsAndOpen = () => {
     });
 
     // Bind subscribe button
-    $('.subscribe-button').click(function (e) {
+    $('.subscribe-icon').click(function (e) {
         e.preventDefault();
         let button = $(this),
             point = getPlaceMarkOnMap(button),
@@ -314,19 +321,37 @@ const setBindsAndOpen = () => {
             {'user_id': userId}
         ).done((data) => {
             button.fadeOut(() => {
-                button.toggleClass('btn-gray',data.subscription).toggleClass('btn-secondary',!data.subscription);
-                button.find('i').toggleClass('icon-bell-cross',data.subscription).toggleClass('icon-bell-check',!data.subscription);
-                button.find('span').html(data.subscription ? toUnsubscribe : toSubscribe);
+                button.toggleClass('icon-bell-cross',data.subscription).toggleClass('icon-bell-check',!data.subscription);
                 button.fadeIn();
             });
-
             window.subscriptions.push(userId);
         });
+    });
+
+    // Click to description full
+    $('.description-full').click(function (e) {
+        e.preventDefault();
+        let point = getPlaceMarkOnMap($(this)),
+            properties = point.properties,
+            fullDescriptionModal = $('#order-full-description-modal');
+
+        fullDescriptionModal.find('h5').html(descriptionFullOfOrderText + properties.get('orderId') + '<br>' + fromText + properties.get('date'));
+        fullDescriptionModal.find('.modal-body p').html(properties.get('description_full'));
+        fullDescriptionModal.modal('show');
     });
 
     // Open selected points
     window.selectedPoints.animate({'margin-left': 0}, 'slow', function () {
         window.selectedPointsOpened = true;
+    });
+
+    // Copy order href
+    $('.cb-copy').click(function () {
+        let orderId = $(this).attr('order_id');
+        navigator.clipboard.writeText(ordersUrl + '?id=' + orderId).then(() => {
+            window.messageModal.find('h4').html(hrefIsCopied);
+            window.messageModal.modal('show');
+        });
     });
 
 }

@@ -5,12 +5,14 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Order\NextStepRequest;
 use App\Http\Requests\Order\OrderRequest;
 use App\Http\Requests\Order\ReadOrderRequest;
+use App\Http\Requests\Order\UserAgeRequest;
 use App\Models\Order;
 use App\Models\OrderImage;
 use App\Models\OrderType;
 use App\Models\OrderUser;
 use App\Models\ReadOrder;
 use App\Models\Subscription;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
@@ -36,12 +38,14 @@ class OrderController extends BaseController
     public function editOrder(OrderRequest $request): View
     {
         $this->data['order'] = Order::find($request->id);
-        if ($this->data['order'] <= 0) abort(403);
         $this->authorize('owner', $this->data['order']);
         $this->getItems('order_types', new OrderType());
         return $this->showView('edit_order');
     }
 
+    /**
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
     public function readOrder(ReadOrderRequest $request): JsonResponse
     {
         $readOrder = ReadOrder::where('order_id',$request->order_id)->first();
@@ -67,10 +71,7 @@ class OrderController extends BaseController
             'orders' => Order::query()
                 ->default()
                 ->filtered()
-                ->with('orderType')
-                ->with('images')
-                ->with('user')
-                ->with('performers')
+                ->with(['orderType','subType','images','user','performers'])
                 ->get(),
             'subscriptions' => Subscription::query()
                 ->with('orders')
@@ -89,17 +90,30 @@ class OrderController extends BaseController
                 ->where('status',2)
                 ->where('approved',0)
                 ->filtered()
-                ->with('orderType')
-                ->with('images')
-                ->with('user')
-                ->with('performers')
-                ->latest('created_at')
+                ->with(['orderType','subType','images','user','performers'])
                 ->limit(1)
                 ->get(),
             'subscriptions' => []
         ],
             200
         );
+    }
+
+    public function getUserAge(UserAgeRequest $request): JsonResponse
+    {
+        $user = User::find($request->id);
+        $age = $user->years();
+        if ($age == 1) $word = 'год';
+        elseif ($age > 1 && $age < 5) $word = 'года';
+        elseif ($age >= 5 && $age < 21) $word = 'лет';
+        else {
+            $lastDigit = (int)substr($age, -1, 1);
+            if ($lastDigit == 0) $word = 'лет';
+            elseif ($lastDigit == 1) $word = 'год';
+            elseif ($lastDigit > 1 && $lastDigit < 5) $word = 'года';
+            else $word = 'лет';
+        }
+        return response()->json(['age' => $age.' '.$word]);
     }
 
     public function orderResponse(OrderRequest $request): JsonResponse
@@ -130,25 +144,25 @@ class OrderController extends BaseController
             $steps[] = $fields;
         } else $steps = [$fields];
 
+        Session::put('steps',$steps);
+
         if (count($steps) == 4) {
             $steps = Session::get('steps');
             Session::forget('steps');
+
             $fields = [
                 'city_id' => 1,
                 'user_id' => Auth::id(),
                 'status' => 2,
                 'approved' => 0
             ];
+
             foreach ($steps as $step) {
-                if (isset($step['subtypes'])) {
-                    $subtypes = [];
-                    foreach ($step['subtypes'] as $subtype) {
-                        $subtypes[] = (int)$subtype;
-                    }
-                    $step['subtypes'] = $subtypes;
-                }
                 $fields = array_merge($fields,$step);
             }
+
+            $orderType = OrderType::find($steps[0]['order_type_id']);
+            if (!$orderType->subtypes->count()) unset($fields['subtype_id']);
 
             if ($request->has('id')) {
                 $order = Order::find($request->id);
@@ -166,10 +180,8 @@ class OrderController extends BaseController
                     ]);
                 }
             }
-
             return response()->json(['order' => $order],200);
         } else {
-            Session::put('steps',$steps);
             return response()->json([],200);
         }
     }

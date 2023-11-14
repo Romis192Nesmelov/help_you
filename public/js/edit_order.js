@@ -12,13 +12,7 @@ $(document).ready(function () {
         completeModal = $('#complete-modal'),
         preValidation = [
             () => {
-                let subTypesBlock = $('input[name=order_type_id]:checked').parents('.radio-group').find('.sub-types-block');
-                if (subTypesBlock.length && !subTypesBlock.find('input[type=checkbox]:checked').length) {
-                    subTypesBlock.find('input[type=checkbox]').addClass('error');
-                    subTypesBlock.find('.error.subtypes').last().html(errorSelectOneOfItems);
-                    subTypesBlock.css('height',subTypesBlock.height() + 27);
-                    return false;
-                } else return true
+                return true
             },
             () => {
                 resetErrors(form);

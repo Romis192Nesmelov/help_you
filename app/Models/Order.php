@@ -18,13 +18,14 @@ class Order extends Model
     protected $fillable = [
         'user_id',
         'order_type_id',
+        'subtype_id',
         'city_id',
-        'subtypes',
         'need_performers',
         'address',
         'latitude',
         'longitude',
-        'description',
+        'description_short',
+        'description_full',
         'approved',
         'status'
     ];
@@ -36,12 +37,17 @@ class Order extends Model
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class)->select('id','avatar','avatar_props','family','name','born');
+        return $this->belongsTo(User::class)->select('id','avatar','avatar_props','family','name');
     }
 
     public function orderType(): BelongsTo
     {
         return $this->belongsTo(OrderType::class);
+    }
+
+    public function subType(): BelongsTo
+    {
+        return $this->belongsTo(SubType::class);
     }
 
     public function performers(): BelongsToMany
@@ -76,26 +82,5 @@ class Order extends Model
         $query->when(request('performers'), function (Builder $q) {
             $q->whereBetween('need_performers',[request('performers_from'),request('performers_to')]);
         });
-    }
-
-    protected $casts = [
-        'subtypes' => Json::class,
-    ];
-
-    public function getOrderSubTypesAttribute($value): array|null
-    {
-        $orderSubTypes = OrderType::find($this->order_type_id)->subtypes;
-        $subTypes = [];
-        if ($this->subtypes) {
-            foreach ($this->subtypes as $id) {
-                foreach ($orderSubTypes as $orderSubType) {
-                    if ($orderSubType['id'] == $id) {
-                        $subTypes[] = $orderSubType;
-                        break;
-                    }
-                }
-            }
-            return $subTypes;
-        } else return null;
     }
 }

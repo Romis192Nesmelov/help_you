@@ -25,6 +25,9 @@ return [
     '403' => 'Доступ запрещен',
 
     'description' => 'Описание',
+    'description_short' => 'Краткое описание',
+    'description_full' => 'Подробное описание',
+    'description_full_of_order' => 'Подробное описание заявки №',
     'details' => 'Подробнее »',
     'collapse' => 'Свернуть',
     'close' => 'Закрыть',
@@ -73,12 +76,15 @@ return [
 
     'order_number' => 'Заяка №',
     'from' => ' от ',
+    'out_of' => ' из ',
     'to' => 'до',
     'born_date' => 'д/р: <span class="born-date">:born</span>',
     'respond_to_an_order' => 'Откликнуться',
+    'copy_order_href_to_clipboard' => 'Скопировать ссылку',
+    'href_is_copied' => 'Ссылка скопирована!',
 
     'order_types' => 'Виды помощи',
-    'number_of_performers' => 'Количество исполнителей',
+    'number_of_performers' => 'Кол-во исполнителей',
     'number_of_performers_from' => 'Человек от',
     'number_of_performers_to' => 'Человек до',
 
