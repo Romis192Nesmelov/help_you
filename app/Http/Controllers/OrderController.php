@@ -91,6 +91,7 @@ class OrderController extends BaseController
                 ->where('approved',0)
                 ->filtered()
                 ->with(['orderType','subType','images','user','performers'])
+                ->orderByDesc('created_at')
                 ->limit(1)
                 ->get(),
             'subscriptions' => []

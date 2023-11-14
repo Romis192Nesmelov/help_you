@@ -413,7 +413,7 @@ const owlSettings = (margin, nav, timeout, responsive, autoplay) => {
 
     return {
         margin: margin,
-        loop: true,
+        loop: autoplay,
         nav: nav,
         autoplay: autoplay,
         autoplayTimeout: timeout,
