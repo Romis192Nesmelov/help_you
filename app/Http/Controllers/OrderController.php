@@ -143,6 +143,11 @@ class OrderController extends BaseController
         $fields = $request->validated();
         if (Session::has('steps')) {
             $steps = Session::get('steps');
+            if (count($steps) == 1) {
+                for ($i=1;$i<=3;$i++) {
+                    unset($fields['photo'.$i]);
+                }
+            }
             $steps[] = $fields;
         } else $steps = [$fields];
 

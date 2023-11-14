@@ -83,10 +83,23 @@
                         <div class="row">
 {{--                            <label>{{ trans('content.add_order_photo') }}</label>--}}
                             @for ($i=1;$i<=3;$i++)
+                                @php $orderImage = null; @endphp
+                                @if (isset($order) && $order->images->count())
+                                    @foreach ($order->images as $image)
+                                        @php
+                                            $fileInfo = pathinfo($image->image);
+                                            $imagePosition = (int)str_replace('order'.$order->id.'_','',$fileInfo['filename']);
+                                        @endphp
+                                        @if ($imagePosition == $i)
+                                            @php $orderImage = $image->image; @endphp
+                                            @break
+                                        @endif
+                                    @endforeach
+                                @endif
                                 <div class="col-lg-4 col-md-4 col-sm-12">
                                     @include('blocks.order_photo_block',[
                                         'name' => 'photo'.$i,
-                                        'image' => isset($order) && count($order->images) >= $i ? $order->images[$i-1]->image : null
+                                        'image' => $orderImage
                                     ])
                                 </div>
                             @endfor

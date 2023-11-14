@@ -35,7 +35,7 @@ class NextStepRequest extends FormRequest
             for ($i=1;$i<=3;$i++) {
                 $fileName = 'photo'.$i;
                 if (request()->hasFile($fileName)) {
-                    $rules[$fileName] = 'mimes:jpg|max:2000';
+                    $rules[$fileName] = 'required|mimes:jpg|max:2000';
                 }
             }
         }
