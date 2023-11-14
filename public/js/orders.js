@@ -9,6 +9,7 @@ $(document).ready(function () {
 
     $('#apply-button').click((e) => {
         e.preventDefault();
+        removeSelectedPoints();
         window.myMap.geoObjects.removeAll();
         getPoints();
     });
@@ -28,7 +29,6 @@ const mapInitWithContainer = () => {
 
 const getPoints = () => {
     getUrl($('form'), (getPreviewFlag ? getPreviewUrl : null), (data) => {
-        getPreviewFlag = false;
         window.placemarks = [];
         let orders = data.orders;
         window.subscriptions = [];
@@ -65,12 +65,11 @@ const getPoints = () => {
                     description_full: point.description_full
                 }));
 
-                if (window.openOrderId && window.openOrderId === point.id) {
-                    window.openOrderId = null;
-                    window.cickedTarget = window.placemarks[k];
-                    window.placemarks[k].options.set('iconColor', '#bc202e');
-                    showOrder(window.placemarks[k]);
-                    setBindsAndOpen();
+                if (getPreviewFlag) {
+                    getPreviewFlag = false;
+                    forceOpenOrder(0);
+                } else if (window.openOrderId && window.openOrderId === point.id) {
+                    forceOpenOrder(k);
                 }
             });
 
@@ -372,4 +371,12 @@ const enablePointImagesCarousel = (container, autoplay) => {
 const getPlaceMarkOnMap = (obj) => {
     let placemarkId = parseInt((obj).parents('.order-block').attr('id').replace('order-',''));
     return window.placemarks[placemarkId];
+}
+
+const forceOpenOrder = (k) => {
+    window.openOrderId = null;
+    window.cickedTarget = window.placemarks[k];
+    window.placemarks[k].options.set('iconColor', '#bc202e');
+    showOrder(window.placemarks[k]);
+    setBindsAndOpen();
 }
