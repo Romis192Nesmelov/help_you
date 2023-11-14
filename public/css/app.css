@@ -289,8 +289,12 @@ table {
 }
 
 .form-check-input.small {
-    width: .3em;
-    height: .3em;
+    width: 10px;
+    height: 10px;
+}
+
+.form-check.small .form-check-input:checked[type=radio] {
+    background-size: 9px;
 }
 
 .error {
