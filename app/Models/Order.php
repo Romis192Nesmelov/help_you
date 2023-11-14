@@ -47,7 +47,7 @@ class Order extends Model
 
     public function subType(): BelongsTo
     {
-        return $this->belongsTo(SubType::class);
+        return $this->belongsTo(Subtype::class);
     }
 
     public function performers(): BelongsToMany
