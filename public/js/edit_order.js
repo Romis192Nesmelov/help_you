@@ -82,7 +82,9 @@ $(document).ready(function () {
 
     backButton.click(() => {
         backButton.attr('disabled','disabled');
-        $.get(backStepUrl, () => {
+        $.get(backStepUrl, {
+            'id': orderId ? orderId : '',
+        }, () => {
             nextPrevStep(true, () => {
                 backButton.removeAttr('disabled');
                 if (step === 1) {

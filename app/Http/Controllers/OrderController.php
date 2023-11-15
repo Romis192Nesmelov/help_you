@@ -1,10 +1,11 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Foundation\Http\FormRequest;
 use App\Http\Requests\Order\DelOrderImageRequest;
 use App\Http\Requests\Order\NextStepRequest;
 use App\Http\Requests\Order\OrderRequest;
+use App\Http\Requests\Order\PrevStepRequest;
 use App\Http\Requests\Order\ReadOrderRequest;
 use App\Http\Requests\Order\UserAgeRequest;
 use App\Models\Order;
@@ -24,6 +25,7 @@ class OrderController extends BaseController
     public function newOrder(): View
     {
         $this->getItems('order_types', new OrderType());
+        $this->data['session_key'] = 'steps';
         return $this->showView('edit_order');
     }
 
@@ -41,6 +43,7 @@ class OrderController extends BaseController
         $this->data['order'] = Order::find($request->id);
         $this->authorize('owner', $this->data['order']);
         $this->getItems('order_types', new OrderType());
+        $this->data['session_key'] = 'edit'.$this->data['order']->id.'_steps';
         return $this->showView('edit_order');
     }
 
@@ -140,9 +143,10 @@ class OrderController extends BaseController
      */
     public function nextStep(NextStepRequest $request): JsonResponse
     {
+        $sessionKey = $this->getSessionKey($request);
         $fields = $request->validated();
-        if (Session::has('steps')) {
-            $steps = Session::get('steps');
+        if (Session::has($sessionKey)) {
+            $steps = Session::get($sessionKey);
             if (count($steps) == 1) {
                 for ($i=1;$i<=3;$i++) {
                     unset($fields['photo'.$i]);
@@ -151,11 +155,11 @@ class OrderController extends BaseController
             $steps[] = $fields;
         } else $steps = [$fields];
 
-        Session::put('steps',$steps);
+        Session::put($sessionKey,$steps);
 
         if (count($steps) == 4) {
-            $steps = Session::get('steps');
-            Session::forget('steps');
+            $steps = Session::get($sessionKey);
+            Session::forget($sessionKey);
 
             $fields = [
                 'city_id' => 1,
@@ -194,13 +198,14 @@ class OrderController extends BaseController
         }
     }
 
-    public function prevStep(): JsonResponse
+    public function prevStep(PrevStepRequest $request): JsonResponse
     {
-        $steps = Session::get('steps');
-        if (count($steps) == 1) Session::forget('steps');
+        $sessionKey = $this->getSessionKey($request);
+        $steps = Session::get($sessionKey);
+        if (count($steps) == 1) Session::forget($sessionKey);
         else {
             array_pop($steps);
-            Session::put('steps',$steps);
+            Session::put($sessionKey,$steps);
         }
         return response()->json([],200);
     }
@@ -253,5 +258,10 @@ class OrderController extends BaseController
         $orderUser = OrderUser::where('order_id',$request->id)->where('user_id',Auth::id())->first();
         $orderUser->delete();
         return response()->json([],200);
+    }
+
+    private function getSessionKey(FormRequest $request): string
+    {
+        return $request->has('id') && (int)$request->input('id') ? 'edit'.$request->id.'_steps' : 'steps';
     }
 }
