@@ -5,8 +5,6 @@
         <img class="w-100" src="{{ asset('images/new_order/final.png') }}" />
     </x-modal>
 
-    {{ $session_key }}
-
     <div class="row">
         <div class="col-12 col-lg-6">
             <div class="rounded-block tall">
