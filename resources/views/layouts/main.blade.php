@@ -55,6 +55,79 @@
 </head>
 
 <body style="overflow-y: hidden;">
+<div class="container">
+    <div id="main-container">
+        <div id="top-line" class="w-100 d-flex align-items-center justify-content-between">
+            <a class="d-none d-lg-block" href="{{ route('home') }}">
+                <div class="logo-block d-none d-lg-flex align-items-center justify-content-between">
+                    @include('blocks.logo_block')
+                    <img class="logo-text" src="{{ asset('images/logo_text.svg') }}" />
+                </div>
+            </a>
+            @include('blocks.main_nav_block', [
+                'id' => 'main-nav',
+                'useHome' => false,
+                'nlAddClass' => 'brands'
+            ])
+
+            <div class="d-block d-lg-none">
+                <a href="{{ route('home') }}">
+                    @include('blocks.logo_block')
+                </a>
+            </div>
+            <div class="d-block d-lg-none">
+                <a id="account-href" {{ !auth()->check() ? 'class=d-none' : '' }} href="{{ route('account.change') }}">@include('blocks.account_icon_block')</a>
+                @if (!auth()->check())
+                    <a id="login-href" href="#" {{ auth()->check() ? 'class=d-none' : '' }} data-bs-toggle="modal" data-bs-target="#login-modal">@include('blocks.account_icon_block')</a>
+                @endif
+            </div>
+
+            <div id="right-button-block" class="buttons-block d-none d-lg-flex align-items-center justify-content-{{ !auth()->check() ? 'end' : 'between' }}" {{ request()->path() == '/' ? 'style=width:250px;' : '' }}>
+                <a class="nav-link dropdown-toggle {{ !auth()->check() ? 'd-none' : '' }}" id="navbar-dropdown-messages" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fa fa-bell-o"></i>
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbar-dropdown-messages">
+                    <ul id="dropdown"></ul>
+                </div>
+                @if (auth()->check() && request()->path() != '/')
+                    <a href="{{ route('order.new_order') }}">
+                        @include('blocks.button_block',[
+                            'primary' => false,
+                            'icon' => 'icon-magazine',
+                            'buttonText' => trans('content.home_head3')
+                        ])
+                    </a>
+                @endif
+                <a href="{{ route('account.change') }}">
+                    @include('blocks.button_block',[
+                        'id' => 'account-button',
+                        'addClass' => !auth()->check() ? 'd-none' : '',
+                        'primary' => false,
+                        'icon' => 'icon-user-lock',
+                        'buttonText' => trans('menu.account')
+                    ])
+                </a>
+                @if (!auth()->check())
+                    @include('blocks.button_block',[
+                    'id' => 'login-button',
+                    'addAttr' => ['style' => 'width:200px'],
+                    'addClass' => auth()->check() ? 'd-none' : '',
+                    'primary' => false,
+                    'dataTarget' => 'login-modal',
+                    'icon' => 'icon-enter3',
+                    'buttonText' => trans('menu.login_or_register')
+                ])
+                @endif
+            </div>
+        </div>
+        @yield('content')
+    </div>
+</div>
+
+<x-modal id="message-modal" head="{{ trans('content.message') }}">
+    <h4 class="text-center p-4">{{ session()->has('message') ? session()->get('message') : '' }}</h4>
+</x-modal>
+
 <div id="loader"><div></div></div>
 
 @if (!auth()->check())
@@ -159,82 +232,7 @@
             ])
         </form>
     </x-modal>
-@endif
 
-<div class="container">
-    <div id="main-container">
-        <div id="top-line" class="w-100 d-flex align-items-center justify-content-between">
-            <a class="d-none d-lg-block" href="{{ route('home') }}">
-                <div class="logo-block d-none d-lg-flex align-items-center justify-content-between">
-                    @include('blocks.logo_block')
-                    <img class="logo-text" src="{{ asset('images/logo_text.svg') }}" />
-                </div>
-            </a>
-            @include('blocks.main_nav_block', [
-                'id' => 'main-nav',
-                'useHome' => false,
-                'nlAddClass' => 'brands'
-            ])
-
-            <div class="d-block d-lg-none">
-                <a href="{{ route('home') }}">
-                    @include('blocks.logo_block')
-                </a>
-            </div>
-            <div class="d-block d-lg-none">
-                <a id="account-href" {{ !auth()->check() ? 'class=d-none' : '' }} href="{{ route('account.change') }}">@include('blocks.account_icon_block')</a>
-                @if (!auth()->check())
-                    <a id="login-href" href="#" {{ auth()->check() ? 'class=d-none' : '' }} data-bs-toggle="modal" data-bs-target="#login-modal">@include('blocks.account_icon_block')</a>
-                @endif
-            </div>
-
-            <div id="right-button-block" class="buttons-block d-none d-lg-flex align-items-center justify-content-{{ !auth()->check() ? 'end' : 'between' }}" {{ request()->path() == '/' ? 'style=width:250px;' : '' }}>
-                <a class="nav-link dropdown-toggle {{ !auth()->check() ? 'd-none' : '' }}" id="navbar-dropdown-messages" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="fa fa-bell-o"></i>
-                </a>
-                <div class="dropdown-menu" aria-labelledby="navbar-dropdown-messages">
-                    <ul id="dropdown"></ul>
-                </div>
-                @if (auth()->check() && request()->path() != '/')
-                    <a href="{{ route('order.new_order') }}">
-                        @include('blocks.button_block',[
-                            'primary' => false,
-                            'icon' => 'icon-magazine',
-                            'buttonText' => trans('content.home_head3')
-                        ])
-                    </a>
-                @endif
-                <a href="{{ route('account.change') }}">
-                    @include('blocks.button_block',[
-                        'id' => 'account-button',
-                        'addClass' => !auth()->check() ? 'd-none' : '',
-                        'primary' => false,
-                        'icon' => 'icon-user-lock',
-                        'buttonText' => trans('menu.account')
-                    ])
-                </a>
-                @if (!auth()->check())
-                    @include('blocks.button_block',[
-                    'id' => 'login-button',
-                    'addAttr' => ['style' => 'width:200px'],
-                    'addClass' => auth()->check() ? 'd-none' : '',
-                    'primary' => false,
-                    'dataTarget' => 'login-modal',
-                    'icon' => 'icon-enter3',
-                    'buttonText' => trans('menu.login_or_register')
-                ])
-                @endif
-            </div>
-        </div>
-        @yield('content')
-    </div>
-</div>
-
-<x-modal id="message-modal" head="{{ trans('content.message') }}">
-    <h4 class="text-center p-4">{{ session()->has('message') ? session()->get('message') : '' }}</h4>
-</x-modal>
-
-@if (!auth()->check())
     <script>
         {{--window.getPointsURL = "{{ route('get_points') }}";--}}
         const generateCodeUrl = "{{ route('auth.generate_code') }}",
@@ -246,11 +244,13 @@
 @else
     <script>getSubscriptionsNews("{{ route('order.get_subscriptions_news') }}","{{ route('order.orders') }}","{{ trans('content.new_order_from') }}");</script>
 @endif
+
 <script>
     const openMessageModalFlag = parseInt("{{ session()->has('message') }}"),
         errorFieldMustBeFilledIn = "{{ trans('validation.field_must_be_filled_in') }}",
         errorSelectOneOfItems = "{{ trans('validation.you_must_select_one_of_the_items') }}",
         errorWrongValue = "{{ trans('validation.wrong_value') }}";
 </script>
+
 </body>
 </html>

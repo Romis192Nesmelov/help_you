@@ -31,6 +31,7 @@
             <label class="ms-3">{{ trans('content.number_of_performers') }}</label>
             <div class="col-sm-6 col-12">
                 @include('blocks.select_block',[
+                    'addClass' => 'mb-2 mb-sm-0',
                     'prefix' => trans('content.from'),
                     'name' => 'performers_from',
                     'values' => range(1, 19)
