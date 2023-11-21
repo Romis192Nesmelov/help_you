@@ -173,6 +173,7 @@
         </div>
     </div>
     <script>
+        window.orderId = parseInt("{{ isset($order) ? $order->id : 0 }}");
         const nextStepUrl = "{{ route('order.next_step') }}",
             backStepUrl = "{{ route('order.prev_step') }}",
             orderPreviewUrl  = "{{ route('order.orders',['preview' => 1]) }}",
@@ -181,8 +182,6 @@
             errorCheckAddress = "{{ trans('validation.check_the_address') }}";
         let step = parseInt("{{ session()->has($session_key) ? count(session()->get($session_key)) : 0 }}");
     </script>
-
-    <script>const orderId = parseInt("{{ isset($order) ? $order->id : 0 }}");</script>
     @if (session()->has($session_key) && count(session()->get($session_key)) >= 3)
         <script>let point = [parseFloat("{{ session()->get($session_key)[2]['latitude'] }}"), parseFloat("{{ session()->get($session_key)[2]['longitude'] }}")];</script>
     @elseif (isset($order))
@@ -190,5 +189,4 @@
     @else
         <script>let point = [];</script>
     @endif
-    <script type="text/javascript" src="{{ asset('js/edit_order.js') }}"></script>
 @endsection

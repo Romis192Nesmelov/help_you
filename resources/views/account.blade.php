@@ -133,9 +133,6 @@
     <script>
         const getCodeUrl = "{{ route('account.get_code') }}",
             currentPhone = "{{ substr(auth()->user()->phone,2) }}",
-            errorBornMessage = "{{ trans('validation.wrong_date') }}",
-            passwordCannotBeLess = "{{ trans('auth.password_cannot_be_less', ['length' => 6]) }}",
-            passwordsMismatch = "{{ trans('auth.password_mismatch') }}";
+            errorBornMessage = "{{ trans('validation.wrong_date') }}";
     </script>
-    <script type="text/javascript" src="{{ asset('js/account.js') }}"></script>
 @endsection

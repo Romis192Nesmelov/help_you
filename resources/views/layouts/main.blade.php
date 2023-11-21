@@ -22,36 +22,33 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.css" />
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <link rel="stylesheet" type="text/css" href="{{ asset('css/icons/fontawesome/styles.min.css') }}" />
-    <link rel="stylesheet" type="text/css" href="{{ asset('css/icons/icomoon/styles.css') }}" />
-    <link rel="stylesheet" type="text/css" href="{{ asset('css/icons/fontawesome/styles.min.css') }}" />
-    <link rel="stylesheet" type="text/css" href="{{ asset('css/datatables.css') }}" />
-    <link rel="stylesheet" type="text/css" href="{{ asset('css/jquery.fancybox.min.css') }}" />
-    <link rel="stylesheet" type="text/css" href="{{ asset('css/owl.carousel.min.css') }}" />
-    <link rel="stylesheet" type="text/css" href="{{ asset('css/jquery.mCustomScrollbar.css') }}" />
-    <link rel="stylesheet" type="text/css" href="{{ asset('css/loader.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ asset('css/app.css') }}" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.css" rel="stylesheet">
 
     <script src="https://code.jquery.com/jquery-3.6.3.js" integrity="sha256-nQLuAZGRRcILA+6dMBOvcRh5Pe310sBpanc6+QBmyVM=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     <script src="https://api-maps.yandex.ru/2.1/?apikey=fa455148-7970-4574-b087-4f913652328d&lang=ru_RU" type="text/javascript"></script>
-    <script type="text/javascript" src="{{ asset('js/interactions.min.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('js/touch.min.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('js/widgets.min.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('js/datatables.min.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('js/jquery.maskedinput.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('js/jquery.fancybox.min.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('js/fancybox_init.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('js/owl.carousel.min.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('js/jquery.mCustomScrollbar.concat.min.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('js/max.height.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('js/main.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('js/loader.js') }}"></script>
-    @if (!auth()->check())
-        <script type="text/javascript" src="{{ asset('js/auth.js') }}"></script>
-    @endif
+    <script src="https://cdn.jsdelivr.net/npm/jquery.maskedinput@1.4.1/src/jquery.maskedinput.min.js" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.js"></script>
+
+    @vite([
+        'resources/js/interactions.min.js',
+        'resources/js/touch.min.js',
+        'resources/js/widgets.min.js',
+        'resources/js/jquery.fancybox.min.js',
+        'resources/js/owl.carousel.min.js',
+        'resources/js/app.js',
+        'resources/css/icons/fontawesome/styles.min.css',
+        'resources/css/icons/icomoon/styles.css',
+        'resources/css/icons/fontawesome/styles.min.css',
+        'resources/css/jquery.fancybox.min.css',
+        'resources/css/owl.carousel.min.css',
+        'resources/css/loader.css',
+        'resources/css/app.css',
+    ])
 </head>
 
 <body style="overflow-y: hidden;">
@@ -232,23 +229,16 @@
             ])
         </form>
     </x-modal>
-
-    <script>
-        {{--window.getPointsURL = "{{ route('get_points') }}";--}}
-        const generateCodeUrl = "{{ route('auth.generate_code') }}",
-            accountUrl = "{{ route('account.change') }}",
-            passwordsMismatch = "{{ trans('auth.password_mismatch') }}",
-            passwordCannotBeLess = "{{ trans('auth.password_cannot_be_less', ['length' => 6]) }}",
-            youMustConsent = "{{ trans('auth.you_must_consent_to_the_processing_of_personal_data') }}";
-    </script>
-@else
-    <script>getSubscriptionsNews("{{ route('order.get_subscriptions_news') }}","{{ route('order.orders') }}","{{ trans('content.new_order_from') }}");</script>
 @endif
 
 <script>
-    const openMessageModalFlag = parseInt("{{ session()->has('message') }}"),
+    const authCheck = parseInt("{{ auth()->check() }}"),
+        accountUrl = "{{ route('account.change') }}",
+        subscriptionsUrl = "{{ route('order.get_subscriptions_news') }}",
+        ordersUrl = "{{ route('order.orders') }}",
+        newOrderFrom = "{{ trans('content.new_order_from') }}",
+        openMessageModalFlag = parseInt("{{ session()->has('message') }}"),
         errorFieldMustBeFilledIn = "{{ trans('validation.field_must_be_filled_in') }}",
-        errorSelectOneOfItems = "{{ trans('validation.you_must_select_one_of_the_items') }}",
         errorWrongValue = "{{ trans('validation.wrong_value') }}";
 </script>
 

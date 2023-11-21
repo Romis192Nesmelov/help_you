@@ -44,5 +44,4 @@
     const closeOrderUrl = "{{ route('order.close_order') }}",
         archiveLabelText = "{{ trans('content.status_0') }}";
 </script>
-<script type="text/javascript" src="{{ asset('js/orders_list.js') }}"></script>
 @endsection

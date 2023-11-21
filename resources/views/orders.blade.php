@@ -116,7 +116,6 @@
         orderReadOrderUrl = "{{ route('order.read_order') }}",
         getPreviewUrl = "{{ route('order.get_preview') }}",
         subscribeUrl = "{{ route('account.subscription') }}",
-        ordersUrl = "{{ route('order.orders') }}",
         getOrdersUrl = "{{ route('order.get_orders') }}",
         getUserAgeUrl = "{{ route('order.get_user_age') }}",
         orderNumber = "{{ trans('content.order_number') }}",
@@ -133,5 +132,4 @@
         userId = parseInt("{{ auth()->id() }}");
         window.openOrderId = parseInt("{{ request()->id }}");
 </script>
-<script type="text/javascript" src="{{ asset('js/orders.js') }}"></script>
 @endsection
