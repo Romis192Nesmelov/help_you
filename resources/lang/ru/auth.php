@@ -46,12 +46,6 @@ return [
 //    'new_email' => '. Новый E-mail: :email у id# :id',
 //    'new_password' => '. Новый пароль: :password у id# :id',
 
-    'messages' => 'Сообщения',
-    'my_subscriptions' => 'Мои подписки',
-    'my_orders' => 'Мои запросы',
-    'my_help' => 'Моя помощь',
-    'incentives' => 'Поощрения от партнеров',
-
     'active_orders' => 'Активные',
     'completed_orders' => 'Завершенные',
     'approving_orders' => 'На модерации',

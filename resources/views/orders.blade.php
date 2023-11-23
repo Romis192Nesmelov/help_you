@@ -111,9 +111,11 @@
         </div>
     </div>
 <script>
-    let getPreviewFlag = parseInt("{{ request()->has('preview') && request()->input('preview') }}");
+    window.getPreviewFlag = parseInt("{{ request()->has('preview') && request()->input('preview') }}");
+    window.openOrderId = parseInt("{{ request()->id }}")
+
     const orderResponseUrl = "{{ route('order.order_response') }}",
-        orderReadOrderUrl = "{{ route('order.read_order') }}",
+        readOrderUrl = "{{ route('order.read_order') }}",
         getPreviewUrl = "{{ route('order.get_preview') }}",
         subscribeUrl = "{{ route('account.subscription') }}",
         getOrdersUrl = "{{ route('order.get_orders') }}",
@@ -128,8 +130,6 @@
         numberOfPerformersText = "{{ trans('content.number_of_performers') }}",
         respondToAnOrder = "{{ trans('content.respond_to_an_order') }}",
         copyOrderHrefToClipboard = "{{ trans('content.copy_order_href_to_clipboard') }}",
-        hrefIsCopied = "{{ trans('content.href_is_copied') }}",
-        userId = parseInt("{{ auth()->id() }}");
-        window.openOrderId = parseInt("{{ request()->id }}");
+        hrefIsCopied = "{{ trans('content.href_is_copied') }}";
 </script>
 @endsection

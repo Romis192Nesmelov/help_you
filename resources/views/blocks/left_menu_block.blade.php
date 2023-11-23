@@ -3,7 +3,7 @@
         @include('blocks.avatar_block')
         <ul class="menu">
             @foreach ($leftMenu as $itemMenu)
-                <li {{ $active_left_menu == $itemMenu['key'] ? 'class=active' : '' }}><a href="{{ route('account.'.$itemMenu['key']) }}"><i class="{{ $itemMenu['icon'] }}"></i>{{ trans('auth.'.$itemMenu['key']) }}</a></li>
+                <li {{ $active_left_menu == $itemMenu['key'] ? 'class=active' : '' }}><a href="{{ route($itemMenu['key']) }}"><i class="{{ $itemMenu['icon'] }}"></i>{{ trans($itemMenu['key']) }}</a></li>
             @endforeach
         </ul>
         <div class="bottom-block">

@@ -11,7 +11,7 @@
     @include('blocks.left_menu_block')
     <div class="col-12 col-lg-8">
         <div class="rounded-block tall">
-            <h2>{{ trans('auth.my_subscriptions') }}</h2>
+            <h2>{{ trans('account.my_subscriptions') }}</h2>
             <div class="content-block simple">
                 @if (count($subscriptions))
                     <table class="table datatable-basic subscriptions">
@@ -30,7 +30,11 @@
                                         <div class="head"><a href="{{ route('order.orders',['id' => $order->id]) }}">{{ $order->orderType->name }}</a></div>
                                         <div class="content">{{ trans('content.address').': '.$order->address }}</div>
                                     </td>
-                                    @include('blocks.del_dt_row_block', ['id' => $subscription->id, 'icon' => 'icon-bell-cross'])
+                                    @include('blocks.del_dt_row_block', [
+                                        'id' => $subscription->id,
+                                        'icon' => 'icon-bell-cross',
+                                        'title' => trans('account.unsubscribe')
+                                    ])
                                 </tr>
                             @endforeach
                         @endforeach

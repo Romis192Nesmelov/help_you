@@ -60,6 +60,11 @@ class Order extends Model
         return $this->hasMany(OrderImage::class);
     }
 
+    public function messages(): HasMany
+    {
+        return $this->hasMany(Message::class);
+    }
+
     public function readSubscribers(): HasMany
     {
         return $this->hasMany(ReadOrder::class);

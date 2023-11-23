@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Order;
+use App\Models\OrderUser;
 use App\Models\Partner;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Session;
 
@@ -45,11 +48,11 @@ class BaseController extends Controller
             [
                 'mainMenu' => ['about', 'how_does_it_work', 'partners',],
                 'leftMenu' => [
-                    ['icon' => 'icon-bubbles4', 'key' => 'messages'],
-                    ['icon' => 'icon-mail-read', 'key' => 'my_subscriptions'],
-                    ['icon' => 'icon-drawer-out', 'key' => 'my_orders'],
-                    ['icon' => 'icon-lifebuoy', 'key' => 'my_help'],
-                    ['icon' => 'icon-gift', 'key' => 'incentives']
+                    ['icon' => 'icon-bubbles4', 'key' => 'messages.chats'],
+                    ['icon' => 'icon-mail-read', 'key' => 'account.my_subscriptions'],
+                    ['icon' => 'icon-drawer-out', 'key' => 'account.my_orders'],
+                    ['icon' => 'icon-lifebuoy', 'key' => 'account.my_help'],
+                    ['icon' => 'icon-gift', 'key' => 'account.incentives']
                 ],
                 'activeMainMenu' => $this->activeMainMenu,
                 'activeLeftMenu' => $this->activeLeftMenu,

@@ -29,7 +29,7 @@ class Subscription extends Model
         return $this->belongsTo(User::class,'user_id');
     }
 
-    public function readOrders(): HasMany
+    public function unreadOrders(): HasMany
     {
         return $this->hasMany(ReadOrder::class)->where('read',null)->orderByDesc('created_at');
     }

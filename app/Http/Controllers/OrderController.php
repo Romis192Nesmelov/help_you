@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Http\Resources\Orders\UnreadOrdersResource;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Http\Requests\Order\DelOrderImageRequest;
 use App\Http\Requests\Order\NextStepRequest;
@@ -63,7 +64,7 @@ class OrderController extends BaseController
     {
         return response()->json([
             'subscriptions' => Subscription::query()
-                ->with('orders.user')
+                ->with('unreadOrders.order.user')
                 ->default()
                 ->get()
         ]);
@@ -179,7 +180,16 @@ class OrderController extends BaseController
                 $this->authorize('owner', $order);
                 $order->update($fields);
 
-            } else $order = Order::create($fields);
+            } else {
+                $subscriptions = Subscription::where('user_id',Auth::id())->get();
+                foreach ($subscriptions as $subscription) {
+                    $order = Order::create($fields);
+                    ReadOrder::create([
+                        'subscription_id' => $subscription->id,
+                        'order_id' => $order->id,
+                    ]);
+                }
+            }
 
             for ($i=1;$i<=3;$i++) {
                 $fieldName = 'photo'.$i;

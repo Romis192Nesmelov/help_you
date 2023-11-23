@@ -22,7 +22,6 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.css" />
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.css" rel="stylesheet">
@@ -43,7 +42,7 @@
         'resources/js/app.js',
         'resources/css/icons/fontawesome/styles.min.css',
         'resources/css/icons/icomoon/styles.css',
-        'resources/css/icons/fontawesome/styles.min.css',
+        'resources/css/datatables.css',
         'resources/css/jquery.fancybox.min.css',
         'resources/css/owl.carousel.min.css',
         'resources/css/loader.css',
@@ -232,11 +231,15 @@
 @endif
 
 <script>
-    const authCheck = parseInt("{{ auth()->check() }}"),
+    const userId = parseInt("{{ auth()->check() }}") ? parseInt("{{ auth()->id() }}") : null,
         accountUrl = "{{ route('account.change') }}",
-        subscriptionsUrl = "{{ route('order.get_subscriptions_news') }}",
+        getSubscriptionsUrl = "{{ route('order.get_subscriptions_news') }}",
+        getUnreadMessages = "{{ route('messages.get_unread_messages') }}",
         ordersUrl = "{{ route('order.orders') }}",
+        chatUrl = "{{ route('messages.chat') }}",
         newOrderFrom = "{{ trans('content.new_order_from') }}",
+        unreadMessages = "{{ trans('messages.unread_messages') }}",
+        inChatNumber = "{{ trans('messages.in_chat_number') }}",
         openMessageModalFlag = parseInt("{{ session()->has('message') }}"),
         errorFieldMustBeFilledIn = "{{ trans('validation.field_must_be_filled_in') }}",
         errorWrongValue = "{{ trans('validation.wrong_value') }}";

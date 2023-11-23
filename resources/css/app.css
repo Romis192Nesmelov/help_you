@@ -157,6 +157,11 @@ h2 {
     margin-bottom: 20px;
 }
 
+h2 i {
+    font-size: 25px !important;
+    margin-right: 10px;
+}
+
 ul.subtypes li {
     font-size: 16px;
     list-style: none;
@@ -198,12 +203,12 @@ table {
     font-size: 18px;
     top: auto;
     margin-top: 10px;
-    right: 25px;
+    right: 15px;
     color: grey;
 }
 
 .form-group.has-label i {
-    margin-top: 40px;
+    margin-top: 33px;
 }
 
 .form-group input,
@@ -786,6 +791,7 @@ button.btn > i {
     align-items: center;
     justify-content: start;
     border-bottom: 1px solid #e65639;
+    margin-bottom: 5px;
 }
 
 .rounded-block .top-submenu > div {
@@ -861,6 +867,53 @@ table.datatable-basic td.empty {
 
 .rounded-block.tall .content-block.simple .datatable-scroll {
     height: 575px;
+}
+
+#messages {
+    width: 100%;
+    height: 620px;
+}
+
+#messages .message-block {
+    width: 100%;
+    display: table;
+    padding: 5px;
+}
+
+#messages .message-block .message {
+    max-width: 70%;
+    min-width: 10px;
+    padding: 10px;
+    font-size: .8em;
+    background-color: #f2ece4;
+    border-radius: 3px;
+    float: left;
+    filter: drop-shadow(1px 1px 0 #000);
+}
+
+#messages .message-block .message .author {
+    font-size: 13px;
+    font-style: italic;
+    font-weight: bold;
+}
+
+#messages .message-block .message .time {
+    font-size: 10px;
+}
+
+#messages .message-block .message.you {
+    text-align: right;
+    float: right;
+    background-color: #e9d6be;
+}
+
+.rounded-block.tall .content-block.simple .chat-input {
+    width: 100%;
+    padding: 20px 0;
+}
+
+.rounded-block.tall .content-block.simple .chat-input i {
+    cursor: pointer;
 }
 
 .rounded-block.tall .absolute-bottom {
@@ -1083,6 +1136,10 @@ table.datatable-basic td.empty {
     .form-group textarea[name=description_full] {
         height: 115px;
     }
+
+    #messages {
+        height: 490px;
+    }
 }
 
 @media (max-width: 1200px) {
@@ -1203,6 +1260,10 @@ table.datatable-basic td.empty {
         width: calc(100% + 60px);
         margin-left: -30px;
     }
+
+    #messages {
+        height: 620px;
+    }
 }
 
 @media (max-width: 768px) {
@@ -1231,6 +1292,10 @@ table.datatable-basic td.empty {
     .rounded-block .top-submenu > div {
         font-size: 11px;
         padding: 5px;
+    }
+
+    #messages .message-block .message {
+        max-width: 98%;
     }
 }
 

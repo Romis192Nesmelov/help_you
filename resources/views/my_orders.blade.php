@@ -26,10 +26,11 @@
     @include('blocks.left_menu_block')
     <div class="col-12 col-lg-8">
         <div class="rounded-block tall">
-            <h2>{{ trans('auth.my_orders') }}</h2>
+            <h2>{{ trans('account.my_orders') }}</h2>
             @include('blocks.top_sub_menu_block',[
                 'menus' => ['active','approving','archive'],
-                'suffix' => '_orders',
+                'prefix' => 'auth',
+                'postfix' => '_orders',
                 'items' => $orders
             ])
             @include('blocks.tab_orders_block', [

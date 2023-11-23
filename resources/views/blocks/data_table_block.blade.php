@@ -7,7 +7,12 @@
                 <div class="content">{{ isset($relationContent) ? $item->$relationContent->$contentName : $item->$contentName }}</div>
             </td>
             @if (isset($editRoute) && isset($statusField) && $statusField && $item[$statusField] != 1)
-                @include('blocks.edit_dt_row_block',['id' => $item->id])
+                @include('blocks.edit_dt_row_block',[
+                    'id' => $item->id,
+                    'title' => trans('content.edit')
+                ])
+            @elseif (isset($chatMode) && $chatMode)
+                <td class="icon"><nobr><i title="{{ trans('messages.participants') }}" class="icon-users4 me-1"></i>{{ $item->performers->count() }}</nobr></td>
             @else
                 <td class="empty"></td>
             @endif
@@ -28,8 +33,16 @@
                 </td>
             @elseif (isset($statusField) && $statusField && !$item->status)
                 <td></td>
-            @elseif (!isset($menuItem) || $menuItem != 'archive')
-                @include('blocks.del_dt_row_block', ['id' => $item->id])
+            @elseif ((!isset($menuItem) || $menuItem != 'archive') && (!isset($chatMode) || !$chatMode))
+                @include('blocks.del_dt_row_block', [
+                    'id' => $item->id,
+                    'title' => trans('content.delete')
+                ])
+            @elseif (isset($chatMode) && $chatMode)
+                @include('blocks.chat_dt_row_block',[
+                    'id' => $item->id,
+                    'title' => trans('content.open')
+                ])
             @else
                 <td class="empty"></td>
             @endif

@@ -93,7 +93,7 @@ class User extends Authenticatable
     public function ordersApproving(): HasMany
     {
         return $this->hasMany(Order::class)
-            ->where('approved',0)
+            ->where('approved',1)
             ->orderByDesc('created_at');
     }
 
@@ -118,6 +118,16 @@ class User extends Authenticatable
             ->where('status',0)
             ->where('approved',1)
             ->orderByDesc('created_at');
+    }
+
+    public function messages(): HasMany
+    {
+        return $this->hasMany(Message::class);
+    }
+
+    public function unreadMessages(): HasMany
+    {
+        return $this->hasMany(MessageUser::class)->where('read',null);
     }
 
     public function years(): int

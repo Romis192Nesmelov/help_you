@@ -4,6 +4,7 @@ use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BaseController;
 use App\Http\Controllers\OrderController;
+use \App\Http\Controllers\ChatsController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -40,7 +41,6 @@ Route::prefix('account')->name('account.')->controller(AccountController::class)
     Route::post('/edit-account', 'editAccount')->name('edit_account');
     Route::post('/delete-subscription', 'deleteSubscription')->name('delete_subscription');
 
-    Route::get('/messages', 'messages')->name('messages');
     Route::get('/change', 'account')->name('change');
     Route::get('/messages', 'messages')->name('messages');
     Route::get('/my-subscriptions', 'mySubscriptions')->name('my_subscriptions');
@@ -70,4 +70,12 @@ Route::middleware(['auth','account.completed'])->name('order.')->controller(Orde
     Route::post('/delete-order-image', 'deleteOrderIMage')->name('delete_order_image');
     Route::post('/close-order', 'closeOrder')->name('close_order');
     Route::post('/delete-response', 'deleteResponse')->name('delete_response');
+});
+
+Route::middleware(['auth','account.completed'])->name('messages.')->controller(ChatsController::class)->group(function () {
+    Route::get('/chats', 'chats')->name('chats');
+    Route::get('/chat', 'chat')->name('chat');
+    Route::get('/get-unread-messages', 'getUnreadMessages')->name('get_unread_messages');
+    Route::post('/read-message', 'readMessage')->name('read_message');
+    Route::post('/new-message', 'newMessage')->name('new_message');
 });

@@ -13,7 +13,7 @@ class UsersSeeder extends Seeder
      */
     public function run(): void
     {
-        User::factory(50)->create();
+        User::factory(10)->create();
         $data = [
             [
                 'name' => 'Роман',
@@ -21,6 +21,26 @@ class UsersSeeder extends Seeder
                 'born' => '14-07-1976',
                 'phone' => '+7(926)247-77-25',
                 'email' => 'romis@nesmelov.com',
+                'password' => bcrypt('apg192'),
+                'code' => '99-99-99',
+                'active' => 1
+            ],
+            [
+                'name' => 'Romis',
+                'family' => 'Nesmelov',
+                'born' => '14-07-1976',
+                'phone' => '+7(958)815-85-65',
+                'email' => 'romis.nesmelov@gmail.com',
+                'password' => bcrypt('apg192'),
+                'code' => '99-99-99',
+                'active' => 1
+            ],
+            [
+                'name' => 'Unknown',
+                'family' => 'Unknown',
+                'born' => '14-07-1976',
+                'phone' => '+7(925)521-37-45',
+                'email' => 'romis192@yandex.ru',
                 'password' => bcrypt('apg192'),
                 'code' => '99-99-99',
                 'active' => 1

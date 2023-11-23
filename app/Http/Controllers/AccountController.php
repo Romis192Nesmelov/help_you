@@ -28,7 +28,7 @@ class AccountController extends BaseController
     public function mySubscriptions() :View
     {
         $this->data['subscriptions'] = Subscription::query()->default()->get();
-        $this->data['active_left_menu'] = 'my_subscriptions';
+        $this->data['active_left_menu'] = 'account.my_subscriptions';
         return $this->showView('my_subscriptions');
     }
 
@@ -39,7 +39,7 @@ class AccountController extends BaseController
             'approving' => Auth::user()->ordersApproving,
             'archive' => Auth::user()->ordersArchive
         ];
-        $this->data['active_left_menu'] = 'my_orders';
+        $this->data['active_left_menu'] = 'account.my_orders';
         return $this->showView('my_orders');
     }
 
@@ -49,7 +49,7 @@ class AccountController extends BaseController
             'active' => Auth::user()->orderActivePerformer,
             'archive' => Auth::user()->orderArchivePerformer
         ];
-        $this->data['active_left_menu'] = 'my_help';
+        $this->data['active_left_menu'] = 'account.my_help';
         return $this->showView('my_help');
     }
 
