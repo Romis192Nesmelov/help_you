@@ -785,6 +785,7 @@ $(document).ready(function () {
 
     //CHATS BLOCK BEGIN
     const messagesBlock = $('#messages');
+    window.unreadTextBlock = ' ' + unreadMessages + '<br>';
     if (messagesBlock.length) {
         messagesBlock.mCustomScrollbar({
             axis: 'y',
@@ -823,6 +824,16 @@ $(document).ready(function () {
                         '_token': window.tokenField,
                         'message_id': message.id,
                         'order_id': orderId
+                    }, () => {
+                        let unreadCounterBlock = $('#unread-order-' + orderId),
+                            unreadCounter = parseInt(unreadCounterBlock.find('span').html().replace(window.unreadTextBlock,''));
+                        unreadCounter--;
+                        if (!unreadCounter) {
+                            unreadCounterBlock.remove();
+                            checkDropDownMenuEmpty();
+                        } else {
+                            unreadCounterBlock.find('span').html(unreadCounter + window.unreadTextBlock);
+                        }
                     }
                 );
             }
@@ -1114,7 +1125,7 @@ const getNews = () => {
                 $('<li></li>').attr('id','unread-order-' + orderId).append(
                     $('<div></div>')
                         .append(
-                            $('<span></span>').html(unreadMessages + '<br>')
+                            $('<span></span>').html(counter + window.unreadTextBlock)
                         ).append(
                         $('<a></a>').attr('href', chatUrl+'/?order_id='+orderId).html(inChatNumber + orderId)
                     )

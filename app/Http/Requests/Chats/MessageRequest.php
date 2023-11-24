@@ -25,7 +25,7 @@ class MessageRequest extends FormRequest
     {
         return [
             'order_id' => 'required|exists:orders,id',
-            'body' => $this->validationString
+            'body' => $this->validationText
         ];
     }
 }
