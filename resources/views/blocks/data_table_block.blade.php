@@ -23,7 +23,7 @@
             @else
                 <td class="empty"></td>
             @endif
-            @if (isset($statusField) && $statusField && $item->status == 1)
+            @if (isset($statusField) && $statusField && $item->status == 1 && (!isset($chatMode) || !$chatMode))
                 <td class="close-order-cell">
                     @include('blocks.button_block',[
                         'addClass' => 'close-order micro',
@@ -31,7 +31,7 @@
                         'buttonText' => trans('content.close')
                     ])
                 </td>
-            @elseif (isset($statusField) && $statusField && !$item->status)
+            @elseif (isset($statusField) && $statusField && !$item->status && (!isset($chatMode) || !$chatMode))
                 <td></td>
             @elseif ((!isset($menuItem) || $menuItem != 'archive') && (!isset($chatMode) || !$chatMode))
                 @include('blocks.del_dt_row_block', [
