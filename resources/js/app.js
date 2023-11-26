@@ -173,13 +173,16 @@ $(document).ready(function () {
                 $('#navbar-dropdown-messages').removeClass('d-none');
                 $('#right-button-block').removeClass('justify-content-end').addClass('justify-content-between');
 
-                // Goto prev url
+                //Goto prev url
                 $.get(
                     getPrevUrl,
                     (data) => {
                         if (data.url) window.location.href = data.url;
                     }
                 );
+
+                //Getting news
+                getNews();
             } else {
                 window.location.href = accountUrl;
             }
@@ -785,7 +788,6 @@ $(document).ready(function () {
 
     //CHATS BLOCK BEGIN
     const messagesBlock = $('#messages');
-    window.unreadTextBlock = ' ' + unreadMessages + '<br>';
     if (messagesBlock.length) {
         messagesBlock.mCustomScrollbar({
             axis: 'y',
@@ -824,16 +826,6 @@ $(document).ready(function () {
                         '_token': window.tokenField,
                         'message_id': message.id,
                         'order_id': orderId
-                    }, () => {
-                        let unreadCounterBlock = $('#unread-order-' + orderId),
-                            unreadCounter = parseInt(unreadCounterBlock.find('span').html().replace(window.unreadTextBlock,''));
-                        unreadCounter--;
-                        if (!unreadCounter) {
-                            unreadCounterBlock.remove();
-                            checkDropDownMenuEmpty();
-                        } else {
-                            unreadCounterBlock.find('span').html(unreadCounter + window.unreadTextBlock);
-                        }
                     }
                 );
             }
@@ -1125,7 +1117,7 @@ const getNews = () => {
                 $('<li></li>').attr('id','unread-order-' + orderId).append(
                     $('<div></div>')
                         .append(
-                            $('<span></span>').html(counter + window.unreadTextBlock)
+                            $('<span></span>').html(counter + ' ' + unreadMessages + '<br>')
                         ).append(
                         $('<a></a>').attr('href', chatUrl+'/?order_id='+orderId).html(inChatNumber + orderId)
                     )
