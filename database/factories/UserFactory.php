@@ -15,16 +15,18 @@ class UserFactory extends Factory
      *
      * @return array<string, mixed>
      */
+    private static $counter = 0;
+
     public function definition(): array
     {
         return [
             'name' => fake()->name(),
             'family' => fake()->lastName(),
             'born' => fake()->date('d-m-Y'),
-            'phone' => '+7(9'.rand(0,9).rand(0,9).')'.rand(0,9).rand(0,9).rand(0,9).'-'.rand(0,9).rand(0,9).'-'.rand(0,9).rand(0,9),
+            'phone' => '+7(926)111-11-1'.(self::$counter++),
             'email' => fake()->unique()->safeEmail(),
 //            'email_verified_at' => now(),
-            'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
+            'password' => bcrypt('123456'),
             'remember_token' => Str::random(10),
             'code' => rand(0,9).rand(0,9).'-'.rand(0,9).rand(0,9).'-'.rand(0,9).rand(0,9),
             'active' => 1

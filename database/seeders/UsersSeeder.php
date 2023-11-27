@@ -49,6 +49,7 @@ class UsersSeeder extends Seeder
                 'name' => 'Anonymous',
                 'family' => 'Anonymous',
                 'phone' => '+7(926)206-39-77',
+                'born' => '14-07-1976',
                 'email' => 'anonymous@mail.ru',
                 'password' => bcrypt('123456'),
                 'code' => '99-99-99',
