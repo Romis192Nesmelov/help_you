@@ -111,8 +111,10 @@
         </div>
     </div>
 <script>
-    window.getPreviewFlag = parseInt("{{ request()->has('preview') && request()->input('preview') }}");
-    window.openOrderId = parseInt("{{ request()->id }}")
+    window.getPreviewFlag = parseInt("{{ request()->has('preview') && request()->input('preview') ? 1 : 0 }}");
+    window.openOrderId = parseInt("{{ request()->id }}");
+
+    console.log(window.getPreviewFlag);
 
     const orderResponseUrl = "{{ route('order.order_response') }}",
         readOrderUrl = "{{ route('order.read_order') }}",

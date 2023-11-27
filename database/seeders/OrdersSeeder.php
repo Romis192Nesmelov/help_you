@@ -27,8 +27,8 @@ class OrdersSeeder extends Seeder
             'latitude' => 55.667594,
             'longitude' => 37.612245,
             'description_short' => 'Чета с кем-то где-то что-то и когда-то надо срочно сделать, а то край!',
-            'approved' => 0,
-            'status' => 1
+            'approved' => 1,
+            'status' => 2
         ]);
 
 //        $performers = [
