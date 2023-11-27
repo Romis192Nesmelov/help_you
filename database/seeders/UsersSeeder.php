@@ -40,8 +40,7 @@ class UsersSeeder extends Seeder
                 'family' => 'Unknown',
                 'born' => '14-07-1976',
                 'phone' => '+7(925)521-37-45',
-                'email' => 'romis192@yandex.ru',
-                'password' => bcrypt('apg192'),
+                'password' => bcrypt('123456'),
                 'code' => '99-99-99',
                 'active' => 1
             ],
