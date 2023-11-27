@@ -40,12 +40,16 @@ class UsersSeeder extends Seeder
                 'family' => 'Unknown',
                 'born' => '14-07-1976',
                 'phone' => '+7(925)521-37-45',
+                'email' => 'unknown@mail.ru',
                 'password' => bcrypt('123456'),
                 'code' => '99-99-99',
                 'active' => 1
             ],
             [
+                'name' => 'Anonymous',
+                'family' => 'Anonymous',
                 'phone' => '+7(926)206-39-77',
+                'email' => 'anonymous@mail.ru',
                 'password' => bcrypt('123456'),
                 'code' => '99-99-99',
                 'active' => 1
