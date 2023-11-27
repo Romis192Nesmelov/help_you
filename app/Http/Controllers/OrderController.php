@@ -166,7 +166,7 @@ class OrderController extends BaseController
                 'city_id' => 1,
                 'user_id' => Auth::id(),
                 'status' => 2,
-                'approved' => 0
+                'approved' => 1
             ];
 
             foreach ($steps as $step) {
@@ -181,9 +181,9 @@ class OrderController extends BaseController
                 $order->update($fields);
 
             } else {
+                $order = Order::create($fields);
                 $subscriptions = Subscription::where('user_id',Auth::id())->get();
                 foreach ($subscriptions as $subscription) {
-                    $order = Order::create($fields);
                     ReadOrder::create([
                         'subscription_id' => $subscription->id,
                         'order_id' => $order->id,
