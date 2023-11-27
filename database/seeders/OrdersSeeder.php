@@ -16,7 +16,7 @@ class OrdersSeeder extends Seeder
     public function run(): void
     {
         $me = User::where('phone','+7(926)247-77-25')->select('id')->first();
-        Order::factory(100)->create();
+//        Order::factory(100)->create();
         $order = Order::create([
             'user_id' => $me->id,
             'order_type_id' => 1,
@@ -27,21 +27,21 @@ class OrdersSeeder extends Seeder
             'latitude' => 55.667594,
             'longitude' => 37.612245,
             'description_short' => 'Чета с кем-то где-то что-то и когда-то надо срочно сделать, а то край!',
-            'approved' => 1,
+            'approved' => 0,
             'status' => 1
         ]);
 
-        $performers = [
-            User::where('phone','+7(958)815-85-65')->select('id')->first(),
-            User::where('phone','+7(925)521-37-45')->select('id')->first(),
-            User::where('phone','+7(926)206-39-77')->select('id')->first()
-        ];
-
-        foreach ($performers as $performer) {
-            OrderUser::create([
-                'order_id' => $order->id,
-                'user_id' => $performer->id
-            ]);
-        }
+//        $performers = [
+//            User::where('phone','+7(958)815-85-65')->select('id')->first(),
+//            User::where('phone','+7(925)521-37-45')->select('id')->first(),
+//            User::where('phone','+7(926)206-39-77')->select('id')->first()
+//        ];
+//
+//        foreach ($performers as $performer) {
+//            OrderUser::create([
+//                'order_id' => $order->id,
+//                'user_id' => $performer->id
+//            ]);
+//        }
     }
 }
