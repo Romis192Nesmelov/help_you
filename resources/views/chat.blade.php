@@ -33,6 +33,8 @@
                             'name' => 'body',
                             'type' => 'text',
                             'icon' => 'icon-arrow-right6',
+                            'min' => 1,
+                            'max' => 3000,
                             'ajax' => true
                         ])
                     </div>

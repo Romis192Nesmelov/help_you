@@ -12,8 +12,8 @@
         value="{{ old($name, ($value ?? '')) }}"
         class="form-control {{ isset($icon) && $icon ? 'has-icon' : '' }}@error($name) error @enderror"
         placeholder="{{ isset($placeholder) && $placeholder ? $placeholder : '' }}"
-        {{ isset($min) ? 'min='.$min : '' }}
-        {{ isset($max) ? 'max='.$max : '' }}
+        {{ isset($min) ? (!isset($type) || $type == 'text' ? 'minlength=' : 'min=').$min : '' }}
+        {{ isset($max) ? (!isset($type) || $type == 'text' ? 'maxlength=' : 'max=').$max : '' }}
         {{ isset($disabled) && $disabled ? 'disabled=disabled' : '' }}
     >
     @include('blocks.wrap_error_block')
