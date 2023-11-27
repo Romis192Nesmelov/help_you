@@ -23,7 +23,7 @@
             @else
                 <td class="empty"></td>
             @endif
-            @if (isset($statusField) && $statusField && $item->status == 1 && (!isset($chatMode) || !$chatMode))
+            @if (isset($statusField) && $statusField && $item->status == 1 && $item->approved && (!isset($chatMode) || !$chatMode))
                 <td class="close-order-cell">
                     @include('blocks.button_block',[
                         'addClass' => 'close-order micro',

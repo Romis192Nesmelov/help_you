@@ -104,6 +104,13 @@ class User extends Authenticatable
             ->orderByDesc('created_at');
     }
 
+    public function orderApproving(): HasMany
+    {
+        return $this->hasMany(Order::class)
+            ->where('approved',0)
+            ->orderByDesc('created_at');
+    }
+
     public function ordersActiveAndApproving(): HasMany
     {
         return $this->hasMany(Order::class)

@@ -18,7 +18,7 @@ class DatabaseSeeder extends Seeder
         $this->call(CitySeeder::class);
         Partner::factory(13)->create();
         $this->call(OrderTypesSeeder::class);
-//        $this->call(OrdersSeeder::class);
+        $this->call(OrdersSeeder::class);
         $this->call(OrderImagesSeeder::class);
         $this->call(SubscriptionTypesSeeder::class);
     }

@@ -36,7 +36,7 @@ class AccountController extends BaseController
     {
         $this->data['orders'] = [
             'active' => Auth::user()->ordersActiveAndApproving,
-            'approving' => Auth::user()->ordersApproving,
+            'approving' => Auth::user()->orderApproving,
             'archive' => Auth::user()->ordersArchive
         ];
         $this->data['active_left_menu'] = 'account.my_orders';
