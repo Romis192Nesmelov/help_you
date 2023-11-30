@@ -657,14 +657,21 @@ $(document).ready(function () {
                             backButton.attr('disabled','disabled');
                             nextButton.attr('disabled','disabled');
 
+                            let hiddenIdInput = $('input[name=id]'),
+                                fields = {
+                                '_token': window.tokenField,
+                                'address': updatedAddress,
+                                'latitude': point[0],
+                                'longitude': point[1]
+                            };
+
+                            if (hiddenIdInput.length) {
+                                fields['id'] = hiddenIdInput.val();
+                            }
+
                             $.post(
                                 nextStepUrl,
-                                {
-                                    '_token': window.tokenField,
-                                    'address': updatedAddress,
-                                    'latitude': point[0],
-                                    'longitude': point[1]
-                                }
+                                fields
                             ).done(() => {
                                 setTimeout(function () {
                                     step++;
