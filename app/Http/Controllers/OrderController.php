@@ -190,13 +190,7 @@ class OrderController extends BaseController
 
             } else {
                 $order = Order::create($fields);
-                $subscriptions = Subscription::where('user_id',Auth::id())->get();
-                foreach ($subscriptions as $subscription) {
-                    ReadOrder::create([
-                        'subscription_id' => $subscription->id,
-                        'order_id' => $order->id,
-                    ]);
-                }
+                $this->newOrderInSubscription($order->id);
             }
 
             for ($i=1;$i<=3;$i++) {
@@ -248,7 +242,7 @@ class OrderController extends BaseController
     /**
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    public function deleteOrderIMage(DelOrderImageRequest $request): JsonResponse
+    public function deleteOrderImage(DelOrderImageRequest $request): JsonResponse
     {
         $order = Order::find($request->id);
         $this->authorize('owner', $order);
@@ -268,9 +262,13 @@ class OrderController extends BaseController
         $this->authorize('owner', $order);
         $order->status = 0;
         $order->save();
+        ReadOrder::where('order_id')->delete();
         return response()->json([],200);
     }
 
+    /**
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
     public function resumeOrder(OrderRequest $request): JsonResponse
     {
         $order = Order::find($request->id);
@@ -278,6 +276,9 @@ class OrderController extends BaseController
         $order->status = 2;
         $order->approved = 0;
         $order->save();
+
+        OrderUser::where('order_id')->delete();
+        $this->newOrderInSubscription($order->id);
         return response()->json([],200);
     }
 
@@ -286,5 +287,16 @@ class OrderController extends BaseController
         $orderUser = OrderUser::where('order_id',$request->id)->where('user_id',Auth::id())->first();
         $orderUser->delete();
         return response()->json([],200);
+    }
+
+    private function newOrderInSubscription(int $orderId): void
+    {
+        $subscriptions = Subscription::where('user_id',Auth::id())->get();
+        foreach ($subscriptions as $subscription) {
+            ReadOrder::create([
+                'subscription_id' => $subscription->id,
+                'order_id' => $orderId,
+            ]);
+        }
     }
 }
