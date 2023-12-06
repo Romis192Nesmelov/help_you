@@ -15,10 +15,12 @@ class OrdersSeeder extends Seeder
      */
     public function run(): void
     {
-        $me = User::where('phone','+7(926)247-77-25')->select('id')->first();
+        $im = User::where('phone','+7(926)247-77-25')->select('id')->first();
+        $anotherUser = User::where('phone','+7(958)815-85-65')->select('id')->first();
+
 //        Order::factory(100)->create();
         $order = Order::create([
-            'user_id' => $me->id,
+            'user_id' => $im->id,
             'order_type_id' => 1,
             'city_id' => 1,
             'subtype_id' => rand(1,4),
@@ -29,6 +31,11 @@ class OrdersSeeder extends Seeder
             'description_short' => 'Чета с кем-то где-то что-то и когда-то надо срочно сделать, а то край!',
             'approved' => 1,
             'status' => 2
+        ]);
+
+        OrderUser::create([
+            'order_id' => $order->id,
+            'user_id' => $anotherUser->id
         ]);
 
 //        $performers = [

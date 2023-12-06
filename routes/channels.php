@@ -15,5 +15,5 @@ use App\Models\Order;
 
 Broadcast::channel('chat_{id}', function ($user, $id) {
     $order = Order::find($id);
-    return $user->id == $order->user_id || in_array($user->id, $order->performers->pluck('id')->toArray());
+    return $order->status && ($user->id == 1 || $user->id == $order->user_id || in_array($user->id, $order->performers->pluck('id')->toArray()));
 });

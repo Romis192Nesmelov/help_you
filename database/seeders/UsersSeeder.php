@@ -18,7 +18,7 @@ class UsersSeeder extends Seeder
                 'name' => 'Администрация',
                 'family' => 'Ресурса',
                 'born' => '14-07-1976',
-                'phone' => '+7(926)247-77-25',
+                'phone' => '+7(000)000-00-00',
                 'email' => 'info@need-help.online',
                 'password' => bcrypt('apg192'),
                 'code' => '99-99-99',

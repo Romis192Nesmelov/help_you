@@ -35,14 +35,14 @@ class NextStepRequest extends FormRequest
         $sessionKey = $this->getSessionKey($this);
         $step = Session::has($sessionKey) ? count(Session::get($sessionKey)) : 0;
         $rules = $this->stepsRules[$step];
-//        if ($step == 1) {
-//            for ($i=1;$i<=3;$i++) {
-//                $fileName = 'photo'.$i;
-//                if (request()->hasFile($fileName)) {
-//                    $rules[$fileName] = 'required|mimes:jpg|max:2000';
-//                }
-//            }
-//        }
+        if ($step == 1) {
+            for ($i=1;$i<=3;$i++) {
+                $fileName = 'photo'.$i;
+                if (request()->hasFile($fileName)) {
+                    $rules[$fileName] = 'required|'.$this->validationJpgAndPng;
+                }
+            }
+        }
         return $rules;
     }
 }

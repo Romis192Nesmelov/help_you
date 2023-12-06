@@ -1,8 +1,12 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Models\Message;
+use App\Models\MessageUser;
+use App\Models\Order;
 use http\Env\Request;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 
 trait HelperTrait
@@ -57,6 +61,38 @@ trait HelperTrait
     public function getSessionKey(FormRequest $request): string
     {
         return $request->has('id') && (int)$request->input('id') ? 'edit'.$request->id.'_steps' : 'steps';
+    }
+
+    public function newChatMessage(Order $order): void
+    {
+        if (!$order->messages->count()) {
+            $message = Message::create([
+                'body' => trans('content.new_chat_message'),
+                'user_id' => 1,
+                'order_id' => $order->id
+            ]);
+        }
+        $this->setNewMessages($message);
+    }
+
+    public function setNewMessages(Message $message): void
+    {
+        if (Auth::id() != $message->order->user_id) {
+            MessageUser::create([
+                'message_id' => $message->id,
+                'user_id' => $message->order->user_id,
+                'order_id' => $message->order_id,
+            ]);
+        }
+        foreach ($message->order->performers as $performer) {
+            if (Auth::id() != $performer->id) {
+                MessageUser::create([
+                    'message_id' => $message->id,
+                    'user_id' => $performer->id,
+                    'order_id' => $message->order_id,
+                ]);
+            }
+        }
     }
 
     public function sendSms($phone, $text)

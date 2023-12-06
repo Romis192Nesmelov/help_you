@@ -69,6 +69,7 @@ Route::middleware(['auth','account.completed'])->name('order.')->controller(Orde
     Route::post('/delete-order', 'deleteOrder')->name('delete_order');
     Route::post('/delete-order-image', 'deleteOrderIMage')->name('delete_order_image');
     Route::post('/close-order', 'closeOrder')->name('close_order');
+    Route::post('/resume-order', 'resumeOrder')->name('resume_order');
     Route::post('/delete-response', 'deleteResponse')->name('delete_response');
 });
 

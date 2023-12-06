@@ -840,6 +840,10 @@ table.datatable-basic td .label {
     color: white;
 }
 
+table.datatable-basic td .label.in_approve {
+    background-color: #004d2a;
+}
+
 table.datatable-basic td .label.open {
     background-color: #008e7c;
 }

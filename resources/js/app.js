@@ -760,21 +760,25 @@ $(document).ready(function () {
     // ORDERS BLOCK END
 
     // ORDERS LIST BLOCK BEGIN
-    const modalConfirm = $('#order-closing-confirm-modal'),
+    const modalClosingConfirm = $('#order-closing-confirm-modal'),
+        modalResumedConfirm = $('#order-resume-confirm-modal'),
         orderClosedModal = $('#order-closed-modal'),
+        orderResumedModal = $('#order-resumed-modal'),
         ordersActiveTable = $('#content-active').find('table.datatable-basic.default');
 
     // Change pagination on data-tables
     ordersActiveTable.on('draw.dt', function () {
-        bindClosingOrder(modalConfirm);
+        bindOrderOperation(modalClosingConfirm,'close-order');
+        bindOrderOperation(modalResumedConfirm,'resume-order');
     });
-    bindClosingOrder(modalConfirm);
 
-    modalConfirm.find('button.close-yes').click(function (e) {
+    bindOrderOperation(modalClosingConfirm,'close-order');
+    bindOrderOperation(modalResumedConfirm,'resume-order');
+
+    // Moving order to archive
+    $('button.close-yes').click(function (e) {
         e.preventDefault();
-        modalConfirm.modal('hide');
-        let deleteCell = window.tableRow.find('.close-order-cell');
-
+        modalClosingConfirm.modal('hide');
         $.post(
             closeOrderUrl,
             {
@@ -783,14 +787,62 @@ $(document).ready(function () {
             }
         ).done(() => {
             window.tableRow.find('.label').removeClass('in-progress').addClass('closed').html(archiveLabelText);
-            deleteCell.removeClass('close-order-cell').addClass('empty');
-            deleteCell.find('button').remove();
+
+            let button = window.tableRow.find('.close-order');
+            button.removeClass('close-order').addClass('resume-order');
+            button.find('button span').html(resumeOrderText);
 
             deleteDataTableRows($('#content-active'), window.tableRow, true);
             addDataTableRow($('#content-archive'), window.tableRow, true);
+            bindOrderOperation(modalResumedConfirm,'resume-order');
+
             orderClosedModal.modal('show');
         });
     });
+
+    // Moving order to in approving
+    $('button.resume-yes').click(function (e) {
+        e.preventDefault();
+        modalResumedConfirm.modal('hide');
+        $.post(
+            resumeOrderUrl,
+            {
+                '_token': window.tokenField,
+                'id': orderId,
+            }
+        ).done(() => {
+            window.tableRow.find('.label').removeClass('closed').addClass('in_approve').html(inApproveLabelText);
+
+            window.tableRow.find('.resume-order').remove();
+            // button.removeClass('resume-order').addClass('close-order');
+            // button.find('span').html(closeOrderText);
+
+            window.tableRow.find('.order-cell-edit').removeClass('empty').addClass('icon').append(
+                $('<a></a>').attr({
+                    'title':editOrderText,
+                    'href':editOrderUrl + '?id=' + orderId
+                }).append(
+                    $('<i></i>').addClass('icon-pencil5')
+                )
+            );
+
+            window.tableRow.find('.order-cell-button').removeClass('order-cell-button').addClass('order-cell-delete').append(
+                $('<i></i>').attr({
+                    'title':deleteOrderText,
+                    'modal-data':'delete-modal',
+                    'del-data':orderId
+                }).addClass('icon-close2')
+            );
+
+            deleteDataTableRows($('#content-archive'), window.tableRow, true);
+            addDataTableRow($('#content-approving'), window.tableRow, true);
+            bindOrderOperation(modalClosingConfirm,'close-order');
+            bindDelete();
+
+            orderResumedModal.modal('show');
+        });
+    });
+
     // ORDERS LIST BLOCK END
 
     //CHATS BLOCK BEGIN
@@ -802,7 +854,7 @@ $(document).ready(function () {
             alwaysShowScrollbar: 1
         });
         messagesBlock.mCustomScrollbar('scrollTo','bottom');
-        const inputMessage = newMessageForm.find('input[name=body]');
+        const inputMessage = $('input[name=body]');
 
         inputMessage.keyup(function(e) {
             if (e.keyCode === 13) {
@@ -905,7 +957,6 @@ const getUrl = (form, url, callBack) => {
             if ($(this).is(':checked')) formData.append($(this).attr('name'), $(this).val());
         }
         else {
-            // console.log($(this).attr('name') + '==' + $(this).val());
             formData.append($(this).attr('name'), $(this).val());
         }
     });
@@ -1622,9 +1673,8 @@ const forceOpenOrder = (k) => {
     setBindsAndOpen();
 }
 
-
-const bindClosingOrder = (modalConfirm) => {
-    let buttons = $('.close-order');
+const bindOrderOperation = (modalConfirm, buttonClass) => {
+    let buttons = $('.' + buttonClass);
     buttons.unbind();
     buttons.click(function () {
         window.tableRow = $(this).parents('tr');

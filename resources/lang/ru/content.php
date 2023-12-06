@@ -32,6 +32,7 @@ return [
     'details' => 'Подробнее »',
     'collapse' => 'Свернуть',
     'close' => 'Закрыть',
+    'resume' => 'Возобновить',
     'date' => 'Дата',
     'delete' => 'Удалить',
     'edit' => 'Редактировать',
@@ -55,6 +56,7 @@ return [
     'home_text_block3' => 'Оказывайте помощь и получайте подарки от партнеров платформы',
     'home_text_block4' => 'Создайте заявку на платформе и получите необходимую помощь',
     'order_is_closed' => 'Заявка успешно закрыта!',
+    'order_is_resumed' => 'Заявка успешно возобновлена!',
 
     'more_about_gifts' => 'Подробнее о подарках',
 
@@ -71,6 +73,7 @@ return [
     'you_must_fill_required_fields' => 'Вы должны заполнить все обязательные поля!',
     'do_you_really_want_to_delete_this_order' => 'Вы действительно хотите удалить эту заявку?',
     'do_you_really_want_to_close_this_order' => 'Вы действительно хотите закрыть эту заявку?',
+    'do_you_really_want_to_resume_this_order' => 'Вы действительно хотите возобновить эту заявку?',
     'do_you_really_want_to_withdraw_your_response' => 'Вы действительно хотите отозвать свой отклик?',
     'do_you_really_want_to_unsubscribe' => 'Вы действительно хотите отписаться от этого пользователя?',
     'deleted' => 'Удалено',
@@ -99,9 +102,12 @@ return [
     'new_order_from' => 'Новая заяка от:',
     'add_order_photo' => 'Добавте изображения',
 
+    'in_approve' => 'На модерации',
     'status_0' => 'Закрыта',
     'status_1' => 'Выполняется',
     'status_2' => 'Открыта',
+
+    'new_chat_message' => 'Администрация ресурса приветствует вас!',
 
 //    'in_russian' => ' по русски',
 //    'in_english' => ' по по английски',

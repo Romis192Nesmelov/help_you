@@ -132,6 +132,9 @@ class OrderController extends BaseController
         else {
             OrderUser::create($fields);
             $order = $order->refresh();
+
+            $this->newChatMessage($order);
+
             if ($order->performers->count() >= $order->need_performers) {
                 $order->status = 1;
                 $order->save();
@@ -169,6 +172,7 @@ class OrderController extends BaseController
                 'status' => 2,
                 'approved' => 1
             ];
+            // Statuses: 2 – new; 1 – in progress; 0 – closed
 
             foreach ($steps as $step) {
                 $fields = array_merge($fields,$step);
@@ -178,7 +182,10 @@ class OrderController extends BaseController
             if (!$orderType->subtypes->count()) unset($fields['subtype_id']);
             if ($request->has('id')) {
                 $order = Order::find($request->id);
+
                 $this->authorize('owner', $order);
+                if (!$order->status) return response()->json([],403);
+
                 $order->update($fields);
 
             } else {
@@ -260,6 +267,16 @@ class OrderController extends BaseController
         $order = Order::find($request->id);
         $this->authorize('owner', $order);
         $order->status = 0;
+        $order->save();
+        return response()->json([],200);
+    }
+
+    public function resumeOrder(OrderRequest $request): JsonResponse
+    {
+        $order = Order::find($request->id);
+        $this->authorize('owner', $order);
+        $order->status = 2;
+        $order->approved = 0;
         $order->save();
         return response()->json([],200);
     }

@@ -17,6 +17,8 @@ use Illuminate\View\View;
 
 class ChatsController extends BaseController
 {
+    use HelperTrait;
+
     public function chats(): View
     {
         $this->data['active_left_menu'] = 'messages.chats';
@@ -46,22 +48,7 @@ class ChatsController extends BaseController
         $data['user_id'] = Auth::id();
         $message = Message::create($data);
 
-        if (Auth::id() != $message->order->user_id) {
-            MessageUser::create([
-                'message_id' => $message->id,
-                'user_id' => $message->order->user_id,
-                'order_id' => $message->order_id,
-            ]);
-        }
-        foreach ($message->order->performers as $performer) {
-            if (Auth::id() != $performer->id) {
-                MessageUser::create([
-                    'message_id' => $message->id,
-                    'user_id' => $performer->id,
-                    'order_id' => $message->order_id,
-                ]);
-            }
-        }
+        $this->setNewMessages($message);
 
         broadcast(new ChatMessageEvent($message));
         return response()->json(MessageResource::make($message)->resolve(), 200);
