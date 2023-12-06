@@ -25,26 +25,25 @@
                         </div>
                     @endforeach
                 </div>
-                <form method="post" id="new-message" class="w-100" action="{{ route('messages.new_message') }}">
-                    @csrf
-                    <input type="hidden" name="order_id" value="{{ $order->id }}">
-                    <div class="chat-input">
-                        @include('blocks.input_block',[
-                            'name' => 'body',
-                            'type' => 'text',
-                            'icon' => 'icon-arrow-right6',
-                            'min' => 1,
-                            'max' => 3000,
-                            'ajax' => true
-                        ])
-                    </div>
-                </form>
+                @csrf
+                <input type="hidden" name="order_id" value="{{ $order->id }}">
+                <div class="chat-input">
+                    @include('blocks.input_block',[
+                        'name' => 'body',
+                        'type' => 'text',
+                        'icon' => 'icon-arrow-right6',
+                        'min' => 1,
+                        'max' => 255,
+                        'ajax' => true
+                    ])
+                </div>
             </div>
         </div>
     </div>
 </div>
 <script>
     const orderId = parseInt("{{ $order->id }}"),
+        newMessageUrl  = "{{ route('messages.new_message') }}",
         readMessageUrl = "{{ route('messages.read_message') }}";
 </script>
 @endsection

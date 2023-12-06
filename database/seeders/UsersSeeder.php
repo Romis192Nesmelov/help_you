@@ -13,8 +13,17 @@ class UsersSeeder extends Seeder
      */
     public function run(): void
     {
-        User::factory(10)->create();
         $data = [
+            [
+                'name' => 'Администрация',
+                'family' => 'Ресурса',
+                'born' => '14-07-1976',
+                'phone' => '+7(926)247-77-25',
+                'email' => 'info@need-help.online',
+                'password' => bcrypt('apg192'),
+                'code' => '99-99-99',
+                'active' => 1
+            ],
             [
                 'name' => 'Роман',
                 'family' => 'Несмелов',
@@ -60,5 +69,6 @@ class UsersSeeder extends Seeder
         foreach ($data as $item) {
             User::create($item);
         }
+        User::factory(10)->create();
     }
 }

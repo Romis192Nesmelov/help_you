@@ -795,23 +795,16 @@ $(document).ready(function () {
             alwaysShowScrollbar: 1
         });
         messagesBlock.mCustomScrollbar('scrollTo','bottom');
-        const newMessageForm = $('form#new-message'),
-            inputMessage = newMessageForm.find('input[name=body]');
+        const inputMessage = newMessageForm.find('input[name=body]');
 
-        newMessageForm.bind('submit', function (e) {
-            e.preventDefault();
-            if (inputMessage.val()) {
-                $.post(newMessageForm.attr('action'),
-                    {
-                        '_token': window.tokenField,
-                        'order_id': orderId,
-                        'body': inputMessage.val()
-                    }
-                );
+        inputMessage.keyup(function(e) {
+            if (e.keyCode === 13) {
+                newMessageChat(inputMessage);
             }
         });
+
         $('.chat-input i').click(() => {
-            newMessageForm.submit();
+            newMessageChat(inputMessage);
         });
 
         window.Echo.private('chat_' + orderId).listen('.chat', res => {
@@ -842,11 +835,23 @@ $(document).ready(function () {
             messageBlockCover.append(messageBlock);
             $('#mCSB_2_container').append(messageBlockCover);
             messagesBlock.mCustomScrollbar('scrollTo','bottom');
-            inputMessage.val('');
         });
     }
     //CHATS BLOCK END
 });
+
+const newMessageChat = (inputMessage) => {
+    if (inputMessage.val()) {
+        $.post(newMessageUrl,
+            {
+                '_token': window.tokenField,
+                'order_id': orderId,
+                'body': inputMessage.val()
+            }
+        );
+        inputMessage.val('');
+    }
+}
 
 const bindFancybox = () => {
     // Fancybox init
