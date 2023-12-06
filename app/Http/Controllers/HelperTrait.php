@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
+use http\Env\Request;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Mail;
 
 trait HelperTrait
@@ -50,6 +52,11 @@ trait HelperTrait
     public function unifyPhone($phone): string
     {
         return '+7'.substr($phone,2);
+    }
+
+    public function getSessionKey(FormRequest $request): string
+    {
+        return $request->has('id') && (int)$request->input('id') ? 'edit'.$request->id.'_steps' : 'steps';
     }
 
     public function sendSms($phone, $text)

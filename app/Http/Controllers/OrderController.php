@@ -22,6 +22,8 @@ use Illuminate\View\View;
 
 class OrderController extends BaseController
 {
+    use HelperTrait;
+
     public function newOrder(): View
     {
         $this->getItems('order_types', new OrderType());
@@ -267,10 +269,5 @@ class OrderController extends BaseController
         $orderUser = OrderUser::where('order_id',$request->id)->where('user_id',Auth::id())->first();
         $orderUser->delete();
         return response()->json([],200);
-    }
-
-    private function getSessionKey(FormRequest $request): string
-    {
-        return $request->has('id') && (int)$request->input('id') ? 'edit'.$request->id.'_steps' : 'steps';
     }
 }
