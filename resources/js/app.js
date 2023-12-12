@@ -316,7 +316,7 @@ $(document).ready(function () {
         emailRegExp = /^[a-zA-Z0-9][\-_\.\+\!\#\$\%\&\'\*\/\=\?\^\`\{\|]{0,1}([a-zA-Z0-9][\-_\.\+\!\#\$\%\&\'\*\/\=\?\^\`\{\|]{0,1})*[a-zA-Z0-9]@[a-zA-Z0-9][-\.]{0,1}([a-zA-Z][-\.]{0,1})*[a-zA-Z0-9]\.[a-zA-Z0-9]{1,}([\.\-]{0,1}[a-zA-Z]){0,}[a-zA-Z0-9]{0,}$/gi
 
     window.avatarImage = null;
-    window.avatarSize = 100;
+    window.avatarSize = 0;
     window.avatarHeight = 0;
 
     $.mask.definitions['c'] = "[1-2]";
@@ -512,20 +512,26 @@ $(document).ready(function () {
 
     // Save tune avatar
     $('#save-tune-avatar').click(() => {
-        let posX = (parseInt(window.avatarImage.css('left')) - 150) / 200 * 100 * 0.7,
-            posY = (parseInt(window.avatarImage.css('top')) - 150) / 200 * 100 * 0.7,
-            size = (100 + window.avatarSize);
+        let posX = parseInt(window.avatarImage.css('left')),
+            basePosY = 200 / 2 - window.avatarImage.height() / 2,
+            posY = parseInt(window.avatarImage.css('top')) + basePosY,
+            size = 100 + window.avatarSize;
 
-        if (posX || posY || size) {
-            $('#avatar-block .avatar.cir').css({
-                'background-position-x': posX,
-                'background-position-y': posY,
-                'background-size': size + '%'
-            });
-            $('input[name=avatar_size]').val(size);
-            $('input[name=avatar_position_x]').val(posX);
-            $('input[name=avatar_position_y]').val(posY);
+        console.log(parseInt(window.avatarImage.css('left')));
+
+        if (size !== 100) {
+            posX -= 150;
+            posY -= 150 + basePosY;
         }
+
+        $('#avatar-block .avatar.cir').css({
+            'background-position-x': posX * 0.35,
+            'background-position-y': posY * 0.35,
+            'background-size': size + '%'
+        });
+        $('input[name=avatar_size]').val(size);
+        $('input[name=avatar_position_x]').val(posX);
+        $('input[name=avatar_position_y]').val(posY);
         tuneAvatarModal.modal('hide');
     });
     // ACCOUNT BLOCK END
@@ -854,57 +860,117 @@ $(document).ready(function () {
             alwaysShowScrollbar: 1
         });
         messagesBlock.mCustomScrollbar('scrollTo','bottom');
-        const inputMessage = $('input[name=body]');
+        const inputMessage = $('input[name=body]'),
+            inputMessageFile = $('input[name=image]');
+
+        inputMessageFile.change(function () {
+            let attachedFile = $(this)[0].files[0];
+            if (attachedFile.type.match('image.*')) {
+                let reader = new FileReader();
+                reader.onload = function (e) {
+                    let attachedImageContainer = $('.attached-image');
+                    if (attachedImageContainer.length) {
+                        attachedImageContainer.find('img').attr('src',e.target.result);
+                        $('.error.image').html('');
+                    } else {
+                        $('#mCSB_2_container').append(
+                            $('<div></div>').addClass('attached-image')
+                                .append(
+                                    $('<a></a>').addClass('fancybox').attr('href',e.target.result)
+                                        .append($('<img>').attr('src',e.target.result))
+                                )
+                                .append(
+                                    $('<div></div>').addClass('error image')
+                                )
+                        );
+                    }
+                    setTimeout(() => {
+                        bindFancybox();
+                        messagesBlock.mCustomScrollbar('scrollTo','bottom');
+                    }, 200);
+                };
+                reader.readAsDataURL(attachedFile);
+            } else {
+                inputMessageFile.val('');
+            }
+        });
 
         inputMessage.keyup(function(e) {
             if (e.keyCode === 13) {
-                newMessageChat(inputMessage);
+                newMessageChat(inputMessage, inputMessageFile, messagesBlock);
             }
         });
 
         $('.chat-input i').click(() => {
-            newMessageChat(inputMessage);
+            newMessageChat(inputMessage, inputMessageFile, messagesBlock);
         });
 
         window.Echo.private('chat_' + orderId).listen('.chat', res => {
-            let message = res.message,
+            // console.log(res.message);
+
+            let messageData = res.message,
                 mainContainer = $('#mCSB_2_container'),
                 lastDate = $('.date-block').last().find('.date').html(),
-                messageBlockCover = $('<div></div>').addClass('message-block'),
-                avatar = $('<div></div>').addClass('avatar cir').css('background','url('+ message.avatar +')'),
-                messageBlock = $('<div></div>').addClass('message')
+                avatarBlock = $('<div></div>').addClass('avatar cir').css('background','url('+ messageData.avatar +')'),
+                messageBody = $('<div></div>').addClass('message-block')
+                    .append(avatarBlock)
                     .append(
-                        $('<div></div>').addClass('author').html(message.author).append(
-                            $('<span></span>').html(message.time)
+                        $('<div></div>').addClass('message')
+                            .append(
+                                $('<div></div>').addClass('author').html(messageData.author).append(
+                                    $('<span></span>').html(messageData.time)
+                                )
+                            ).append(
+                            $('<div></div>').html(messageData.body)
                         )
-                    ).append(
-                        $('<div></div>').html(message.body)
                     );
 
-            if (message.date !== lastDate) {
+
+            if (messageData.date !== lastDate) {
                 let dateBlock = $('<div></div>').addClass('date-block').append(
-                    $('<div></div>').addClass('date').html(message.date)
+                    $('<span></span>').addClass('date').html(messageData.date)
                 )
                 mainContainer.append(dateBlock);
             }
 
-            mainContainer.append(messageBlockCover.append(avatar).append(messageBlock));
+            $.each(messageData.avatar_props, function (prop, value) {
+                avatarBlock.css(prop, (prop === 'background-size' ? value : value * 0.2));
+            });
+
+            if (messageData.image) {
+                $('.attached-image').last().append(messageBody);
+            } else {
+                mainContainer.append(messageBody);
+            }
             messagesBlock.mCustomScrollbar('scrollTo','bottom');
         });
     }
     //CHATS BLOCK END
 });
 
-const newMessageChat = (inputMessage) => {
-    if (inputMessage.val()) {
-        $.post(newMessageUrl,
-            {
-                '_token': window.tokenField,
-                'order_id': orderId,
-                'body': inputMessage.val()
+const newMessageChat = (inputMessage, inputMessageFile, messagesBlock) => {
+    if (inputMessage.val() || inputMessageFile.val()) {
+        let formData = new FormData();
+
+        $('.error').html('');
+        formData.append('_token', window.tokenField);
+        formData.append('order_id', parseInt(orderId));
+        formData.append('body', inputMessage.val());
+
+        if (inputMessageFile.val())
+            formData.append('image', inputMessageFile[0].files[0]);
+
+        processingAjax(
+            newMessageUrl,
+            formData,
+            'post',
+            (data) => {
+                inputMessage.val('');
+            },
+            (data) => {
+                messagesBlock.mCustomScrollbar('scrollTo','bottom');
             }
         );
-        inputMessage.val('');
     }
 }
 
@@ -958,6 +1024,19 @@ const getUrl = (form, url, callBack) => {
     });
     submitButton.attr('disabled','disabled');
 
+    processingAjax(
+        url ? url : form.attr('action'),
+        formData,
+        form.attr('method'),
+        (data) => {
+            if (callBack) callBack(data);
+            submitButton.removeAttr('disabled');
+        },
+        (data) => {
+            submitButton.removeAttr('disabled');
+        }
+    );
+
     $.ajax({
         url: url ? url : form.attr('action'),
         data: formData,
@@ -970,22 +1049,40 @@ const getUrl = (form, url, callBack) => {
             submitButton.removeAttr('disabled');
         },
         error: (data) => {
-            let response = jQuery.parseJSON(data.responseText),
-                replaceErr = {
-                    'phone':'телефон',
-                    'email':'E-mail',
-                    'user_name':'имя'
-                };
-
-            $.each(response.errors, function (field, error) {
-                let errorMsg = error[0];
-                $.each(replaceErr, function (src,replace) {
-                    errorMsg = error[0].replace(src,replace);
-                });
-                form.find('input[name='+field+']').addClass('error');
-                form.find('.error.'+field).html(errorMsg);
-            });
+            processingInputsError(data,form);
             submitButton.removeAttr('disabled');
+        }
+    });
+}
+
+const processingAjax = (url, formData, method, successCallback, failCallback) => {
+    $.ajax({
+        url: url,
+        data: formData,
+        processData: false,
+        contentType: false,
+        type: method,
+        cache: false,
+        success: (data) => {
+            if (successCallback) successCallback(data);
+        },
+        error: (data) => {
+            let replaceErr = {
+                'body':'сообщения',
+                'phone':'телефон',
+                'email':'E-mail',
+                'user_name':'имя'
+            };
+
+            $.each(data.responseJSON.errors, function (field, error) {
+                var errorMsg = error[0];
+                $.each(replaceErr, function (src,replace) {
+                    errorMsg = errorMsg.replace(src,replace);
+                });
+                $('input[name='+field+']').addClass('error');
+                $('.error.'+field).html(errorMsg);
+            });
+            if (failCallback) failCallback(data);
         }
     });
 }

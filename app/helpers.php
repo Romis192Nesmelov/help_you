@@ -33,3 +33,15 @@ function getRussianDate($timestamp): string
     ];
     return date('d',$timestamp).' '. $monthList[(int)date('n',$timestamp) - 1] . ' ' . date('Y',$timestamp);
 }
+
+function avatarProps($avatar, $avatarProps, $coof): string
+{
+    $avatarStyles = 'background-image:url('.(asset($avatar ? $avatar : 'images/def_avatar.svg')).');';
+    if ($avatarProps) {
+        foreach ($avatarProps as $prop => $value) {
+            if ($prop != 'background-size') $avatarStyles .= $prop.':'.($value * $coof).';';
+            else $avatarStyles .= $prop.':'.$value.';';
+        }
+    }
+    return $avatarStyles;
+}

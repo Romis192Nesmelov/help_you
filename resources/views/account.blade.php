@@ -79,7 +79,7 @@
         <input type="hidden" name="avatar_position_x">
         <input type="hidden" name="avatar_position_y">
 
-        @include('blocks.left_menu_block')
+        @include('blocks.left_menu_block',['hasChangeAvatar' => true])
         <div class="col-12 col-lg-8">
             <div class="rounded-block tall">
                 <div class="row">

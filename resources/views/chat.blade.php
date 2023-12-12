@@ -3,7 +3,7 @@
 @section('content')
 
 <div class="row">
-    @include('blocks.left_menu_block')
+    @include('blocks.left_menu_block',['hasChangeAvatar' => false])
     <div class="col-12 col-lg-8">
         <div class="rounded-block tall white">
             <h2 class="d-flex justify-content-start">
@@ -15,19 +15,28 @@
             </h2>
             <div class="content-block simple">
                 <div id="messages">
-                    @include('blocks.chat_date_block',['timestamp' => $order->messages[0]->created_at->timestamp])
-                    @foreach ($order->messages as $k => $message)
-                        @if ($k !== 0 && $message->created_at->format('d') != $order->messages[$k-1]->created_at->format('d'))
-                            @include('blocks.chat_date_block',['timestamp' => $message->created_at->timestamp])
-                        @endif
-                        <div class="message-block">
-                            <div class="avatar cir" style="background: url({{ asset($message->user->avatar ?? 'images/def_avatar.svg' ) }})"></div>
-                            <div class="message">
-                                <div class="author">{{ $message->user->name.' '.$message->user->family }}<span>{{ $message->created_at->format('H:m') }}</span></div>
-                                <div>{{ $message->body }}</div>
-                            </div>
-                        </div>
-                    @endforeach
+                    @if ($order->messages->count())
+                        @include('blocks.chat_date_block',['timestamp' => $order->messages[0]->created_at->timestamp])
+                        @foreach ($order->messages as $k => $message)
+                            @if ($k !== 0 && $message->created_at->format('d') != $order->messages[$k-1]->created_at->format('d'))
+                                @include('blocks.chat_date_block',['timestamp' => $message->created_at->timestamp])
+                            @endif
+                            @if ($message->image)
+                                <div class="attached-image">
+                                    <a href="{{ asset($message->image) }}" class="fancybox"><img src="{{ asset($message->image) }}" /></a>
+                                    <div class="message-block">
+                                        @include('blocks.avatar_message_block')
+                                        @include('blocks.message_block')
+                                    </div>
+                                </div>
+                            @else
+                                <div class="message-block">
+                                    @include('blocks.avatar_message_block')
+                                    @include('blocks.message_block')
+                                </div>
+                            @endif
+                        @endforeach
+                    @endif
                 </div>
                 @csrf
                 <input type="hidden" name="order_id" value="{{ $order->id }}">
@@ -40,6 +49,10 @@
                         'max' => 255,
                         'ajax' => true
                     ])
+                    <div class="chat-attach-file">
+                        <i class="icon-attachment"></i>
+                        <input type="file" name="image">
+                    </div>
                 </div>
             </div>
         </div>

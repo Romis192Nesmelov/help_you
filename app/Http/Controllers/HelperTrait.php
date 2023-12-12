@@ -18,12 +18,13 @@ trait HelperTrait
     public string $validationCode = 'required|regex:/^(([0-9]{2})\-([0-9]{2})-([0-9]{2}))$/';
     public string $validationInteger = 'required|integer';
     public string $validationNumeric = 'required|numeric';
-    public string $validationString = 'required|min:3|max:255';
-    public string $validationText = 'nullable|min:5|max:3000';
+    public string $validationString = 'required|min3|max:255';
+    public string $validationText = 'nullable|min:1|max:3000';
     public string $validationLongText = 'required|min:5|max:50000';
     public string $validationColor = 'regex:/^(hsv\((\d+)\,\s(\d+)\%\,\s(\d+)\%\))$/';
     public string $validationSvg = 'required|mimes:svg|max:10';
     public string $validationJpgAndPng = 'mimes:jpg,png|max:2000';
+    public string $validationJpgAndPngSmall = 'mimes:jpg,png|max:300';
     public string $validationJpg = 'mimes:jpg|max:2000';
     public string $validationPng = 'mimes:png|max:2000';
     public string $validationDate = 'regex:/^(\d{2})\/(\d{2})\/(\d{4})$/';

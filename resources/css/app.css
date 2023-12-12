@@ -878,6 +878,18 @@ table.datatable-basic td.empty {
     height: 620px;
 }
 
+#messages .attached-image {
+    width: 50%;
+    margin-bottom: 5px;
+}
+
+#messages .attached-image img {
+    width: 100%;
+    padding: 10px;
+    border-radius: 20px;
+    border: 1px solid grey;
+}
+
 #messages .date-block {
     width: 100%;
     margin-top: 20px;
@@ -908,6 +920,9 @@ table.datatable-basic td.empty {
 
 #messages .message-block .message {
     font-size: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 #messages .message-block .message .author {
@@ -926,13 +941,48 @@ table.datatable-basic td.empty {
     border: 1px solid #e65639;
 }
 
-.rounded-block.tall .content-block.simple .chat-input {
+.chat-input {
     width: 100%;
+    display: flex;
+    justify-content: space-between;
     padding: 20px 0;
 }
 
-.rounded-block.tall .content-block.simple .chat-input i {
+.chat-input i {
     cursor: pointer;
+}
+
+.chat-input .form-group {
+    width: calc(100% - 38px);
+}
+
+.chat-input .chat-attach-file {
+    width: 38px;
+    height: 38px;
+    position: relative;
+    overflow: hidden;
+}
+
+.chat-input .chat-attach-file input {
+    opacity: 0;
+    cursor: pointer;
+    position: absolute;
+    right: 0;
+    filter: opacity(0%);
+}
+
+.chat-input .chat-attach-file i {
+    position: absolute;
+    font-size: 20px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    color: grey;
+}
+
+.chat-input .chat-attach-file:hover i,
+.chat-input i:hover {
+    color: #e65639;
 }
 
 .rounded-block.tall .absolute-bottom {
@@ -1297,6 +1347,10 @@ table.datatable-basic td.empty {
     #selected-points {
         width: 100%;
         margin-left: -105%;
+    }
+
+    #messages .attached-image {
+        width: 100%;
     }
 }
 

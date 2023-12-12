@@ -13,6 +13,7 @@ use App\Models\Order;
 use App\Models\OrderUser;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class ChatsController extends BaseController
@@ -46,12 +47,21 @@ class ChatsController extends BaseController
     {
         $data = $request->validated();
         $data['user_id'] = Auth::id();
-        $message = Message::create($data);
 
+        if ($request->hasFile('image')) {
+            $pathToImage = 'images/messages_images/';
+            do {
+                $imageName = Str::random(32);
+            } while (file_exists(base_path('public/'.$pathToImage.$imageName.'.'.$request->file('image')->getClientOriginalExtension())));
+            $data = $this->processingImage($request, $data,'image', $pathToImage, $imageName);
+        }
+
+        $message = Message::create($data);
         $this->setNewMessages($message);
 
         broadcast(new ChatMessageEvent($message));
         return response()->json(MessageResource::make($message)->resolve(), 200);
+//        return response()->json(['data' => $data], 200);
     }
 
     public function readMessage(ReadMessageRequest $request): JsonResponse

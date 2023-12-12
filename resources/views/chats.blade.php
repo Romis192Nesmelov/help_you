@@ -3,7 +3,7 @@
 @section('content')
 
 <div class="row">
-    @include('blocks.left_menu_block')
+    @include('blocks.left_menu_block',['hasChangeAvatar' => false])
     <div class="col-12 col-lg-8">
         <div class="rounded-block tall">
             <h2>{{ trans('messages.chats') }}</h2>

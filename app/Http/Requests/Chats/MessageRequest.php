@@ -24,8 +24,9 @@ class MessageRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'image' => 'nullable|'.$this->validationJpgAndPngSmall,
             'order_id' => 'required|exists:orders,id',
-            'body' => $this->validationText
+            'body' => 'nullable|min:1|max:255'
         ];
     }
 }

@@ -95,7 +95,7 @@ class AccountController extends BaseController
         foreach (['size','position_x','position_y'] as $avatarProp) {
             $fieldProp = 'avatar_'.$avatarProp;
             $prop = $fields[$fieldProp];
-            if ($prop) $fields['avatar_props']['background-'.str_replace('_','-',$avatarProp)] = $avatarProp == 'size' ? ((int)$prop).'%' : ((float)$prop).'px';
+            if ($prop) $fields['avatar_props']['background-'.str_replace('_','-',$avatarProp)] = $avatarProp == 'size' ? ((int)$prop).'%' : ((float)$prop);
             unset($fields[$fieldProp]);
         }
         $fields = $this->processingImage($request, $fields,'avatar', 'images/avatars/', Auth::id());
