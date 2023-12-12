@@ -18,8 +18,10 @@ class MessageResource extends JsonResource
             'id' => $this->id,
             'body' => $this->body,
             'author_id' => $this->user->id,
+            'avatar' => $this->user->avatar ? asset($this->user->avatar) : asset('images/def_avatar.svg'),
             'author' => $this->user->name.' '.$this->user->family,
-            'created_at' => $this->created_at->format('H:i:s')
+            'date' => getRussianDate($this->created_at->timestamp),
+            'time' => $this->created_at->format('H:m')
         ];
     }
 }

@@ -135,10 +135,13 @@ class OrderController extends BaseController
 
             $this->newChatMessage($order);
 
-            if ($order->performers->count() >= $order->need_performers) {
-                $order->status = 1;
-                $order->save();
-            }
+            $order->status = 1;
+            $order->save();
+
+//            if ($order->performers->count() >= $order->need_performers) {
+//                $order->status = 1;
+//                $order->save();
+//            }
             return response()->json([],200);
         }
     }

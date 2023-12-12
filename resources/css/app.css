@@ -878,37 +878,52 @@ table.datatable-basic td.empty {
     height: 620px;
 }
 
+#messages .date-block {
+    width: 100%;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 14px;
+}
+
+#messages .date-block span.date {
+    padding: 5px 10px;
+    border-radius: 20px;
+    background: #d9d9d9;
+    color: white;
+}
+
 #messages .message-block {
     width: 100%;
-    display: table;
-    padding: 5px;
+    display: flex;
+    justify-content: start;
+    padding: 10px 5px;
+}
+
+#messages .message-block .avatar.cir {
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
 }
 
 #messages .message-block .message {
-    max-width: 70%;
-    min-width: 10px;
-    padding: 10px;
-    font-size: .8em;
-    background-color: #f2ece4;
-    border-radius: 3px;
-    float: left;
-    filter: drop-shadow(1px 1px 0 #000);
+    font-size: 15px;
 }
 
 #messages .message-block .message .author {
     font-size: 13px;
-    font-style: italic;
     font-weight: bold;
 }
 
-#messages .message-block .message .time {
-    font-size: 10px;
+#messages .message-block .message .author span {
+    font-weight: normal;
+    margin-left: 3px;
+    color: grey;
 }
 
-#messages .message-block .message.you {
-    text-align: right;
-    float: right;
-    background-color: #e9d6be;
+.rounded-block.tall.white {
+    background: white;
+    border: 1px solid #e65639;
 }
 
 .rounded-block.tall .content-block.simple .chat-input {

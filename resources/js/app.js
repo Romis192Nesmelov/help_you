@@ -868,31 +868,27 @@ $(document).ready(function () {
 
         window.Echo.private('chat_' + orderId).listen('.chat', res => {
             let message = res.message,
+                mainContainer = $('#mCSB_2_container'),
+                lastDate = $('.date-block').last().find('.date').html(),
                 messageBlockCover = $('<div></div>').addClass('message-block'),
-                messageBlock = $('<div></div>').addClass('message');
+                avatar = $('<div></div>').addClass('avatar cir').css('background','url('+ message.avatar +')'),
+                messageBlock = $('<div></div>').addClass('message')
+                    .append(
+                        $('<div></div>').addClass('author').html(message.author).append(
+                            $('<span></span>').html(message.time)
+                        )
+                    ).append(
+                        $('<div></div>').html(message.body)
+                    );
 
-            if (message.author_id === userId) messageBlock.addClass('you');
-            else {
-                $.post(readMessageUrl,
-                    {
-                        '_token': window.tokenField,
-                        'message_id': message.id,
-                        'order_id': orderId
-                    }
-                );
+            if (message.date !== lastDate) {
+                let dateBlock = $('<div></div>').addClass('date-block').append(
+                    $('<div></div>').addClass('date').html(message.date)
+                )
+                mainContainer.append(dateBlock);
             }
 
-            messageBlock
-                .append(
-                    $('<div></div>').addClass('author').html(message.author)
-                ).append(
-                $('<div></div>').html(message.body)
-            ).append(
-                $('<div></div>').addClass('time').html(message.created_at)
-            );
-
-            messageBlockCover.append(messageBlock);
-            $('#mCSB_2_container').append(messageBlockCover);
+            mainContainer.append(messageBlockCover.append(avatar).append(messageBlock));
             messagesBlock.mCustomScrollbar('scrollTo','bottom');
         });
     }
