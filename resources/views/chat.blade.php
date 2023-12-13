@@ -54,9 +54,11 @@
         <div class="rounded-block tall white pt-4">
             <div class="d-flex justify-content-start align-items-center">
                 <a href="{{ route('messages.chats') }}"><i title="{{ trans('messages.chats') }}" class="icon-arrow-left52 fs-4 me-3"></i></a>
-                <a class="fancybox" href="{{ asset($order->images[0]->image) }}">
-                    <div id="chat-image" class="me-3" style="background: url({{ asset($order->images[0]->image) }})"></div>
-                </a>
+                @if ($order->images->count())
+                    <a class="fancybox" href="{{ asset($order->images[0]->image) }}">
+                        <div id="chat-image" class="me-3" style="background: url({{ asset($order->images[0]->image) }})"></div>
+                    </a>
+                @endif
                 <div>
                     <a data-bs-toggle="modal" data-bs-target="#order-data-modal">
                         {{ trans('messages.chat_head',['order_id' => $order->id,'order_date' => $order->created_at->format('d.m.y'),'order_name' => $order->orderType->name]) }}
