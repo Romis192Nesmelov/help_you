@@ -16,10 +16,10 @@
                             <div class="born">{{ $order->user->born }}</div>
                         </div>
                     </div>
-                    <button id="subscribe-button" type="button" class="btn btn-primary small mt-0">
-                        <i class="icon-bell-check"></i>
-                        <span>{{ trans('content.subscribe') }}</span>
-                    </button>
+{{--                    <button id="subscribe-button" type="button" class="btn btn-primary small mt-0">--}}
+{{--                        <i class="icon-bell-check"></i>--}}
+{{--                        <span>{{ trans('content.subscribe') }}</span>--}}
+{{--                    </button>--}}
                 </div>
                 @if ($order->images->count())
                     <div class="images owl-carousel">
@@ -39,9 +39,9 @@
                     </ul>
                 @endif
                 <p class="mb-1 text-center">{{ trans('content.address') }}: <span class="order-address">{{ $order->address }}</span></p>
-                @if ($order->description_full)
+                @if ($order->description_full || $order->description_short)
                     <p class="small text-center fst-italic mt-2 mb-0">{{ trans('content.description') }}:</p>
-                    <p class="text-center order-description fst-italic mb-1">{{ $order->description_full }}</p>
+                    <p class="text-center order-description fst-italic mb-1">{{ $order->description_full ?? $order->description_short }}</p>
                 @endif
             </div>
         </div>
