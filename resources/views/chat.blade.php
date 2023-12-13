@@ -52,7 +52,7 @@
     @include('blocks.left_menu_block',['hasChangeAvatar' => false])
     <div class="col-12 col-lg-8">
         <div class="rounded-block tall white pt-4">
-            <div class="d-flex justify-content-start align-items-center">
+            <div class="d-flex justify-content-start align-items-center mb-3">
                 <a href="{{ route('messages.chats') }}"><i title="{{ trans('messages.chats') }}" class="icon-arrow-left52 fs-4 me-3"></i></a>
                 @if ($order->images->count())
                     <a class="fancybox" href="{{ asset($order->images[0]->image) }}">
