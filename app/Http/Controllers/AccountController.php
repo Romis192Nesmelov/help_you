@@ -98,7 +98,7 @@ class AccountController extends BaseController
             if ($prop) $fields['avatar_props']['background-'.str_replace('_','-',$avatarProp)] = $avatarProp == 'size' ? ((int)$prop).'%' : ((float)$prop);
             unset($fields[$fieldProp]);
         }
-        $fields = $this->processingImage($request, $fields,'avatar', 'images/avatars/', Auth::id());
+        $fields = $this->processingImage($request, $fields,'avatar', 'images/avatars/', 'avatar'.Auth::id());
         Auth::user()->update($fields);
         return response()->json(['message' => trans('content.save_complete')],200);
     }
