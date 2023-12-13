@@ -852,7 +852,11 @@ $(document).ready(function () {
     // ORDERS LIST BLOCK END
 
     //CHATS BLOCK BEGIN
-    const messagesBlock = $('#messages');
+    const messagesBlock = $('#messages'),
+        orderDataModal = $('#order-data-modal');
+
+    enablePointImagesCarousel(orderDataModal.find('.images'),orderDataModal.find('.image').length > 1);
+
     if (messagesBlock.length) {
         messagesBlock.mCustomScrollbar({
             axis: 'y',
@@ -877,7 +881,7 @@ $(document).ready(function () {
                             $('<div></div>').addClass('attached-image')
                                 .append(
                                     $('<a></a>').addClass('fancybox').attr('href',e.target.result)
-                                        .append($('<img>').attr('src',e.target.result))
+                                        .append($('<img>').attr('src',e.target.result).css('opacity',0.6))
                                 )
                                 .append(
                                     $('<div></div>').addClass('error image')
@@ -901,17 +905,21 @@ $(document).ready(function () {
             }
         });
 
+        inputMessageFile.keyup(function(e) {
+            if (e.keyCode === 13) {
+                newMessageChat(inputMessage, inputMessageFile, messagesBlock);
+            }
+        });
+
         $('.chat-input i').click(() => {
             newMessageChat(inputMessage, inputMessageFile, messagesBlock);
         });
 
         window.Echo.private('chat_' + orderId).listen('.chat', res => {
-            // console.log(res.message);
-
             let messageData = res.message,
                 mainContainer = $('#mCSB_2_container'),
                 lastDate = $('.date-block').last().find('.date').html(),
-                avatarBlock = $('<div></div>').addClass('avatar cir').css('background','url('+ messageData.avatar +')'),
+                avatarBlock = $('<div></div>').addClass('avatar cir').css(getAvatarProps(messageData.avatar,messageData.avatar_props,0.2)),
                 messageBody = $('<div></div>').addClass('message-block')
                     .append(avatarBlock)
                     .append(
@@ -930,15 +938,14 @@ $(document).ready(function () {
                 let dateBlock = $('<div></div>').addClass('date-block').append(
                     $('<span></span>').addClass('date').html(messageData.date)
                 )
-                mainContainer.append(dateBlock);
+                if (lastDate) mainContainer.append(dateBlock);
+                else mainContainer.prepend(dateBlock);
             }
 
-            $.each(messageData.avatar_props, function (prop, value) {
-                avatarBlock.css(prop, (prop === 'background-size' ? value : value * 0.2));
-            });
-
             if (messageData.image) {
-                $('.attached-image').last().append(messageBody);
+                let attachedImage = $('.attached-image').last();
+                attachedImage.find('img').css('opacity',1);
+                attachedImage.append(messageBody);
             } else {
                 mainContainer.append(messageBody);
             }
@@ -1521,15 +1528,8 @@ const showOrder = (point) => {
 
     // Check subscriptions
     let subscribeBellClass = window.subscriptions.includes(user.id) ? 'icon-bell-cross' : 'icon-bell-check',
-        avatarProps = {'background-image':'url('+avatar+')'};
+        posUnreadOrder = window.unreadOrders.indexOf(orderId);
 
-    if (user.avatar_props) {
-        $.each(user.avatar_props, function (prop, value) {
-            avatarProps[prop] = value;
-        });
-    }
-
-    let posUnreadOrder = window.unreadOrders.indexOf(orderId);
     if (posUnreadOrder !== -1) {
         delete window.unreadOrders[posUnreadOrder];
         $.get(
@@ -1549,7 +1549,7 @@ const showOrder = (point) => {
             .append(
                 $('<div></div>').addClass('d-flex align-items-center justify-content-center')
                     .append(
-                        $('<div></div>').addClass('avatar cir').css(avatarProps)
+                        $('<div></div>').addClass('avatar cir').css(getAvatarProps(avatar,user.avatar_props,0.35))
                     ).append(
                     $('<div></div>').css('width',215)
                         .append(
@@ -1786,4 +1786,14 @@ const checkDropDownMenuEmpty = () => {
     if (!window.dropDown.html()) {
         window.rightButtonBlock.find('.dot').remove();
     }
+}
+
+const getAvatarProps = (avatar, props, coof) => {
+    let avatarProps = {'background-image':'url('+avatar+')'};
+    if (props) {
+        $.each(props, function (prop, value) {
+            avatarProps[prop] = (prop === 'background-size' ? value : value * coof);
+        });
+    }
+    return avatarProps;
 }
