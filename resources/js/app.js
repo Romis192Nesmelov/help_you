@@ -868,23 +868,30 @@ $(document).ready(function () {
             inputMessageFile = $('input[name=image]');
 
         inputMessageFile.change(function () {
-            let attachedFile = $(this)[0].files[0];
-            if (attachedFile.type.match('image.*')) {
-                let reader = new FileReader();
+            let attachedFile = $(this)[0].files[0],
+                reader = new FileReader(),
+                attachedImageContainer = $('.attached-image.not-loaded').last();
+
+            if (inputMessageFile.val() && attachedFile.type.match('image.*')) {
                 reader.onload = function (e) {
-                    let attachedImageContainer = $('.attached-image');
                     if (attachedImageContainer.length) {
                         attachedImageContainer.find('img').attr('src',e.target.result);
                         $('.error.image').html('');
                     } else {
                         $('#mCSB_2_container').append(
-                            $('<div></div>').addClass('attached-image')
+                            $('<div></div>').addClass('attached-image not-loaded')
                                 .append(
                                     $('<a></a>').addClass('fancybox').attr('href',e.target.result)
                                         .append($('<img>').attr('src',e.target.result).css('opacity',0.6))
                                 )
                                 .append(
                                     $('<div></div>').addClass('error image')
+                                )
+                                .append(
+                                    $('<i></i>').addClass('icon-close2').click(function () {
+                                        $(this).parents('.attached-image.not-loaded').remove();
+                                        inputMessageFile.val('');
+                                    })
                                 )
                         );
                     }
@@ -896,6 +903,7 @@ $(document).ready(function () {
                 reader.readAsDataURL(attachedFile);
             } else {
                 inputMessageFile.val('');
+                attachedImageContainer.remove();
             }
         });
 
@@ -905,7 +913,7 @@ $(document).ready(function () {
             }
         });
 
-        inputMessageFile.keyup(function(e) {
+        messagesBlock.keyup(function(e) {
             if (e.keyCode === 13) {
                 newMessageChat(inputMessage, inputMessageFile, messagesBlock);
             }
@@ -945,7 +953,9 @@ $(document).ready(function () {
             if (messageData.image) {
                 let attachedImage = $('.attached-image').last();
                 attachedImage.find('img').css('opacity',1);
+                attachedImage.removeClass('not-loaded');
                 attachedImage.append(messageBody);
+                attachedImage.find('i').remove();
             } else {
                 mainContainer.append(messageBody);
             }

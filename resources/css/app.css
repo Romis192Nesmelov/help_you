@@ -898,12 +898,20 @@ table.datatable-basic td.empty {
     width: 50%;
     margin-bottom: 5px;
     border-radius: 20px;
+    position: relative;
     border: 1px solid grey;
 }
 
 #messages .attached-image img {
     width: 100%;
     padding: 10px;
+}
+
+#messages .attached-image i {
+    position: absolute;
+    cursor: pointer;
+    top: 20px;
+    right: 20px;
 }
 
 #messages .date-block {
