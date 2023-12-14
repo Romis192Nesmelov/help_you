@@ -17,7 +17,7 @@ trait HelperTrait
     public string $validationCode = 'required|regex:/^(([0-9]{2})\-([0-9]{2})-([0-9]{2}))$/';
     public string $validationInteger = 'required|integer';
     public string $validationNumeric = 'required|numeric';
-    public string $validationString = 'required|min3|max:255';
+    public string $validationString = 'required|min:3|max:255';
     public string $validationText = 'nullable|min:1|max:3000';
     public string $validationLongText = 'required|min:5|max:50000';
     public string $validationColor = 'regex:/^(hsv\((\d+)\,\s(\d+)\%\,\s(\d+)\%\))$/';

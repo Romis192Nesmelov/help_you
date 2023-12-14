@@ -1053,23 +1053,6 @@ const getUrl = (form, url, callBack) => {
             submitButton.removeAttr('disabled');
         }
     );
-
-    $.ajax({
-        url: url ? url : form.attr('action'),
-        data: formData,
-        processData: false,
-        contentType: false,
-        type: form.attr('method'),
-        cache: false,
-        success: (data) => {
-            if (callBack) callBack(data);
-            submitButton.removeAttr('disabled');
-        },
-        error: (data) => {
-            processingInputsError(data,form);
-            submitButton.removeAttr('disabled');
-        }
-    });
 }
 
 const processingAjax = (url, formData, method, successCallback, failCallback) => {

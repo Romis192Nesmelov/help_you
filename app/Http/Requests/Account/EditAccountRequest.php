@@ -37,7 +37,6 @@ class EditAccountRequest extends FormRequest
         ];
 
         if ($this->hasFile('avatar')) $validationArr['avatar'] = $this->validationJpgAndPng;
-
         return $validationArr;
     }
 }
