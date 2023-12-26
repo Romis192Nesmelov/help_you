@@ -128,6 +128,7 @@ i.icon-close2 {
 
 a:hover,
 td.icon i:hover,
+a:hover .content,
 i.icon-close2:hover {
     color: #f07258 !important;
 }
@@ -596,7 +597,8 @@ button.btn > i {
 }
 
 #selected-points a,
-#selected-points .subscribe-icon:hover {
+#selected-points .subscribe-icon:hover,
+#selected-points .subscribe-icon.icon-bell-cross {
     color: #e65639;
 }
 
@@ -881,14 +883,6 @@ table.datatable-basic td.empty {
     height: 575px;
 }
 
-#chat-image {
-    width: 70px;
-    height: 70px;
-    border-radius: 50%;
-    background-size: cover !important;
-    background-repeat: no-repeat !important;
-}
-
 #messages {
     width: 100%;
     height: 620px;
@@ -929,8 +923,17 @@ table.datatable-basic td.empty {
     color: white;
 }
 
-#messages .message-block {
+#messages .message-row {
     width: 100%;
+    display: flex;
+    justify-content: start;
+}
+
+#messages .message-row.my-self {
+    justify-content: end;
+}
+
+#messages .message-block {
     display: flex;
     justify-content: start;
     padding: 10px;

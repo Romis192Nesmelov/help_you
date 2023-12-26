@@ -3,8 +3,13 @@
         <tr id="row-{{ $item->id }}">
             <td class="id">{{ $item->id }}</td>
             <td>
-                <div class="head">{{ isset($relationHead) ? $item->$relationHead->$headName : $item->$headName }}</div>
-                <div class="content">{{ isset($relationContent) ? $item->$relationContent->$contentName : $item->$contentName }}</div>
+                @if (isset($chatMode) && $chatMode)
+                    <a href="{{ route('messages.chat',['order_id' => $item->id]) }}">
+                        @include('blocks.datatable_head_column_block')
+                    </a>
+                @else
+                    @include('blocks.datatable_head_column_block')
+                @endif
             </td>
 
             @if (isset($editRoute) && isset($statusField) && $statusField && $item[$statusField] > 1)
@@ -50,11 +55,6 @@
                 @include('blocks.del_dt_row_block', [
                     'id' => $item->id,
                     'title' => trans('content.delete')
-                ])
-            @elseif (isset($chatMode) && $chatMode)
-                @include('blocks.chat_dt_row_block',[
-                    'id' => $item->id,
-                    'title' => trans('content.open')
                 ])
             @else
                 <td class="order-cell-delete empty"></td>

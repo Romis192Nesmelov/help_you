@@ -865,48 +865,33 @@ $(document).ready(function () {
         });
         messagesBlock.mCustomScrollbar('scrollTo','bottom');
         const inputMessage = $('input[name=body]'),
-            inputMessageFile = $('input[name=image]');
+            inputMessageFile = $('input[name=image]'),
+            mainContainer = $('#mCSB_2_container'),
+            attachedImageContainer = getAttachedImageContainerNotLoaded();
 
         inputMessageFile.change(function () {
             let attachedFile = $(this)[0].files[0],
-                reader = new FileReader(),
-                attachedImageContainer = $('.attached-image.not-loaded').last();
+                reader = new FileReader();
 
+            // Preview attaching image
             if (inputMessageFile.val() && attachedFile.type.match('image.*')) {
                 reader.onload = function (e) {
                     if (attachedImageContainer.length) {
                         attachedImageContainer.find('img').attr('src',e.target.result);
                         $('.error.image').html('');
                     } else {
-                        $('#mCSB_2_container').append(
-                            $('<div></div>').addClass('attached-image not-loaded')
-                                .append(
-                                    $('<a></a>').addClass('fancybox').attr('href',e.target.result)
-                                        .append($('<img>').attr('src',e.target.result).css('opacity',0.6))
-                                )
-                                .append(
-                                    $('<div></div>').addClass('error image')
-                                )
-                                .append(
-                                    $('<i></i>').addClass('icon-close2').click(function () {
-                                        $(this).parents('.attached-image.not-loaded').remove();
-                                        inputMessageFile.val('');
-                                    })
-                                )
-                        );
+                        attachingImageContainer(mainContainer, messagesBlock, true, true, e.target.result);
                     }
-                    setTimeout(() => {
-                        bindFancybox();
-                        messagesBlock.mCustomScrollbar('scrollTo','bottom');
-                    }, 200);
                 };
                 reader.readAsDataURL(attachedFile);
             } else {
                 inputMessageFile.val('');
-                attachedImageContainer.remove();
+                messageRow.remove();
+                // attachedImageContainer.remove();
             }
         });
 
+        // Send new message
         inputMessage.keyup(function(e) {
             if (e.keyCode === 13) {
                 newMessageChat(inputMessage, inputMessageFile, messagesBlock);
@@ -925,7 +910,6 @@ $(document).ready(function () {
 
         window.Echo.private('chat_' + orderId).listen('.chat', res => {
             let messageData = res.message,
-                mainContainer = $('#mCSB_2_container'),
                 lastDate = $('.date-block').last().find('.date').html(),
                 avatarBlock = $('<div></div>').addClass('avatar cir').css(getAvatarProps(messageData.avatar,messageData.avatar_props,0.2)),
                 messageBody = $('<div></div>').addClass('message-block')
@@ -937,10 +921,9 @@ $(document).ready(function () {
                                     $('<span></span>').html(messageData.time)
                                 )
                             ).append(
-                            $('<div></div>').html(messageData.body)
-                        )
+                                $('<div></div>').html(messageData.body)
+                            )
                     );
-
 
             if (messageData.date !== lastDate) {
                 let dateBlock = $('<div></div>').addClass('date-block').append(
@@ -951,19 +934,69 @@ $(document).ready(function () {
             }
 
             if (messageData.image) {
-                let attachedImage = $('.attached-image').last();
-                attachedImage.find('img').css('opacity',1);
-                attachedImage.removeClass('not-loaded');
-                attachedImage.append(messageBody);
-                attachedImage.find('i').remove();
+                // If attached image already exists
+                let attachedImageContainer = getAttachedImageContainerNotLoaded();
+                if (attachedImageContainer.length) {
+                    attachedImageContainer.find('img').css('opacity',1);
+                    attachedImageContainer.removeClass('not-loaded');
+                    attachedImageContainer.append(messageBody);
+                    attachedImageContainer.find('i').remove();
+                } else {
+                    attachingImageContainer(mainContainer, messagesBlock, false, false, messageData.image);
+                }
             } else {
-                mainContainer.append(messageBody);
+                let messageRow = getMessageRow(myId === messageData.author_id);
+                messageRow.append(messageBody);
+                mainContainer.append(messageRow);
             }
             messagesBlock.mCustomScrollbar('scrollTo','bottom');
         });
     }
     //CHATS BLOCK END
 });
+
+const getMessageRow = (selfFlag) => {
+    let messageRow = $('<div></div>').addClass('message-row');
+    if (selfFlag) messageRow.addClass('my-self');
+    return messageRow;
+}
+
+const getAttachedImageContainerNotLoaded = () => {
+    return $('.attached-image.not-loaded').last();
+}
+
+const attachingImageContainer = (mainContainer, messagesBlock, selfFlag, notLoadedFlag, imgSrc) => {
+    let messageRow = getMessageRow(selfFlag),
+        attachedImageContainer = $('<div></div>').addClass('attached-image');
+
+    attachedImageContainer
+        .append(
+            $('<a></a>').addClass('fancybox').attr('href',imgSrc)
+                .append(
+                    $('<img>').attr('src',imgSrc).css('opacity',(notLoadedFlag ? 0.6 : 1))
+                )
+        );
+
+    if (notLoadedFlag) {
+        attachedImageContainer.addClass('not-loaded');
+        attachedImageContainer.append($('<div></div>').addClass('error image'));
+        attachedImageContainer.append(
+            $('<i></i>').addClass('icon-close2').click(function () {
+                // $(this).parents('.attached-image.not-loaded').remove();
+                messageRow.remove();
+                inputMessageFile.val('');
+            })
+        );
+    }
+
+    messageRow.append(attachedImageContainer);
+    mainContainer.append(messageRow);
+
+    setTimeout(() => {
+        bindFancybox();
+        messagesBlock.mCustomScrollbar('scrollTo','bottom');
+    }, 200);
+}
 
 const newMessageChat = (inputMessage, inputMessageFile, messagesBlock) => {
     if (inputMessage.val() || inputMessageFile.val()) {

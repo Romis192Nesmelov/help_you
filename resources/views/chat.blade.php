@@ -54,21 +54,18 @@
         <div class="rounded-block tall white pt-4">
             <div class="d-flex justify-content-start align-items-center mb-3">
                 <a href="{{ route('messages.chats') }}"><i title="{{ trans('messages.chats') }}" class="icon-arrow-left52 fs-4 me-3"></i></a>
-                @if ($order->images->count())
-                    <a class="fancybox" href="{{ asset($order->images[0]->image) }}">
-                        <div id="chat-image" class="me-3" style="background: url({{ asset($order->images[0]->image) }})"></div>
-                    </a>
-                @endif
                 <div>
-                    <a data-bs-toggle="modal" data-bs-target="#order-data-modal">
-                        {{ trans('messages.chat_head',['order_id' => $order->id,'order_date' => $order->created_at->format('d.m.y'),'order_name' => $order->orderType->name]) }}
-                    </a>
-                    <div class="fs-6">
+                    <b>
                         @if ($order->user_id == auth()->id())
                             @include('blocks.user_name_block',['user' => $order->performers[0]])
                         @else
                             @include('blocks.user_name_block',['user' => $order->user])
                         @endif
+                    </b>
+                    <div class="fs-6">
+                        <a data-bs-toggle="modal" data-bs-target="#order-data-modal">
+                            {{ trans('messages.chat_head',['order_date' => $order->created_at->format('d.m.y'),'order_name' => $order->orderType->name]) }}
+                        </a>
                     </div>
                 </div>
             </div>
@@ -80,20 +77,16 @@
                             @if ($k !== 0 && $message->created_at->format('d') != $order->messages[$k-1]->created_at->format('d'))
                                 @include('blocks.chat_date_block',['timestamp' => $message->created_at->timestamp])
                             @endif
-                            @if ($message->image)
-                                <div class="attached-image">
-                                    <a href="{{ asset($message->image) }}" class="fancybox"><img src="{{ asset($message->image) }}" /></a>
-                                    <div class="message-block">
-                                        @include('blocks.avatar_message_block')
+                            <div class="message-row {{ $message->user_id == auth()->id() ? 'my-self' : '' }}">
+                                @if ($message->image)
+                                    <div class="attached-image">
+                                        <a href="{{ asset($message->image) }}" class="fancybox"><img src="{{ asset($message->image) }}" /></a>
                                         @include('blocks.message_block')
                                     </div>
-                                </div>
-                            @else
-                                <div class="message-block">
-                                    @include('blocks.avatar_message_block')
+                                @else
                                     @include('blocks.message_block')
-                                </div>
-                            @endif
+                                @endif
+                            </div>
                         @endforeach
                     @endif
                 </div>
@@ -119,6 +112,7 @@
 </div>
 <script>
     const orderId = parseInt("{{ $order->id }}"),
+        myId = parseInt("{{ auth()->id() }}"),
         newMessageUrl  = "{{ route('messages.new_message') }}",
         readMessageUrl = "{{ route('messages.read_message') }}";
 </script>

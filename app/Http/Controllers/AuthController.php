@@ -31,7 +31,6 @@ class AuthController extends Controller
 
     public function generateCode(GenerateCodeRequest $request): JsonResponse
     {
-        $request->validated();
         $phone = $this->unifyPhone($request->phone);
         $user = User::where('phone',$phone)->first();
         if (!$user) {
@@ -67,7 +66,6 @@ class AuthController extends Controller
 
     public function resetPassword(ResetPasswordRequest $request): JsonResponse
     {
-        $request->validated();
         $user = User::where('phone',$this->unifyPhone($request->phone))->where('active',1)->first();
         if (!$user) return response()->json(['errors' => ['phone' => [trans('auth.wrong_phone')]]], 401);
         else {

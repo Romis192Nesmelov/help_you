@@ -55,7 +55,6 @@ class AccountController extends BaseController
 
     public function getCode(GetCodeRequest $request): JsonResponse
     {
-        $request->validated();
         Auth::user()->code = $this->generatingCode();
         Auth::user()->save();
         return response()->json(['message' => trans('auth.code').': '.Auth::user()->code],200);
@@ -63,7 +62,6 @@ class AccountController extends BaseController
 
     public function changePhone(ChangePhoneRequest $request): JsonResponse
     {
-        $request->validated();
         if (Auth::user()->code != $request->code) return response()->json(['errors' => ['code' => [trans('auth.wrong_code')]]], 401);
         else {
             Auth::user()->phone = $request->phone;
@@ -74,7 +72,6 @@ class AccountController extends BaseController
 
     public function changePassword(ChangePasswordRequest $request): JsonResponse
     {
-        $request->validated();
         if (!Hash::check($request->old_password, Auth::user()->password))
             return response()->json(['errors' => ['old_password' => [trans('auth.wrong_old_password')]]], 401);
         else {
