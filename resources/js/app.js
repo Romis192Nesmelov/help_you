@@ -866,28 +866,34 @@ $(document).ready(function () {
         messagesBlock.mCustomScrollbar('scrollTo','bottom');
         const inputMessage = $('input[name=body]'),
             inputMessageFile = $('input[name=image]'),
-            mainContainer = $('#mCSB_2_container'),
-            attachedImageContainer = getAttachedImageContainerNotLoaded();
+            mainContainer = $('#mCSB_2_container');
 
         inputMessageFile.change(function () {
-            let attachedFile = $(this)[0].files[0],
+            let attachedImageContainer = getAttachedImageContainerNotLoaded(),
+                attachedFile = $(this)[0].files[0],
                 reader = new FileReader();
 
             // Preview attaching image
-            if (inputMessageFile.val() && attachedFile.type.match('image.*')) {
+            if (inputMessageFile.val() && (attachedFile.type === 'image/jpeg' || attachedFile.type === 'image/png')) {
                 reader.onload = function (e) {
                     if (attachedImageContainer.length) {
                         attachedImageContainer.find('img').attr('src',e.target.result);
                         $('.error.image').html('');
                     } else {
-                        attachingImageContainer(mainContainer, messagesBlock, true, true, e.target.result);
+                        attachingImageContainer(
+                            mainContainer,
+                            messagesBlock,
+                            inputMessageFile,
+                            true,
+                            true,
+                            e.target.result
+                        );
                     }
                 };
                 reader.readAsDataURL(attachedFile);
             } else {
                 inputMessageFile.val('');
-                messageRow.remove();
-                // attachedImageContainer.remove();
+                removeLastMessageRowWithPreviewImage();
             }
         });
 
@@ -908,6 +914,7 @@ $(document).ready(function () {
             newMessageChat(inputMessage, inputMessageFile, messagesBlock);
         });
 
+        // Receiving new message
         window.Echo.private('chat_' + orderId).listen('.chat', res => {
             let messageData = res.message,
                 lastDate = $('.date-block').last().find('.date').html(),
@@ -925,6 +932,7 @@ $(document).ready(function () {
                             )
                     );
 
+            // Set global date
             if (messageData.date !== lastDate) {
                 let dateBlock = $('<div></div>').addClass('date-block').append(
                     $('<span></span>').addClass('date').html(messageData.date)
@@ -933,19 +941,24 @@ $(document).ready(function () {
                 else mainContainer.prepend(dateBlock);
             }
 
+            // Removing last message row if that contains not-attached image
+            if (myId === messageData.author_id) {
+                inputMessageFile.val('');
+                removeLastMessageRowWithPreviewImage();
+            }
+
             if (messageData.image) {
-                // If attached image already exists
-                let attachedImageContainer = getAttachedImageContainerNotLoaded();
-                if (attachedImageContainer.length) {
-                    attachedImageContainer.find('img').css('opacity',1);
-                    attachedImageContainer.removeClass('not-loaded');
-                    attachedImageContainer.append(messageBody);
-                    attachedImageContainer.find('i').remove();
-                } else {
-                    attachingImageContainer(mainContainer, messagesBlock, false, false, messageData.image);
-                }
+                let attachedImageContainer = attachingImageContainer(
+                    mainContainer,
+                    messagesBlock,
+                    inputMessageFile,
+                    myId === messageData.author_id,
+                    false,
+                    messageData.image
+                );
+                attachedImageContainer.append(messageBody);
             } else {
-                let messageRow = getMessageRow(myId === messageData.author_id);
+                let messageRow = getNewMessageRow(myId === messageData.author_id);
                 messageRow.append(messageBody);
                 mainContainer.append(messageRow);
             }
@@ -955,18 +968,25 @@ $(document).ready(function () {
     //CHATS BLOCK END
 });
 
-const getMessageRow = (selfFlag) => {
+const getNewMessageRow = (selfFlag) => {
     let messageRow = $('<div></div>').addClass('message-row');
     if (selfFlag) messageRow.addClass('my-self');
     return messageRow;
+}
+
+const removeLastMessageRowWithPreviewImage = () => {
+    let attachedImageContainer = getAttachedImageContainerNotLoaded();
+    if (attachedImageContainer.length) {
+        attachedImageContainer.parents('.message-row').remove();
+    }
 }
 
 const getAttachedImageContainerNotLoaded = () => {
     return $('.attached-image.not-loaded').last();
 }
 
-const attachingImageContainer = (mainContainer, messagesBlock, selfFlag, notLoadedFlag, imgSrc) => {
-    let messageRow = getMessageRow(selfFlag),
+const attachingImageContainer = (mainContainer, messagesBlock, inputMessageFile, selfFlag, notLoadedFlag, imgSrc) => {
+    let messageRow = getNewMessageRow(selfFlag),
         attachedImageContainer = $('<div></div>').addClass('attached-image');
 
     attachedImageContainer
@@ -996,6 +1016,8 @@ const attachingImageContainer = (mainContainer, messagesBlock, selfFlag, notLoad
         bindFancybox();
         messagesBlock.mCustomScrollbar('scrollTo','bottom');
     }, 200);
+
+    return attachedImageContainer;
 }
 
 const newMessageChat = (inputMessage, inputMessageFile, messagesBlock) => {
