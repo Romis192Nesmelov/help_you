@@ -950,31 +950,33 @@ table.datatable-basic td.empty {
     justify-content: end;
 }
 
-#messages .message-block {
+#messages .message-row .message-block {
+    max-width: 90%;
     display: flex;
     justify-content: start;
     padding: 10px;
 }
 
-#messages .message-block .avatar.cir {
+#messages .message-row .message-block .avatar.cir {
     width: 40px;
     height: 40px;
     margin-right: 10px;
 }
 
-#messages .message-block .message {
+#messages .message-row .message-block .message {
+    max-width: calc(100% - 50px);
     font-size: 15px;
     display: flex;
     flex-direction: column;
     justify-content: center;
 }
 
-#messages .message-block .message .author {
+#messages .message-row .message-block .message .author {
     font-size: 13px;
     font-weight: bold;
 }
 
-#messages .message-block .message .author span {
+#messages .message-row .message-block .message .author span {
     font-weight: normal;
     margin-left: 3px;
     color: grey;
@@ -1418,7 +1420,7 @@ table.datatable-basic td.empty {
         padding: 5px;
     }
 
-    #messages .message-block .message {
+    #messages .message-row .message-block .message {
         max-width: 98%;
     }
 }
