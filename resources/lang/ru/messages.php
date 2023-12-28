@@ -2,6 +2,7 @@
 
 return [
     'chats' => 'Сообщения',
+    'message' => 'Сообщение...',
     'my_orders' => 'Мои заявки',
     'im_performer' => 'Я исполнитель',
     'chat_head' => ':order_name от :order_date',

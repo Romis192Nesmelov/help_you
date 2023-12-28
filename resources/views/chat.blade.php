@@ -31,11 +31,9 @@
                     </div>
                 @endif
                 <h2 class="order-type text-center mt-3 mb-1">{{ $order->orderType->name }}</h2>
-                @if ($order->orderType->subtypesActive->count())
+                @if ($order->subtype_id)
                     <ul class="subtypes">
-                        @foreach ($order->orderType->subtypesActive as $subtype)
-                            <li>{{ $subtype->name }}</li>
-                        @endforeach
+                        <li>{{ $order->subType->name }}</li>
                     </ul>
                 @endif
                 <p class="mb-1 text-center">{{ trans('content.address') }}: <span class="order-address">{{ $order->address }}</span></p>
@@ -53,7 +51,7 @@
     <div class="col-12 col-lg-8">
         <div class="rounded-block tall white pt-4">
             <div class="d-flex justify-content-start align-items-center mb-3">
-                <a href="{{ route('messages.chats') }}"><i title="{{ trans('messages.chats') }}" class="icon-arrow-left52 fs-4 me-3"></i></a>
+                <a href="{{ route('messages.chats') }}"><i title="{{ trans('messages.chats') }}" class="icon-arrow-left8 fs-4 me-3"></i></a>
                 <div>
                     <b>
                         @if ($order->user_id == auth()->id())
@@ -93,18 +91,17 @@
                 @csrf
                 <input type="hidden" name="order_id" value="{{ $order->id }}">
                 <div class="chat-input">
-                    @include('blocks.input_block',[
+                    <div class="chat-attach-file">
+                        <i class="icon-camera"></i>
+                        <input type="file" name="image">
+                    </div>
+                    @include('blocks.textarea_block',[
                         'name' => 'body',
-                        'type' => 'text',
-                        'icon' => 'icon-arrow-right6',
-                        'min' => 1,
+                        'icon' => 'icon-circle-right2',
+                        'placeholder' => trans('messages.message'),
                         'max' => 255,
                         'ajax' => true
                     ])
-                    <div class="chat-attach-file">
-                        <i class="icon-attachment"></i>
-                        <input type="file" name="image">
-                    </div>
                 </div>
             </div>
         </div>

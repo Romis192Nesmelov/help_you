@@ -864,7 +864,7 @@ $(document).ready(function () {
             alwaysShowScrollbar: 1
         });
         messagesBlock.mCustomScrollbar('scrollTo','bottom');
-        const inputMessage = $('input[name=body]'),
+        const inputMessage = $('textarea[name=body]'),
             inputMessageFile = $('input[name=image]'),
             mainContainer = $('#mCSB_2_container');
 
@@ -898,14 +898,16 @@ $(document).ready(function () {
         });
 
         // Send new message
-        inputMessage.keyup(function(e) {
+        inputMessage.keydown(function(e) {
             if (e.keyCode === 13) {
+                e.preventDefault();
                 newMessageChat(inputMessage, inputMessageFile, messagesBlock);
             }
         });
 
-        messagesBlock.keyup(function(e) {
+        messagesBlock.keydown(function(e) {
             if (e.keyCode === 13) {
+                e.preventDefault();
                 newMessageChat(inputMessage, inputMessageFile, messagesBlock);
             }
         });

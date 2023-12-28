@@ -208,6 +208,18 @@ table {
     color: grey;
 }
 
+.form-group.text-area.has-icon textarea {
+    padding-right: 50px;
+}
+
+.form-group.text-area i {
+    top: 50%;
+    transform: translateY(calc(-50% - 5px));
+    margin: 0;
+    font-size: 25px;
+    color: #b4b4b4;
+}
+
 .form-group.has-label i {
     margin-top: 33px;
 }
@@ -216,6 +228,10 @@ table {
 .form-group select,
 .form-group textarea {
     border-radius: 20px;
+}
+
+.form-group textarea {
+    overflow: hidden;
 }
 
 .form-group textarea[name=description_short] {
@@ -885,7 +901,8 @@ table.datatable-basic td.empty {
 
 #messages {
     width: 100%;
-    height: 620px;
+    height: 598px;
+    background: url("../../public/images/shadow.png") repeat-x top left;
 }
 
 #messages .attached-image {
@@ -965,13 +982,15 @@ table.datatable-basic td.empty {
 
 .rounded-block.tall.white {
     background: white;
-    border: 1px solid #e65639;
+    border: 2px solid #F2F2F2;
 }
 
 .chat-input {
     width: 100%;
+    height: 60px;
     display: flex;
     justify-content: space-between;
+    align-items: center;
     padding: 20px 0;
 }
 
@@ -981,6 +1000,11 @@ table.datatable-basic td.empty {
 
 .chat-input .form-group {
     width: calc(100% - 38px);
+}
+
+.chat-input .form-group textarea {
+    height: 60px;
+    border-radius: 10px;
 }
 
 .chat-input .chat-attach-file {
@@ -1000,11 +1024,11 @@ table.datatable-basic td.empty {
 
 .chat-input .chat-attach-file i {
     position: absolute;
-    font-size: 20px;
+    font-size: 22px;
     top: 50%;
     left: 50%;
     transform: translate(-50%,-50%);
-    color: grey;
+    color: #a2a1a1;
 }
 
 .chat-input .chat-attach-file:hover i,
@@ -1062,7 +1086,7 @@ table.datatable-basic td.empty {
     position: relative;
     padding: 0 54px 30px 54px;
     margin-bottom: 30px;
-    border-bottom: 1px solid #ced4da;
+    border-bottom: 1px solid #F2F2F2;
     display: flex;
     align-items: center;
     justify-content: left;
@@ -1151,7 +1175,7 @@ table.datatable-basic td.empty {
     border-radius: 7px;
     margin-bottom: 30px;
     background-color: white;
-    border: 1px solid #ced4da;
+    border: 1px solid #F2F2F2;
 }
 
 .progress-bar {
@@ -1234,7 +1258,7 @@ table.datatable-basic td.empty {
     }
 
     #messages {
-        height: 490px;
+        height: 468px;
     }
 }
 
@@ -1358,7 +1382,7 @@ table.datatable-basic td.empty {
     }
 
     #messages {
-        height: 620px;
+        height: 598px;
     }
 }
 
