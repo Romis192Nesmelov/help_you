@@ -1887,7 +1887,7 @@ const checkDropDownMenuNotEmpty = () => {
             bellRing(0);
         }
     }, 200);
-    
+
     audio.muted = false;
     audio.play();
 }
