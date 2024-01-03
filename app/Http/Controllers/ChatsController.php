@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Events\ChatMessageEvent;
 use App\Http\Requests\Chats\ChatRequest;
-use App\Http\Requests\Chats\ReadMessageRequest;
 use App\Http\Resources\Message\MessageResource;
 use App\Models\Message;
 use App\Http\Requests\Chats\MessageRequest;
@@ -34,12 +33,7 @@ class ChatsController extends BaseController
     {
         $this->data['active_left_menu'] = 'messages.chats';
         $this->data['order'] = Order::find($request->input('order_id'));
-        if ($unreadMessages = MessageUser::where('order_id',$this->data['order']->id)->where('user_id',Auth::id())->where('read',null)->get()) {
-            foreach ($unreadMessages as $unreadMessage) {
-                $unreadMessage->read = true;
-                $unreadMessage->save();
-            }
-        }
+		$this->setReadAllMessagesInChatForUser($this->data['order']->id);
         return $this->showView('chat');
     }
 
@@ -60,23 +54,21 @@ class ChatsController extends BaseController
         $this->setNewMessages($message);
 
         broadcast(new ChatMessageEvent($message));
+
         return response()->json(MessageResource::make($message)->resolve(), 200);
 //        return response()->json(['data' => $data], 200);
     }
 
-    public function readMessage(ReadMessageRequest $request): JsonResponse
+    public function readMessage(ChatRequest $request): JsonResponse
     {
-        if ($unreadMessage = MessageUser::where('message_id', $request->input('message_id'))->where('user_id',Auth::id())->first()) {
-            $unreadMessage->read = true;
-            $unreadMessage->save();
-        }
+        $this->setReadAllMessagesInChatForUser($request->input('order_id'));
         return response()->json([],200);
     }
 
     public function getUnreadMessages(): JsonResponse
     {
         $unreadMessagesCounters = [];
-        if ($unreadMessages = MessageUser::where('user_id',Auth::id())->where('read',0)->orderBy('order_id')->get()) {
+        if ($unreadMessages = MessageUser::where('user_id',Auth::id())->where('read',null)->orderBy('order_id')->get()) {
             foreach ($unreadMessages as $unreadMessage) {
                 if (!isset($unreadMessagesCounters['order'.$unreadMessage->order_id])) {
                     $unreadMessagesCounters['order'.$unreadMessage->order_id] = 1;
@@ -84,5 +76,10 @@ class ChatsController extends BaseController
             }
         }
         return response()->json(['unread' => $unreadMessagesCounters],200);
+    }
+
+    private function setReadAllMessagesInChatForUser(int $orderId): void
+    {
+        MessageUser::where('order_id',$orderId)->where('user_id',Auth::id())->where('read',null)->update(['read' => true]);
     }
 }

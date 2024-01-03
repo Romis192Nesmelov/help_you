@@ -109,7 +109,6 @@
 </div>
 <script>
     const orderId = parseInt("{{ $order->id }}"),
-        myId = parseInt("{{ auth()->id() }}"),
         newMessageUrl  = "{{ route('messages.new_message') }}",
         readMessageUrl = "{{ route('messages.read_message') }}";
 </script>

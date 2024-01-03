@@ -231,6 +231,7 @@
 @endif
 
 <script>
+    window.orderId = null;
     const userId = parseInt("{{ auth()->check() }}") ? parseInt("{{ auth()->id() }}") : null,
         accountUrl = "{{ route('account.change') }}",
         getSubscriptionsUrl = "{{ route('order.get_subscriptions_news') }}",

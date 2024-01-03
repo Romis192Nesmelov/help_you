@@ -84,6 +84,7 @@ class AccountController extends BaseController
     public function editAccount(EditAccountRequest $request): JsonResponse
     {
         $fields = $request->validated();
+        $fields = $this->processingSpecialField($fields, 'mail_notice');
         $birthday = Carbon::parse($fields['born']);
         $currentDate = Carbon::now();
         $age = $currentDate->diffInYears($birthday);

@@ -93,6 +93,12 @@
                                 'value' => auth()->user()->$accountItem
                             ])
                         @endforeach
+                        @include('blocks.checkbox_block',[
+                            'checked' => auth()->user()->mail_notice,
+                            'name' => 'mail_notice',
+                            'label' => trans('account.receive_email_notices'),
+                            'ajax' => true
+                        ])
                         <p id="phone-number" class="mt-3 mb-0 text-center">{{ trans('auth.phone').': '.auth()->user()->phone }}</p>
                         @include('blocks.button_block',[
                             'primary' => false,

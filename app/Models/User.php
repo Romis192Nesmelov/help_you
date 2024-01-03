@@ -32,6 +32,7 @@ class User extends Authenticatable
         'password',
         'code',
         'info_about',
+        'mail_notice',
         'active'
     ];
 

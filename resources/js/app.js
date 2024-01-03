@@ -115,7 +115,29 @@ $(document).ready(function () {
     });
 
     // Getting news for dropdown
-    if (userId) getNews();
+    if (userId) {
+        getNews();
+
+        // Receiving new notices
+        window.Echo.private('notice_' + userId).listen('.notice', res => {
+            if (res.notice === 'message' && (!orderId || orderId !== res.order_id)) {
+                let unreadMessageRow = $('#unread-message-' + res.order_id);
+
+                checkDropDownMenuNotEmpty();
+                if (unreadMessageRow.length) {
+                    let unreadMessagesCounter = unreadMessageRow.find('span.counter'),
+                        unreadMessagesValue = parseInt(unreadMessagesCounter.html());
+
+                    unreadMessagesValue++;
+                    unreadMessagesCounter.html(unreadMessagesValue);
+                } else {
+                    appendDropdownUnreadMessageRow(res.order_id, 1);
+                }
+            } else if (res.notice === 'new_order') {
+                appendDropdownUnreadOrder(res.order_id, res.user_name);
+            }
+        });
+    }
     // MAIN BLOCK END
 
     // AUTH BLOCK BEGIN
@@ -180,7 +202,6 @@ $(document).ready(function () {
                         if (data.url) window.location.href = data.url;
                     }
                 );
-
                 //Getting news
                 getNews();
             } else {
@@ -918,6 +939,14 @@ $(document).ready(function () {
 
         // Receiving new message
         window.Echo.private('chat_' + orderId).listen('.chat', res => {
+            $.post(readMessageUrl, {
+                '_token': window.tokenField,
+                'order_id': orderId,
+            }, () => {
+                window.dropDown.find('li.unread-messages').remove();
+                if (!window.dropDown.find('li').length) window.rightButtonBlock.find('.dot').remove();
+            });
+
             let messageData = res.message,
                 lastDate = $('.date-block').last().find('.date').html(),
                 avatarBlock = $('<div></div>').addClass('avatar cir').css(getAvatarProps(messageData.avatar,messageData.avatar_props,0.2)),
@@ -944,7 +973,7 @@ $(document).ready(function () {
             }
 
             // Removing last message row if that contains not-attached image
-            if (myId === messageData.author_id) {
+            if (userId === messageData.author_id) {
                 inputMessageFile.val('');
                 removeLastMessageRowWithPreviewImage();
             }
@@ -954,13 +983,13 @@ $(document).ready(function () {
                     mainContainer,
                     messagesBlock,
                     inputMessageFile,
-                    myId === messageData.author_id,
+                    userId === messageData.author_id,
                     false,
                     messageData.image
                 );
                 attachedImageContainer.append(messageBody);
             } else {
-                let messageRow = getNewMessageRow(myId === messageData.author_id);
+                let messageRow = getNewMessageRow(userId === messageData.author_id);
                 messageRow.append(messageBody);
                 mainContainer.append(messageRow);
             }
@@ -1324,19 +1353,13 @@ const getNews = () => {
     window.dropDown.html('');
 
     $.get(getUnreadMessages).done((data) => {
-        $.each(data.unread, function (id, counter) {
-            let orderId = parseInt(id.replace('order',''));
-            window.dropDown.append(
-                $('<li></li>').attr('id','unread-order-' + orderId).append(
-                    $('<div></div>')
-                        .append(
-                            $('<span></span>').html(counter + ' ' + unreadMessages + '<br>')
-                        ).append(
-                        $('<a></a>').attr('href', chatUrl+'/?order_id='+orderId).html(inChatNumber + orderId)
-                    )
-                ).append('<hr>')
-            );
-        });
+        if (data.unread.length !== 0) {
+            checkDropDownMenuNotEmpty();
+            $.each(data.unread, function (id, counter) {
+                let orderId = parseInt(id.replace('order',''));
+                appendDropdownUnreadMessageRow(orderId, counter);
+            });
+        }
     });
 
     $.get(getSubscriptionsUrl).done((data) => {
@@ -1344,20 +1367,41 @@ const getNews = () => {
             checkDropDownMenuNotEmpty();
             $.each(data.subscriptions, function (k,subscription) {
                 $.each(subscription.unread_orders, function (k,unreadOrder) {
-                    window.dropDown.append(
-                        $('<li></li>').attr('id','unread-order-' + unreadOrder.order.id).append(
-                            $('<div></div>')
-                                .append(
-                                    $('<a></a>').attr('href', ordersUrl+'/?id='+unreadOrder.order.id).html(newOrderFrom + '<br>')
-                                ).append(
-                                    $('<span></span>').html(unreadOrder.order.user.name + ' ' + unreadOrder.order.user.family)
-                                )
-                        ).append('<hr>')
-                    );
+                    appendDropdownUnreadOrder(unreadOrder.order.id, unreadOrder.order.user.name + ' ' + unreadOrder.order.user.family);
                 });
             });
         }
     });
+}
+
+const appendDropdownUnreadMessageRow = (orderId, counter) => {
+    window.dropDown.append(
+        $('<li></li>').attr('id','unread-message-' + orderId).addClass('unread-messages').append(
+            $('<div></div>')
+                .append(
+                    $('<span></span>').html(unreadMessages)
+                ).append(
+                    $('<span></span>').addClass('counter').html(counter)
+                ).append(
+                    $('<br/>')
+                ).append(
+                $('<a></a>').attr('href', chatUrl+'/?order_id='+orderId).html(inChatNumber + orderId)
+            )
+        ).append('<hr>')
+    );
+}
+
+const appendDropdownUnreadOrder = (orderId, userName) => {
+    window.dropDown.append(
+        $('<li></li>').attr('id','unread-order-' + orderId).addClass('unread-subscriptions').append(
+            $('<div></div>')
+                .append(
+                    $('<a></a>').attr('href', ordersUrl+'/?id=' + orderId).html(newOrderFrom + '<br>')
+                ).append(
+                $('<span></span>').html(userName)
+            )
+        ).append('<hr>')
+    );
 }
 
 const imagePreview = (container, defImage, callBack) => {
@@ -1830,6 +1874,29 @@ const checkDropDownMenuNotEmpty = () => {
     if (!window.rightButtonBlock.find('.dot').length) window.rightButtonBlock.append(
         $('<span></span>').addClass('dot')
     );
+
+    let degrees = 15,
+        counter = 0,
+        audio = new Audio('/sounds/so-proud-notification.mp3'),
+        bellRinging = setInterval(() => {
+        degrees *= -1;
+        bellRing(degrees);
+        counter++;
+        if (counter > 5) {
+            clearInterval(bellRinging);
+            bellRing(0);
+        }
+    }, 200);
+    
+    audio.muted = false;
+    audio.play();
+}
+
+const bellRing = (degrees) => {
+    window.rightButtonBlock.css({'-webkit-transform' : 'rotate('+ degrees +'deg)',
+        '-moz-transform' : 'rotate('+ degrees +'deg)',
+        '-ms-transform' : 'rotate('+ degrees +'deg)',
+        'transform' : 'rotate('+ degrees +'deg)'});
 }
 
 const checkDropDownMenuEmpty = () => {

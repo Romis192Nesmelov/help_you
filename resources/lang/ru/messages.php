@@ -7,6 +7,6 @@ return [
     'im_performer' => 'Я исполнитель',
     'chat_head' => ':order_name от :order_date',
     'participants' => 'Участники',
-    'unread_messages' => 'непрочитанных сообщений',
+    'unread_messages' => 'Новых сообщений: ',
     'in_chat_number' => 'в чате по заявке №',
 ];

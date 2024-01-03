@@ -33,7 +33,8 @@ class EditAccountRequest extends FormRequest
             'family' => $this->validationString,
             'born' => $this->validationBorn,
             'email' => 'nullable|email|unique:users,email,'.Auth::id(),
-            'info_about' => $this->validationText
+            'info_about' => $this->validationText,
+            'mail_notice' => 'nullable'
         ];
 
         if ($this->hasFile('avatar')) $validationArr['avatar'] = $this->validationJpgAndPng;

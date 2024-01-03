@@ -1,12 +1,14 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Events\NotificationEvent;
+use App\Jobs\SendMessage;
 use App\Models\Message;
 use App\Models\MessageUser;
 use App\Models\Order;
+use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Mail;
 
 trait HelperTrait
 {
@@ -28,25 +30,16 @@ trait HelperTrait
     public string $validationPng = 'mimes:png|max:2000';
     public string $validationDate = 'regex:/^(\d{2})\/(\d{2})\/(\d{4})$/';
 
-//    public function getCutTableName(Model $item) :string
-//    {
-//        return substr($item->getTable(),0,-1);
-//    }
-
-//    public function sendMessage($email, $fields, $template, $pathToFile=null): void
-//    {
-//        Mail::send('emails.'.$template, ['fields' => $fields], function($message) use ($email, $fields, $pathToFile) {
-//            $message->subject(trans('admin.message_from'));
-//            $message->from(env('MAIL_TO'), 'Help you?');
-//            $message->to($email);
-//            if ($pathToFile) $message->attach($pathToFile);
-//        });
-//    }
-
 //    public function saveCompleteMessage(): void
 //    {
 //        session()->flash('message', trans('content.save_complete'));
 //    }
+
+    public function processingSpecialField($fields, $specFieldName): array
+    {
+        if (isset($fields[$specFieldName]) && $fields[$specFieldName] == 'on') $fields[$specFieldName] = 1;
+        return $fields;
+    }
 
     public function generatingCode(): string
     {
@@ -83,6 +76,8 @@ trait HelperTrait
                 'user_id' => $message->order->user_id,
                 'order_id' => $message->order_id,
             ]);
+            broadcast(new NotificationEvent('message', $message->order_id, $message->order->user_id));
+            $this->mailNotice($message->order, $message->order->userCredentials, 'new_message_notice');
         }
         foreach ($message->order->performers as $performer) {
             if (Auth::id() != $performer->id) {
@@ -91,6 +86,8 @@ trait HelperTrait
                     'user_id' => $performer->id,
                     'order_id' => $message->order_id,
                 ]);
+                broadcast(new NotificationEvent('message', $message->order_id, $performer->id));
+                $this->mailNotice($message->order, $performer, 'new_message_notice');
             }
         }
     }
@@ -115,5 +112,17 @@ trait HelperTrait
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         return json_decode(curl_exec($ch));
+    }
+
+    public function sendMessage(string $template, string $mailTo, string|null $cc, array $fields, string|null $pathToFile=null)
+    {
+        dispatch(new SendMessage($template, $mailTo, null, $fields));
+    }
+
+    private function mailNotice(Order $order, User $user, string $template): void
+    {
+        if ($user->email && $user->mail_notice) {
+            $this->sendMessage($template, $user->email, null, ['order' => $order]);
+        }
     }
 }

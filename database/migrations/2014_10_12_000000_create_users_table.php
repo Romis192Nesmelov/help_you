@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('code',8)->nullable();
             $table->string('password')->nullable();
             $table->text('info_about')->nullable();
+            $table->boolean('mail_notice')->nullable();
             $table->boolean('active')->nullable();
             $table->rememberToken();
             $table->timestamps();
