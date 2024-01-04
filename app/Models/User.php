@@ -142,4 +142,9 @@ class User extends Authenticatable
     {
         return Carbon::parse($this->born)->age;
     }
+
+    public function ratings(): HasMany
+    {
+        return $this->hasMany(Rating::class);
+    }
 }

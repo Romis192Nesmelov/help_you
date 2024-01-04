@@ -30,7 +30,19 @@
 </x-modal>
 
 <x-modal id="order-closed-modal" head="{{ trans('content.order_is_closed') }}">
-    <img class="w-100" src="{{ asset('images/closed.png') }}" />
+    <form method="post" action="{{ route('order.set_rating') }}" class="rating-form d-flex flex-column align-items-center">
+        <input type="hidden" name="order_id" value="">
+        <input type="hidden" name="rating" value="0">
+        @csrf
+        <img class="w-50" src="{{ asset('images/closed.png') }}" />
+        <h2 class="text-center mt-3">{{ trans('content.set_rate') }}</h2>
+        @include('blocks.rating_line_block')
+        @include('blocks.button_block',[
+            'buttonType' => 'submit',
+            'primary' => true,
+            'buttonText' => trans('content.send')
+        ])
+    </form>
 </x-modal>
 
 <x-modal id="order-resumed-modal" head="{{ trans('content.order_is_resumed') }}">

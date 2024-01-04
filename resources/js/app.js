@@ -806,6 +806,7 @@ $(document).ready(function () {
     $('button.close-yes').click(function (e) {
         e.preventDefault();
         modalClosingConfirm.modal('hide');
+        orderClosedModal.find('input[name=order_id]').val(orderId);
         $.post(
             closeOrderUrl,
             {
@@ -815,9 +816,9 @@ $(document).ready(function () {
         ).done(() => {
             window.tableRow.find('.label').removeClass('in-progress').addClass('closed').html(archiveLabelText);
 
-            let button = window.tableRow.find('.close-order');
+            let button = window.tableRow.find('button.close-order');
             button.removeClass('close-order').addClass('resume-order');
-            button.find('button span').html(resumeOrderText);
+            button.find('span').html(resumeOrderText);
 
             deleteDataTableRows($('#content-active'), window.tableRow, true);
             addDataTableRow($('#content-archive'), window.tableRow, true);
@@ -870,6 +871,30 @@ $(document).ready(function () {
         });
     });
 
+    // Set rating
+    let ratingForm = $('form.rating-form');
+    ratingForm.find('i').click(function () {
+        let parentForm = $(this).parents('form'),
+            ratingInput = parentForm.find('input[name=rating]'),
+            ratingVal = parseInt($(this).attr('id').replace('rating-star-',''));
+
+        ratingInput.val(ratingVal);
+        ratingForm.find('i').each(function () {
+            let currentStarVal = parseInt($(this).attr('id').replace('rating-star-',''));
+            if (currentStarVal <= ratingVal && $(this).hasClass('icon-star-empty3')) {
+                $(this).removeClass('icon-star-empty3').addClass('icon-star-full2');
+            } else if (currentStarVal > ratingVal && $(this).hasClass('icon-star-full2')) {
+                $(this).removeClass('icon-star-full2').addClass('icon-star-empty3');
+            }
+        });
+    });
+
+    ratingForm.submit(function (e) {
+        e.preventDefault();
+        getUrl(ratingForm, null, (data) => {
+            orderClosedModal.modal('hide');
+        });
+    });
     // ORDERS LIST BLOCK END
 
     //CHATS BLOCK BEGIN
@@ -1639,22 +1664,21 @@ const showOrder = (point) => {
         .append(
             $('<h6></h6>').addClass('order-number').html(orderNumber + orderId + fromText + properties.get('date'))
         ).append(
-        $('<div></div>').addClass('w-100 d-flex align-items-center justify-content-between')
-            .append(
-                $('<div></div>').addClass('d-flex align-items-center justify-content-center')
-                    .append(
-                        $('<div></div>').addClass('avatar cir').css(getAvatarProps(avatar,user.avatar_props,0.35))
-                    ).append(
-                    $('<div></div>').css('width',215)
+            $('<div></div>').addClass('w-100 d-flex align-items-center justify-content-between')
+                .append(
+                    $('<div></div>').addClass('d-flex align-items-center justify-content-center')
                         .append(
-                            $('<div></div>').addClass('user-name').html(user.family+' '+user.name)
+                            $('<div></div>').addClass('avatar cir').css(getAvatarProps(avatar,user.avatar_props,0.35))
                         ).append(
-                        $('<div></div>').addClass('born').html(window.useAge)
-                    )
-                )
-            )
-            .append($('<i></i>').addClass('subscribe-icon ' + subscribeBellClass))
-    );
+                            $('<div></div>').css('width',215)
+                                .append(
+                                    $('<div></div>').addClass('user-name').html(user.family+' '+user.name)
+                                ).append(
+                                    $('<div></div>').addClass('fs-lg-6 fs-sm-7 ms-3').html(window.useAge)
+                                )
+                            )
+                    ).append($('<i></i>').addClass('subscribe-icon ' + subscribeBellClass))
+        );
 
     if (images.length) {
         let imagesContainer = $('<div></div>').addClass('images owl-carousel mt-3');

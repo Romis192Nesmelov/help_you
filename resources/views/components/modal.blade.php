@@ -1,4 +1,5 @@
 @props([
+    'id' => '',
     'head' => false,
     'footer' => false,
     'yes_button' => false,
@@ -7,7 +8,7 @@
     'yes_button_text' => trans('content.yes')
 ])
 
-<div {{ $attributes->class('modal fade') }} tabindex="-1" aria-labelledby="{{ $attributes->get('id') }}Label" aria-hidden="true">
+<div {{ $attributes->class('modal fade') }} tabindex="-1" id="{{ $id }}" aria-labelledby="{{ $id }}Label" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">

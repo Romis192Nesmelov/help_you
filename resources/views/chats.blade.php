@@ -16,13 +16,9 @@
                 <div id="content-{{ $menuItem }}" class="content-block" {{ !$loop->first ? 'style=display:none' : '' }}>
                     @if (count($chats[$menuItem]))
                         @include('blocks.data_table_block',[
-                            'items' => $chats[$menuItem],
-                            'relationHead' => 'orderType',
-                            'grandName' => 'name',
-                            'headName' => 'name',
-                            'contentName' => 'address',
-                            'statusField' => 'status',
-                            'chatMode' => true
+                            'orders' => $chats[$menuItem],
+                            'chatMode' => true,
+                            'editRoute' => null
                         ])
                     @endif
                     <h4 class="no-data-block text-uppercase text-secondary {{ count($chats[$menuItem]) ? 'd-none' : '' }}">{{ trans('content.no_data') }}</h4>

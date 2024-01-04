@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\User;
+
 function visibleStep($step, $session_key): bool
 {
     return ($step == 1 && !session()->has($session_key)) || (session()->has($session_key) && $step == count(session()->get($session_key))+1);
@@ -44,4 +46,32 @@ function avatarProps($avatar, $avatarProps, $coof): string
         }
     }
     return $avatarStyles;
+}
+
+function getUserAge(User $user): string
+{
+    $age = $user->years();
+    if ($age == 1) $word = 'год';
+    elseif ($age > 1 && $age < 5) $word = 'года';
+    elseif ($age >= 5 && $age < 21) $word = 'лет';
+    else {
+        $lastDigit = (int)substr($age, -1, 1);
+        if ($lastDigit == 0) $word = 'лет';
+        elseif ($lastDigit == 1) $word = 'год';
+        elseif ($lastDigit > 1 && $lastDigit < 5) $word = 'года';
+        else $word = 'лет';
+    }
+    return $age.' '.$word;
+}
+
+function getUserRating(User $user): int
+{
+    if (!$user->ratings->count()) return 0;
+    else {
+        $totalRating = 0;
+        foreach ($user->ratings as $rating) {
+            $totalRating += $rating->value;
+        }
+        return round($totalRating / $user->ratings->count());
+    }
 }

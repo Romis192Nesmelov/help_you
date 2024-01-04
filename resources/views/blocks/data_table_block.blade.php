@@ -1,10 +1,12 @@
 <table class="table datatable-basic default">
-    @foreach($items as $item)
-        <tr id="row-{{ $item->id }}">
-            <td class="id">{{ $item->id }}</td>
+    @foreach($orders as $order)
+        <tr id="row-{{ $order->id }}">
+            <td class="id">{{ $order->id }}</td>
+
+            {{-- Head cell --}}
             <td>
                 @if (isset($chatMode) && $chatMode)
-                    <a href="{{ route('messages.chat',['order_id' => $item->id]) }}">
+                    <a href="{{ route('messages.chat',['order_id' => $order->id]) }}">
                         @include('blocks.datatable_head_column_block')
                     </a>
                 @else
@@ -12,38 +14,26 @@
                 @endif
             </td>
 
-            @if (isset($editRoute) && isset($statusField) && $statusField && $item[$statusField] > 1)
-                @include('blocks.edit_dt_row_block',[
-                    'id' => $item->id,
-                    'title' => trans('content.edit')
-                ])
+            {{-- Edit cell --}}
+            @if ($editRoute && $order['status'] > 1)
+                <td class="order-cell-edit icon"><a title="{{ trans('content.edit') }}" href="{{ route($editRoute,['id' => $order->id]) }}"><i class="icon-pencil5"></i></a></td>
             @elseif (isset($chatMode) && $chatMode)
-                <td class="icon"><nobr><i title="{{ trans('messages.participants') }}" class="icon-users4 me-1"></i>{{ $item->performers->count() }}</nobr></td>
-            @else
-                <td class="order-cell-edit empty"></td>
-            @endif
-
-            @if (isset($statusField) && $statusField)
-                <td class="text-center">
-                    @if ($item->approved)
-                        <span class="label {{ ['closed','in-progress','open'][$item[$statusField]] }}">{{ trans('content.status_'.((string)$item[$statusField])) }}</span>
-                    @else
-                        <span class="label in_approve">{{ trans('content.in_approve') }}</span>
-                    @endif
-                </td>
+                <td class="icon"><nobr><i title="{{ trans('messages.participants') }}" class="icon-users4 me-1"></i>{{ $order->performers->count() }}</nobr></td>
             @else
                 <td class="empty"></td>
             @endif
 
-            @if (isset($statusField) && $statusField && $item->status == 1 && $item->approved && (!isset($chatMode) || !$chatMode))
-                <td class="order-cell-button">
-                    @include('blocks.button_block',[
-                        'addClass' => 'close-order micro',
-                        'primary' => false,
-                        'buttonText' => trans('content.close')
-                    ])
-                </td>
-            @elseif (isset($statusField) && $statusField && !$item->status && (!isset($chatMode) || !$chatMode))
+            {{-- Status label cell --}}
+            <td class="text-center">
+                @if ($order->approved)
+                    <span class="label {{ ['closed','in-progress','open'][$order->status] }}">{{ trans('content.status_'.((string)$order->status)) }}</span>
+                @else
+                    <span class="label in_approve">{{ trans('content.in_approve') }}</span>
+                @endif
+            </td>
+
+            {{-- Close, resume or delete cell --}}
+            @if (!$order->status && (!isset($chatMode) || !$chatMode))
                 <td class="order-cell-button">
                     @include('blocks.button_block',[
                         'addClass' => 'resume-order micro',
@@ -51,14 +41,23 @@
                         'buttonText' => trans('content.resume')
                     ])
                 </td>
-            @elseif ((!isset($menuItem) || $menuItem != 'archive') && (!isset($chatMode) || !$chatMode))
+            @elseif ($order->status == 1 && $order->approved && $order->user_id == auth()->id() && (!isset($chatMode) || !$chatMode))
+                <td class="order-cell-button">
+                    @include('blocks.button_block',[
+                        'addClass' => 'close-order micro',
+                        'primary' => false,
+                        'buttonText' => trans('content.close')
+                    ])
+                </td>
+            @elseif ($order->status == 2 && (!isset($chatMode) || !$chatMode))
                 @include('blocks.del_dt_row_block', [
-                    'id' => $item->id,
+                    'id' => $order->id,
                     'title' => trans('content.delete')
                 ])
             @else
-                <td class="order-cell-delete empty"></td>
+                <td class="empty"></td>
             @endif
+
         </tr>
     @endforeach
 </table>

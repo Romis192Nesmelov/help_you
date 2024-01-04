@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Http\Requests\Order\SetRatingRequest;
+use App\Models\Rating;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Http\Requests\Order\DelOrderImageRequest;
 use App\Http\Requests\Order\NextStepRequest;
@@ -108,19 +110,7 @@ class OrderController extends BaseController
 
     public function getUserAge(UserAgeRequest $request): JsonResponse
     {
-        $user = User::find($request->id);
-        $age = $user->years();
-        if ($age == 1) $word = 'год';
-        elseif ($age > 1 && $age < 5) $word = 'года';
-        elseif ($age >= 5 && $age < 21) $word = 'лет';
-        else {
-            $lastDigit = (int)substr($age, -1, 1);
-            if ($lastDigit == 0) $word = 'лет';
-            elseif ($lastDigit == 1) $word = 'год';
-            elseif ($lastDigit > 1 && $lastDigit < 5) $word = 'года';
-            else $word = 'лет';
-        }
-        return response()->json(['age' => $age.' '.$word]);
+        return response()->json(['age' => getUserAge(User::find($request->id))]);
     }
 
     public function orderResponse(OrderRequest $request): JsonResponse
@@ -266,6 +256,25 @@ class OrderController extends BaseController
         $order->status = 0;
         $order->save();
         ReadOrder::where('order_id')->delete();
+        return response()->json([],200);
+    }
+
+    public function setRating(SetRatingRequest $request): JsonResponse
+    {
+        $order = Order::find($request->order_id);
+        foreach ($order->performers as $performer) {
+            $rating = Rating::where('order_id',$order->id)->where('user_id',$performer->id)->first();
+            if ($rating) {
+                $rating->value = $request->rating;
+                $rating->save();
+            } else {
+                Rating::create([
+                    'value' => $request->rating,
+                    'order_id' => $order->id,
+                    'user_id' => $performer->id
+                ]);
+            }
+        }
         return response()->json([],200);
     }
 

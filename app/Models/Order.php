@@ -38,7 +38,7 @@ class Order extends Model
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class)->select('id','avatar','avatar_props','name','family');
+        return $this->belongsTo(User::class)->select('id','avatar','avatar_props','name','family','born');
     }
 
     public function userCredentials(): BelongsTo
@@ -93,5 +93,10 @@ class Order extends Model
         $query->when(request('performers'), function (Builder $q) {
             $q->whereBetween('need_performers',[request('performers_from'),request('performers_to')]);
         });
+    }
+
+    public function ratings(): HasMany
+    {
+        return $this->hasMany(Rating::class);
     }
 }

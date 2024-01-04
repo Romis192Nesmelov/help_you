@@ -1,26 +1,25 @@
 @extends('layouts.main')
 
 @section('content')
+<x-modal id="user-data-modal" head="{{ trans('content.user_data') }}">
+    @include('blocks.user_creds_block',[
+        'user' => $order->user_id == auth()->id() ? $order->performers[0] : $order->user,
+        'rating' => $order->user_id == auth()->id() ? getUserRating($order->performers[0]) : null
+    ])
+</x-modal>
 
 <x-modal id="order-data-modal">
     <div id="selected-points m-auto">
         <div id="points-container">
                 <h6 class="text-center">
-                    {{ trans('messages.chat_head',['order_id' => $order->id,'order_date' => $order->created_at->format('d.m.y'),'order_name' => $order->orderType->name]) }}
+                    {{ trans('messages.chat_head',[
+                        'order_id' => $order->id,
+                        'order_name' => $order->name,
+                        'order_type_name' => $order->orderType->name,
+                        'order_date' => $order->created_at->format('d.m.y')
+                    ]) }}
                 </h6>
-                <div class="w-100 d-flex mb-3 align-items-center justify-content-between">
-                    <div class="d-flex align-items-center justify-content-center">
-                        <div class="avatar cir" style="{!! avatarProps($order->user->avatar, $order->user->avatar_props, 0.35) !!}"></div>
-                        <div>
-                            <div class="user-name">@include('blocks.user_name_block', ['user' => $order->user])</div>
-                            <div class="born">{{ $order->user->born }}</div>
-                        </div>
-                    </div>
-{{--                    <button id="subscribe-button" type="button" class="btn btn-primary small mt-0">--}}
-{{--                        <i class="icon-bell-check"></i>--}}
-{{--                        <span>{{ trans('content.subscribe') }}</span>--}}
-{{--                    </button>--}}
-                </div>
+                @include('blocks.user_creds_block',['user' => $order->user])
                 @if ($order->images->count())
                     <div class="images owl-carousel">
                         @foreach ($order->images as $image)
@@ -53,13 +52,15 @@
             <div class="d-flex justify-content-start align-items-center mb-3">
                 <a href="{{ route('messages.chats') }}"><i title="{{ trans('messages.chats') }}" class="icon-arrow-left8 fs-4 me-3"></i></a>
                 <div>
-                    <b>
-                        @if ($order->user_id == auth()->id())
-                            @include('blocks.user_name_block',['user' => $order->performers[0]])
-                        @else
-                            @include('blocks.user_name_block',['user' => $order->user])
-                        @endif
-                    </b>
+                    <a data-bs-toggle="modal" data-bs-target="#user-data-modal">
+                        <b>
+                            @if ($order->user_id == auth()->id())
+                                @include('blocks.user_name_block',['user' => $order->performers[0]])
+                            @else
+                                @include('blocks.user_name_block',['user' => $order->user])
+                            @endif
+                        </b>
+                    </a>
                     <div class="fs-lg-6 fs-sm-7">
                         <a data-bs-toggle="modal" data-bs-target="#order-data-modal">
                             {{ trans('messages.chat_head',[
