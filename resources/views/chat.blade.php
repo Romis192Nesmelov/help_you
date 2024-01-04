@@ -60,9 +60,13 @@
                             @include('blocks.user_name_block',['user' => $order->user])
                         @endif
                     </b>
-                    <div class="fs-6">
+                    <div class="fs-lg-6 fs-sm-7">
                         <a data-bs-toggle="modal" data-bs-target="#order-data-modal">
-                            {{ trans('messages.chat_head',['order_date' => $order->created_at->format('d.m.y'),'order_name' => $order->orderType->name]) }}
+                            {{ trans('messages.chat_head',[
+                                'order_name' => $order->name,
+                                'order_type_name' => $order->orderType->name,
+                                'order_date' => $order->created_at->format('d.m.y')
+                            ]) }}
                         </a>
                     </div>
                 </div>

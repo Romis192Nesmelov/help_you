@@ -1097,6 +1097,7 @@ table.datatable-basic td.empty {
 .avatar.cir {
     width: 70px;
     height: 70px;
+    min-width: 70px;
     overflow: hidden;
     position: relative;
     border-radius: 50%;
@@ -1147,11 +1148,6 @@ table.datatable-basic td.empty {
     opacity: 0;
     filter: opacity(0%);
     z-index: 999;
-}
-
-.user-name {
-    font-size: 18px;
-    margin-left: 25px;
 }
 
 .born {

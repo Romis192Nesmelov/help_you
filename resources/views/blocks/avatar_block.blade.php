@@ -7,7 +7,7 @@
                     <input type="file" name="avatar">
                 @endif
             </div>
-            <div class="user-name">{!! trans('content.welcome', ['user' => auth()->user()->name ? auth()->user()->name.' '.auth()->user()->family : auth()->user()->phone ]) !!}</div>
+            <div class="fs-lg-6 fs-sm-7 ms-3">{!! trans('content.welcome', ['user' => auth()->user()->name ? auth()->user()->name.' '.auth()->user()->family : auth()->user()->phone ]) !!}</div>
         </div>
         @include('blocks.error_block', ['name' => 'avatar'])
     </div>

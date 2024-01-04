@@ -18,6 +18,7 @@
                         @include('blocks.data_table_block',[
                             'items' => $chats[$menuItem],
                             'relationHead' => 'orderType',
+                            'grandName' => 'name',
                             'headName' => 'name',
                             'contentName' => 'address',
                             'statusField' => 'status',
