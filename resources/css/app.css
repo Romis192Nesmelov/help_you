@@ -1259,6 +1259,10 @@ table.datatable-basic td.empty {
         height: 115px;
     }
 
+    #info-about textarea {
+        height: 455px;
+    }
+
     #messages {
         height: 468px;
     }

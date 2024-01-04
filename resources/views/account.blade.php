@@ -72,7 +72,7 @@
         </div>
     </x-modal>
 
-    <form class="row" enctype="multipart/form-data" method="post" action="{{ route('account.edit_account') }}">
+    <form id="account-form" class="row" enctype="multipart/form-data" method="post" action="{{ route('account.edit_account') }}">
         @csrf
 
         <input type="hidden" name="avatar_size">

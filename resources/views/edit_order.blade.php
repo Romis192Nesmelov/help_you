@@ -80,6 +80,15 @@
                                 </div>
                             @endforeach
                         </div>
+                        <h2 class="mt-4">{{ trans('content.order_name') }}</h2>
+                        @include('blocks.input_block',[
+                            'name' => 'name',
+                            'min' => 3,
+                            'max' => 50,
+                            'type' => 'text',
+                            'value' => isset($order) ? $order->name : (session()->has($session_key) && count(session()->get($session_key)) >= 1 ? session()->get($session_key)[0]['name'] : ''),
+                            'ajax' => true
+                        ])
                     </div>
                     <div id="inputs-step2" class="{{ getStepClass(2, $session_key) }}">
                         @include('blocks.input_block',[

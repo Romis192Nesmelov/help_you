@@ -24,6 +24,7 @@ class OrdersSeeder extends Seeder
             'order_type_id' => 1,
             'city_id' => 1,
             'subtype_id' => rand(1,4),
+            'name' => 'Тестовая заяка',
             'need_performers' => 10,
             'address' => 'Криворожская улица, 17, подъезд 2, этаж 3, кв. 32',
             'latitude' => 55.667594,

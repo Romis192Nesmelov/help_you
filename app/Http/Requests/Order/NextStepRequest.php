@@ -11,7 +11,7 @@ class NextStepRequest extends FormRequest
     use HelperTrait;
 
     public array $stepsRules = [
-        ['id' => 'nullable|exists:orders,id', 'order_type_id' => 'required|exists:order_types,id', 'subtype_id' => 'nullable|exists:subtypes,id'],
+        ['id' => 'nullable|exists:orders,id', 'order_type_id' => 'required|exists:order_types,id', 'subtype_id' => 'nullable|exists:subtypes,id', 'name' => 'required|min:3|max:50'],
         ['id' => 'nullable|exists:orders,id', 'need_performers' => 'required|integer|min:1|max:20'],
         ['id' => 'nullable|exists:orders,id', 'address' => 'required|string|min:5|max:200', 'latitude' => 'required|numeric', 'longitude' => 'required|numeric'],
         ['id' => 'nullable|exists:orders,id', 'description_short' => 'nullable|string|min:5|max:200', 'description_full' => 'nullable|string|min:5|max:1000']

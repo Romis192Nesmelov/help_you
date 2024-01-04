@@ -27,6 +27,7 @@ class OrderFactory extends Factory
             'order_type_id' => $orderType,
             'subtype_id' => $subtype,
             'city_id' => 1,
+            'name' => fake()->text(50),
             'need_performers' => rand(1,20),
             'address' => fake()->address(),
             'latitude' => fake()->randomFloat(6, 55, 56),

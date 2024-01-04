@@ -315,7 +315,8 @@ $(document).ready(function () {
     // AUTH BLOCK END
 
     // ACCOUNT BLOCK BEGIN
-    const bornDateField = $('input[name=born]'),
+    const accountForm = $('#account-form'),
+        bornDateField = $('input[name=born]'),
         emailField = $('input[name=email]'),
         changePhoneModal = $('#change-phone-modal'),
         phoneField = changePhoneModal.find('input[name=phone]'),
@@ -344,13 +345,12 @@ $(document).ready(function () {
     bornDateField.mask("99-99-9999");
 
     const preValidationChangeAccount = (e) => {
-        let form = $(e.target).parents('form'),
-            born = bornDateField.val().split('-'),
+        let born = bornDateField.val().split('-'),
             currentDate = new Date();
 
-        resetErrors(form);
+        resetErrors(accountForm);
 
-        let validationFlag = lengthValidate(form, ['name','family','born']);
+        let validationFlag = lengthValidate(accountForm, ['name','family','born']);
 
         if (
             !validationDate(born) ||
@@ -382,7 +382,7 @@ $(document).ready(function () {
 
     //Unlock save button
     $.each(['name','family','born', 'email'], (k, field) => {
-        $('input[name='+field+']').on('change', preValidationChangeAccount).keyup(preValidationChangeAccount);
+        accountForm.find('input[name='+field+']').on('change', preValidationChangeAccount).keyup(preValidationChangeAccount);
     });
 
     const unlockGetCodeAndChangePhoneButtons = () => {

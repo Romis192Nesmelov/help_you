@@ -20,6 +20,7 @@ class Order extends Model
         'order_type_id',
         'subtype_id',
         'city_id',
+        'name',
         'need_performers',
         'address',
         'latitude',

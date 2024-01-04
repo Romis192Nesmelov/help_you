@@ -99,6 +99,7 @@ return [
     'subscribe' => 'Подписаться',
     'unsubscribe' => 'Отписаться',
 
+    'order_name' => 'Название заявки',
     'new_order_from' => 'Новая заяка от:',
     'add_order_photo' => 'Добавте изображения',
 
