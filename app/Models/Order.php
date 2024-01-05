@@ -38,7 +38,7 @@ class Order extends Model
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class)->select('id','avatar','avatar_props','name','family','born');
+        return $this->belongsTo(User::class)->select('id','avatar','avatar_props','name','family','born','info_about');
     }
 
     public function userCredentials(): BelongsTo

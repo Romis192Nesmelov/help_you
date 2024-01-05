@@ -58,6 +58,8 @@ Route::middleware(['auth','account.completed'])->name('order.')->controller(Orde
     Route::get('/get-subscriptions-news', 'getSubscriptionsNews')->name('get_subscriptions_news');
 
     Route::get('/get-user-age', 'getUserAge')->name('get_user_age');
+    Route::post('/get-order-performers', 'getOrderPerformers')->name('get_order_performers');
+    Route::post('/remove-order-performer', 'removeOrderPerformer')->name('remove_order_performer');
 
     Route::post('/get-orders', 'getOrders')->name('get_orders');
     Route::post('/get-preview', 'getPreview')->name('get_preview');

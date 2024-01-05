@@ -14,11 +14,16 @@
                 @endif
             </td>
 
-            {{-- Edit cell --}}
-            @if ($editRoute && $order['status'] > 1)
+            {{-- Edit or remove performers cell --}}
+            @if ($editRoute && $order['status'] == 2)
                 <td class="order-cell-edit icon"><a title="{{ trans('content.edit') }}" href="{{ route($editRoute,['id' => $order->id]) }}"><i class="icon-pencil5"></i></a></td>
-            @elseif (isset($chatMode) && $chatMode)
-                <td class="icon"><nobr><i title="{{ trans('messages.participants') }}" class="icon-users4 me-1"></i>{{ $order->performers->count() }}</nobr></td>
+            @elseif ((isset($chatMode) && $chatMode) || $order['status'] == 1)
+                <td class="icon">
+                    <nobr>
+                        <i id="order-performers-{{ $order->id }}" title="{{ trans('messages.participants') }}" class="{{ $order->user_id == auth()->id() ? 'performers-list' : '' }} icon-users4 me-1"></i>
+                        <span>{{ $order->performers->count() }}</span>
+                    </nobr>
+                </td>
             @else
                 <td class="empty"></td>
             @endif

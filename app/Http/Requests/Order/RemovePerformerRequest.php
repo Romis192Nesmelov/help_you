@@ -5,9 +5,10 @@ namespace App\Http\Requests\Order;
 use App\Http\Controllers\HelperTrait;
 use Illuminate\Foundation\Http\FormRequest;
 
-class UserAgeRequest extends FormRequest
+class RemovePerformerRequest extends FormRequest
 {
     use HelperTrait;
+
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -23,6 +24,9 @@ class UserAgeRequest extends FormRequest
      */
     public function rules(): array
     {
-        return ['id' => $this->validationUserId];
+        return [
+            'order_id' => $this->validationOrderId,
+            'user_id' => $this->validationUserId
+        ];
     }
 }

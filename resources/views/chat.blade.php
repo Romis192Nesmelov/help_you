@@ -6,6 +6,8 @@
         'user' => $order->user_id == auth()->id() ? $order->performers[0] : $order->user,
         'rating' => $order->user_id == auth()->id() ? getUserRating($order->performers[0]) : null
     ])
+    <h5 class="text-center">{{ trans('content.info_about_user') }}</h5>
+    @include('blocks.info_about_user_block',['info' => $order->user_id == auth()->id() ? $order->performers[0]->info_about : $order->user->info_about])
 </x-modal>
 
 <x-modal id="order-data-modal">

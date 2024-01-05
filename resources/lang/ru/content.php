@@ -69,14 +69,20 @@ return [
 
     'organizations' => 'Организации',
     'info_about_company' => 'Информация о компании',
+    'info_about_user' => 'Информация о пользователе:',
+    'info_is_missing' => 'Информация отсутствует',
 
+    'remove_this_performer' => 'Отказаться от услуг',
     'you_must_fill_required_fields' => 'Вы должны заполнить все обязательные поля!',
     'do_you_really_want_to_delete_this_order' => 'Вы действительно хотите удалить эту заявку?',
     'do_you_really_want_to_close_this_order' => 'Вы действительно хотите закрыть эту заявку?',
     'do_you_really_want_to_resume_this_order' => 'Вы действительно хотите возобновить эту заявку?',
     'do_you_really_want_to_withdraw_your_response' => 'Вы действительно хотите отозвать свой отклик?',
     'do_you_really_want_to_unsubscribe' => 'Вы действительно хотите отписаться от этого пользователя?',
+    'do_you_really_want_to_remove_this_performer' => 'Вы действительно хотите отказаться от услуг этого пользователя?',
     'deleted' => 'Удалено',
+    'the_performer_is_removed' => 'Пользователь удален из исполнителей',
+    'no_performers' => 'Нет исполнителей',
 
     'order_number' => 'Заяка №',
     'from' => ' от ',
@@ -88,6 +94,7 @@ return [
     'href_is_copied' => 'Ссылка скопирована!',
 
     'order_types' => 'Виды помощи',
+    'performers' => 'Исполнители',
     'number_of_performers' => 'Кол-во исполнителей',
     'number_of_performers_from' => 'Человек от',
     'number_of_performers_to' => 'Человек до',

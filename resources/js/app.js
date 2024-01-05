@@ -41,7 +41,7 @@ $(document).ready(function () {
 
     setTimeout(function () {
         removeLoader();
-    },700);
+    },500);
 
     // Datatable
     const baseDataTable = dataTableAttributes($('.datatable-basic.default'), 8);
@@ -60,9 +60,9 @@ $(document).ready(function () {
         const parent = $(this).parents('.tab');
         if (!parent.hasClass('active')) {
             let currentActiveTab = topMenu.find('.tab.active'),
-                currentActiveTabId = currentActiveTab.find('a').attr('id').replace('top-submenu-',''),
+                currentActiveTabId = getId(currentActiveTab.find('a'), 'top-submenu-', false),
                 currentContent = $('#content-'+currentActiveTabId),
-                newActiveIdTabId = $(this).attr('id').replace('top-submenu-',''),
+                newActiveIdTabId = getId($(this), 'top-submenu-', false),
                 newContent = $('#content-'+newActiveIdTabId);
 
             currentActiveTab.removeClass('active');
@@ -538,8 +538,6 @@ $(document).ready(function () {
             posY = parseInt(window.avatarImage.css('top')) + basePosY,
             size = 100 + window.avatarSize;
 
-        console.log(parseInt(window.avatarImage.css('left')));
-
         if (size !== 100) {
             posX -= 150;
             posY -= 150 + basePosY;
@@ -696,10 +694,8 @@ $(document).ready(function () {
                                 fields['id'] = hiddenIdInput.val();
                             }
 
-                            $.post(
-                                nextStepUrl,
-                                fields
-                            ).done(() => {
+                            $.post(nextStepUrl, fields,
+                            () => {
                                 setTimeout(function () {
                                     step++;
                                     setProgressBar(progressBar);
@@ -749,14 +745,11 @@ $(document).ready(function () {
     if (window.orderId) {
         $('.order-photo .icon-close2.d-block').click(function () {
             let photoPos = parseInt($(this).parents('.order-photo').find('input[type=file]').attr('name').replace('photo',''));
-            $.post(
-                deleteOrderImageUrl,
-                {
-                    '_token': window.tokenField,
-                    'id': orderId,
-                    'pos': photoPos
-                }
-            );
+            $.post(deleteOrderImageUrl, {
+                '_token': window.tokenField,
+                'id': orderId,
+                'pos': photoPos
+            });
         });
     }
     // EDIT ORDER BLOCK END
@@ -789,6 +782,11 @@ $(document).ready(function () {
     // ORDERS LIST BLOCK BEGIN
     const modalClosingConfirm = $('#order-closing-confirm-modal'),
         modalResumedConfirm = $('#order-resume-confirm-modal'),
+        orderPerformersModal = $('#order-performers-modal'),
+        tablePerformers = orderPerformersModal.find('table.table.table-striped'),
+        headNoPerformers = orderPerformersModal.find('h4'),
+        removePerformerModal = $('#remove-performer-modal'),
+        removePerformerModalYesButton = removePerformerModal.find('button.delete-yes'),
         orderClosedModal = $('#order-closed-modal'),
         orderResumedModal = $('#order-resumed-modal'),
         ordersActiveTable = $('#content-active').find('table.datatable-basic.default');
@@ -807,13 +805,10 @@ $(document).ready(function () {
         e.preventDefault();
         modalClosingConfirm.modal('hide');
         orderClosedModal.find('input[name=order_id]').val(orderId);
-        $.post(
-            closeOrderUrl,
-            {
-                '_token': window.tokenField,
-                'id': orderId,
-            }
-        ).done(() => {
+        $.post(closeOrderUrl, {
+            '_token': window.tokenField,
+            'id': orderId,
+        }, () => {
             window.tableRow.find('.label').removeClass('in-progress').addClass('closed').html(archiveLabelText);
 
             let button = window.tableRow.find('button.close-order');
@@ -832,18 +827,16 @@ $(document).ready(function () {
     $('button.resume-yes').click(function (e) {
         e.preventDefault();
         modalResumedConfirm.modal('hide');
-        $.post(
-            resumeOrderUrl,
-            {
-                '_token': window.tokenField,
-                'id': orderId,
-            }
-        ).done(() => {
+        $.post(resumeOrderUrl, {
+            '_token': window.tokenField,
+            'id': orderId,
+        }, () => {
             window.tableRow.find('.label').removeClass('closed').addClass('in_approve').html(inApproveLabelText);
 
             window.tableRow.find('.resume-order').remove();
-            // button.removeClass('resume-order').addClass('close-order');
-            // button.find('span').html(closeOrderText);
+            let button = window.tableRow.find('button.resume-order');
+            button.removeClass('resume-order').addClass('close-order');
+            button.find('span').html(closeOrderText);
 
             window.tableRow.find('.order-cell-edit').removeClass('empty').addClass('icon').append(
                 $('<a></a>').attr({
@@ -876,11 +869,11 @@ $(document).ready(function () {
     ratingForm.find('i').click(function () {
         let parentForm = $(this).parents('form'),
             ratingInput = parentForm.find('input[name=rating]'),
-            ratingVal = parseInt($(this).attr('id').replace('rating-star-',''));
+            ratingVal = getId($(this), 'rating-star-', true);
 
         ratingInput.val(ratingVal);
         ratingForm.find('i').each(function () {
-            let currentStarVal = parseInt($(this).attr('id').replace('rating-star-',''));
+            let currentStarVal = getId($(this), 'rating-star-', true);
             if (currentStarVal <= ratingVal && $(this).hasClass('icon-star-empty3')) {
                 $(this).removeClass('icon-star-empty3').addClass('icon-star-full2');
             } else if (currentStarVal > ratingVal && $(this).hasClass('icon-star-full2')) {
@@ -893,6 +886,69 @@ $(document).ready(function () {
         e.preventDefault();
         getUrl(ratingForm, null, (data) => {
             orderClosedModal.modal('hide');
+        });
+    });
+
+    // Show order performers modal
+    $('i.performers-list').click(function () {
+        let orderId = getId($(this), 'order-performers-', true);
+        $.post(getOrderPerformersUrl, {
+            '_token': window.tokenField,
+            'id': orderId,
+        }, (data) => {
+            if (data.performers.length) {
+                headNoPerformers.addClass('d-none');
+                tablePerformers.removeClass('d-none');
+
+                $.each(data.performers, function (k, performer) {
+                    let tableRowLast = tablePerformers.find('tr').last(),
+                        tableRow = !k ? tableRowLast : tableRowLast.clone(),
+                        removePerformerIcon = tableRow.find('.order-cell-delete i');
+
+                    tableRow.attr('id','row-' + (k + 1));
+                    if (k) tablePerformers.append(tableRow);
+                    if (performer.avatar) tableRow.find('.avatar.cir').css(getAvatarProps(performer.avatar,performer.avatar_props,0.35))
+                    tableRow.find('.user-name').html(performer.full_name);
+                    tableRow.find('.user-age').html(performer.age);
+                    // removePerformerIcon.attr('id',performer.id);
+
+                    removePerformerIcon.click(function () {
+                        window.removingPerformerId = performer.id;
+                        window.orderId = orderId;
+                        orderPerformersModal.modal('hide');
+                        removePerformerModal.modal('show');
+                    });
+
+                    let ratingLine = tableRow.find('.rating-line');
+                    if (performer.rating) {
+                        for (let i=1;i<=ratingLine.find('i').length;i++) {
+                            let ratingStar = ratingLine.find('#rating-star-' + i);
+                            if (i <= performer.rating && ratingStar.hasClass('icon-star-empty3')) {
+                                ratingStar.removeClass('icon-star-empty3').addClass('icon-star-full2');
+                            } else if (i > performer.rating && ratingStar.hasClass('icon-star-full2')) ratingStar.removeClass('icon-star-full2').addClass('icon-star-empty3');
+                        }
+                    } else ratingLine.find('i.icon-star-full2').removeClass('icon-star-full2').addClass('icon-star-empty3');
+
+                });
+            } else {
+                headNoPerformers.removeClass('d-none');
+                tablePerformers.addClass('d-none');
+            }
+        });
+        orderPerformersModal.modal('show');
+    });
+
+    removePerformerModalYesButton.unbind();
+    removePerformerModalYesButton.click(function () {
+        $.post(removeOrderPerformer, {
+            '_token': window.tokenField,
+            'order_id': window.orderId,
+            'user_id': window.removingPerformerId
+        }, (data) => {
+            $('#order-performers-' + window.orderId).next('span').html(data.performers_count);
+            messageModal.find('h4').html(data.message);
+            removePerformerModal.modal('hide');
+            messageModal.modal('show');
         });
     });
     // ORDERS LIST BLOCK END
@@ -1085,8 +1141,7 @@ const newMessageChat = (inputMessage, inputMessageFile, messagesBlock) => {
         formData.append('order_id', parseInt(orderId));
         formData.append('body', inputMessage.val());
 
-        if (inputMessageFile.val())
-            formData.append('image', inputMessageFile[0].files[0]);
+        if (inputMessageFile.val()) formData.append('image', inputMessageFile[0].files[0]);
 
         processingAjax(
             newMessageUrl,
@@ -1366,7 +1421,7 @@ const addDataTableRow = (contentBlockTab, row, useCounter) => {
 }
 
 const changeDataCounter = (contentBlockTab, increment) => {
-    let contentId = contentBlockTab.attr('id').replace('content-',''),
+    let contentId = getId(contentBlockTab, 'content-', false),
         containerCounter = $('#top-submenu-'+contentId).next('sup'),
         counterVal = parseInt(containerCounter.html());
 
@@ -1672,9 +1727,9 @@ const showOrder = (point) => {
                         ).append(
                             $('<div></div>').css('width',215)
                                 .append(
-                                    $('<div></div>').addClass('user-name').html(user.family+' '+user.name)
+                                    $('<div></div>').addClass('ms-3 fs-lg-6 fs-sm-7 user-name').html(user.family+' '+user.name)
                                 ).append(
-                                    $('<div></div>').addClass('fs-lg-6 fs-sm-7 ms-3').html(window.useAge)
+                                    $('<div></div>').addClass('fs-lg-6 fs-sm-7 ms-3 user-age').html(window.useAge)
                                 )
                             )
                     ).append($('<i></i>').addClass('subscribe-icon ' + subscribeBellClass))
@@ -1794,13 +1849,11 @@ const setBindsAndOpen = () => {
             properties = point.properties,
             orderId = properties.get('orderId'),
             orderRespondModal = $('#order-respond-modal');
-        $.post(
-            orderResponseUrl,
-            {
-                '_token': window.tokenField,
-                'id': orderId,
-            }
-        ).done(() => {
+
+        $.post(orderResponseUrl, {
+            '_token': window.tokenField,
+            'id': orderId,
+        }, () => {
             orderRespondModal.find('.order-number').html(orderId);
             orderRespondModal.find('.order-date').html(properties.get('date'));
             orderRespondModal.find('.order-type').html(properties.get('orderType'));
@@ -1872,7 +1925,7 @@ const enablePointImagesCarousel = (container, autoplay) => {
 }
 
 const getPlaceMarkOnMap = (obj) => {
-    let placemarkId = parseInt((obj).parents('.order-block').attr('id').replace('order-',''));
+    let placemarkId = getId((obj).parents('.order-block'), 'order-', true);
     return window.placemarks[placemarkId];
 }
 
@@ -1889,7 +1942,7 @@ const bindOrderOperation = (modalConfirm, buttonClass) => {
     buttons.unbind();
     buttons.click(function () {
         window.tableRow = $(this).parents('tr');
-        window.orderId = parseInt(window.tableRow.attr('id').replace('row-',''));
+        window.orderId = getId(window.tableRow, 'row-', true);
         modalConfirm.modal('show');
     });
 }
@@ -1937,4 +1990,9 @@ const getAvatarProps = (avatar, props, coof) => {
         });
     }
     return avatarProps;
+}
+
+const getId = (obj, replace, returnInt) => {
+    let id = obj.attr('id').replace(replace, '');
+    return returnInt ? parseInt(id) : id;
 }

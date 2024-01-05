@@ -2,10 +2,12 @@
 
 namespace App\Http\Requests\Order;
 
+use App\Http\Controllers\HelperTrait;
 use Illuminate\Foundation\Http\FormRequest;
 
 class DelOrderImageRequest extends FormRequest
 {
+    use HelperTrait;
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -22,7 +24,7 @@ class DelOrderImageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'id' => 'required|exists:orders,id',
+            'id' => $this->validationOrderId,
             'pos' => 'required|integer|min:1|max:3'
         ];
     }

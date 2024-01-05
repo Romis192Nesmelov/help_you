@@ -2,10 +2,12 @@
 
 namespace App\Http\Requests\Chats;
 
+use App\Http\Controllers\HelperTrait;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ChatRequest extends FormRequest
 {
+    use HelperTrait;
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -22,7 +24,7 @@ class ChatRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'order_id' => 'required|exists:orders,id'
+            'order_id' => $this->validationOrderId,
         ];
     }
 }

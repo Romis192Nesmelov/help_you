@@ -2,10 +2,12 @@
 
 namespace App\Http\Requests\Order;
 
+use App\Http\Controllers\HelperTrait;
 use Illuminate\Foundation\Http\FormRequest;
 
 class SetRatingRequest extends FormRequest
 {
+    use HelperTrait;
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -22,7 +24,7 @@ class SetRatingRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'order_id' => 'required|exists:orders,id',
+            'order_id' => $this->validationOrderId,
             'rating' => 'required|integer|min:1|max:5'
         ];
     }

@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Http\Requests\Order\RemovePerformerRequest;
 use App\Http\Requests\Order\SetRatingRequest;
 use App\Models\Rating;
 use Illuminate\Foundation\Http\FormRequest;
@@ -111,6 +112,39 @@ class OrderController extends BaseController
     public function getUserAge(UserAgeRequest $request): JsonResponse
     {
         return response()->json(['age' => getUserAge(User::find($request->id))]);
+    }
+
+    /**
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
+    public function getOrderPerformers(OrderRequest $request): JsonResponse
+    {
+        $order = Order::find($request->id);
+        $this->authorize('owner', $order);
+        $performers = [];
+        foreach ($order->performers as $performer) {
+            $performers[] = [
+                'id' => $performer->id,
+                'avatar' => $performer->avatar,
+                'avatar_props' => $performer->avatar_props,
+                'full_name' => $performer->name.' '.$performer->family,
+                'age' => getUserAge($performer),
+                'rating' => getUserRating($performer)
+            ];
+        }
+        return response()->json(['performers' => $performers],200);
+    }
+
+    /**
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
+    public function removeOrderPerformer(RemovePerformerRequest $request): JsonResponse
+    {
+        $order = Order::find($request->order_id);
+        $this->authorize('owner', $order);
+        if (!$order->status) return response()->json([],403);
+//        OrderUser::where('order_id',$request->order_id)->where('user_id',$request->user_id)->delete();
+        return response()->json(['message' => trans('content.the_performer_is_removed'), 'performers_count' => $order->performers->count()],200);
     }
 
     public function orderResponse(OrderRequest $request): JsonResponse

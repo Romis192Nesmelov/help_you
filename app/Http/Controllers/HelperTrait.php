@@ -29,6 +29,8 @@ trait HelperTrait
     public string $validationJpg = 'mimes:jpg|max:2000';
     public string $validationPng = 'mimes:png|max:2000';
     public string $validationDate = 'regex:/^(\d{2})\/(\d{2})\/(\d{4})$/';
+    public string $validationOrderId = 'required|exists:orders,id';
+    public string $validationUserId = 'required|exists:users,id';
 
 //    public function saveCompleteMessage(): void
 //    {

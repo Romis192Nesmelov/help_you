@@ -24,6 +24,6 @@ class OrderRequest extends FormRequest
      */
     public function rules(): array
     {
-        return ['id' => 'required|exists:orders,id'];
+        return ['id' => $this->validationOrderId];
     }
 }

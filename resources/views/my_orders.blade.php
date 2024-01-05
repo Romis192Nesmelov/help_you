@@ -7,6 +7,12 @@
     'head' => trans('content.do_you_really_want_to_delete_this_order')
 ])
 
+@include('blocks.modal_delete_block',[
+    'id' => 'remove-performer-modal',
+    'action' => 'order.remove_order_performer',
+    'head' => trans('content.do_you_really_want_to_remove_this_performer')
+])
+
 <x-modal
     id="order-closing-confirm-modal"
     head="{{ trans('content.warning') }}"
@@ -49,6 +55,18 @@
     <img class="w-100" src="{{ asset('images/resumed.png') }}" />
 </x-modal>
 
+<x-modal id="order-performers-modal" head="{{ trans('content.performers') }}">
+    <h4 class="text-center p-4">{{ trans('content.no_performers') }}</h4>
+    <table  class="table table-striped">
+        <tr>
+            <td>@include('blocks.user_creds_block',['rating' => 1])</td>
+            <td class="order-cell-delete icon align-middle">
+                <i title="{{ trans('content.remove_this_performer') }}" class="icon-user-block fs-5"></i>
+            </td>
+        </tr>
+    </table>
+</x-modal>
+
 <div class="row">
     @include('blocks.left_menu_block',['hasChangeAvatar' => false])
     <div class="col-12 col-lg-8">
@@ -72,6 +90,8 @@
     const closeOrderUrl = "{{ route('order.close_order') }}",
         resumeOrderUrl = "{{ route('order.resume_order') }}",
         editOrderUrl = "{{ route('order.edit_order') }}",
+        getOrderPerformersUrl = "{{ route('order.get_order_performers') }}",
+        removeOrderPerformer = "{{ route('order.remove_order_performer') }}",
         inApproveLabelText = "{{ trans('content.in_approve') }}",
         archiveLabelText = "{{ trans('content.status_0') }}",
         closeOrderText = "{{ trans('content.close') }}",

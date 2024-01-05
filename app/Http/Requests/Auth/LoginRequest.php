@@ -23,6 +23,9 @@ class LoginRequest extends FormRequest
      */
     public function rules(): array
     {
-        return ['phone' => $this->validationPhone,'password' => 'required|min:3|max:20'];
+        return [
+            'phone' => $this->validationPhone,
+            'password' => 'required|min:3|max:20'
+        ];
     }
 }

@@ -2,10 +2,12 @@
 
 namespace App\Http\Requests\Account;
 
+use App\Http\Controllers\HelperTrait;
 use Illuminate\Foundation\Http\FormRequest;
 
 class SubscriptionRequest extends FormRequest
 {
+    use HelperTrait;
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -21,6 +23,6 @@ class SubscriptionRequest extends FormRequest
      */
     public function rules(): array
     {
-        return ['user_id' => 'required|exists:users,id'];
+        return ['user_id' => $this->validationUserId];
     }
 }
