@@ -97,6 +97,7 @@
         closeOrderText = "{{ trans('content.close') }}",
         resumeOrderText = "{{ trans('content.resume') }}",
         editOrderText = "{{ trans('content.edit') }}",
-        deleteOrderText = "{{ trans('content.delete') }}";
+        deleteOrderText = "{{ trans('content.delete') }}",
+        participantsText = "{{ trans('messages.participants') }}";
 </script>
 @endsection

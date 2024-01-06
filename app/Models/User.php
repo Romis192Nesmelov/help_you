@@ -147,4 +147,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Rating::class);
     }
+
+    public function readStatusOrder(): HasMany
+    {
+        return $this->hasMany(ReadStatusOrder::class);
+    }
 }

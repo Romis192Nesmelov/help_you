@@ -13,6 +13,12 @@ $(document).ready(function () {
     window.dropDown = $('#dropdown');
     window.rightButtonBlock = $('#right-button-block .fa.fa-bell-o');
 
+    const modalClosingConfirm = $('#order-closing-confirm-modal'),
+        modalResumedConfirm = $('#order-resume-confirm-modal'),
+        orderClosedModal = $('#order-closed-modal'),
+        orderResumedModal = $('#order-resumed-modal'),
+        ordersActiveTable = $('#content-active').find('table.datatable-basic.default');
+
     // Setting datatable defaults
     $.extend( $.fn.dataTable.defaults, {
         autoWidth: false,
@@ -119,7 +125,9 @@ $(document).ready(function () {
         getNews();
         // Receiving new notices
         window.Echo.private('notice_' + userId).listen('.notice', res => {
-            if (res.notice === 'new_message' && (!orderId || orderId !== res.order_id)) {
+            let tableRow = $('#row-' + res.order_id);
+
+            if (res.notice === 'new_message' && (!window.orderId || window.orderId !== res.order_id)) {
                 let unreadMessageRow = $('#unread-message-' + res.order_id);
                 checkDropDownMenuNotEmpty();
                 if (unreadMessageRow.length) {
@@ -134,8 +142,38 @@ $(document).ready(function () {
             } else if (res.notice === 'new_order') {
                 checkDropDownMenuNotEmpty();
                 appendDropdownUnreadOrder(res.order_id, res.user_name);
+            } else if (res.notice === 'new_performer') {
+                if (tableRow.length) {
+                    let countPerformersContainer = getPerformersCountContainer(res.order_id),
+                        countPerformers = parseInt(countPerformersContainer.html());
+                    countPerformers++;
+                    countPerformersContainer.html(countPerformers);
+                } else {
+                    checkDropDownMenuNotEmpty();
+                    appendDropdownUnreadPerformer(res.order_id, res.user_name);
+                }
+            } else if (res.notice === 'order_approved') {
+                if (tableRow.length) {
+                    movingOrderToApproved(tableRow);
+                } else {
+                    checkDropDownMenuNotEmpty();
+                    appendDropdownUnreadOrderStatus(res.order_id, 4);
+                }
+            } else if (res.notice === 'new_order_status') {
+                if (tableRow.length) {
+                    if (res.order_status === 1) {
+                        movingOrderToInProgress(tableRow, res.performers, modalClosingConfirm);
+                    } else {
+                        movingOrderToArchive(tableRow, modalResumedConfirm);
+                    }
+                } else {
+                    checkDropDownMenuNotEmpty();
+                    appendDropdownUnreadOrderStatus(res.order_id, res.order_status);
+                }
             } else if (res.notice === 'delete_order') {
                 $('#unread-order-' + res.order_id).remove();
+                $('#unread-message-' + res.order_id).remove();
+                $('#unread-performer-' + res.order_id).remove();
             }
             checkDropDownMenuEmpty();
         });
@@ -370,7 +408,7 @@ $(document).ready(function () {
 
         if (emailField.val().length && !emailField.val().match(emailRegExp)) {
             emailField.addClass('error');
-            $('.error.email').html(errorWrongValue);
+            $('.error.email').html(errorWrongValueText);
         }
 
         if (validationFlag) {
@@ -576,7 +614,7 @@ $(document).ready(function () {
                 resetErrors(form);
                 if (performersInput.val() <= 0 || performersInput.val() > 20) {
                     performersInput.addClass('error');
-                    performersInputError.html(errorWrongValue);
+                    performersInputError.html(errorWrongValueText);
                     return false;
                 } else return true;
             },
@@ -584,11 +622,11 @@ $(document).ready(function () {
                 resetErrors(form);
                 if (addressInput.val() < 5) {
                     addressInput.addClass('error');
-                    addressInputError.html(errorFieldMustBeFilledIn);
+                    addressInputError.html(errorFieldMustBeFilledInText);
                     return false;
                 } else if (addressInput.val() > 200) {
                     addressInput.addClass('error');
-                    addressInputError.html(errorWrongValue);
+                    addressInputError.html(errorWrongValueText);
                     return false;
                 } else return true;
             },
@@ -643,7 +681,7 @@ $(document).ready(function () {
     backButton.click(() => {
         backButton.attr('disabled','disabled');
         $.get(backStepUrl, {
-            'id': orderId ? orderId : '',
+            'id': window.orderId ? window.orderId : '',
         }, () => {
             nextPrevStep(true, () => {
                 backButton.removeAttr('disabled');
@@ -749,7 +787,7 @@ $(document).ready(function () {
             let photoPos = parseInt($(this).parents('.order-photo').find('input[type=file]').attr('name').replace('photo',''));
             $.post(deleteOrderImageUrl, {
                 '_token': window.tokenField,
-                'id': orderId,
+                'id': window.orderId,
                 'pos': photoPos
             });
         });
@@ -782,17 +820,6 @@ $(document).ready(function () {
     // ORDERS BLOCK END
 
     // ORDERS LIST BLOCK BEGIN
-    const modalClosingConfirm = $('#order-closing-confirm-modal'),
-        modalResumedConfirm = $('#order-resume-confirm-modal'),
-        orderPerformersModal = $('#order-performers-modal'),
-        tablePerformers = orderPerformersModal.find('table.table.table-striped'),
-        headNoPerformers = orderPerformersModal.find('h4'),
-        removePerformerModal = $('#remove-performer-modal'),
-        removePerformerModalYesButton = removePerformerModal.find('button.delete-yes'),
-        orderClosedModal = $('#order-closed-modal'),
-        orderResumedModal = $('#order-resumed-modal'),
-        ordersActiveTable = $('#content-active').find('table.datatable-basic.default');
-
     // Change pagination on data-tables
     ordersActiveTable.on('draw.dt', function () {
         bindOrderOperation(modalClosingConfirm,'close-order');
@@ -806,21 +833,12 @@ $(document).ready(function () {
     $('button.close-yes').click(function (e) {
         e.preventDefault();
         modalClosingConfirm.modal('hide');
-        orderClosedModal.find('input[name=order_id]').val(orderId);
+        orderClosedModal.find('input[name=order_id]').val(window.orderId);
         $.post(closeOrderUrl, {
             '_token': window.tokenField,
-            'id': orderId,
+            'id': window.orderId,
         }, () => {
-            window.tableRow.find('.label').removeClass('in-progress').addClass('closed').html(archiveLabelText);
-
-            let button = window.tableRow.find('button.close-order');
-            button.removeClass('close-order').addClass('resume-order');
-            button.find('span').html(resumeOrderText);
-
-            deleteDataTableRows($('#content-active'), window.tableRow, true);
-            addDataTableRow($('#content-archive'), window.tableRow, true);
-            bindOrderOperation(modalResumedConfirm,'resume-order');
-
+            movingOrderToArchive(window.tableRow, modalResumedConfirm);
             orderClosedModal.modal('show');
         });
     });
@@ -831,37 +849,9 @@ $(document).ready(function () {
         modalResumedConfirm.modal('hide');
         $.post(resumeOrderUrl, {
             '_token': window.tokenField,
-            'id': orderId,
+            'id': window.orderId,
         }, () => {
-            window.tableRow.find('.label').removeClass('closed').addClass('in_approve').html(inApproveLabelText);
-
-            window.tableRow.find('.resume-order').remove();
-            let button = window.tableRow.find('button.resume-order');
-            button.removeClass('resume-order').addClass('close-order');
-            button.find('span').html(closeOrderText);
-
-            window.tableRow.find('.order-cell-edit').removeClass('empty').addClass('icon').append(
-                $('<a></a>').attr({
-                    'title':editOrderText,
-                    'href':editOrderUrl + '?id=' + orderId
-                }).append(
-                    $('<i></i>').addClass('icon-pencil5')
-                )
-            );
-
-            window.tableRow.find('.order-cell-button').removeClass('order-cell-button').addClass('order-cell-delete').append(
-                $('<i></i>').attr({
-                    'title':deleteOrderText,
-                    'modal-data':'delete-modal',
-                    'del-data':orderId
-                }).addClass('icon-close2')
-            );
-
-            deleteDataTableRows($('#content-archive'), window.tableRow, true);
-            addDataTableRow($('#content-approving'), window.tableRow, true);
-            bindOrderOperation(modalClosingConfirm,'close-order');
-            bindDelete();
-
+            movingOrderToApproved(window.tableRow);
             orderResumedModal.modal('show');
         });
     });
@@ -892,67 +882,7 @@ $(document).ready(function () {
     });
 
     // Show order performers modal
-    $('i.performers-list').click(function () {
-        let orderId = getId($(this), 'order-performers-', true);
-        $.post(getOrderPerformersUrl, {
-            '_token': window.tokenField,
-            'id': orderId,
-        }, (data) => {
-            if (data.performers.length) {
-                headNoPerformers.addClass('d-none');
-                tablePerformers.removeClass('d-none');
-
-                $.each(data.performers, function (k, performer) {
-                    let tableRowLast = tablePerformers.find('tr').last(),
-                        tableRow = !k ? tableRowLast : tableRowLast.clone(),
-                        removePerformerIcon = tableRow.find('.order-cell-delete i');
-
-                    tableRow.attr('id','row-' + (k + 1));
-                    if (k) tablePerformers.append(tableRow);
-                    if (performer.avatar) tableRow.find('.avatar.cir').css(getAvatarProps(performer.avatar,performer.avatar_props,0.35))
-                    tableRow.find('.user-name').html(performer.full_name);
-                    tableRow.find('.user-age').html(performer.age);
-                    // removePerformerIcon.attr('id',performer.id);
-
-                    removePerformerIcon.click(function () {
-                        window.removingPerformerId = performer.id;
-                        window.orderId = orderId;
-                        orderPerformersModal.modal('hide');
-                        removePerformerModal.modal('show');
-                    });
-
-                    let ratingLine = tableRow.find('.rating-line');
-                    if (performer.rating) {
-                        for (let i=1;i<=ratingLine.find('i').length;i++) {
-                            let ratingStar = ratingLine.find('#rating-star-' + i);
-                            if (i <= performer.rating && ratingStar.hasClass('icon-star-empty3')) {
-                                ratingStar.removeClass('icon-star-empty3').addClass('icon-star-full2');
-                            } else if (i > performer.rating && ratingStar.hasClass('icon-star-full2')) ratingStar.removeClass('icon-star-full2').addClass('icon-star-empty3');
-                        }
-                    } else ratingLine.find('i.icon-star-full2').removeClass('icon-star-full2').addClass('icon-star-empty3');
-
-                });
-            } else {
-                headNoPerformers.removeClass('d-none');
-                tablePerformers.addClass('d-none');
-            }
-        });
-        orderPerformersModal.modal('show');
-    });
-
-    removePerformerModalYesButton.unbind();
-    removePerformerModalYesButton.click(function () {
-        $.post(removeOrderPerformer, {
-            '_token': window.tokenField,
-            'order_id': window.orderId,
-            'user_id': window.removingPerformerId
-        }, (data) => {
-            $('#order-performers-' + window.orderId).next('span').html(data.performers_count);
-            messageModal.find('h4').html(data.message);
-            removePerformerModal.modal('hide');
-            messageModal.modal('show');
-        });
-    });
+    bindOrderPerformersList();
     // ORDERS LIST BLOCK END
 
     //CHATS BLOCK BEGIN
@@ -1021,10 +951,10 @@ $(document).ready(function () {
         });
 
         // Receiving new message
-        window.Echo.private('chat_' + orderId).listen('.chat', res => {
+        window.Echo.private('chat_' + window.orderId).listen('.chat', res => {
             $.post(readMessageUrl, {
                 '_token': window.tokenField,
-                'order_id': orderId,
+                'order_id': window.orderId,
             }, () => {
                 window.dropDown.find('li.unread-messages').remove();
                 if (!window.dropDown.find('li').length) window.rightButtonBlock.find('.dot').remove();
@@ -1088,11 +1018,13 @@ const getNewMessageRow = (selfFlag) => {
     return messageRow;
 }
 
+const getPerformersCountContainer = (orderId) => {
+    return $('#order-performers-' + window.orderId).next('span');
+}
+
 const removeLastMessageRowWithPreviewImage = () => {
     let attachedImageContainer = getAttachedImageContainerNotLoaded();
-    if (attachedImageContainer.length) {
-        attachedImageContainer.parents('.message-row').remove();
-    }
+    if (attachedImageContainer.length) attachedImageContainer.parents('.message-row').remove();
 }
 
 const getAttachedImageContainerNotLoaded = () => {
@@ -1140,7 +1072,7 @@ const newMessageChat = (inputMessage, inputMessageFile, messagesBlock) => {
 
         $('.error').html('');
         formData.append('_token', window.tokenField);
-        formData.append('order_id', parseInt(orderId));
+        formData.append('order_id', parseInt(window.orderId));
         formData.append('body', inputMessage.val());
 
         if (inputMessageFile.val()) formData.append('image', inputMessageFile[0].files[0]);
@@ -1308,6 +1240,78 @@ const bindChangePagination = (dataTable) => {
     });
 }
 
+const bindOrderPerformersList = () => {
+    const iconPerformersList =  $('i.performers-list'),
+        removePerformerModal = $('#remove-performer-modal'),
+        removePerformerModalYesButton = removePerformerModal.find('button.delete-yes'),
+        orderPerformersModal = $('#order-performers-modal'),
+        tablePerformers = orderPerformersModal.find('table.table.table-striped'),
+        headNoPerformers = orderPerformersModal.find('h4');
+
+    iconPerformersList.unbind();
+    iconPerformersList.click(function () {
+        let orderId = getId($(this), 'order-performers-', true);
+        $.post(getOrderPerformersUrl, {
+            '_token': window.tokenField,
+            'id': orderId,
+        }, (data) => {
+            if (data.performers.length) {
+                headNoPerformers.addClass('d-none');
+                tablePerformers.removeClass('d-none');
+
+                $.each(data.performers, function (k, performer) {
+                    let tableRowLast = tablePerformers.find('tr').last(),
+                        tableRow = !k ? tableRowLast : tableRowLast.clone(),
+                        removePerformerIcon = tableRow.find('.order-cell-delete i');
+
+                    tableRow.attr('id','row-' + (k + 1));
+                    if (k) tablePerformers.append(tableRow);
+                    if (performer.avatar) tableRow.find('.avatar.cir').css(getAvatarProps(performer.avatar,performer.avatar_props,0.35))
+                    tableRow.find('.user-name').html(performer.full_name);
+                    tableRow.find('.user-age').html(performer.age);
+                    // removePerformerIcon.attr('id',performer.id);
+
+                    removePerformerIcon.click(function () {
+                        window.removingPerformerId = performer.id;
+                        window.orderId = orderId;
+                        orderPerformersModal.modal('hide');
+                        removePerformerModal.modal('show');
+                    });
+
+                    let ratingLine = tableRow.find('.rating-line');
+                    if (performer.rating) {
+                        for (let i=1;i<=ratingLine.find('i').length;i++) {
+                            let ratingStar = ratingLine.find('#rating-star-' + i);
+                            if (i <= performer.rating && ratingStar.hasClass('icon-star-empty3')) {
+                                ratingStar.removeClass('icon-star-empty3').addClass('icon-star-full2');
+                            } else if (i > performer.rating && ratingStar.hasClass('icon-star-full2')) ratingStar.removeClass('icon-star-full2').addClass('icon-star-empty3');
+                        }
+                    } else ratingLine.find('i.icon-star-full2').removeClass('icon-star-full2').addClass('icon-star-empty3');
+
+                });
+            } else {
+                headNoPerformers.removeClass('d-none');
+                tablePerformers.addClass('d-none');
+            }
+        });
+        orderPerformersModal.modal('show');
+    });
+
+    removePerformerModalYesButton.unbind();
+    removePerformerModalYesButton.click(function () {
+        $.post(removeOrderPerformer, {
+            '_token': window.tokenField,
+            'order_id': window.orderId,
+            'user_id': window.removingPerformerId
+        }, (data) => {
+            getPerformersCountContainer(window.orderId).html(data.performers_count);
+            messageModal.find('h4').html(data.message);
+            removePerformerModal.modal('hide');
+            messageModal.modal('show');
+        });
+    });
+}
+
 const bindDelete = () => {
     let deleteIcon = $('.icon-close2, .icon-bell-cross');
     deleteIcon.unbind();
@@ -1375,6 +1379,65 @@ const clickYesDeleteOnModal = (dataTable, useCounter) => {
     });
 }
 
+const movingOrderToApproved = (tableRow) => {
+    changeTableRowLabel(tableRow, 'closed', 'in-approve', inApproveLabelText);
+    tableRow.find('.resume-order').remove();
+
+    tableRow.find('.order-cell-edit').removeClass('empty').addClass('icon').append(
+        $('<a></a>').attr({
+            'title': editOrderText,
+            'href': editOrderUrl + '?id=' + window.orderId
+        }).append(
+            $('<i></i>').addClass('icon-pencil5')
+        )
+    );
+
+    tableRow.find('.order-cell-button').removeClass('order-cell-button').addClass('order-cell-delete').append(
+        $('<i></i>').attr({
+            'title': deleteOrderText,
+            'modal-data': 'delete-modal',
+            'del-data': window.orderId
+        }).addClass('icon-close2')
+    );
+    bindDelete();
+
+    deleteDataTableRows($('#content-archive'), tableRow, true);
+    addDataTableRow($('#content-approving'), tableRow, true);
+}
+
+const movingOrderToInProgress = (tableRow, performers, modalClosingConfirm) => {
+    changeTableRowLabel(tableRow, 'in-approve', 'in-progress', inApproveLabelText);
+
+    tableRow.find('.order-cell-edit').html('').append(
+        $('<i></i>').attr({
+            'id': getId(tableRow, 'row-', true),
+            'title': participantsText,
+        }).addClass('performers-list icon-users4 me-1')
+    ).append(
+        $('<span></span>').html(performers)
+    );
+    bindOrderPerformersList();
+
+    tableRow.find('.order-cell-delete').removeClass('order-cell-delete').addClass('order-cell-button').append(
+        $('<button></button>').attr('type','button').addClass('btn btn-secondary close-order micro').append(
+            $('<span></span>').html(closeOrderText)
+        )
+    );
+    tableRow.find('i.icon-close2').remove();
+    bindOrderOperation(modalClosingConfirm,'close-order');
+}
+
+const movingOrderToArchive = (tableRow, modalResumedConfirm) => {
+    changeTableRowLabel(tableRow, 'in-progress', 'closed', archiveLabelText);
+    changeTableRowButton(tableRow, 'close-order', 'resume-order', resumeOrderText);
+
+    tableRow.find('.order-cell-edit').addClass('empty').html('');
+
+    deleteDataTableRows($('#content-active'), tableRow, true);
+    addDataTableRow($('#content-archive'), tableRow, true);
+    bindOrderOperation(modalResumedConfirm,'resume-order');
+}
+
 const deleteDataTableRows = (contentBlockTab, row, useCounter) => {
     let baseTable = row.parents('.datatable-basic.default'),
         dataTable = contentBlockTab.find('table'+window.dataTableClasses).DataTable();
@@ -1396,6 +1459,16 @@ const deleteDataTableRows = (contentBlockTab, row, useCounter) => {
     dataTable.draw();
     bindChangePagination(dataTable);
     bindDelete();
+}
+
+const changeTableRowLabel = (tableRow, removingClass, addingClass, labelText) => {
+    tableRow.find('.label').removeClass(removingClass).addClass(addingClass).html(labelText);
+}
+
+const changeTableRowButton = (tableRow, removingClass, addingClass, buttonText) => {
+    let button = tableRow.find('button.' + removingClass);
+    button.removeClass(removingClass).addClass(addingClass);
+    button.find('span').html(buttonText);
 }
 
 const addDataTableRow = (contentBlockTab, row, useCounter) => {
@@ -1434,7 +1507,7 @@ const changeDataCounter = (contentBlockTab, increment) => {
 const getNews = () => {
     window.dropDown.html('');
 
-    $.get(getUnreadMessages).done((data) => {
+    $.get(getUnreadMessagesUrl).done((data) => {
         if (data.unread.length !== 0) {
             checkDropDownMenuNotEmpty();
             $.each(data.unread, function (id, counter) {
@@ -1446,11 +1519,30 @@ const getNews = () => {
 
     $.get(getSubscriptionsUrl).done((data) => {
         if (data.subscriptions.length) {
-            checkDropDownMenuNotEmpty();
             $.each(data.subscriptions, function (k,subscription) {
-                $.each(subscription.unread_orders, function (k,unreadOrder) {
-                    appendDropdownUnreadOrder(unreadOrder.order.id, unreadOrder.order.user.name + ' ' + unreadOrder.order.user.family);
-                });
+                if (subscription.unread_orders.length) {
+                    checkDropDownMenuNotEmpty();
+                    $.each(subscription.unread_orders, function (k,unreadOrder) {
+                        appendDropdownUnreadOrder(unreadOrder.order.id, unreadOrder.order.user.name + ' ' + unreadOrder.order.user.family);
+                    });
+                }
+            });
+        }
+    });
+
+    $.get(getUnreadOrderPerformersUrl).done((data) => {
+        if (data.performers.length) {
+            checkDropDownMenuNotEmpty();
+            $.each(data.performers, function (k,performer) {
+                appendDropdownUnreadPerformer(performer.order_id, performer.user.name + ' ' + performer.user.family);
+            });
+        }
+    });
+
+    $.get(getUnreadOrderStatusUrl).done((data) => {
+        if (data.orders.length) {
+            $.each(data.orders, function (k,order) {
+                appendDropdownUnreadOrderStatus(order.id, order.status);
             });
         }
     });
@@ -1461,15 +1553,15 @@ const appendDropdownUnreadMessageRow = (orderId, counter) => {
         $('<li></li>').attr('id','unread-message-' + orderId).addClass('unread-messages').append(
             $('<div></div>')
                 .append(
-                    $('<span></span>').html(unreadMessages)
+                    $('<span></span>').html(unreadMessagesText)
                 ).append(
                     $('<span></span>').addClass('counter').html(counter)
                 ).append(
                     $('<br/>')
                 ).append(
-                $('<a></a>').attr('href', chatUrl+'/?order_id='+orderId).html(inChatNumber + orderId)
-            )
-        ).append('<hr>')
+                    $('<a></a>').attr('href', chatUrl+'/?order_id=' + orderId).html(inChatNumberText + orderId)
+                )
+            ).append('<hr>')
     );
 }
 
@@ -1478,11 +1570,37 @@ const appendDropdownUnreadOrder = (orderId, userName) => {
         $('<li></li>').attr('id','unread-order-' + orderId).addClass('unread-subscriptions').append(
             $('<div></div>')
                 .append(
-                    $('<a></a>').attr('href', ordersUrl+'/?id=' + orderId).html(newOrderFrom + '<br>')
+                    $('<a></a>').attr('href', ordersUrl+'/?id=' + orderId).html(newOrderFromText + '<br>')
                 ).append(
-                $('<span></span>').html(userName)
-            )
-        ).append('<hr>')
+                    $('<span></span>').html(userName)
+                )
+            ).append('<hr>')
+    );
+}
+
+const appendDropdownUnreadPerformer = (orderId, userName) => {
+    window.dropDown.append(
+        $('<li></li>').attr('id','unread-performer-' + orderId).addClass('unread-performer').append(
+            $('<div></div>')
+                .append(
+                    $('<a></a>').attr('href', myOrders).html(newPerformerText + orderId + ':<br>')
+                ).append(
+                    $('<span></span>').html(userName)
+                )
+            ).append('<hr>')
+    );
+}
+
+const appendDropdownUnreadOrderStatus = (orderId, orderStatus) => {
+    window.dropDown.append(
+        $('<li></li>').attr('id','unread-order-status-' + orderId).addClass('unread-order-status').append(
+            $('<div></div>')
+                .append(
+                    $('<a></a>').attr('href', myOrders).html(newOrderStatusText + orderId + ':<br>')
+                ).append(
+                    $('<span></span>').html('«' + window.orderStatuses[orderStatus] + '»')
+                )
+            ).append('<hr>')
     );
 }
 
@@ -1607,31 +1725,43 @@ const getPoints = () => {
         }
         if (orders.length) {
             $.each(orders, function (k,point) {
-                let createdAt = new Date(point.created_at);
-                window.placemarks.push(getPlaceMark([point.latitude, point.longitude], {
-                    placemarkId: k,
-                    // balloonContentHeader: point.order_type.name,
-                    // balloonContentBody: point.address,
-                    orderId: point.id,
-                    name: point.order_type.name,
-                    address: point.address,
-                    orderType: point.order_type.name,
-                    images: point.images,
-                    orderSubTypes: point.order_type.subtypes,
-                    subtypes: point.subtypes,
-                    need_performers: point.need_performers,
-                    performers: point.performers.length,
-                    user: point.user,
-                    date: createdAt.toLocaleDateString('ru-RU'),
-                    description_short: point.description_short,
-                    description_full: point.description_full
-                }));
+                let createdAt = new Date(point.created_at),
+                    meIsPerformer = false;
+                if (point.performers.length) {
+                    for (let p=0;p<point.performers.length;p++) {
+                        if (point.performers[p].id === userId) {
+                            meIsPerformer = true;
+                            break;
+                        }
+                    }
+                }
 
-                if (window.getPreviewFlag) {
-                    window.getPreviewFlag = false;
-                    forceOpenOrder(0);
-                } else if (window.openOrderId && window.openOrderId === point.id) {
-                    forceOpenOrder(k);
+                if (!meIsPerformer) {
+                    window.placemarks.push(getPlaceMark([point.latitude, point.longitude], {
+                        placemarkId: k,
+                        // balloonContentHeader: point.order_type.name,
+                        // balloonContentBody: point.address,
+                        orderId: point.id,
+                        name: point.order_type.name,
+                        address: point.address,
+                        orderType: point.order_type.name,
+                        images: point.images,
+                        orderSubTypes: point.order_type.subtypes,
+                        subtypes: point.subtypes,
+                        need_performers: point.need_performers,
+                        performers: point.performers.length,
+                        user: point.user,
+                        date: createdAt.toLocaleDateString('ru-RU'),
+                        description_short: point.description_short,
+                        description_full: point.description_full
+                    }));
+
+                    if (window.getPreviewFlag) {
+                        window.getPreviewFlag = false;
+                        forceOpenOrder(0);
+                    } else if (window.openOrderId && window.openOrderId === point.id) {
+                        forceOpenOrder(k);
+                    }
                 }
             });
 
@@ -1712,14 +1842,14 @@ const showOrder = (point) => {
             readOrderUrl,
             {'order_id': orderId}
         ).done(() => {
-            $('#unread-order-'+orderId).remove();
+            $('#unread-order-' + orderId).remove();
             checkDropDownMenuEmpty();
         });
     }
 
     orderContainer
         .append(
-            $('<h6></h6>').addClass('order-number').html(orderNumber + orderId + fromText + properties.get('date'))
+            $('<h6></h6>').addClass('order-number').html(orderNumberText + orderId + fromText + properties.get('date'))
         ).append(
             $('<div></div>').addClass('w-100 d-flex align-items-center justify-content-between')
                 .append(
@@ -1765,7 +1895,7 @@ const showOrder = (point) => {
         orderContainer.append(subTypesContainer);
     }
 
-    orderContainer.append($('<p></p>').addClass('mb-1 text-left').html('<b>' + address +'</b>: ' + properties.get('address')));
+    orderContainer.append($('<p></p>').addClass('mb-1 text-left').html('<b>' + addressText +'</b>: ' + properties.get('address')));
 
     if (descriptionShort) {
         orderContainer
@@ -1792,13 +1922,13 @@ const showOrder = (point) => {
         );
 
     if (userId !== user.id) {
-        orderContainer.append($('<button></button>').addClass('respond-button btn btn-primary w-100').attr('type','button').append($('<span></span>').html(respondToAnOrder)));
+        orderContainer.append($('<button></button>').addClass('respond-button btn btn-primary w-100').attr('type','button').append($('<span></span>').html(respondToAnOrderText)));
     }
 
     orderContainer.append($('<button></button>').addClass('cb-copy btn btn-primary w-100 mt-3').attr({
         'type':'button',
         'order_id':properties.get('orderId')
-    }).append($('<span></span>').html(copyOrderHrefToClipboard)));
+    }).append($('<span></span>').html(copyOrderHrefToClipboardText)));
 
     orderContainer.append($('<hr>'));
     window.pointsContainer.append(orderContainer);
@@ -1908,12 +2038,11 @@ const setBindsAndOpen = () => {
             href = ordersUrl + '?id=' + orderId;
         if (navigator.clipboard) {
             window.navigator.clipboard.writeText(href).then(() => {
-                window.messageModal.find('h4').html(hrefIsCopied);
+                window.messageModal.find('h4').html(hrefIsCopiedText);
                 window.messageModal.modal('show');
             });
         }
     });
-
 }
 
 const enablePointImagesCarousel = (container, autoplay) => {

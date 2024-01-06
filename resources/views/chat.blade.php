@@ -115,8 +115,8 @@
     </div>
 </div>
 <script>
-    const orderId = parseInt("{{ $order->id }}"),
-        newMessageUrl  = "{{ route('messages.new_message') }}",
+    window.orderId = parseInt("{{ $order->id }}");
+    const newMessageUrl  = "{{ route('messages.new_message') }}",
         readMessageUrl = "{{ route('messages.read_message') }}";
 </script>
 @endsection

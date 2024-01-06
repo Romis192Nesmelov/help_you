@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Models\Order;
 use App\Models\User;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
@@ -14,16 +15,16 @@ class NotificationEvent implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     private string $noticeType;
+    private Order $order;
     private int $userId;
-    private int $orderId;
 
     /**
      * Create a new event instance.
      */
-    public function __construct(string $noticeType, int $orderId, int $userId=null)
+    public function __construct(string $noticeType, Order $order, int $userId)
     {
         $this->noticeType = $noticeType;
-        $this->orderId = $orderId;
+        $this->order = $order;
         $this->userId = $userId;
     }
 
@@ -54,17 +55,24 @@ class NotificationEvent implements ShouldBroadcast
      */
     public function broadcastWith(): array
     {
-        if ($this->userId) {
-            $user = User::find($this->userId);
+        if ($this->noticeType == 'new_order') {
             return [
                 'notice' => $this->noticeType,
-                'order_id' => $this->orderId,
-                'user_name' => $user->name.' '.$user->family
+                'order_id' => $this->order->id,
+                'user_name' => $this->order->user->name . ' ' . $this->order->user->family
+            ];
+        } elseif ($this->noticeType == 'new_performer') {
+            return [
+                'notice' => $this->noticeType,
+                'order_id' => $this->order->id,
+                'user_name' => $this->order->performers[$this->order->performers->count()-1]->name . ' ' . $this->order->performers[$this->order->performers->count()-1]->family
             ];
         } else {
             return [
                 'notice' => $this->noticeType,
-                'order_id' => $this->orderId
+                'order_id' => $this->order->id,
+                'performers' => $this->order->performers->count(),
+                'order_status' => $this->order->status,
             ];
         }
     }

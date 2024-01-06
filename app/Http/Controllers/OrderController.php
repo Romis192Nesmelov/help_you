@@ -5,6 +5,8 @@ use App\Events\NotificationEvent;
 use App\Http\Requests\Order\RemovePerformerRequest;
 use App\Http\Requests\Order\SetRatingRequest;
 use App\Models\Rating;
+use App\Models\ReadPerformer;
+use App\Models\ReadStatusOrder;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Http\Requests\Order\DelOrderImageRequest;
 use App\Http\Requests\Order\NextStepRequest;
@@ -110,6 +112,27 @@ class OrderController extends BaseController
         );
     }
 
+    public function getUnreadOrderPerformers(): JsonResponse
+    {
+        return response()->json([
+            'performers' => ReadPerformer::query()
+                ->whereIn('order_id',Order::where('user_id',Auth::id())->pluck('id')->toArray())
+                ->where('read',null)
+                ->with(['user'])
+                ->get()
+        ]);
+    }
+
+    public function getUnreadOrderStatus(): JsonResponse
+    {
+        return response()->json([
+            'orders' => ReadStatusOrder::query()
+                ->whereIn('order_id',Order::where('user_id',Auth::id())->pluck('id')->toArray())
+                ->where('read',null)
+                ->get()
+        ]);
+    }
+
     public function getUserAge(UserAgeRequest $request): JsonResponse
     {
         return response()->json(['age' => getUserAge(User::find($request->id))]);
@@ -158,10 +181,24 @@ class OrderController extends BaseController
             OrderUser::create($fields);
             $order = $order->refresh();
 
+            ReadPerformer::create([
+                'order_id' => $order->id,
+                'user_id' => Auth::id(),
+            ]);
+            broadcast(new NotificationEvent('new_performer', $order, $order->user_id));
+            $this->mailNotice($order, $order->userCredentials, 'new_performer_notice');
+
             $this->newChatMessage($order);
 
             $order->status = 1;
             $order->save();
+
+            ReadStatusOrder::create([
+                'order_id' => $order->id,
+                'status' => 1,
+            ]);
+            broadcast(new NotificationEvent('new_order_status', $order, $order->user_id));
+            $this->mailNotice($order, $order->userCredentials, 'new_order_status_notice');
 
 //            if ($order->performers->count() >= $order->need_performers) {
 //                $order->status = 1;
@@ -329,7 +366,7 @@ class OrderController extends BaseController
         $order->approved = 0;
         $order->save();
 
-        OrderUser::where('order_id')->delete();
+        OrderUser::where('order_id',$request->id)->delete();
         $this->newOrderInSubscription($order->id);
         return response()->json([],200);
     }

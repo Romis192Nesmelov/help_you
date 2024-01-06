@@ -120,16 +120,16 @@
         subscribeUrl = "{{ route('account.subscription') }}",
         getOrdersUrl = "{{ route('order.get_orders') }}",
         getUserAgeUrl = "{{ route('order.get_user_age') }}",
-        orderNumber = "{{ trans('content.order_number') }}",
+        orderNumberText = "{{ trans('content.order_number') }}",
         fromText = "{{ trans('content.from') }}",
         outOfText = "{{ trans('content.out_of') }}",
-        address = "{{ trans('content.address') }}",
+        addressText = "{{ trans('content.address') }}",
         descriptionShortText = "{{ trans('content.description_short') }}",
         descriptionFullText = "{{ trans('content.description_full') }}",
         descriptionFullOfOrderText = "{{ trans('content.description_full_of_order') }}",
         numberOfPerformersText = "{{ trans('content.number_of_performers') }}",
-        respondToAnOrder = "{{ trans('content.respond_to_an_order') }}",
-        copyOrderHrefToClipboard = "{{ trans('content.copy_order_href_to_clipboard') }}",
-        hrefIsCopied = "{{ trans('content.href_is_copied') }}";
+        respondToAnOrderText = "{{ trans('content.respond_to_an_order') }}",
+        copyOrderHrefToClipboardText = "{{ trans('content.copy_order_href_to_clipboard') }}",
+        hrefIsCopiedText = "{{ trans('content.href_is_copied') }}";
 </script>
 @endsection

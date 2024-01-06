@@ -231,20 +231,29 @@
 @endif
 
 <script>
-    window.orderId = null;
     const userId = parseInt("{{ auth()->check() }}") ? parseInt("{{ auth()->id() }}") : null,
         accountUrl = "{{ route('account.change') }}",
+        getUnreadMessagesUrl = "{{ route('messages.get_unread_messages') }}",
         getSubscriptionsUrl = "{{ route('order.get_subscriptions_news') }}",
-        getUnreadMessages = "{{ route('messages.get_unread_messages') }}",
+        getUnreadOrderPerformersUrl = "{{ route('order.get_unread_order_performers') }}",
+        getUnreadOrderStatusUrl = "{{ route('order.get_unread_order_status') }}",
         ordersUrl = "{{ route('order.orders') }}",
+        myOrders = "{{ route('account.my_orders') }}",
         chatUrl = "{{ route('messages.chat') }}",
-        newOrderFrom = "{{ trans('content.new_order_from') }}",
-        unreadMessages = "{{ trans('messages.unread_messages') }}",
-        inChatNumber = "{{ trans('messages.in_chat_number') }}",
-        openMessageModalFlag = parseInt("{{ session()->has('message') }}"),
-        errorFieldMustBeFilledIn = "{{ trans('validation.field_must_be_filled_in') }}",
-        errorWrongValue = "{{ trans('validation.wrong_value') }}";
+        newOrderFromText = "{{ trans('content.new_order_from') }}",
+        unreadMessagesText = "{{ trans('messages.unread_messages') }}",
+        newPerformerText = "{{ trans('content.new_performer') }}",
+        newOrderStatusText = "{{ trans('content.new_order_status') }}",
+        inChatNumberText = "{{ trans('messages.in_chat_number') }}",
+        errorFieldMustBeFilledInText = "{{ trans('validation.field_must_be_filled_in') }}",
+        errorWrongValueText = "{{ trans('validation.wrong_value') }}",
+        openMessageModalFlag = parseInt("{{ session()->has('message') }}");
+        window.orderStatuses = [];
 </script>
+@for ($i=0;$i<3;$i++)
+    <script>window.orderStatuses.push("{{ trans('content.status_'.$i) }}");</script>
+@endfor
+<script>window.orderStatuses.push("{{ trans('content.approved') }}");</script>
 
 </body>
 </html>

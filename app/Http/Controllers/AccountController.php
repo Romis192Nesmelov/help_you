@@ -7,6 +7,9 @@ use App\Http\Requests\Account\ChangePhoneRequest;
 use App\Http\Requests\Account\EditAccountRequest;
 use App\Http\Requests\Account\GetCodeRequest;
 use App\Http\Requests\Account\SubscriptionRequest;
+use App\Models\Order;
+use App\Models\ReadPerformer;
+use App\Models\ReadStatusOrder;
 use App\Models\Subscription;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -34,6 +37,9 @@ class AccountController extends BaseController
 
     public function myOrders(): View
     {
+        $myOrdersIds = Order::where('user_id',Auth::id())->pluck('id')->toArray();
+        ReadStatusOrder::query()->whereIn('order_id',$myOrdersIds)->update(['read' => true]);
+        ReadPerformer::query()->whereIn('order_id',$myOrdersIds)->update(['read' => true]);
         $this->data['orders'] = [
             'active' => Auth::user()->ordersActiveAndApproving,
             'approving' => Auth::user()->orderApproving,

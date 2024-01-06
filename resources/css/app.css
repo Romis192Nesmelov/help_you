@@ -204,7 +204,7 @@ table {
     font-size: 18px;
     top: auto;
     margin-top: 10px;
-    right: 15px;
+    right: 25px;
     color: grey;
 }
 
@@ -866,7 +866,7 @@ table.datatable-basic td .label {
     color: white;
 }
 
-table.datatable-basic td .label.in_approve {
+table.datatable-basic td .label.in-approve {
     background-color: #004d2a;
 }
 
@@ -959,6 +959,7 @@ table.datatable-basic td.empty {
 
 #messages .message-row .message-block .avatar.cir {
     width: 40px;
+    min-width: 40px;
     height: 40px;
     margin-right: 10px;
 }

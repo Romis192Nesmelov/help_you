@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use App\Casts\Json;
 use Illuminate\Support\Facades\Auth;
 
 class Order extends Model
@@ -71,9 +70,14 @@ class Order extends Model
         return $this->hasMany(Message::class);
     }
 
-    public function readSubscribers(): HasMany
+    public function readSubscriptions(): HasMany
     {
         return $this->hasMany(ReadOrder::class);
+    }
+
+    public function readPerformers(): HasMany
+    {
+        return $this->hasMany(ReadPerformer::class);
     }
 
     public function scopeDefault(Builder $query): void

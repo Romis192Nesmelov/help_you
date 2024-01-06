@@ -16,16 +16,18 @@
 
             {{-- Edit or remove performers cell --}}
             @if ($editRoute && $order['status'] == 2)
-                <td class="order-cell-edit icon"><a title="{{ trans('content.edit') }}" href="{{ route($editRoute,['id' => $order->id]) }}"><i class="icon-pencil5"></i></a></td>
+                <td class="order-cell-edit icon">
+                    <a title="{{ trans('content.edit') }}" href="{{ route($editRoute,['id' => $order->id]) }}"><i class="icon-pencil5"></i></a>
+                </td>
             @elseif ((isset($chatMode) && $chatMode) || $order['status'] == 1)
-                <td class="icon">
+                <td class="order-cell-edit icon">
                     <nobr>
                         <i id="order-performers-{{ $order->id }}" title="{{ trans('messages.participants') }}" class="{{ $order->user_id == auth()->id() ? 'performers-list' : '' }} icon-users4 me-1"></i>
                         <span>{{ $order->performers->count() }}</span>
                     </nobr>
                 </td>
             @else
-                <td class="empty"></td>
+                <td class="order-cell-edit icon empty"></td>
             @endif
 
             {{-- Status label cell --}}
@@ -33,7 +35,7 @@
                 @if ($order->approved)
                     <span class="label {{ ['closed','in-progress','open'][$order->status] }}">{{ trans('content.status_'.((string)$order->status)) }}</span>
                 @else
-                    <span class="label in_approve">{{ trans('content.in_approve') }}</span>
+                    <span class="label in-approve">{{ trans('content.in_approve') }}</span>
                 @endif
             </td>
 
