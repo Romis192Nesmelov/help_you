@@ -16,17 +16,15 @@ class NotificationEvent implements ShouldBroadcast
     private string $noticeType;
     private int $userId;
     private int $orderId;
-    private string|null $userName;
 
     /**
      * Create a new event instance.
      */
-    public function __construct(string $noticeType, int $orderId, int $userId, string|null $userName=null)
+    public function __construct(string $noticeType, int $orderId, int $userId=null)
     {
         $this->noticeType = $noticeType;
         $this->orderId = $orderId;
         $this->userId = $userId;
-        $this->userName = $userName;
     }
 
     /**
@@ -56,6 +54,18 @@ class NotificationEvent implements ShouldBroadcast
      */
     public function broadcastWith(): array
     {
-        return ['notice' => $this->noticeType, 'order_id' => $this->orderId, 'user_name' => $this->userName];
+        if ($this->userId) {
+            $user = User::find($this->userId);
+            return [
+                'notice' => $this->noticeType,
+                'order_id' => $this->orderId,
+                'user_name' => $user->name.' '.$user->family
+            ];
+        } else {
+            return [
+                'notice' => $this->noticeType,
+                'order_id' => $this->orderId
+            ];
+        }
     }
 }

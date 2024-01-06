@@ -117,12 +117,10 @@ $(document).ready(function () {
     // Getting news for dropdown
     if (userId) {
         getNews();
-
         // Receiving new notices
         window.Echo.private('notice_' + userId).listen('.notice', res => {
-            if (res.notice === 'message' && (!orderId || orderId !== res.order_id)) {
+            if (res.notice === 'new_message' && (!orderId || orderId !== res.order_id)) {
                 let unreadMessageRow = $('#unread-message-' + res.order_id);
-
                 checkDropDownMenuNotEmpty();
                 if (unreadMessageRow.length) {
                     let unreadMessagesCounter = unreadMessageRow.find('span.counter'),
@@ -134,8 +132,12 @@ $(document).ready(function () {
                     appendDropdownUnreadMessageRow(res.order_id, 1);
                 }
             } else if (res.notice === 'new_order') {
+                checkDropDownMenuNotEmpty();
                 appendDropdownUnreadOrder(res.order_id, res.user_name);
+            } else if (res.notice === 'delete_order') {
+                $('#unread-order-' + res.order_id).remove();
             }
+            checkDropDownMenuEmpty();
         });
     }
     // MAIN BLOCK END
@@ -1969,19 +1971,18 @@ const checkDropDownMenuNotEmpty = () => {
     audio.play();
 }
 
-const bellRing = (degrees) => {
-    window.rightButtonBlock.css({'-webkit-transform' : 'rotate('+ degrees +'deg)',
-        '-moz-transform' : 'rotate('+ degrees +'deg)',
-        '-ms-transform' : 'rotate('+ degrees +'deg)',
-        'transform' : 'rotate('+ degrees +'deg)'});
-}
-
 const checkDropDownMenuEmpty = () => {
     if (!window.dropDown.html()) {
         window.rightButtonBlock.find('.dot').remove();
     }
 }
 
+const bellRing = (degrees) => {
+    window.rightButtonBlock.css({'-webkit-transform' : 'rotate('+ degrees +'deg)',
+        '-moz-transform' : 'rotate('+ degrees +'deg)',
+        '-ms-transform' : 'rotate('+ degrees +'deg)',
+        'transform' : 'rotate('+ degrees +'deg)'});
+}
 const getAvatarProps = (avatar, props, coof) => {
     let avatarProps = {'background-image':'url('+avatar+')'};
     if (props) {

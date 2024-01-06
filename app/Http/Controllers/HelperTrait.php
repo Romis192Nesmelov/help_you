@@ -78,7 +78,7 @@ trait HelperTrait
                 'user_id' => $message->order->user_id,
                 'order_id' => $message->order_id,
             ]);
-            broadcast(new NotificationEvent('message', $message->order_id, $message->order->user_id));
+            broadcast(new NotificationEvent('new_message', $message->order_id, $message->order->user_id));
             $this->mailNotice($message->order, $message->order->userCredentials, 'new_message_notice');
         }
         foreach ($message->order->performers as $performer) {
@@ -88,7 +88,7 @@ trait HelperTrait
                     'user_id' => $performer->id,
                     'order_id' => $message->order_id,
                 ]);
-                broadcast(new NotificationEvent('message', $message->order_id, $performer->id));
+                broadcast(new NotificationEvent('new_message', $message->order_id, $performer->id));
                 $this->mailNotice($message->order, $performer, 'new_message_notice');
             }
         }

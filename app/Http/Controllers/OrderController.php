@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Events\NotificationEvent;
 use App\Http\Requests\Order\RemovePerformerRequest;
 use App\Http\Requests\Order\SetRatingRequest;
 use App\Models\Rating;
@@ -143,7 +144,7 @@ class OrderController extends BaseController
         $order = Order::find($request->order_id);
         $this->authorize('owner', $order);
         if (!$order->status) return response()->json([],403);
-//        OrderUser::where('order_id',$request->order_id)->where('user_id',$request->user_id)->delete();
+        OrderUser::where('order_id',$request->order_id)->where('user_id',$request->user_id)->delete();
         return response()->json(['message' => trans('content.the_performer_is_removed'), 'performers_count' => $order->performers->count()],200);
     }
 
@@ -260,6 +261,11 @@ class OrderController extends BaseController
         else {
             foreach ($order->images as $image) {
                 $this->deleteFile($image->image);
+            }
+            $unreadOrders = ReadOrder::where('order_id',$request->id)->where('read',null)->get();
+            foreach ($unreadOrders as $unreadOrder) {
+                broadcast(new NotificationEvent('delete_order', $request->id, $unreadOrder->subscription->subscriber_id));
+                $unreadOrder->delete();
             }
             $order->delete();
             return response()->json([],200);

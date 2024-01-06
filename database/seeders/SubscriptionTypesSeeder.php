@@ -16,7 +16,7 @@ class SubscriptionTypesSeeder extends Seeder
      */
     public function run(): void
     {
-        $ids = [11,12,13];
+        $ids = [2,3,4,5];
         foreach ($ids as $id) {
             $usedIds = [];
             $subscript = 0;
