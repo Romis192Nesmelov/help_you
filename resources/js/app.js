@@ -154,10 +154,10 @@ $(document).ready(function () {
                 }
             } else if (res.notice === 'order_approved') {
                 if (tableRow.length) {
-                    movingOrderToApproved(tableRow);
+                    movingOrderToOpen(tableRow);
                 } else {
                     checkDropDownMenuNotEmpty();
-                    appendDropdownUnreadOrderStatus(res.order_id, 4);
+                    appendDropdownUnreadOrderStatus(res.order_id, 2);
                 }
             } else if (res.notice === 'new_order_status') {
                 if (tableRow.length) {
@@ -851,7 +851,7 @@ $(document).ready(function () {
             '_token': window.tokenField,
             'id': window.orderId,
         }, () => {
-            movingOrderToApproved(window.tableRow);
+            movingOrderToApproving(window.tableRow);
             orderResumedModal.modal('show');
         });
     });
@@ -1379,8 +1379,8 @@ const clickYesDeleteOnModal = (dataTable, useCounter) => {
     });
 }
 
-const movingOrderToApproved = (tableRow) => {
-    changeTableRowLabel(tableRow, 'closed', 'in-approve', inApproveLabelText);
+const movingOrderToApproving = (tableRow) => {
+    changeTableRowLabel(tableRow, 'closed', 'in-approve', window.orderStatuses[3]);
     tableRow.find('.resume-order').remove();
 
     tableRow.find('.order-cell-edit').removeClass('empty').addClass('icon').append(
@@ -1405,8 +1405,15 @@ const movingOrderToApproved = (tableRow) => {
     addDataTableRow($('#content-approving'), tableRow, true);
 }
 
+const movingOrderToOpen = (tableRow) => {
+    changeTableRowLabel(tableRow, 'in-approve', 'open', window.orderStatuses[2]);
+    deleteDataTableRows($('#content-approving'), tableRow, true);
+    addDataTableRow($('#content-active'), tableRow, true);
+    bindDelete();
+}
+
 const movingOrderToInProgress = (tableRow, performers, modalClosingConfirm) => {
-    changeTableRowLabel(tableRow, 'in-approve', 'in-progress', inApproveLabelText);
+    changeTableRowLabel(tableRow, 'in-approve', 'in-progress', window.orderStatuses[1]);
 
     tableRow.find('.order-cell-edit').html('').append(
         $('<i></i>').attr({
@@ -1428,7 +1435,7 @@ const movingOrderToInProgress = (tableRow, performers, modalClosingConfirm) => {
 }
 
 const movingOrderToArchive = (tableRow, modalResumedConfirm) => {
-    changeTableRowLabel(tableRow, 'in-progress', 'closed', archiveLabelText);
+    changeTableRowLabel(tableRow, 'in-progress', 'closed', window.orderStatuses[0]);
     changeTableRowButton(tableRow, 'close-order', 'resume-order', resumeOrderText);
 
     tableRow.find('.order-cell-edit').addClass('empty').html('');

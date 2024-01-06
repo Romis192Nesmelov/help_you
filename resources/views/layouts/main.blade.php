@@ -253,7 +253,9 @@
 @for ($i=0;$i<3;$i++)
     <script>window.orderStatuses.push("{{ trans('content.status_'.$i) }}");</script>
 @endfor
-<script>window.orderStatuses.push("{{ trans('content.approved') }}");</script>
+<script>
+    window.orderStatuses.push("{{ trans('content.in_approve') }}");
+</script>
 
 </body>
 </html>
