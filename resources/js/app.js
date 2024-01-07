@@ -125,8 +125,7 @@ $(document).ready(function () {
         getNews();
         // Receiving new notices
         window.Echo.private('notice_' + userId).listen('.notice', res => {
-            let tableRow = $('#row-' + res.order_id);
-
+            let tableRow = getTableRow(res.order_id);
             if (res.notice === 'new_message' && (!window.orderId || window.orderId !== res.order_id)) {
                 let unreadMessageRow = $('#unread-message-' + res.order_id);
                 checkDropDownMenuNotEmpty();
@@ -170,10 +169,18 @@ $(document).ready(function () {
                     checkDropDownMenuNotEmpty();
                     appendDropdownUnreadOrderStatus(res.order_id, res.order_status);
                 }
+            } else if (res.notice === 'remove_performer') {
+                if (tableRow.length) {
+                    deleteDataTableRows($('#content-active'), tableRow, true);
+                } else {
+                    checkDropDownMenuNotEmpty();
+                    appendDropdownUnreadRemovedPerformer(res.order_id);
+                }
             } else if (res.notice === 'delete_order') {
                 $('#unread-order-' + res.order_id).remove();
                 $('#unread-message-' + res.order_id).remove();
                 $('#unread-performer-' + res.order_id).remove();
+                $('#unread-removed-performer-' + res.order_id).remove();
             }
             checkDropDownMenuEmpty();
         });
@@ -1018,6 +1025,10 @@ const getNewMessageRow = (selfFlag) => {
     return messageRow;
 }
 
+const getTableRow = (orderId) => {
+    return $('#row-' + orderId);
+}
+
 const getPerformersCountContainer = (orderId) => {
     return $('#order-performers-' + window.orderId).next('span');
 }
@@ -1264,7 +1275,6 @@ const bindOrderPerformersList = () => {
                         tableRow = !k ? tableRowLast : tableRowLast.clone(),
                         removePerformerIcon = tableRow.find('.order-cell-delete i');
 
-                    tableRow.attr('id','row-' + (k + 1));
                     if (k) tablePerformers.append(tableRow);
                     if (performer.avatar) tableRow.find('.avatar.cir').css(getAvatarProps(performer.avatar,performer.avatar_props,0.35))
                     tableRow.find('.user-name').html(performer.full_name);
@@ -1299,12 +1309,16 @@ const bindOrderPerformersList = () => {
 
     removePerformerModalYesButton.unbind();
     removePerformerModalYesButton.click(function () {
-        $.post(removeOrderPerformer, {
+        $.post(removeOrderPerformerUrl, {
             '_token': window.tokenField,
             'order_id': window.orderId,
             'user_id': window.removingPerformerId
         }, (data) => {
-            getPerformersCountContainer(window.orderId).html(data.performers_count);
+            if (data.performers_count) {
+                getPerformersCountContainer(window.orderId).html(data.performers_count);
+            } else {
+                movingOrderToOpen(getTableRow(window.orderId));
+            }
             messageModal.find('h4').html(data.message);
             removePerformerModal.modal('hide');
             messageModal.modal('show');
@@ -1319,8 +1333,8 @@ const bindDelete = () => {
         window.deleteId = $(this).attr('del-data');
         let deleteModal = $('#'+$(this).attr('modal-data')),
             inputId = deleteModal.find('input[name=id]'),
-            possibleParentRow = $('#row-'+window.deleteId),
-            altParentRow = $('.row-'+window.deleteId);
+            possibleParentRow = $('#row-' + window.deleteId),
+            altParentRow = $('.row-' + window.deleteId);
 
         window.deleteRow = possibleParentRow.length ? possibleParentRow : altParentRow;
 
@@ -1381,68 +1395,89 @@ const clickYesDeleteOnModal = (dataTable, useCounter) => {
 
 const movingOrderToApproving = (tableRow) => {
     changeTableRowLabel(tableRow, 'closed', 'in-approve', window.orderStatuses[3]);
-    tableRow.find('.resume-order').remove();
-
-    tableRow.find('.order-cell-edit').removeClass('empty').addClass('icon').append(
-        $('<a></a>').attr({
-            'title': editOrderText,
-            'href': editOrderUrl + '?id=' + window.orderId
-        }).append(
-            $('<i></i>').addClass('icon-pencil5')
-        )
-    );
-
-    tableRow.find('.order-cell-button').removeClass('order-cell-button').addClass('order-cell-delete').append(
-        $('<i></i>').attr({
-            'title': deleteOrderText,
-            'modal-data': 'delete-modal',
-            'del-data': window.orderId
-        }).addClass('icon-close2')
-    );
-    bindDelete();
+    addEditOrderIcon(tableRow);
+    addDeleteIcon(tableRow);
 
     deleteDataTableRows($('#content-archive'), tableRow, true);
     addDataTableRow($('#content-approving'), tableRow, true);
 }
 
 const movingOrderToOpen = (tableRow) => {
-    changeTableRowLabel(tableRow, 'in-approve', 'open', window.orderStatuses[2]);
-    deleteDataTableRows($('#content-approving'), tableRow, true);
-    addDataTableRow($('#content-active'), tableRow, true);
-    bindDelete();
+    if (tableRow.parents('.content-block').attr('id') !== 'content-active') {
+        changeTableRowLabel(tableRow, 'in-approve', 'open', window.orderStatuses[2]);
+        deleteDataTableRows($('#content-approving'), tableRow, true);
+        addDataTableRow($('#content-active'), tableRow, true);
+    } else {
+        changeTableRowLabel(tableRow, 'in-progress', 'open', window.orderStatuses[2]);
+        addEditOrderIcon(tableRow);
+        addDeleteIcon(tableRow);
+    }
 }
 
 const movingOrderToInProgress = (tableRow, performers, modalClosingConfirm) => {
     changeTableRowLabel(tableRow, 'in-approve', 'in-progress', window.orderStatuses[1]);
-
-    tableRow.find('.order-cell-edit').html('').append(
-        $('<i></i>').attr({
-            'id': getId(tableRow, 'row-', true),
-            'title': participantsText,
-        }).addClass('performers-list icon-users4 me-1')
-    ).append(
-        $('<span></span>').html(performers)
-    );
-    bindOrderPerformersList();
-
-    tableRow.find('.order-cell-delete').removeClass('order-cell-delete').addClass('order-cell-button').append(
-        $('<button></button>').attr('type','button').addClass('btn btn-secondary close-order micro').append(
-            $('<span></span>').html(closeOrderText)
-        )
-    );
-    tableRow.find('i.icon-close2').remove();
-    bindOrderOperation(modalClosingConfirm,'close-order');
+    addPerformersIcon(tableRow, performers);
+    addCloseOrderButton(tableRow, modalClosingConfirm);
 }
 
 const movingOrderToArchive = (tableRow, modalResumedConfirm) => {
     changeTableRowLabel(tableRow, 'in-progress', 'closed', window.orderStatuses[0]);
     changeTableRowButton(tableRow, 'close-order', 'resume-order', resumeOrderText);
 
-    tableRow.find('.order-cell-edit').addClass('empty').html('');
+    getOrderCellEdit(tableRow).addClass('empty').html('');
 
     deleteDataTableRows($('#content-active'), tableRow, true);
     addDataTableRow($('#content-archive'), tableRow, true);
     bindOrderOperation(modalResumedConfirm,'resume-order');
+}
+
+const getOrderCellEdit = (tableRow) => {
+    return tableRow.find('.order-cell-edit');
+}
+
+const addEditOrderIcon = (tableRow) => {
+    tableRow.find('.order-cell-edit').html('').removeClass('empty').addClass('icon').append(
+        $('<a></a>').attr({
+            'title': editOrderText,
+            'href': editOrderUrl + '?id=' + getId(tableRow, 'row-', false)
+        }).append(
+            $('<i></i>').addClass('icon-pencil5')
+        )
+    );
+}
+
+const addPerformersIcon = (tableRow, performers) => {
+    getOrderCellEdit(tableRow).html('').append(
+        $('<nobr></nobr>').append(
+            $('<i></i>').attr({
+                'id': 'order-performers-' + getId(tableRow, 'row-', false),
+                'title': participantsText,
+            }).addClass('performers-list icon-users4 me-1')
+        ).append(
+            $('<span></span>').html(performers)
+        )
+    );
+    bindOrderPerformersList();
+}
+
+const addCloseOrderButton = (tableRow, modalClosingConfirm) => {
+    tableRow.find('.order-cell-delete').html('').removeClass('order-cell-delete').addClass('order-cell-button').append(
+        $('<button></button>').attr('type','button').addClass('btn btn-secondary close-order micro').append(
+            $('<span></span>').html(closeOrderText)
+        )
+    );
+    bindOrderOperation(modalClosingConfirm,'close-order');
+}
+
+const addDeleteIcon = (tableRow) => {
+    tableRow.find('.order-cell-button').html('').removeClass('order-cell-button').addClass('order-cell-delete').append(
+        $('<i></i>').attr({
+            'title': deleteOrderText,
+            'modal-data': 'delete-modal',
+            'del-data': getId(tableRow, 'row-', false)
+        }).addClass('icon-close2')
+    );
+    bindDelete();
 }
 
 const deleteDataTableRows = (contentBlockTab, row, useCounter) => {
@@ -1546,6 +1581,16 @@ const getNews = () => {
         }
     });
 
+    $.get(getUnreadOrderRemovedPerformersUrl).done((data) => {
+        if (data.performers.length) {
+            checkDropDownMenuNotEmpty();
+            console.log(data.performers);
+            $.each(data.performers, function (k,performer) {
+                appendDropdownUnreadRemovedPerformer(performer.order.id);
+            });
+        }
+    });
+
     $.get(getUnreadOrderStatusUrl).done((data) => {
         if (data.orders.length) {
             $.each(data.orders, function (k,order) {
@@ -1566,7 +1611,7 @@ const appendDropdownUnreadMessageRow = (orderId, counter) => {
                 ).append(
                     $('<br/>')
                 ).append(
-                    $('<a></a>').attr('href', chatUrl+'/?order_id=' + orderId).html(inChatNumberText + orderId)
+                    $('<a></a>').attr('href', chatUrl + '/?order_id=' + orderId).html(inChatNumberText + orderId)
                 )
             ).append('<hr>')
     );
@@ -1608,6 +1653,16 @@ const appendDropdownUnreadOrderStatus = (orderId, orderStatus) => {
                     $('<span></span>').html('«' + window.orderStatuses[orderStatus] + '»')
                 )
             ).append('<hr>')
+    );
+}
+
+const appendDropdownUnreadRemovedPerformer = (orderId) => {
+    window.dropDown.append(
+        $('<li></li>').attr('id','unread-removed-performer-' + orderId).addClass('unread-removed-performer').append(
+            $('<div></div>').append(
+                $('<a></a>').attr('href', ordersUrl + '/?id=' + orderId).html(removedPerformerText + orderId)
+            )
+        ).append('<hr>')
     );
 }
 

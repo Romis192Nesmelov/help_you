@@ -26,4 +26,7 @@
         </div>
     </div>
 </div>
+<script>
+    const closeOrderUrl = "{{ route('order.close_order') }}";
+</script>
 @endsection

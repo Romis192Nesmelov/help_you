@@ -6,7 +6,9 @@ use App\Jobs\SendMessage;
 use App\Models\Message;
 use App\Models\MessageUser;
 use App\Models\Order;
+use App\Models\ReadRemovedPerformer;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 
@@ -119,6 +121,16 @@ trait HelperTrait
     public function sendMessage(string $template, string $mailTo, string|null $cc, array $fields, string|null $pathToFile=null)
     {
         dispatch(new SendMessage($template, $mailTo, null, $fields));
+    }
+
+    public function setReadUnread(Model $model, $myOrdersIds): void
+    {
+        $model->query()->whereIn('order_id',$myOrdersIds)->update(['read' => true]);
+    }
+
+    public function setReadUnreadRemovedPerformers(): void
+    {
+        ReadRemovedPerformer::where('user_id',Auth::id())->update(['read' => true]);
     }
 
     private function mailNotice(Order $order, User $user, string $template): void

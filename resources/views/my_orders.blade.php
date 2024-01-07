@@ -57,7 +57,7 @@
 
 <x-modal id="order-performers-modal" head="{{ trans('content.performers') }}">
     <h4 class="text-center p-4">{{ trans('content.no_performers') }}</h4>
-    <table  class="table table-striped">
+    <table class="table table-striped">
         <tr>
             <td>@include('blocks.user_creds_block',['rating' => 1])</td>
             <td class="order-cell-delete icon align-middle">
@@ -91,9 +91,7 @@
         resumeOrderUrl = "{{ route('order.resume_order') }}",
         editOrderUrl = "{{ route('order.edit_order') }}",
         getOrderPerformersUrl = "{{ route('order.get_order_performers') }}",
-        removeOrderPerformer = "{{ route('order.remove_order_performer') }}",
-        inApproveLabelText = "{{ trans('content.in_approve') }}",
-        archiveLabelText = "{{ trans('content.status_0') }}",
+        removeOrderPerformerUrl = "{{ route('order.remove_order_performer') }}",
         closeOrderText = "{{ trans('content.close') }}",
         resumeOrderText = "{{ trans('content.resume') }}",
         editOrderText = "{{ trans('content.edit') }}",

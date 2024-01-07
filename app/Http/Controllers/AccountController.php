@@ -38,8 +38,9 @@ class AccountController extends BaseController
     public function myOrders(): View
     {
         $myOrdersIds = Order::where('user_id',Auth::id())->pluck('id')->toArray();
-        ReadStatusOrder::query()->whereIn('order_id',$myOrdersIds)->update(['read' => true]);
-        ReadPerformer::query()->whereIn('order_id',$myOrdersIds)->update(['read' => true]);
+        $this->setReadUnread(new ReadStatusOrder(), $myOrdersIds);
+        $this->setReadUnread(new ReadPerformer(), $myOrdersIds);
+
         $this->data['orders'] = [
             'active' => Auth::user()->ordersActiveAndApproving,
             'approving' => Auth::user()->orderApproving,
@@ -51,6 +52,7 @@ class AccountController extends BaseController
 
     public function myHelp(): View
     {
+        $this->setReadUnreadRemovedPerformers();
         $this->data['orders'] = [
             'active' => Auth::user()->orderActivePerformer,
             'archive' => Auth::user()->orderArchivePerformer

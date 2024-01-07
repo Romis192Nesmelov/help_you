@@ -31,7 +31,7 @@ class OrdersSeeder extends Seeder
             'longitude' => 37.612245,
             'description_short' => 'Чета с кем-то где-то что-то и когда-то надо срочно сделать, а то край!',
             'approved' => 1,
-            'status' => 2
+            'status' => 1
         ]);
 
         OrderUser::create([

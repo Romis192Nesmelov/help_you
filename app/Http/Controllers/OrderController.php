@@ -6,8 +6,8 @@ use App\Http\Requests\Order\RemovePerformerRequest;
 use App\Http\Requests\Order\SetRatingRequest;
 use App\Models\Rating;
 use App\Models\ReadPerformer;
+use App\Models\ReadRemovedPerformer;
 use App\Models\ReadStatusOrder;
-use Illuminate\Foundation\Http\FormRequest;
 use App\Http\Requests\Order\DelOrderImageRequest;
 use App\Http\Requests\Order\NextStepRequest;
 use App\Http\Requests\Order\OrderRequest;
@@ -39,6 +39,7 @@ class OrderController extends BaseController
 
     public function orders(): View
     {
+        $this->setReadUnreadRemovedPerformers();
         $this->getItems('order_types', new OrderType());
         return $this->showView('orders');
     }
@@ -123,6 +124,17 @@ class OrderController extends BaseController
         ]);
     }
 
+    public function getUnreadOrderRemovedPerformers(): JsonResponse
+    {
+        return response()->json([
+            'performers' => ReadRemovedPerformer::query()
+                ->where('user_id', Auth::id())
+                ->where('read', null)
+                ->with(['order'])
+                ->get()
+        ]);
+    }
+
     public function getUnreadOrderStatus(): JsonResponse
     {
         return response()->json([
@@ -165,9 +177,24 @@ class OrderController extends BaseController
     public function removeOrderPerformer(RemovePerformerRequest $request): JsonResponse
     {
         $order = Order::find($request->order_id);
+        $performer = User::find($request->user_id);
         $this->authorize('owner', $order);
         if (!$order->status) return response()->json([],403);
+
         OrderUser::where('order_id',$request->order_id)->where('user_id',$request->user_id)->delete();
+        if (!$order->performers->count()) {
+            $order->status = 2;
+            $order->save();
+        }
+
+        ReadRemovedPerformer::create([
+            'order_id' => $request->order_id,
+            'user_id' => $request->user_id,
+        ]);
+
+        broadcast(new NotificationEvent('remove_performer', $order, $request->user_id));
+        $this->mailNotice($order, $performer, 'remove_performer_notice');
+
         return response()->json(['message' => trans('content.the_performer_is_removed'), 'performers_count' => $order->performers->count()],200);
     }
 

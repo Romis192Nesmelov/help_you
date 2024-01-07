@@ -80,6 +80,11 @@ class Order extends Model
         return $this->hasMany(ReadPerformer::class);
     }
 
+    public function readRemovedPerformers(): HasMany
+    {
+        return $this->hasMany(ReadRemovedPerformer::class);
+    }
+
     public function scopeDefault(Builder $query): void
     {
         $query

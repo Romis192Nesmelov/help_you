@@ -64,6 +64,7 @@ Route::middleware(['auth','account.completed'])->name('order.')->controller(Orde
     Route::post('/get-orders', 'getOrders')->name('get_orders');
     Route::post('/get-preview', 'getPreview')->name('get_preview');
     Route::get('/get-unread-order-performers', 'getUnreadOrderPerformers')->name('get_unread_order_performers');
+    Route::get('/get-unread-order-removed-performers', 'getUnreadOrderRemovedPerformers')->name('get_unread_order_removed_performers');
     Route::get('/get-unread-order-status', 'getUnreadOrderStatus')->name('get_unread_order_status');
     Route::post('/order-response', 'orderResponse')->name('order_response');
 
