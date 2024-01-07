@@ -12,10 +12,10 @@ $(document).ready(function () {
     window.tokenField = $('input[name=_token]').val();
     window.dropDown = $('#dropdown');
     window.rightButtonBlock = $('#right-button-block .fa.fa-bell-o');
+    window.modalClosingConfirm = $('#order-closing-confirm-modal');
+    window.modalResumedConfirm = $('#order-resume-confirm-modal');
 
-    const modalClosingConfirm = $('#order-closing-confirm-modal'),
-        modalResumedConfirm = $('#order-resume-confirm-modal'),
-        orderClosedModal = $('#order-closed-modal'),
+    const orderClosedModal = $('#order-closed-modal'),
         orderResumedModal = $('#order-resumed-modal'),
         ordersActiveTable = $('#content-active').find('table.datatable-basic.default');
 
@@ -161,9 +161,9 @@ $(document).ready(function () {
             } else if (res.notice === 'new_order_status') {
                 if (tableRow.length) {
                     if (res.order_status === 1) {
-                        movingOrderToInProgress(tableRow, res.performers, modalClosingConfirm);
+                        movingOrderToInProgress(tableRow, res.performers);
                     } else {
-                        movingOrderToArchive(tableRow, modalResumedConfirm);
+                        movingOrderToArchive(tableRow);
                     }
                 } else {
                     checkDropDownMenuNotEmpty();
@@ -827,25 +827,19 @@ $(document).ready(function () {
     // ORDERS BLOCK END
 
     // ORDERS LIST BLOCK BEGIN
-    // Change pagination on data-tables
-    ordersActiveTable.on('draw.dt', function () {
-        bindOrderOperation(modalClosingConfirm,'close-order');
-        bindOrderOperation(modalResumedConfirm,'resume-order');
-    });
-
-    bindOrderOperation(modalClosingConfirm,'close-order');
-    bindOrderOperation(modalResumedConfirm,'resume-order');
+    bindOrderOperation(window.modalClosingConfirm,'close-order');
+    bindOrderOperation(window.modalResumedConfirm,'resume-order');
 
     // Moving order to archive
     $('button.close-yes').click(function (e) {
         e.preventDefault();
-        modalClosingConfirm.modal('hide');
+        window.modalClosingConfirm.modal('hide');
         orderClosedModal.find('input[name=order_id]').val(window.orderId);
         $.post(closeOrderUrl, {
             '_token': window.tokenField,
             'id': window.orderId,
         }, () => {
-            movingOrderToArchive(window.tableRow, modalResumedConfirm);
+            movingOrderToArchive(window.tableRow);
             orderClosedModal.modal('show');
         });
     });
@@ -853,7 +847,7 @@ $(document).ready(function () {
     // Moving order to in approving
     $('button.resume-yes').click(function (e) {
         e.preventDefault();
-        modalResumedConfirm.modal('hide');
+        window.modalResumedConfirm.modal('hide');
         $.post(resumeOrderUrl, {
             '_token': window.tokenField,
             'id': window.orderId,
@@ -1247,6 +1241,8 @@ const bindChangePagination = (dataTable) => {
     const paginationEvent = ('draw.dt');
     dataTable.off(paginationEvent);
     dataTable.on(paginationEvent, function () {
+        bindOrderOperation(window.modalClosingConfirm,'close-order');
+        bindOrderOperation(window.modalResumedConfirm,'resume-order');
         bindDelete();
     });
 }
@@ -1414,13 +1410,13 @@ const movingOrderToOpen = (tableRow) => {
     }
 }
 
-const movingOrderToInProgress = (tableRow, performers, modalClosingConfirm) => {
+const movingOrderToInProgress = (tableRow, performers) => {
     changeTableRowLabel(tableRow, 'in-approve', 'in-progress', window.orderStatuses[1]);
     addPerformersIcon(tableRow, performers);
-    addCloseOrderButton(tableRow, modalClosingConfirm);
+    addCloseOrderButton(tableRow);
 }
 
-const movingOrderToArchive = (tableRow, modalResumedConfirm) => {
+const movingOrderToArchive = (tableRow) => {
     changeTableRowLabel(tableRow, 'in-progress', 'closed', window.orderStatuses[0]);
     changeTableRowButton(tableRow, 'close-order', 'resume-order', resumeOrderText);
 
@@ -1428,7 +1424,7 @@ const movingOrderToArchive = (tableRow, modalResumedConfirm) => {
 
     deleteDataTableRows($('#content-active'), tableRow, true);
     addDataTableRow($('#content-archive'), tableRow, true);
-    bindOrderOperation(modalResumedConfirm,'resume-order');
+    bindOrderOperation(window.modalResumedConfirm,'resume-order');
 }
 
 const getOrderCellEdit = (tableRow) => {
@@ -1460,13 +1456,13 @@ const addPerformersIcon = (tableRow, performers) => {
     bindOrderPerformersList();
 }
 
-const addCloseOrderButton = (tableRow, modalClosingConfirm) => {
+const addCloseOrderButton = (tableRow) => {
     tableRow.find('.order-cell-delete').html('').removeClass('order-cell-delete').addClass('order-cell-button').append(
         $('<button></button>').attr('type','button').addClass('btn btn-secondary close-order micro').append(
             $('<span></span>').html(closeOrderText)
         )
     );
-    bindOrderOperation(modalClosingConfirm,'close-order');
+    bindOrderOperation(window.modalClosingConfirm,'close-order');
 }
 
 const addDeleteIcon = (tableRow) => {
