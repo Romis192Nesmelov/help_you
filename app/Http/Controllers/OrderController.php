@@ -227,7 +227,7 @@ class OrderController extends BaseController
             broadcast(new NotificationEvent('new_order_status', $order, $order->user_id));
             $this->mailNotice($order, $order->userCredentials, 'new_order_status_notice');
 
-            broadcast(new OrderEvent('remove_order', $request->id));
+            broadcast(new OrderEvent('remove_order', $order));
 
 //            if ($order->performers->count() >= $order->need_performers) {
 //                $order->status = 1;
@@ -334,7 +334,7 @@ class OrderController extends BaseController
                 $unreadOrder->delete();
             }
 
-            broadcast(new OrderEvent('remove_order', $request->id));
+            broadcast(new OrderEvent('remove_order', $order));
 
             $order->delete();
             return response()->json([],200);
@@ -366,7 +366,7 @@ class OrderController extends BaseController
         $order->save();
         ReadOrder::where('order_id')->delete();
 
-        broadcast(new OrderEvent('remove_order', $request->id));
+        broadcast(new OrderEvent('remove_order', $order));
 
         return response()->json([],200);
     }

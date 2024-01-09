@@ -904,11 +904,31 @@ $(document).ready(function () {
         window.Echo.channel('order_event').listen('.order', res => {
             if (res.notice === 'remove_order') {
                 for (let i=0;i<window.placemarks.length;i++) {
-                    if (window.placemarks[i].properties.get('orderId') === res.order_id) {
+                    if (window.placemarks[i].properties.get('orderId') === res.order.id) {
                         window.clusterer.remove(window.placemarks[i]);
                         break;
                     }
                 }
+            } else {
+                let markId = window.placemarks.length,
+                    createdAt = new Date(res.order.created_at);
+
+                window.placemarks.push(getPlaceMark([res.order.latitude, res.order.longitude], {
+                    placemarkId: markId,
+                    orderId: res.order.id,
+                    name: res.order_type.name,
+                    address: res.order.address,
+                    orderType: res.order_type.name,
+                    images: res.images,
+                    subtype: res.sub_type.name,
+                    need_performers: res.order.need_performers,
+                    performers: res.performers.length,
+                    user: res.user,
+                    date: createdAt.toLocaleDateString('ru-RU'),
+                    description_short: res.order.description_short,
+                    description_full: res.order.description_full
+                }));
+                window.clusterer.add(window.placemarks);
             }
         });
     }
@@ -1680,7 +1700,6 @@ const getNews = () => {
     $.get(getUnreadOrderRemovedPerformersUrl).done((data) => {
         if (data.performers.length) {
             checkNotices();
-            console.log(data.performers);
             $.each(data.performers, function (k,performer) {
                 appendDropdownUnreadRemovedPerformer(performer.order.id);
             });
@@ -1869,7 +1888,7 @@ const mapInitWithContainerForEditOrder = () => {
     mapInit('image-step3');
     if (point.length) {
         window.placemark = getPlaceMark(point,{});
-        window.myMap.geoObjects.add(window.placemark)
+        window.myMap.geoObjects.add(window.placemark);
         zoomAndCenterMap();
     }
 }
@@ -1918,8 +1937,7 @@ const getPoints = () => {
                         address: point.address,
                         orderType: point.order_type.name,
                         images: point.images,
-                        orderSubTypes: point.order_type.subtypes,
-                        subtypes: point.subtypes,
+                        subtype: point.sub_type.name,
                         need_performers: point.need_performers,
                         performers: point.performers.length,
                         user: point.user,
@@ -1995,8 +2013,7 @@ const addPointsToMap = () => {
 const showOrder = (point) => {
     let properties = point.properties,
         orderId = properties.get('orderId'),
-        orderSubTypes = properties.get('orderSubTypes'),
-        currentSubTypes = properties.get('subtypes'),
+        currentSubType = properties.get('subtype'),
         user = properties.get('user'),
         images = properties.get('images'),
         descriptionShort = properties.get('description_short'),
@@ -2053,18 +2070,8 @@ const showOrder = (point) => {
 
     orderContainer.append($('<h2></h2>').addClass('order-type text-dark text-left mt-3 mb-4').html(properties.get('orderType')));
 
-    if (orderSubTypes && currentSubTypes) {
-        let subTypesContainer = $('<ul></ul>').addClass('subtypes');
-        for (let i=0; i < orderSubTypes.length; i++) {
-            for (let ic=0; ic < currentSubTypes.length; ic++) {
-                if (orderSubTypes[i].id === currentSubTypes[ic]) {
-                    subTypesContainer.append($('<li></li>').html(orderSubTypes[i].name));
-                    break;
-                }
-            }
-        }
-        orderContainer.append(subTypesContainer);
-    }
+    let subTypesContainer = $('<ul></ul>').addClass('subtypes').append($('<li></li>').html(currentSubType));
+    orderContainer.append(subTypesContainer);
 
     orderContainer.append($('<p></p>').addClass('mb-1 text-left').html('<b>' + addressText +'</b>: ' + properties.get('address')));
 

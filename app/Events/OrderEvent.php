@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Models\Order;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
@@ -13,15 +14,15 @@ class OrderEvent implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     private string $noticeType;
-    private int $orderId;
+    private Order $order;
 
     /**
      * Create a new event instance.
      */
-    public function __construct(string $noticeType, int $orderId)
+    public function __construct(string $noticeType, Order $order)
     {
         $this->noticeType = $noticeType;
-        $this->orderId = $orderId;
+        $this->order = $order;
     }
 
     /**
@@ -53,7 +54,12 @@ class OrderEvent implements ShouldBroadcast
     {
         return [
             'notice' => $this->noticeType,
-            'order_id' => $this->orderId
+            'order' => $this->order,
+            'performers' => $this->order->performers,
+            'user' => $this->order->user,
+            'order_type' => $this->order->orderType,
+            'sub_type' => $this->order->subType,
+            'images' => $this->order->images,
         ];
     }
 }
