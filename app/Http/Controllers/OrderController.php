@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Events\NotificationEvent;
+use App\Events\OrderEvent;
 use App\Http\Requests\Order\RemovePerformerRequest;
 use App\Http\Requests\Order\SetRatingRequest;
 use App\Models\Rating;
@@ -226,6 +227,8 @@ class OrderController extends BaseController
             broadcast(new NotificationEvent('new_order_status', $order, $order->user_id));
             $this->mailNotice($order, $order->userCredentials, 'new_order_status_notice');
 
+            broadcast(new OrderEvent('remove_order', $request->id));
+
 //            if ($order->performers->count() >= $order->need_performers) {
 //                $order->status = 1;
 //                $order->save();
@@ -330,6 +333,9 @@ class OrderController extends BaseController
                 broadcast(new NotificationEvent('delete_order', $request->id, $unreadOrder->subscription->subscriber_id));
                 $unreadOrder->delete();
             }
+
+            broadcast(new OrderEvent('remove_order', $request->id));
+
             $order->delete();
             return response()->json([],200);
         }
@@ -359,6 +365,9 @@ class OrderController extends BaseController
         $order->status = 0;
         $order->save();
         ReadOrder::where('order_id')->delete();
+
+        broadcast(new OrderEvent('remove_order', $request->id));
+
         return response()->json([],200);
     }
 

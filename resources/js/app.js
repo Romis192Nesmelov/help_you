@@ -899,7 +899,19 @@ $(document).ready(function () {
     window.selectedPointsOpened = false;
     window.cickedTarget = null;
 
-    if ($('#map').length) ymaps.ready(mapInitWithContainerForOrders);
+    if ($('#map').length) {
+        ymaps.ready(mapInitWithContainerForOrders);
+        window.Echo.channel('order_event').listen('.order', res => {
+            if (res.notice === 'remove_order') {
+                for (let i=0;i<window.placemarks.length;i++) {
+                    if (window.placemarks[i].properties.get('orderId') === res.order_id) {
+                        window.clusterer.remove(window.placemarks[i]);
+                        break;
+                    }
+                }
+            }
+        });
+    }
 
     $('#apply-button').click((e) => {
         e.preventDefault();
@@ -1958,7 +1970,6 @@ const getPoints = () => {
 
             window.myMap.geoObjects.events.add('click', function (e) {
                 var target = e.get('target');
-                // console.log(target.properties.get('orderId'));
 
                 target.options.set('iconColor', '#bc202e');
                 if (target.properties.get('geoObjects')) {
@@ -2151,7 +2162,7 @@ const setBindsAndOpen = () => {
             orderRespondModal.find('.order-type').html(properties.get('orderType'));
             orderRespondModal.find('.order-address').html(properties.get('address'));
             orderRespondModal.modal('show');
-            window.clusterer.remove(point);
+            // window.clusterer.remove(point);
             removeSelectedPoints();
         });
     });
