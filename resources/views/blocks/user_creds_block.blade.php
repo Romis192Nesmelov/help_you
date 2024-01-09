@@ -1,6 +1,6 @@
 <div class="w-100 d-flex mb-3 align-items-center">
     <div class="d-flex align-items-center justify-content-center">
-        <div class="avatar cir" style="{!! avatarProps(isset($user) ? $user->avatar : null, isset($user) ? $user->avatar_props : null, 0.35) !!}"></div>
+        @include('blocks.avatar_block', ['user' => $user ?? null, 'coof' => 0.35])
         <div class="ms-3">
             <div class="fs-lg-6 fs-sm-7 user-name">
                 @if (isset($user))

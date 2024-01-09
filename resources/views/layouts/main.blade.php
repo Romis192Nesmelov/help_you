@@ -239,8 +239,12 @@
         getUnreadOrderRemovedPerformersUrl  = "{{ route('order.get_unread_order_removed_performers') }}",
         getUnreadOrderStatusUrl = "{{ route('order.get_unread_order_status') }}",
         ordersUrl = "{{ route('order.orders') }}",
-        myOrders = "{{ route('account.my_orders') }}",
+        getUserAgeUrl = "{{ route('order.get_user_age') }}",
+        mySubscriptionsUrl = "{{ route('account.my_subscriptions') }}",
+        myOrdersUrl = "{{ route('account.my_orders') }}",
+        myHelpUrl = "{{ route('account.my_help') }}",
         chatUrl = "{{ route('messages.chat') }}",
+        addressText = "{{ trans('content.address') }}",
         newOrderFromText = "{{ trans('content.new_order_from') }}",
         unreadMessagesText = "{{ trans('messages.unread_messages') }}",
         newPerformerText = "{{ trans('content.new_performer') }}",
@@ -251,9 +255,12 @@
         errorWrongValueText = "{{ trans('validation.wrong_value') }}",
         openMessageModalFlag = parseInt("{{ session()->has('message') }}");
         window.orderStatuses = [];
+        window.orderStatusClasses = ['closed','in-progress','open','in-approve'];
 </script>
 @for ($i=0;$i<3;$i++)
-    <script>window.orderStatuses.push("{{ trans('content.status_'.$i) }}");</script>
+    <script>
+        window.orderStatuses.push("{{ trans('content.status_'.$i) }}");
+    </script>
 @endfor
 <script>
     window.orderStatuses.push("{{ trans('content.in_approve') }}");

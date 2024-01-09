@@ -31,13 +31,13 @@ class OrdersSeeder extends Seeder
             'longitude' => 37.612245,
             'description_short' => 'Чета с кем-то где-то что-то и когда-то надо срочно сделать, а то край!',
             'approved' => 1,
-            'status' => 1
+            'status' => 2
         ]);
 
-        OrderUser::create([
-            'order_id' => $order->id,
-            'user_id' => $anotherUser->id
-        ]);
+//        OrderUser::create([
+//            'order_id' => $order->id,
+//            'user_id' => $anotherUser->id
+//        ]);
 
 //        $performers = [
 //            User::where('phone','+7(958)815-85-65')->select('id')->first(),

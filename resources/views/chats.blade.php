@@ -4,7 +4,7 @@
 
 <div class="row">
     @include('blocks.left_menu_block',['hasChangeAvatar' => false])
-    <div class="col-12 col-lg-8">
+    <div id="my-chats" class="col-12 col-lg-8 right-block">
         <div class="rounded-block tall">
             <h2>{{ trans('messages.chats') }}</h2>
             @include('blocks.top_sub_menu_block',[
@@ -27,4 +27,5 @@
         </div>
     </div>
 </div>
+<script>const participantsText = "{{ trans('messages.participants') }}";</script>
 @endsection

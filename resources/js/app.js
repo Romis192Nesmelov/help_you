@@ -125,62 +125,152 @@ $(document).ready(function () {
         getNews();
         // Receiving new notices
         window.Echo.private('notice_' + userId).listen('.notice', res => {
-            let tableRow = getTableRow(res.order_id);
-            if (res.notice === 'new_message' && (!window.orderId || window.orderId !== res.order_id)) {
-                let unreadMessageRow = $('#unread-message-' + res.order_id);
-                checkDropDownMenuNotEmpty();
+            let rightBlockId = $('.right-block').attr('id'),
+                tableRow = getTableRow(res.order.id);
+
+            if (res.notice === 'new_message') {
+                let unreadMessageRow = $('#unread-messages-' + res.order.id);
+                checkNotices();
                 if (unreadMessageRow.length) {
                     let unreadMessagesCounter = unreadMessageRow.find('span.counter'),
                         unreadMessagesValue = parseInt(unreadMessagesCounter.html());
-
                     unreadMessagesValue++;
                     unreadMessagesCounter.html(unreadMessagesValue);
                 } else {
-                    appendDropdownUnreadMessageRow(res.order_id, 1);
+                    appendDropdownUnreadMessageRow(res.order.id, 1);
                 }
-            } else if (res.notice === 'new_order') {
-                checkDropDownMenuNotEmpty();
-                appendDropdownUnreadOrder(res.order_id, res.user_name);
+
+                if (rightBlockId === 'my-chats' && !tableRow.length) {
+                    tableRow = $('<tr></tr>').attr('id','row-' + res.order.id)
+                        .append(
+                            $('<td></td>').addClass('id').html(res.order.id)
+                        ).append(
+                            $('<td></td>').append(
+                                $('<a></a>').attr('href',chatUrl + '?order_id=' + res.order.id)
+                                    .append(
+                                        $('<div></div>').addClass('head').html('«' + res.order.name + '» – ' + res.order_type.name)
+                                    ).append(
+                                        $('<div></div>').addClass('content').html(res.order.address)
+                                    )
+                            )
+                        ).append(
+                            $('<td></td>').addClass('order-cell-edit icon')
+                                .append(
+                                    $('<nobr></nobr>')
+                                        .append(
+                                            $('<i></i>').attr({'id':'order-performers-' + res.order.id, 'title':participantsText}).addClass('performers-list icon-users4 me-1')
+                                        ).append(
+                                            $('<span></span>').html(res.performers.length)
+                                        )
+                                )
+                        ).append(
+                            $('<td></td>').addClass('text-center')
+                                .append(
+                                    $('<span></span>').addClass('label ' + window.orderStatusClasses[res.order.status]).html(window.orderStatuses[res.order.status])
+                                )
+                        ).append(
+                            $('<td></td>').addClass('empty')
+                        );
+
+                    if (res.order.user_id === userId) {
+                        addDataTableRow($('#content-my_orders'), tableRow, true);
+                    } else {
+                        addDataTableRow($('#content-im_performer'), tableRow, true);
+                    }
+                }
+            } else if (res.notice === 'new_order_in_subscription') {
+                checkNotices();
+                appendDropdownUnreadOrder(res.order.id, getUserName(res.user));
+
+                tableRow = $('<tr></tr>').attr('id','row-' + res.order.id).append(
+                        $('<td></td>').addClass('id').html(res.order.id)
+                    ).append(
+                        $('<td></td>').addClass('cell-avatar').html(getAvatarBlock())
+                    ).append(
+                        $('<td></td>').append(
+                            $('<div></div>').addClass('head').html(getUserName(res.order))
+                        ).append(
+                            $('<div></div>').addClass('content user-age')
+                        )
+                    ).append(
+                        $('<td></td>').append(
+                            $('<div></div>').addClass('head')
+                                .append(
+                                    $('<a></a>').attr('href',ordersUrl + '?id=' + res.order.id).html(res.order_type.name)
+                                )
+                        ).append(
+                            $('<div></div>').addClass('content').html(addressText + ': ' + res.order.address)
+                        )
+                    ).append(
+                        $('<td></td>').addClass('order-cell-delete icon')
+                            .append('<i></i>').attr(
+                                {
+                                    'title': unsubscribeText,
+                                    'del-data': res.subscription_id,
+                                    'modal-data': 'delete-modal'
+                                }
+                        ).addClass('icon-bell-cross')
+                    );
+
+                addDataTableRow($('#content-my-subscriptions'), tableRow, false);
+                getUserAge(res.user.id);
+
             } else if (res.notice === 'new_performer') {
-                if (tableRow.length) {
-                    let countPerformersContainer = getPerformersCountContainer(res.order_id),
+                if (rightBlockId === 'my-orders') {
+                    let countPerformersContainer = getPerformersCountContainer(res.order.id),
                         countPerformers = parseInt(countPerformersContainer.html());
                     countPerformers++;
                     countPerformersContainer.html(countPerformers);
-                } else {
-                    checkDropDownMenuNotEmpty();
-                    appendDropdownUnreadPerformer(res.order_id, res.user_name);
                 }
+                checkNotices();
+                appendDropdownUnreadPerformer(res.order.id, getUserName(res.performers[res.performers.length-1]));
             } else if (res.notice === 'order_approved') {
-                if (tableRow.length) {
+                if (rightBlockId === 'my-orders') {
                     movingOrderToOpen(tableRow);
-                } else {
-                    checkDropDownMenuNotEmpty();
-                    appendDropdownUnreadOrderStatus(res.order_id, 2);
                 }
+                checkNotices();
+                appendDropdownUnreadOrderStatus(res.order.id, 2);
             } else if (res.notice === 'new_order_status') {
-                if (tableRow.length) {
-                    if (res.order_status === 1) {
-                        movingOrderToInProgress(tableRow, res.performers);
+                if (rightBlockId === 'my-orders') {
+                    if (res.order.status === 1) {
+                        movingOrderToInProgress(tableRow, res.performers.length);
                     } else {
                         movingOrderToArchive(tableRow);
                     }
-                } else {
-                    checkDropDownMenuNotEmpty();
-                    appendDropdownUnreadOrderStatus(res.order_id, res.order_status);
+                } else if (rightBlockId === 'my-chats') {
+                    if (res.order.status === 0) {
+                        if (res.order.user_id === userId) {
+                            deleteDataTableRows($('#content-my_orders'), tableRow, true);
+                        } else {
+                            deleteDataTableRows($('#content-im_performer'), tableRow, true);
+                        }
+                    }
                 }
+                checkNotices();
+                appendDropdownUnreadOrderStatus(res.order.id, res.order_status);
             } else if (res.notice === 'remove_performer') {
                 if (tableRow.length) {
                     deleteDataTableRows($('#content-active'), tableRow, true);
                 } else {
-                    checkDropDownMenuNotEmpty();
-                    appendDropdownUnreadRemovedPerformer(res.order_id);
+                    checkNotices();
+                    appendDropdownUnreadRemovedPerformer(res.order.id);
                 }
             } else if (res.notice === 'delete_order') {
-                $('#unread-order-' + res.order_id).remove();
-                $('#unread-message-' + res.order_id).remove();
-                $('#unread-performer-' + res.order_id).remove();
-                $('#unread-removed-performer-' + res.order_id).remove();
+                $.each(['messages','subscriptions','performer','status','help'],function (k,id){
+                    $('#unread-' + id + '-' + res.order.d).remove();
+                });
+
+                $.each(['messages','subscriptions','order','help'],function (k,className){
+                    if (!window.dropDown.find('.unread-' + className).length) $('#left-menu-my-' + className).find('.dot').remove()
+                });
+
+                if (rightBlockId === 'my-chats') {
+                    if (res.order.user_id === userId) {
+                        deleteDataTableRows($('#content-my_orders'), tableRow, true);
+                    } else {
+                        deleteDataTableRows($('#content-im_performer'), tableRow, true);
+                    }
+                }
             }
             checkDropDownMenuEmpty();
         });
@@ -963,18 +1053,16 @@ $(document).ready(function () {
 
             let messageData = res.message,
                 lastDate = $('.date-block').last().find('.date').html(),
-                avatarBlock = $('<div></div>').addClass('avatar cir').css(getAvatarProps(messageData.avatar,messageData.avatar_props,0.2)),
                 messageBody = $('<div></div>').addClass('message-block')
-                    .append(avatarBlock)
+                    .append(getAvatarBlock(messageData.user, 0.2))
                     .append(
                         $('<div></div>').addClass('message')
                             .append(
-                                $('<div></div>').addClass('author').html(messageData.author).append(
-                                    $('<span></span>').html(messageData.time)
+                                $('<div></div>').addClass('author').html(getUserName(messageData.user))
+                                    .append($('<span></span>').html(messageData.time))
+                                ).append(
+                                    $('<div></div>').html(messageData.body)
                                 )
-                            ).append(
-                                $('<div></div>').html(messageData.body)
-                            )
                     );
 
             // Set global date
@@ -987,7 +1075,7 @@ $(document).ready(function () {
             }
 
             // Removing last message row if that contains not-attached image
-            if (userId === messageData.author_id) {
+            if (userId === messageData.user.id) {
                 inputMessageFile.val('');
                 removeLastMessageRowWithPreviewImage();
             }
@@ -997,13 +1085,13 @@ $(document).ready(function () {
                     mainContainer,
                     messagesBlock,
                     inputMessageFile,
-                    userId === messageData.author_id,
+                    userId === messageData.user.id,
                     false,
                     messageData.image
                 );
                 attachedImageContainer.append(messageBody);
             } else {
-                let messageRow = getNewMessageRow(userId === messageData.author_id);
+                let messageRow = getNewMessageRow(userId === messageData.user.id);
                 messageRow.append(messageBody);
                 mainContainer.append(messageRow);
             }
@@ -1547,7 +1635,7 @@ const getNews = () => {
 
     $.get(getUnreadMessagesUrl).done((data) => {
         if (data.unread.length !== 0) {
-            checkDropDownMenuNotEmpty();
+            checkNotices();
             $.each(data.unread, function (id, counter) {
                 let orderId = parseInt(id.replace('order',''));
                 appendDropdownUnreadMessageRow(orderId, counter);
@@ -1559,7 +1647,7 @@ const getNews = () => {
         if (data.subscriptions.length) {
             $.each(data.subscriptions, function (k,subscription) {
                 if (subscription.unread_orders.length) {
-                    checkDropDownMenuNotEmpty();
+                    checkNotices();
                     $.each(subscription.unread_orders, function (k,unreadOrder) {
                         appendDropdownUnreadOrder(unreadOrder.order.id, unreadOrder.order.user.name + ' ' + unreadOrder.order.user.family);
                     });
@@ -1570,7 +1658,7 @@ const getNews = () => {
 
     $.get(getUnreadOrderPerformersUrl).done((data) => {
         if (data.performers.length) {
-            checkDropDownMenuNotEmpty();
+            checkNotices();
             $.each(data.performers, function (k,performer) {
                 appendDropdownUnreadPerformer(performer.order_id, performer.user.name + ' ' + performer.user.family);
             });
@@ -1579,7 +1667,7 @@ const getNews = () => {
 
     $.get(getUnreadOrderRemovedPerformersUrl).done((data) => {
         if (data.performers.length) {
-            checkDropDownMenuNotEmpty();
+            checkNotices();
             console.log(data.performers);
             $.each(data.performers, function (k,performer) {
                 appendDropdownUnreadRemovedPerformer(performer.order.id);
@@ -1598,7 +1686,7 @@ const getNews = () => {
 
 const appendDropdownUnreadMessageRow = (orderId, counter) => {
     window.dropDown.append(
-        $('<li></li>').attr('id','unread-message-' + orderId).addClass('unread-messages').append(
+        $('<li></li>').attr('id','unread-messages-' + orderId).addClass('unread-messages').append(
             $('<div></div>')
                 .append(
                     $('<span></span>').html(unreadMessagesText)
@@ -1611,55 +1699,69 @@ const appendDropdownUnreadMessageRow = (orderId, counter) => {
                 )
             ).append('<hr>')
     );
+    appendDotInLeftMenu('left-menu-my-messages');
 }
 
 const appendDropdownUnreadOrder = (orderId, userName) => {
     window.dropDown.append(
-        $('<li></li>').attr('id','unread-order-' + orderId).addClass('unread-subscriptions').append(
+        $('<li></li>').attr('id','unread-subscriptions-' + orderId).addClass('unread-subscriptions').append(
             $('<div></div>')
                 .append(
-                    $('<a></a>').attr('href', ordersUrl+'/?id=' + orderId).html(newOrderFromText + '<br>')
+                    $('<a></a>').attr('href', mySubscriptionsUrl).html(newOrderFromText + '<br>')
                 ).append(
                     $('<span></span>').html(userName)
                 )
             ).append('<hr>')
     );
+    appendDotInLeftMenu('left-menu-my-subscriptions');
 }
 
 const appendDropdownUnreadPerformer = (orderId, userName) => {
     window.dropDown.append(
-        $('<li></li>').attr('id','unread-performer-' + orderId).addClass('unread-performer').append(
+        $('<li></li>').attr('id','unread-performer-' + orderId).addClass('unread-orders').append(
             $('<div></div>')
                 .append(
-                    $('<a></a>').attr('href', myOrders).html(newPerformerText + orderId + ':<br>')
+                    $('<a></a>').attr('href', myOrdersUrl).html(newPerformerText + orderId + ':<br>')
                 ).append(
                     $('<span></span>').html(userName)
                 )
             ).append('<hr>')
     );
+    appendDotInLeftMenu('left-menu-my-orders');
 }
 
 const appendDropdownUnreadOrderStatus = (orderId, orderStatus) => {
     window.dropDown.append(
-        $('<li></li>').attr('id','unread-order-status-' + orderId).addClass('unread-order-status').append(
+        $('<li></li>').attr('id','unread-status-' + orderId).addClass('unread-orders').append(
             $('<div></div>')
                 .append(
-                    $('<a></a>').attr('href', myOrders).html(newOrderStatusText + orderId + ':<br>')
+                    $('<a></a>').attr('href', myOrdersUrl).html(newOrderStatusText + orderId + ':<br>')
                 ).append(
                     $('<span></span>').html('«' + window.orderStatuses[orderStatus] + '»')
                 )
             ).append('<hr>')
     );
+    appendDotInLeftMenu('left-menu-my-orders');
 }
 
 const appendDropdownUnreadRemovedPerformer = (orderId) => {
     window.dropDown.append(
-        $('<li></li>').attr('id','unread-removed-performer-' + orderId).addClass('unread-removed-performer').append(
+        $('<li></li>').attr('id','unread-help-' + orderId).addClass('unread-help').append(
             $('<div></div>').append(
-                $('<a></a>').attr('href', ordersUrl + '/?id=' + orderId).html(removedPerformerText + orderId)
+                $('<a></a>').attr('href', myHelpUrl).html(removedPerformerText + orderId)
             )
         ).append('<hr>')
     );
+    appendDotInLeftMenu('left-menu-my-help');
+}
+
+const appendDotInLeftMenu = (leftMenuId) => {
+    let leftMenu = $('#' + leftMenuId);
+    if (!leftMenu.find('.dot').length) {
+        leftMenu.append(
+            $('<div></div>').addClass('dot')
+        );
+    }
 }
 
 const imagePreview = (container, defImage, callBack) => {
@@ -1856,6 +1958,7 @@ const getPoints = () => {
 
             window.myMap.geoObjects.events.add('click', function (e) {
                 var target = e.get('target');
+                // console.log(target.properties.get('orderId'));
 
                 target.options.set('iconColor', '#bc202e');
                 if (target.properties.get('geoObjects')) {
@@ -1884,7 +1987,6 @@ const showOrder = (point) => {
         orderSubTypes = properties.get('orderSubTypes'),
         currentSubTypes = properties.get('subtypes'),
         user = properties.get('user'),
-        avatar = user.avatar ? user.avatar : '/images/def_avatar.svg',
         images = properties.get('images'),
         descriptionShort = properties.get('description_short'),
         descriptionFull = properties.get('description_full'),
@@ -1913,7 +2015,7 @@ const showOrder = (point) => {
                 .append(
                     $('<div></div>').addClass('d-flex align-items-center justify-content-center')
                         .append(
-                            $('<div></div>').addClass('avatar cir').css(getAvatarProps(avatar,user.avatar_props,0.35))
+                            getAvatarBlock(user, 0.35)
                         ).append(
                             $('<div></div>').css('width',215)
                                 .append(
@@ -2136,7 +2238,7 @@ const bindOrderOperation = (modalConfirm, buttonClass) => {
     });
 }
 
-const checkDropDownMenuNotEmpty = () => {
+const checkNotices = () => {
     if (!window.rightButtonBlock.find('.dot').length) window.rightButtonBlock.append(
         $('<span></span>').addClass('dot')
     );
@@ -2162,6 +2264,8 @@ const checkDropDownMenuEmpty = () => {
     if (!window.dropDown.html()) {
         window.rightButtonBlock.find('.dot').remove();
     }
+
+
 }
 
 const bellRing = (degrees) => {
@@ -2170,6 +2274,12 @@ const bellRing = (degrees) => {
         '-ms-transform' : 'rotate('+ degrees +'deg)',
         'transform' : 'rotate('+ degrees +'deg)'});
 }
+
+const getAvatarBlock = (user, coof) => {
+    let avatar = user.avatar ? user.avatar : '/images/def_avatar.svg';
+    return $('<div></div>').addClass('avatar cir').css(getAvatarProps(avatar, user.avatar_props, coof));
+}
+
 const getAvatarProps = (avatar, props, coof) => {
     let avatarProps = {'background-image':'url('+avatar+')'};
     if (props) {
@@ -2183,4 +2293,18 @@ const getAvatarProps = (avatar, props, coof) => {
 const getId = (obj, replace, returnInt) => {
     let id = obj.attr('id').replace(replace, '');
     return returnInt ? parseInt(id) : id;
+}
+
+const getUserName = (user) => {
+    return user.name + ' ' + user.family;
+}
+
+const getUserAge = (userId) => {
+    $.get(
+        getUserAgeUrl,
+        {'id': userId},
+        (data) => {
+            $('.user-age').html(data.age);
+        }
+    );
 }

@@ -64,7 +64,6 @@
             @else
                 <td class="empty"></td>
             @endif
-
         </tr>
     @endforeach
 </table>

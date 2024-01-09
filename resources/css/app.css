@@ -473,10 +473,6 @@ button.btn > i {
 }
 
 #top-line .buttons-block i .dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background-color: #e65639;
     margin-top: -5px;
     margin-left: -5px;
     position: absolute;
@@ -771,10 +767,27 @@ button.btn > i {
     color: white !important;
 }
 
+.dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #e65639;
+}
+
 .rounded-block ul.menu {
     list-style: none;
     padding: 0;
     font-size: 18px;
+}
+
+.rounded-block ul.menu li {
+    display: flex;
+    justify-content: start;
+    align-items: center;
+}
+
+.rounded-block ul.menu li .dot {
+    margin-left: 5px;
 }
 
 .dropdown-menu {

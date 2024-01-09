@@ -16,7 +16,9 @@
         </div>
         <ul class="menu">
             @foreach ($leftMenu as $itemMenu)
-                <li {{ $active_left_menu == $itemMenu['key'] ? 'class=active' : '' }}><a href="{{ route($itemMenu['key']) }}"><i class="{{ $itemMenu['icon'] }}"></i>{{ trans($itemMenu['key']) }}</a></li>
+                <li id="left-menu-{{ $itemMenu['id'] }}" {{ $active_left_menu == $itemMenu['key'] ? 'class=active' : '' }}>
+                    <a href="{{ route($itemMenu['key']) }}"><i class="{{ $itemMenu['icon'] }}"></i>{{ trans($itemMenu['key']) }}</a>
+                </li>
             @endforeach
         </ul>
         <div class="bottom-block">

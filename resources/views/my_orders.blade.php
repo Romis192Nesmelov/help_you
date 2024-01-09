@@ -69,7 +69,7 @@
 
 <div class="row">
     @include('blocks.left_menu_block',['hasChangeAvatar' => false])
-    <div class="col-12 col-lg-8">
+    <div id="my-orders" class="col-12 col-lg-8 right-block">
         <div class="rounded-block tall">
             <h2>{{ trans('account.my_orders') }}</h2>
             @include('blocks.top_sub_menu_block',[

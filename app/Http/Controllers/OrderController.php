@@ -206,24 +206,23 @@ class OrderController extends BaseController
         if ($order->user_id == Auth::id()) return response()->json([],403);
         else {
             OrderUser::create($fields);
-            $order = $order->refresh();
-
             ReadPerformer::create([
                 'order_id' => $order->id,
                 'user_id' => Auth::id(),
             ]);
-            broadcast(new NotificationEvent('new_performer', $order, $order->user_id));
-            $this->mailNotice($order, $order->userCredentials, 'new_performer_notice');
-
-            $this->newChatMessage($order);
-
-            $order->status = 1;
-            $order->save();
-
             ReadStatusOrder::create([
                 'order_id' => $order->id,
                 'status' => 1,
             ]);
+
+            $order->status = 1;
+            $order->save();
+            $order->refresh();
+
+            broadcast(new NotificationEvent('new_performer', $order, $order->user_id));
+            $this->mailNotice($order, $order->userCredentials, 'new_performer_notice');
+            $this->newChatMessage($order);
+
             broadcast(new NotificationEvent('new_order_status', $order, $order->user_id));
             $this->mailNotice($order, $order->userCredentials, 'new_order_status_notice');
 
@@ -282,7 +281,7 @@ class OrderController extends BaseController
 
             } else {
                 $order = Order::create($fields);
-                $this->newOrderInSubscription($order->id);
+                $this->newOrderInSubscription($order);
             }
 
             for ($i=1;$i<=3;$i++) {
@@ -394,7 +393,7 @@ class OrderController extends BaseController
         $order->save();
 
         OrderUser::where('order_id',$request->id)->delete();
-        $this->newOrderInSubscription($order->id);
+        $this->newOrderInSubscription($order);
         return response()->json([],200);
     }
 
@@ -405,14 +404,17 @@ class OrderController extends BaseController
         return response()->json([],200);
     }
 
-    private function newOrderInSubscription(int $orderId): void
+    private function newOrderInSubscription(Order $order): void
     {
         $subscriptions = Subscription::where('user_id',Auth::id())->get();
         foreach ($subscriptions as $subscription) {
             ReadOrder::create([
                 'subscription_id' => $subscription->id,
-                'order_id' => $orderId,
+                'order_id' => $order->id,
             ]);
+
+//            broadcast(new NotificationEvent('new_order_in_subscription', $order, $subscription->subscriber_id));
+//            $this->mailNotice($order, $subscription->subscriber, 'new_order_in_subscription');
         }
     }
 }

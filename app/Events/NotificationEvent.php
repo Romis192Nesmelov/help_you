@@ -16,15 +16,17 @@ class NotificationEvent implements ShouldBroadcast
     private string $noticeType;
     private Order $order;
     private int $userId;
+    private int|null $subscriptionId;
 
     /**
      * Create a new event instance.
      */
-    public function __construct(string $noticeType, Order $order, int $userId)
+    public function __construct(string $noticeType, Order $order, int $userId, int|null $subscriptionId=null)
     {
         $this->noticeType = $noticeType;
         $this->order = $order;
         $this->userId = $userId;
+        $this->subscriptionId = $subscriptionId;
     }
 
     /**
@@ -54,25 +56,13 @@ class NotificationEvent implements ShouldBroadcast
      */
     public function broadcastWith(): array
     {
-        if ($this->noticeType == 'new_order') {
-            return [
-                'notice' => $this->noticeType,
-                'order_id' => $this->order->id,
-                'user_name' => $this->order->user->name . ' ' . $this->order->user->family
-            ];
-        } elseif ($this->noticeType == 'new_performer') {
-            return [
-                'notice' => $this->noticeType,
-                'order_id' => $this->order->id,
-                'user_name' => $this->order->performers[$this->order->performers->count()-1]->name . ' ' . $this->order->performers[$this->order->performers->count()-1]->family
-            ];
-        } else {
-            return [
-                'notice' => $this->noticeType,
-                'order_id' => $this->order->id,
-                'performers' => $this->order->performers->count(),
-                'order_status' => $this->order->status,
-            ];
-        }
+        return [
+            'notice' => $this->noticeType,
+            'order' => $this->order,
+            'performers' => $this->order->performers,
+            'user' => $this->order->user,
+            'order_type' => $this->order->orderType,
+            'subscription_id' => $this->subscriptionId
+        ];
     }
 }

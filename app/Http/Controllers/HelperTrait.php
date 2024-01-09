@@ -123,9 +123,9 @@ trait HelperTrait
         dispatch(new SendMessage($template, $mailTo, null, $fields));
     }
 
-    public function setReadUnread(Model $model, $myOrdersIds): void
+    public function setReadUnread(Model $model): void
     {
-        $model->query()->whereIn('order_id',$myOrdersIds)->update(['read' => true]);
+        $model->query()->whereIn('order_id',Order::where('user_id',Auth::id())->pluck('id')->toArray())->update(['read' => true]);
     }
 
     public function setReadUnreadRemovedPerformers(): void

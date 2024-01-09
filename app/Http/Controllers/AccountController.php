@@ -8,6 +8,7 @@ use App\Http\Requests\Account\EditAccountRequest;
 use App\Http\Requests\Account\GetCodeRequest;
 use App\Http\Requests\Account\SubscriptionRequest;
 use App\Models\Order;
+use App\Models\ReadOrder;
 use App\Models\ReadPerformer;
 use App\Models\ReadStatusOrder;
 use App\Models\Subscription;
@@ -30,17 +31,16 @@ class AccountController extends BaseController
 
     public function mySubscriptions() :View
     {
-        $this->data['subscriptions'] = Subscription::query()->default()->get();
+        $this->setReadUnread(new ReadOrder());
+        $this->data['unread_orders'] = ReadOrder::whereIn('subscription_id',Subscription::query()->default()->pluck('id')->toArray())->where('read',null)->orderByDesc('created_at')->get();
         $this->data['active_left_menu'] = 'account.my_subscriptions';
         return $this->showView('my_subscriptions');
     }
 
     public function myOrders(): View
     {
-        $myOrdersIds = Order::where('user_id',Auth::id())->pluck('id')->toArray();
-        $this->setReadUnread(new ReadStatusOrder(), $myOrdersIds);
-        $this->setReadUnread(new ReadPerformer(), $myOrdersIds);
-
+        $this->setReadUnread(new ReadPerformer());
+        $this->setReadUnread(new ReadStatusOrder());
         $this->data['orders'] = [
             'active' => Auth::user()->ordersActiveAndApproving,
             'approving' => Auth::user()->orderApproving,

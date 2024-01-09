@@ -44,11 +44,11 @@ class BaseController extends Controller
             [
                 'mainMenu' => ['about', 'how_does_it_work', 'partners',],
                 'leftMenu' => [
-                    ['icon' => 'icon-bubbles4', 'key' => 'messages.chats'],
-                    ['icon' => 'icon-mail-read', 'key' => 'account.my_subscriptions'],
-                    ['icon' => 'icon-drawer-out', 'key' => 'account.my_orders'],
-                    ['icon' => 'icon-lifebuoy', 'key' => 'account.my_help'],
-                    ['icon' => 'icon-gift', 'key' => 'account.incentives']
+                    ['id' => 'my-messages', 'icon' => 'icon-bubbles4', 'key' => 'messages.chats'],
+                    ['id' => 'my-subscriptions', 'icon' => 'icon-mail-read', 'key' => 'account.my_subscriptions'],
+                    ['id' => 'my-orders', 'icon' => 'icon-drawer-out', 'key' => 'account.my_orders'],
+                    ['id' => 'my-help', 'icon' => 'icon-lifebuoy', 'key' => 'account.my_help'],
+                    ['id' => 'incentives', 'icon' => 'icon-gift', 'key' => 'account.incentives']
                 ],
                 'activeMainMenu' => $this->activeMainMenu,
                 'activeLeftMenu' => $this->activeLeftMenu,
