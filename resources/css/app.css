@@ -224,6 +224,14 @@ table {
     margin-top: 33px;
 }
 
+#orders-search i.icon-search4 {
+    cursor: pointer;
+}
+
+#orders-search i.icon-search4:hover {
+    color: darkgrey;
+}
+
 .form-group input,
 .form-group select,
 .form-group textarea {

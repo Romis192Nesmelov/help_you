@@ -58,6 +58,7 @@
         <div class="col-lg-4 col-12 mt-lg-0 mt-2 row d-flex align-items-end m-0 p-0">
             <label class="ms-3">{{ trans('content.search') }}</label>
             @include('blocks.input_block',[
+                'id' => 'orders-search',
                 'name' => 'search',
                 'addClass' => 'w-100',
                 'type' => 'text',

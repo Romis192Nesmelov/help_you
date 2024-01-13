@@ -84,7 +84,8 @@ class OrderController extends BaseController
         return response()->json([
             'orders' => Order::query()
                 ->default()
-                ->filtered()
+//                ->filtered()
+//                ->searched()
                 ->with(['orderType','subType','images','user','performers'])
                 ->get(),
             'subscriptions' => Subscription::query()

@@ -104,6 +104,18 @@ class Order extends Model
         });
     }
 
+    public function scopeSearched(Builder $query): void
+    {
+        $query->when(request('search'), function (Builder $q) {
+            $searched = request('search');
+            $q
+                ->where('name', 'LIKE', "%{$searched}%")
+                ->orWhere('address', 'LIKE', "%{$searched}%")
+                ->orWhere('description_short', 'LIKE', "%{$searched}%")
+                ->orWhere('description_full', 'LIKE', "%{$searched}%");
+        });
+    }
+
     public function ratings(): HasMany
     {
         return $this->hasMany(Rating::class);

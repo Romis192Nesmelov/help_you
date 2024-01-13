@@ -1914,8 +1914,7 @@ const getPoints = () => {
                 }
             });
         }
-        if (orders.length) {
-
+        if (data) {
             $.each(orders, function (k,point) {
                 let createdAt = new Date(point.created_at),
                     meIsPerformer = false;
@@ -2016,6 +2015,7 @@ const showOrder = (point) => {
         orderId = properties.get('orderId'),
         currentSubType = properties.get('subtype'),
         user = properties.get('user'),
+        orderName = properties.get('name'),
         images = properties.get('images'),
         descriptionShort = properties.get('description_short'),
         descriptionFull = properties.get('description_full'),
@@ -2069,7 +2069,8 @@ const showOrder = (point) => {
         enablePointImagesCarousel(imagesContainer,images.length > 1);
     }
 
-    orderContainer.append($('<h2></h2>').addClass('order-type text-dark text-left mt-3 mb-4').html(properties.get('orderType')));
+    orderContainer.append($('<h2></h2>').addClass('order-name text-dark text-left mt-3 mb-4').html(orderName));
+    orderContainer.append($('<h2></h2>').addClass('order-type text-dark text-left mt-3 h5').html(properties.get('orderType')));
 
     if (currentSubType) {
         let subTypesContainer = $('<ul></ul>').addClass('subtypes').append($('<li></li>').html(currentSubType));
