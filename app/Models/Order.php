@@ -99,7 +99,7 @@ class Order extends Model
             $q->where('order_type_id',request('order_type'));
         });
 
-        $query->when(request('performers'), function (Builder $q) {
+        $query->when(request('performers_from') && request('performers_to'), function (Builder $q) {
             $q->whereBetween('need_performers',[request('performers_from'),request('performers_to')]);
         });
     }

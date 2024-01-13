@@ -1915,6 +1915,7 @@ const getPoints = () => {
             });
         }
         if (orders.length) {
+
             $.each(orders, function (k,point) {
                 let createdAt = new Date(point.created_at),
                     meIsPerformer = false;
@@ -1933,11 +1934,11 @@ const getPoints = () => {
                         // balloonContentHeader: point.order_type.name,
                         // balloonContentBody: point.address,
                         orderId: point.id,
-                        name: point.order_type.name,
+                        name: point.name,
                         address: point.address,
                         orderType: point.order_type.name,
                         images: point.images,
-                        subtype: point.sub_type.name,
+                        subtype: point.sub_type ? point.sub_type.name : null,
                         need_performers: point.need_performers,
                         performers: point.performers.length,
                         user: point.user,
@@ -2070,8 +2071,10 @@ const showOrder = (point) => {
 
     orderContainer.append($('<h2></h2>').addClass('order-type text-dark text-left mt-3 mb-4').html(properties.get('orderType')));
 
-    let subTypesContainer = $('<ul></ul>').addClass('subtypes').append($('<li></li>').html(currentSubType));
-    orderContainer.append(subTypesContainer);
+    if (currentSubType) {
+        let subTypesContainer = $('<ul></ul>').addClass('subtypes').append($('<li></li>').html(currentSubType));
+        orderContainer.append(subTypesContainer);
+    }
 
     orderContainer.append($('<p></p>').addClass('mb-1 text-left').html('<b>' + addressText +'</b>: ' + properties.get('address')));
 

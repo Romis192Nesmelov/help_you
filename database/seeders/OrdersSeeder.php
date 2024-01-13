@@ -18,7 +18,6 @@ class OrdersSeeder extends Seeder
         $im = User::where('phone','+7(926)247-77-25')->select('id')->first();
         $anotherUser = User::where('phone','+7(958)815-85-65')->select('id')->first();
 
-//        Order::factory(100)->create();
         $order = Order::create([
             'user_id' => $im->id,
             'order_type_id' => 1,
