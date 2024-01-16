@@ -28,13 +28,13 @@
             ])
         </div>
     </div>
-    @if (!auth()->check())
-        <script>
-            let getPrevUrl = "{{ route('prev_url') }}";
-            const generateCodeUrl = "{{ route('auth.generate_code') }}",
-                passwordsMismatch = "{{ trans('auth.password_mismatch') }}",
-                passwordCannotBeLess = "{{ trans('auth.password_cannot_be_less', ['length' => 6]) }}",
-                youMustConsent = "{{ trans('auth.you_must_consent_to_the_processing_of_personal_data') }}";
-        </script>
-    @endif
+{{--    @if (!auth()->check())--}}
+{{--        <script>--}}
+{{--            let getPrevUrl = "{{ route('prev_url') }}";--}}
+{{--            const generateCodeUrl = "{{ route('auth.generate_code') }}",--}}
+{{--                passwordsMismatch = "{{ trans('auth.password_mismatch') }}",--}}
+{{--                passwordCannotBeLess = "{{ trans('auth.password_cannot_be_less', ['length' => 6]) }}",--}}
+{{--                youMustConsent = "{{ trans('auth.you_must_consent_to_the_processing_of_personal_data') }}";--}}
+{{--        </script>--}}
+{{--    @endif--}}
 @endsection

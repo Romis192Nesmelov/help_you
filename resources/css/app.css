@@ -224,6 +224,11 @@ table {
     margin-top: 33px;
 }
 
+.form-group.has-label i.icon-eye,
+.form-group.has-label i.icon-eye-blocked {
+    cursor: pointer;
+}
+
 #orders-search i.icon-search4 {
     cursor: pointer;
 }

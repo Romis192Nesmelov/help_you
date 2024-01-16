@@ -23,7 +23,7 @@ class AuthController extends Controller
         $credentials['active'] = 1;
         $credentials['phone'] = $this->unifyPhone($credentials['phone']);
 
-        if (Auth::attempt($credentials, $request->remember == 'on')) {
+        if (Auth::attempt($credentials, $request->remember)) {
             $request->session()->regenerate();
             return response()->json(['account' => Auth::user()->name && Auth::user()->family && Auth::user()->born && Auth::user()->email],200);
         } else return response()->json(['errors' => ['phone' => [trans('auth.failed')], 'password' => [trans('auth.failed')]]], 401);

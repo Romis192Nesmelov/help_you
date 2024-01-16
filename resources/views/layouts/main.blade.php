@@ -51,7 +51,8 @@
 </head>
 
 <body style="overflow-y: hidden;">
-<div class="container">
+<div id="app" class="container">
+    @csrf
     <div id="main-container">
         <div id="top-line" class="w-100 d-flex align-items-center justify-content-between">
             <a class="d-none d-lg-block" href="{{ route('home') }}">
@@ -118,6 +119,57 @@
         </div>
         @yield('content')
     </div>
+
+    <x-modal id="login-modal" v-if="{{ (int)!auth()->check() }}" head="{{ trans('menu.login_or_register') }}">
+        <login-component
+            url="{{ route('auth.login') }}"
+            lphone="{{ trans('auth.phone') }}"
+            lpassword="{{ trans('auth.password') }}"
+            lcheckbox="{{ trans('auth.remember_me') }}"
+            lenter="{{ trans('auth.enter') }}"
+            lregister="{{ trans('auth.register') }}"
+            entertext="{{ trans('auth.enter') }}"
+            registertext="{{ trans('auth.register') }}"
+        ></login-component>
+        @include('blocks.forgot_password_block')
+
+{{--        <form method="post" action="{{ route('auth.login') }}">--}}
+{{--            @csrf--}}
+{{--            @include('blocks.input_phone_block')--}}
+{{--            @include('blocks.input_block',[--}}
+{{--                'name' => 'password',--}}
+{{--                'addClass' => 'password',--}}
+{{--                'type' => 'password',--}}
+{{--                'label' => trans('auth.password'),--}}
+{{--                'icon' => 'icon-eye',--}}
+{{--                'ajax' => true--}}
+{{--            ])--}}
+{{--            @include('blocks.button_block',[--}}
+{{--                'id' => 'enter-button',--}}
+{{--                'primary' => true,--}}
+{{--                'buttonType' => 'submit',--}}
+{{--                'icon' => 'icon-enter3',--}}
+{{--                'buttonText' => trans('auth.enter'),--}}
+{{--                'disabled' => true--}}
+{{--            ])--}}
+{{--            @include('blocks.button_block',[--}}
+{{--                'id' => null,--}}
+{{--                'primary' => false,--}}
+{{--                'addClass' => 'mb-3',--}}
+{{--                'dataTarget' => 'register-modal',--}}
+{{--                'dataDismiss' => true,--}}
+{{--                'icon' => 'icon-user-plus',--}}
+{{--                'buttonText' => trans('auth.register')--}}
+{{--            ])--}}
+{{--            @include('blocks.checkbox_block',[--}}
+{{--                'checked' => true,--}}
+{{--                'addClass' => 'text-center',--}}
+{{--                'name' => 'remember',--}}
+{{--                'label' => trans('auth.remember_me'),--}}
+{{--                'ajax' => true--}}
+{{--            ])--}}
+{{--        </form>--}}
+    </x-modal>
 </div>
 
 <x-modal id="message-modal" head="{{ trans('content.message') }}">
@@ -126,46 +178,8 @@
 
 <div id="loader"><div></div></div>
 
-@if (!auth()->check())
-    <x-modal id="login-modal" head="{{ trans('menu.login_or_register') }}">
-        <form method="post" action="{{ route('auth.login') }}">
-            @csrf
-            @include('blocks.input_phone_block')
-            @include('blocks.input_block',[
-                'name' => 'password',
-                'addClass' => 'password',
-                'type' => 'password',
-                'label' => trans('auth.password'),
-                'icon' => 'icon-eye',
-                'ajax' => true
-            ])
-            @include('blocks.button_block',[
-                'id' => 'enter-button',
-                'primary' => true,
-                'buttonType' => 'submit',
-                'icon' => 'icon-enter3',
-                'buttonText' => trans('auth.enter'),
-                'disabled' => true
-            ])
-            @include('blocks.button_block',[
-                'id' => null,
-                'primary' => false,
-                'addClass' => 'mb-3',
-                'dataTarget' => 'register-modal',
-                'dataDismiss' => true,
-                'icon' => 'icon-user-plus',
-                'buttonText' => trans('auth.register')
-            ])
-            @include('blocks.checkbox_block',[
-                'checked' => true,
-                'addClass' => 'text-center',
-                'name' => 'remember',
-                'label' => trans('auth.remember_me'),
-                'ajax' => true
-            ])
-        </form>
-        @include('blocks.forgot_password_block')
-    </x-modal>
+
+
 
     <x-modal id="register-modal" head="{{ trans('auth.register') }}">
         <form method="post" action="{{ route('auth.register') }}">
@@ -228,43 +242,48 @@
             ])
         </form>
     </x-modal>
-@endif
 
-<script>
-    const userId = parseInt("{{ auth()->check() }}") ? parseInt("{{ auth()->id() }}") : null,
-        accountUrl = "{{ route('account.change') }}",
-        getUnreadMessagesUrl = "{{ route('messages.get_unread_messages') }}",
-        getSubscriptionsUrl = "{{ route('order.get_subscriptions_news') }}",
-        getUnreadOrderPerformersUrl = "{{ route('order.get_unread_order_performers') }}",
-        getUnreadOrderRemovedPerformersUrl  = "{{ route('order.get_unread_order_removed_performers') }}",
-        getUnreadOrderStatusUrl = "{{ route('order.get_unread_order_status') }}",
-        ordersUrl = "{{ route('order.orders') }}",
-        getUserAgeUrl = "{{ route('order.get_user_age') }}",
-        mySubscriptionsUrl = "{{ route('account.my_subscriptions') }}",
-        myOrdersUrl = "{{ route('account.my_orders') }}",
-        myHelpUrl = "{{ route('account.my_help') }}",
-        chatUrl = "{{ route('messages.chat') }}",
-        addressText = "{{ trans('content.address') }}",
-        newOrderFromText = "{{ trans('content.new_order_from') }}",
-        unreadMessagesText = "{{ trans('messages.unread_messages') }}",
-        newPerformerText = "{{ trans('content.new_performer') }}",
-        removedPerformerText = "{{ trans('content.removed_performer') }}",
-        newOrderStatusText = "{{ trans('content.new_order_status') }}",
-        inChatNumberText = "{{ trans('messages.in_chat_number') }}",
-        errorFieldMustBeFilledInText = "{{ trans('validation.field_must_be_filled_in') }}",
-        errorWrongValueText = "{{ trans('validation.wrong_value') }}",
-        openMessageModalFlag = parseInt("{{ session()->has('message') }}");
-        window.orderStatuses = [];
-        window.orderStatusClasses = ['closed','in-progress','open','in-approve'];
-</script>
-@for ($i=0;$i<3;$i++)
-    <script>
-        window.orderStatuses.push("{{ trans('content.status_'.$i) }}");
-    </script>
-@endfor
-<script>
-    window.orderStatuses.push("{{ trans('content.in_approve') }}");
-</script>
+{{--<script>--}}
+{{--    const userId = parseInt("{{ auth()->check() }}") ? parseInt("{{ auth()->id() }}") : null,--}}
+{{--        accountUrl = "{{ route('account.change') }}",--}}
+{{--        getUnreadMessagesUrl = "{{ route('messages.get_unread_messages') }}",--}}
+{{--        getSubscriptionsUrl = "{{ route('order.get_subscriptions_news') }}",--}}
+{{--        getUnreadOrderPerformersUrl = "{{ route('order.get_unread_order_performers') }}",--}}
+{{--        getUnreadOrderRemovedPerformersUrl  = "{{ route('order.get_unread_order_removed_performers') }}",--}}
+{{--        getUnreadOrderStatusUrl = "{{ route('order.get_unread_order_status') }}",--}}
+{{--        ordersUrl = "{{ route('order.orders') }}",--}}
+{{--        getUserAgeUrl = "{{ route('order.get_user_age') }}",--}}
+{{--        mySubscriptionsUrl = "{{ route('account.my_subscriptions') }}",--}}
+{{--        myOrdersUrl = "{{ route('account.my_orders') }}",--}}
+{{--        myHelpUrl = "{{ route('account.my_help') }}",--}}
+{{--        chatUrl = "{{ route('messages.chat') }}",--}}
+{{--        addressText = "{{ trans('content.address') }}",--}}
+{{--        newOrderFromText = "{{ trans('content.new_order_from') }}",--}}
+{{--        unreadMessagesText = "{{ trans('messages.unread_messages') }}",--}}
+{{--        newPerformerText = "{{ trans('content.new_performer') }}",--}}
+{{--        removedPerformerText = "{{ trans('content.removed_performer') }}",--}}
+{{--        newOrderStatusText = "{{ trans('content.new_order_status') }}",--}}
+{{--        inChatNumberText = "{{ trans('messages.in_chat_number') }}",--}}
+{{--        errorFieldMustBeFilledInText = "{{ trans('validation.field_must_be_filled_in') }}",--}}
+{{--        errorWrongValueText = "{{ trans('validation.wrong_value') }}",--}}
+{{--        openMessageModalFlag = parseInt("{{ session()->has('message') }}");--}}
+{{--        window.orderStatuses = [];--}}
+{{--        window.orderStatusClasses = ['closed','in-progress','open','in-approve'];--}}
+{{--</script>--}}
+{{--@for ($i=0;$i<3;$i++)--}}
+{{--    <script>--}}
+{{--        window.orderStatuses.push("{{ trans('content.status_'.$i) }}");--}}
+{{--    </script>--}}
+{{--@endfor--}}
+{{--<script>--}}
+{{--    window.orderStatuses.push("{{ trans('content.in_approve') }}");--}}
+{{--</script>--}}
 
 </body>
 </html>
+{{--<script>--}}
+{{--    import TestComponent from "../js/TestComponent.vue";--}}
+{{--    export default {--}}
+{{--        components: {TestComponent}--}}
+{{--    }--}}
+{{--</script>--}}
