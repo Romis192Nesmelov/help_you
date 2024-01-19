@@ -53,27 +53,27 @@
             news_status_orders.length
         )">
             <ul id="dropdown">
-                <li v-for="(counter, id) in this.news_messages" :key="'message_in_'+id">
+                <li v-for="(counter, id) in this.news_messages" :key="id">
                     Новых сообщений: <span class="counter">{{ counter }}</span><br>
                     <a :href="chat_url+'?order_id='+(id.replace('order',''))">в чате по заявке №{{ id.replace('order','') }}</a>
                     <hr>
                 </li>
-                <li v-for="order in news_subscriptions" :key="'subscription'+order.id">
+                <li v-for="(news, id) in news_subscriptions" :key="id">
                     <a :href="my_subscriptions_url">Новая заяка от:</a><br>
-                    {{ order.user.name+' '+order.user.family }}
+                    {{ news.user.name+' '+news.user.family }}
                     <hr>
                 </li>
-                <li v-for="news in this.news_performers" :key="'new_performers'+news.order_id">
+                <li v-for="(news, id) in this.news_performers" :key="id">
                     <a :href="my_orders_url">Новый исполнитель у заявки №:{{ news.order_id }}:</a><br>
                     {{ news.user.name+' '+news.user.family }}
                     <hr>
                 </li>
-                <li v-for="news in this.news_removed_performers" :key="'new_removed_performers'+news.order_id">
+                <li v-for="(news, id) in this.news_removed_performers" :key="id">
                     <a :href="my_help_url">Вам было отказано в участии</a><br>
                     в выполнении заяки №{{ news.order_id }}
                     <hr>
                 </li>
-                <li v-for="news in this.news_status_orders" :key="'new_status_order'+news.order_id">
+                <li v-for="(news, id) in this.news_status_orders" :key="id">
                     <a :href="my_orders_url">Новый статус у заявки №:{{ news.order_id }}</a>:<br>
                     «{{ this.orders_statuses[news.status] }}»
                     <hr>
@@ -135,9 +135,9 @@ export default {
         'my_orders_url': String,
         'my_help_url': String,
         'news_subscriptions': Object,
-        'news_performers': Array,
-        'news_removed_performers': Array,
-        'news_status_orders': Array,
+        'news_performers': Object,
+        'news_removed_performers': Object,
+        'news_status_orders': Object,
         'orders_statuses': Array
     },
 }

@@ -101,9 +101,9 @@ export default {
             mainMenu: {},
             newsMessages: {},
             newsSubscriptions: {},
-            newsPerformers: [],
-            newsRemovedPerformers: [],
-            newsStatusOrders: [],
+            newsPerformers: {},
+            newsRemovedPerformers: {},
+            newsStatusOrders: {},
             ordersStatuses: []
         }
     },
@@ -124,19 +124,25 @@ export default {
                     $.each(response.data.news_subscriptions, function (k,subscription) {
                         if (subscription.unread_orders.length) {
                             $.each(subscription.unread_orders, function (k,unreadOrder) {
-                                self.newsSubscriptions[unreadOrder.order_id] = unreadOrder.order;
+                                self.newsSubscriptions['subscription'+unreadOrder.order_id] = unreadOrder.order;
                             });
                         }
                     });
                 }
                 if (response.data.news_performers.length) {
-                    self.newsPerformers = response.data.news_performers;
+                    $.each(response.data.news_performers, function (k,news) {
+                        self.newsPerformers['performer'+news.order_id] = news;
+                    });
                 }
                 if (response.data.news_removed_performers.length) {
-                    self.newsRemovedPerformers = response.data.news_removed_performers;
+                    $.each(response.data.news_performers, function (k,news) {
+                        self.newsRemovedPerformers['removed_performer'+news.order_id] = news;
+                    });
                 }
                 if (response.data.news_status_orders.length) {
-                    self.newsStatusOrders = response.data.news_status_orders;
+                    $.each(response.data.news_status_orders, function (k,news) {
+                        self.newsStatusOrders['status'+news.order_id] = news;
+                    });
                     self.ordersStatuses = response.data.orders_statuses;
                 }
             });
