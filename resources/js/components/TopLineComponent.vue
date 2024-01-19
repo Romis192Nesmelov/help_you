@@ -57,6 +57,7 @@
         </div>
         <right-block-component
             :auth_check="authCheck"
+            :user_id="userId"
             :on_root="on_root"
             :account_icon="account_icon"
             :account_change_url="account_change_url"
@@ -70,6 +71,7 @@
             :news_performers="newsPerformers"
             :news_removed_performers="newsRemovedPerformers"
             :news_status_orders="newsStatusOrders"
+            :new_orders_approved="newOrdersApproved"
             :orders_statuses="ordersStatuses"
         ></right-block-component>
     </div>
@@ -88,28 +90,37 @@ export default {
     name: "TopLineComponent",
     created() {
         this.authCheck = !isNaN(parseInt(this.auth));
+        this.userId = parseInt(this.user_id);
         this.mainMenu = JSON.parse(this.main_menu);
+        this.ordersStatuses = JSON.parse(this.order_statuses);
 
         if (this.authCheck) {
             this.getNewsMessages();
             this.getNewsOrders();
+            this.listenEvents();
         }
     },
     data() {
         return {
             authCheck: false,
+            userId: 0,
             mainMenu: {},
             newsMessages: {},
             newsSubscriptions: {},
             newsPerformers: {},
             newsRemovedPerformers: {},
             newsStatusOrders: {},
+            newOrdersApproved: {},
             ordersStatuses: []
         }
     },
     methods: {
-        loggedIn() {
+        loggedIn(id) {
+            this.userId = id;
             this.authCheck = true;
+            this.getNewsMessages();
+            this.getNewsOrders();
+            this.listenEvents();
         },
         getNewsMessages() {
             let self = this;
@@ -131,7 +142,7 @@ export default {
                 }
                 if (response.data.news_performers.length) {
                     $.each(response.data.news_performers, function (k,news) {
-                        self.newsPerformers['performer'+news.order_id] = news;
+                        self.newsPerformers['new_performer'+news.order_id] = news;
                     });
                 }
                 if (response.data.news_removed_performers.length) {
@@ -143,9 +154,49 @@ export default {
                     $.each(response.data.news_status_orders, function (k,news) {
                         self.newsStatusOrders['status'+news.order_id] = news;
                     });
-                    self.ordersStatuses = response.data.orders_statuses;
                 }
             });
+        },
+        listenEvents() {
+            let self = this;
+            window.Echo.private('notice_' + this.userId).listen('.notice', res => {
+                if (res.notice === 'new_message') {
+                    let messageKey = 'order'+res.order.id;
+                    if (self.newsMessages[messageKey]) {
+                        let counter = self.newsMessages[messageKey];
+                        counter++;
+                        self.newsMessages[messageKey] = counter;
+                    } else {
+                        self.newsMessages[messageKey] = 1;
+                    }
+                } else if (res.notice === 'new_order_in_subscription') {
+                    self.newsSubscriptions['subscription'+res.order.id] = res.order;
+                } else if (res.notice === 'new_performer') {
+                    self.newsPerformers['new_performer'+res.order.id] = res.order;
+                } else if (res.notice === 'order_approved') {
+                    self.newOrdersApproved['status'+res.order.d] = res.order;
+                } else if (res.notice === 'new_order_status') {
+                    self.newsStatusOrders['status'+res.order.d] = res.order;
+                    if (!res.order.status) this.deleteOrderNotice(res.order.id);
+                } else if (res.notice === 'remove_performer') {
+                    self.newsRemovedPerformers['removed_performer'+res.order.id] = res.order;
+                } else if (res.notice === 'delete_order') {
+                    this.deleteOrderNotice(res.order.id);
+                }
+            });
+        },
+        deleteOrderNotice(orderId) {
+            let orderKeyNewMessages = 'order'+orderId,
+                orderKeySubscriptions = 'subscription'+orderId,
+                orderKeyNewPerformer = 'performer'+orderId,
+                orderKeyOrderApproved = 'status'+orderId,
+                orderKeyOrderStatus = 'status'+orderId;
+
+            if (self.newsMessages[orderKeyNewMessages]) delete self.newsMessages[orderKeyNewMessages];
+            if (self.newsSubscriptions[orderKeySubscriptions]) delete self.newsSubscriptions[orderKeySubscriptions];
+            if (self.newsPerformers[orderKeyNewPerformer]) delete self.newsPerformers[orderKeyNewPerformer];
+            if (self.newOrdersApproved[orderKeyOrderApproved]) delete self.newOrdersApproved[orderKeyOrderApproved];
+            if (self.newsStatusOrders[orderKeyOrderStatus]) delete self.newsStatusOrders[orderKeyOrderStatus];
         }
     },
     components: {
@@ -159,6 +210,7 @@ export default {
     },
     props: {
         'auth': String,
+        'user_id': String,
         'on_root': Boolean,
         'home_url': String,
         'login_url': String,
@@ -178,7 +230,8 @@ export default {
         'chat_url': String,
         'get_orders_new_url': String,
         'my_orders_url': String,
-        'my_help_url': String
+        'my_help_url': String,
+        'order_statuses': String
     },
 }
 </script>

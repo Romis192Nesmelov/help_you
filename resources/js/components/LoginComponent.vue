@@ -85,7 +85,7 @@ export default {
             })
                 .then(function (response) {
                     $('#login-modal').modal('hide');
-                    self.$emit('loggedIn');
+                    self.$emit('loggedIn',response.data.id);
                 })
                 .catch(function (error) {
                     $.each(error.response.data.errors, (name,error) => {

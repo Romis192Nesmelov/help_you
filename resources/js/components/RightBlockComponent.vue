@@ -11,47 +11,17 @@
     <div id="right-button-block" :class="'buttons-block d-none d-lg-flex align-items-center justify-content-'+(auth_check ? 'between' : 'end')+(on_root ? ' on-root' : '')">
         <a
             id="navbar-dropdown-messages"
-            :class="'nav-link'+(
-                news_messages.length ||
-                news_subscriptions.length ||
-                news_performers.length ||
-                news_removed_performers.length ||
-                news_removed_performers ||
-                news_status_orders.length
-                ? ' dropdown-toggle' : ''
-                )"
+            :class="'nav-link'+(this.countMessages ? ' dropdown-toggle' : '')"
             role="button"
-            :data-bs-toggle="(
-                news_messages.length ||
-                news_subscriptions.length ||
-                news_performers.length ||
-                news_removed_performers.length ||
-                news_removed_performers ||
-                news_status_orders.length
-                ? 'dropdown' : ''
-                )"
+            :data-bs-toggle="this.countMessages ? 'dropdown' : ''"
             aria-expanded="false"
             v-if="auth_check"
         >
             <i class="fa fa-bell-o">
-                <span class="dot" v-if="(
-                    news_messages.length ||
-                    news_subscriptions.length ||
-                    news_performers.length ||
-                    news_removed_performers.length ||
-                    news_removed_performers ||
-                    news_status_orders.length
-                )"></span>
+                <span class="dot" v-if="this.countMessages"></span>
             </i>
         </a>
-        <div class="dropdown-menu" aria-labelledby="navbar-dropdown-messages" v-if="auth_check && (
-            news_messages.length ||
-            news_subscriptions.length ||
-            news_performers.length ||
-            news_removed_performers.length ||
-            news_removed_performers ||
-            news_status_orders.length
-        )">
+        <div class="dropdown-menu" aria-labelledby="navbar-dropdown-messages" v-show="auth_check && this.countMessages">
             <ul id="dropdown">
                 <li v-for="(counter, id) in this.news_messages" :key="id">
                     Новых сообщений: <span class="counter">{{ counter }}</span><br>
@@ -59,7 +29,7 @@
                     <hr>
                 </li>
                 <li v-for="(news, id) in news_subscriptions" :key="id">
-                    <a :href="my_subscriptions_url">Новая заяка от:</a><br>
+                    <a :href="my_subscriptions_url">Новая заяка №{{ news.id }} от:</a><br>
                     {{ news.user.name+' '+news.user.family }}
                     <hr>
                 </li>
@@ -76,6 +46,10 @@
                 <li v-for="(news, id) in this.news_status_orders" :key="id">
                     <a :href="my_orders_url">Новый статус у заявки №:{{ news.order_id }}</a>:<br>
                     «{{ this.orders_statuses[news.status] }}»
+                    <hr>
+                </li>
+                <li v-for="(news, id) in this.new_orders_approved" :key="id">
+                    <a :href="my_orders_url">Заявка №:{{ news.order_id }} одобрена!</a>
                     <hr>
                 </li>
             </ul>
@@ -118,13 +92,28 @@ export default {
     components: {
         AccountIconComponent, ButtonComponent
     },
+    created() {
+        // console.log(this.news_subscriptions);
+        // let self = this;
+        // setTimeout(function () {
+        //     delete self.news_subscriptions['subscription17'];
+        // }, 5000);
+    },
     data() {
         return {
-            statuses: ['Закрыта','Выполняется',]
+            countMessages: (
+                this.news_messages.length ||
+                this.news_subscriptions.length ||
+                this.news_performers.length ||
+                this.news_removed_performers.length ||
+                this.news_removed_performers ||
+                this.news_status_orders.length
+            )
         }
     },
     props: {
         'auth_check': Boolean,
+        'user_id': Number,
         'on_root': Boolean,
         'account_icon': String,
         'new_order_url': String,
@@ -138,6 +127,7 @@ export default {
         'news_performers': Object,
         'news_removed_performers': Object,
         'news_status_orders': Object,
+        'new_orders_approved': Object,
         'orders_statuses': Array
     },
 }

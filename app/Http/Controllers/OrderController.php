@@ -71,11 +71,6 @@ class OrderController extends BaseController
 
     public function getOrdersNews(): JsonResponse
     {
-        $orderStatuses = [];
-        for ($i=0;$i<3;$i++) {
-            $orderStatuses[] = trans('content.status_'.$i);
-        }
-
         return response()->json([
             'news_subscriptions' => Subscription::query()
                 ->with('unreadOrders.order.user')
@@ -94,8 +89,7 @@ class OrderController extends BaseController
             'news_status_orders' => ReadStatusOrder::query()
                 ->whereIn('order_id',Order::where('user_id',Auth::id())->pluck('id')->toArray())
                 ->where('read',null)
-                ->get(),
-            'orders_statuses' => $orderStatuses
+                ->get()
         ]);
     }
 
