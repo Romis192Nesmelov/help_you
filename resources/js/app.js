@@ -1,55 +1,144 @@
 import './bootstrap';
 import {createApp} from "vue/dist/vue.esm-bundler";
-import InputComponent from "./components/blocks/InputComponent.vue";
-import LoginComponent from "./components/LoginComponent.vue";
+import TopLineComponent from "./components/TopLineComponent.vue";
 
 const app = createApp({
     components: {
-        InputComponent,
-        LoginComponent,
+        TopLineComponent,
     }
 });
 
 window.tokenField = $('input[name=_token]').val();
-window.phoneRegExp = /^((\+)?(\d)(\s)?(\()?[0-9]{3}(\))?(\s)?([0-9]{3})(\-)?([0-9]{2})(\-)?([0-9]{2}))$/gi;
-window.codeRegExp = /^((\d){2}(\-)(\d){2}(\-)(\d){2})$/gi;
-window.inputPhone = null;
-window.inputPassword = null;
-window.inputConfirmPassword = null;
+
+window.inputLoginPhone = '';
+window.inputLoginPassword = '';
+
+window.inputRegisterPhone = '';
+window.inputRegisterPassword = '';
+window.inputRegisterConfirmPassword = '';
+window.inputRegisterCode = '';
+window.inputIAgreeRegister = false;
+
+window.inputRestorePasswordPhone = '';
 
 app.mount('#app');
 
+// window.eventBus = new Vue();
+
 $(document).ready(function () {
     // MAIN BLOCK BEGIN
+    window.showMessage = (message) => {
+        const messageModal = $('#message-modal');
+        messageModal.find('h4').html(message);
+        messageModal.modal('show');
+    }
+
+    $('.form-group.has-label i.icon-eye').click(function () {
+        let cover = $(this).parents('.form-group'),
+            input = cover.find('input');
+        if ($(this).hasClass('icon-eye')) {
+            input.attr('type','text');
+            $(this).removeClass('icon-eye').addClass('icon-eye-blocked');
+        } else {
+            input.attr('type','password');
+            $(this).removeClass('icon-eye-blocked').addClass('icon-eye');
+        }
+    });
+
     $.mask.definitions['n'] = "[7-8]";
-    const loginModal =  $('#login-modal'),
+
+    const loginModal = $('#login-modal'),
         loginModalLogin = loginModal.find('input[name=phone]'),
         loginModalPassword = loginModal.find('input[name=password]'),
-        submitButton = $('#enter');
+        phoneMask = "+n(999)999-99-99",
+        codeMask = "99-99-99",
+        phoneRegExp = /^((\+)?(\d)(\s)?(\()?[0-9]{3}(\))?(\s)?([0-9]{3})(\-)?([0-9]{2})(\-)?([0-9]{2}))$/gi,
+        emailRegExp = /^[a-zA-Z0-9][\-_\.\+\!\#\$\%\&\'\*\/\=\?\^\`\{\|]{0,1}([a-zA-Z0-9][\-_\.\+\!\#\$\%\&\'\*\/\=\?\^\`\{\|]{0,1})*[a-zA-Z0-9]@[a-zA-Z0-9][-\.]{0,1}([a-zA-Z][-\.]{0,1})*[a-zA-Z0-9]\.[a-zA-Z0-9]{1,}([\.\-]{0,1}[a-zA-Z]){0,}[a-zA-Z0-9]{0,}$/gi,
+        codeRegExp = /^((\d){2}(\-)(\d){2}(\-)(\d){2})$/gi;
 
-    loginModalLogin.mask("+n(999)999-99-99").keyup(function () {
-        if ($(this).val().match(window.phoneRegExp)) {
-            window.inputPhone = $(this).val();
-            if (window.inputPhone && window.inputPassword) submitButton.removeAttr('disabled');
+    loginModalLogin.mask(phoneMask).keyup(function () {
+        if ($(this).val().match(phoneRegExp)) {
+            window.inputLoginPhone = $(this).val();
+            enableLoginModalButtons();
         } else {
-            window.inputPhone = null;
-            if (submitButton.attr('disabled') !== 'disabled') submitButton.attr('disabled','disabled');
+            window.inputLoginPhone = null;
+            enableLoginModalButtons();
         }
-
     });
+
     loginModalPassword.keyup(function () {
         if ($(this).val().length) {
-            window.inputPassword = $(this).val();
-            if (window.inputPhone && window.inputPassword) submitButton.removeAttr('disabled');
+            window.inputLoginPassword = $(this).val();
+            enableLoginModalButtons();
         } else {
-            window.inputPassword = null;
-            if (submitButton.attr('disabled') !== 'disabled') submitButton.attr('disabled','disabled');
+            window.inputLoginPassword = null;
+            enableLoginModalButtons();
         }
     })
 
-    $('input[name=code]').mask("99-99-99");
+    const registerModal = $('#register-modal'),
+        loginRegisterModal = registerModal.find('input[name=phone]'),
+        passwordRegisterModal = registerModal.find('input[name=password]'),
+        confirmPasswordRegisterModal = registerModal.find('input[name=password_confirmation]'),
+        codeRegisterModal = registerModal.find('input[name=code]'),
+        iAgreeRegisterModal = registerModal.find('input[name=i_agree]');
 
-    // window.messageModal = $('#message-modal');
+    loginRegisterModal.mask(phoneMask).keyup(function () {
+        if ($(this).val().match(phoneRegExp)) {
+            window.inputRegisterPhone = $(this).val();
+            enableRegisterModalButtons();
+        } else {
+            window.inputRegisterPhone = null;
+            enableRegisterModalButtons();
+        }
+    });
+
+    passwordRegisterModal.keyup(function () {
+        if ($(this).val().length) {
+            window.inputRegisterPassword = $(this).val();
+            enableRegisterModalButtons();
+        } else {
+            window.inputRegisterPassword = null;
+            enableRegisterModalButtons();
+        }
+    });
+
+    confirmPasswordRegisterModal.keyup(function () {
+        if ($(this).val().length) {
+            window.inputRegisterConfirmPassword = $(this).val();
+            enableRegisterModalButtons();
+        } else {
+            window.inputRegisterConfirmPassword = null;
+            enableRegisterModalButtons();
+        }
+    });
+
+    codeRegisterModal.mask(codeMask).keyup(function () {
+        if ($(this).val().match(codeRegExp)) {
+            window.inputRegisterCode = $(this).val();
+            enableRegisterModalButtons();
+        } else {
+            window.inputRegisterCode = null;
+            enableRegisterModalButtons();
+        }
+    });
+
+    iAgreeRegisterModal.change(function () {
+        window.inputIAgreeRegister = $(this).is(':checked');
+        enableRegisterModalButtons();
+    });
+
+    const submitRestorePasswordButton = $('#reset-button');
+    $('#restore-password-modal input[name=phone]').mask(phoneMask).keyup(function () {
+        if ($(this).val().match(phoneRegExp)) {
+            window.inputRestorePasswordPhone = $(this).val();
+            submitRestorePasswordButton.removeAttr('disabled');
+        } else {
+            window.inputRestorePasswordPhone = null;
+            submitRestorePasswordButton.attr('disabled','disabled');
+        }
+    });
+
     // window.dropDown = $('#dropdown');
     // window.rightButtonBlock = $('#right-button-block .fa.fa-bell-o');
     // window.modalClosingConfirm = $('#order-closing-confirm-modal');
@@ -89,15 +178,18 @@ $(document).ready(function () {
         removeLoader();
     },500);
 
+    // Fancybox init
+    bindFancybox();
+
     // Datatable
-    const baseDataTable = dataTableAttributes($('.datatable-basic.default'), 8);
-    const subscrDataTable = dataTableAttributes($('.datatable-basic.subscriptions'), 6);
-    if (baseDataTable) clickYesDeleteOnModal(baseDataTable, true);
-    if (subscrDataTable) clickYesDeleteOnModal(subscrDataTable, false);
+    // const baseDataTable = dataTableAttributes($('.datatable-basic.default'), 8);
+    // const subscrDataTable = dataTableAttributes($('.datatable-basic.subscriptions'), 6);
+    // if (baseDataTable) clickYesDeleteOnModal(baseDataTable, true);
+    // if (subscrDataTable) clickYesDeleteOnModal(subscrDataTable, false);
 
     // Click to delete items
-    window.deleteId = null;
-    window.deleteRow = null;
+    // window.deleteId = null;
+    // window.deleteRow = null;
 
     // // Top menu tabs
     // const topMenu = $('.rounded-block.tall .top-submenu');
@@ -135,20 +227,7 @@ $(document).ready(function () {
     //     }
     // });
     //
-    $('.form-group.has-label i.icon-eye').click(function () {
-        let cover = $(this).parents('.form-group'),
-            input = cover.find('input');
-        if ($(this).hasClass('icon-eye')) {
-            input.attr('type','text');
-            $(this).removeClass('icon-eye').addClass('icon-eye-blocked');
-        } else {
-            input.attr('type','password');
-            $(this).removeClass('icon-eye-blocked').addClass('icon-eye');
-        }
-    });
     //
-    // // Fancybox init
-    // bindFancybox();
     //
     // // Open message modal
     // if (openMessageModalFlag) messageModal.modal('show');
@@ -317,180 +396,6 @@ $(document).ready(function () {
     // }
     // // MAIN BLOCK END
     //
-    // // AUTH BLOCK BEGIN
-    // const loginModal = $('#login-modal'),
-    //     loginPhoneField = loginModal.find('input[name=phone]'),
-    //     loginPasswordField = loginModal.find('input[name=password]'),
-    //     loginPasswordFieldError = loginModal.find('.error.password'),
-    //     loginButton = $('#enter-button'),
-    //
-    //     registerModal = $('#register-modal'),
-    //     registerPhoneField = registerModal.find('input[name=phone]'),
-    //     getRegisterCodeButton = $('#get-register-code'),
-    //     registerPasswordField = registerModal.find('input[name=password]'),
-    //     registerConfirmPasswordField = registerModal.find('input[name=password_confirmation]'),
-    //     registerCodeField = registerModal.find('input[name=code]'),
-    //     registerAgree = registerModal.find('input[name=i_agree]'),
-    //     registerPasswordFieldError = registerModal.find('.error.password'),
-    //     registerAgreeError = registerModal.find('.error.i_agree'),
-    //     registerConfirmPasswordFieldError = registerModal.find('.error.password_confirmation'),
-    //     registerButton = $('#register-button'),
-    //
-    //     resetPasswordModal = $('#restore-password-modal'),
-    //     resetPhoneField = resetPasswordModal.find('input[name=phone]'),
-    //     resetButton = $('#reset-button');
-    //
-    // const unlockLoginButton = () => {
-    //     if (loginPhoneField.val().match(phoneRegExp)) {
-    //         if (loginPasswordField.val().length) loginButton.removeAttr('disabled');
-    //         else loginButton.attr('disabled','disabled');
-    //         registerPhoneField.val(loginPhoneField.val());
-    //     } else loginButton.attr('disabled','disabled');
-    // };
-    //
-    // //Unlock login button
-    // loginPhoneField.on('change',unlockLoginButton);
-    // loginPasswordField.on('change',unlockLoginButton).keyup(unlockLoginButton);
-    //
-    // //Login form
-    // loginButton.click((e) => {
-    //     e.preventDefault();
-    //
-    //     loginPasswordField.removeClass('error');
-    //     loginPasswordFieldError.html('');
-    //
-    //     getUrl(loginModal.find('form'), null, (data) => {
-    //         loginModal.modal('hide');
-    //         if (data.account) {
-    //             loginModal.remove();
-    //             registerModal.remove();
-    //             resetPasswordModal.remove();
-    //             $('#login-button').remove();
-    //             $('#account-button').removeClass('d-none');
-    //             $('#login-href').remove();
-    //             $('#account-href').removeClass('d-none');
-    //             $('#navbar-dropdown-messages').removeClass('d-none');
-    //             $('#right-button-block').removeClass('justify-content-end').addClass('justify-content-between');
-    //
-    //             //Goto prev url
-    //             $.get(
-    //                 getPrevUrl,
-    //                 (data) => {
-    //                     if (data.url) window.location.href = data.url;
-    //                 }
-    //             );
-    //             //Getting news
-    //             getNews();
-    //         } else {
-    //             window.location.href = accountUrl;
-    //         }
-    //     });
-    // });
-    //
-    // const unlockGetCodeAndRegisterButtons = () => {
-    //     if (
-    //         registerPhoneField.val().match(phoneRegExp) &&
-    //         registerPasswordField.val().length &&
-    //         registerConfirmPasswordField.val().length
-    //     ) {
-    //         getRegisterCodeButton.removeAttr('disabled');
-    //         if (registerCodeField.val().match(codeRegExp)) registerButton.removeAttr('disabled');
-    //         else registerButton.attr('disabled','disabled');
-    //     } else {
-    //         getRegisterCodeButton.attr('disabled','disabled');
-    //         registerButton.attr('disabled','disabled');
-    //     }
-    // };
-    //
-    // //Unlock get code button
-    // registerPhoneField.on('change',unlockGetCodeAndRegisterButtons);
-    // registerPasswordField.on('change',unlockGetCodeAndRegisterButtons).keyup(unlockGetCodeAndRegisterButtons);
-    // registerConfirmPasswordField.on('change',unlockGetCodeAndRegisterButtons).keyup(unlockGetCodeAndRegisterButtons);
-    // registerCodeField.on('change',unlockGetCodeAndRegisterButtons).keyup(unlockGetCodeAndRegisterButtons);
-    //
-    // //Unlock register button
-    // registerCodeField.on('change', unlockGetCodeAndRegisterButtons).keyup(unlockGetCodeAndRegisterButtons);
-    //
-    // const preValidationRegister = () => {
-    //     registerPasswordField.removeClass('error');
-    //     registerConfirmPasswordField.removeClass('error');
-    //     registerAgree.removeClass('error');
-    //
-    //     registerPasswordFieldError.html('');
-    //     registerConfirmPasswordFieldError.html('');
-    //     registerAgreeError.html('');
-    //
-    //     if (!registerAgree.is(':checked')) {
-    //         registerAgree.addClass('error');
-    //         registerAgreeError.html(youMustConsent);
-    //         return false;
-    //     }
-    //
-    //     if (registerPasswordField.val() !== registerConfirmPasswordField.val()) {
-    //         registerPasswordField.addClass('error');
-    //         registerConfirmPasswordField.addClass('error');
-    //         registerPasswordFieldError.html(passwordsMismatch);
-    //         registerConfirmPasswordFieldError.html(passwordsMismatch);
-    //         return false;
-    //     } else if (registerPasswordField.val().length < 6) {
-    //         registerPasswordField.addClass('error');
-    //         registerConfirmPasswordField.addClass('error');
-    //         registerPasswordFieldError.html(passwordCannotBeLess);
-    //         registerConfirmPasswordFieldError.html(passwordCannotBeLess);
-    //         return false;
-    //     }
-    //     return true;
-    // }
-    //
-    // //Register form generate code
-    // getRegisterCodeButton.click((e) => {
-    //     e.preventDefault();
-    //     if (preValidationRegister()) {
-    //         getCodeAgainCounter(getRegisterCodeButton, 45);
-    //         getUrl(registerModal.find('form'), generateCodeUrl, (data) => {
-    //             getRegisterCodeButton.addClass('d-none');
-    //             registerButton.removeClass('d-none');
-    //             registerModal.find('.form-group.d-none').removeClass('d-none');
-    //             messageModal.find('h4').html(data.message);
-    //             messageModal.modal('show');
-    //         });
-    //     }
-    // });
-    //
-    // //Register form final register
-    // registerButton.click((e) => {
-    //     e.preventDefault();
-    //     if (preValidationRegister()) {
-    //         getUrl(registerModal.find('form'), null, (data) => {
-    //             messageModal.find('h4').html(data.message);
-    //             registerModal.modal('hide');
-    //             messageModal.modal('show');
-    //         });
-    //     }
-    // });
-    //
-    // const unlockResetButton = () => {
-    //     if (resetPhoneField.val().match(phoneRegExp)) resetButton.removeAttr('disabled');
-    //     else resetButton.attr('disabled','disabled');
-    // };
-    //
-    // //Unlock reset button
-    // resetPhoneField.on('change',unlockResetButton);
-    //
-    // //Reset password form
-    // resetButton.click((e) => {
-    //     e.preventDefault();
-    //     getUrl(resetPasswordModal.find('form'), null, (data) => {
-    //         resetPasswordModal.modal('hide');
-    //         messageModal.find('h4').html(data.message);
-    //         messageModal.modal('show');
-    //     });
-    // });
-    //
-    // let currentUrl = new URL(window.location.href);
-    // if (currentUrl.searchParams.get('login')) loginModal.modal('show');
-    // // AUTH BLOCK END
-    //
     // // ACCOUNT BLOCK BEGIN
     // const accountForm = $('#account-form'),
     //     bornDateField = $('input[name=born]'),
@@ -512,7 +417,6 @@ $(document).ready(function () {
     //     avatarContainer = $('#avatar-container'),
     //
     //     saveButton =$('#account-save'),
-    //     emailRegExp = /^[a-zA-Z0-9][\-_\.\+\!\#\$\%\&\'\*\/\=\?\^\`\{\|]{0,1}([a-zA-Z0-9][\-_\.\+\!\#\$\%\&\'\*\/\=\?\^\`\{\|]{0,1})*[a-zA-Z0-9]@[a-zA-Z0-9][-\.]{0,1}([a-zA-Z][-\.]{0,1})*[a-zA-Z0-9]\.[a-zA-Z0-9]{1,}([\.\-]{0,1}[a-zA-Z]){0,}[a-zA-Z0-9]{0,}$/gi
     //
     // window.avatarImage = null;
     // window.avatarSize = 0;
@@ -1173,6 +1077,55 @@ $(document).ready(function () {
     //CHATS BLOCK END
 });
 
+const bindFancybox = () => {
+    // Fancybox init
+    $('.fancybox').fancybox({
+        'autoScale': true,
+        'touch': false,
+        'transitionIn': 'elastic',
+        'transitionOut': 'elastic',
+        'speedIn': 500,
+        'speedOut': 300,
+        'autoDimensions': true,
+        'centerOnScroll': true
+    });
+}
+
+const addLoader = () => {
+    $('body').prepend(
+        $('<div></div>').attr('id','loader').append($('<div></div>'))
+    ).css({
+        // 'overflow':'hidden',
+        'padding-right':20
+    });
+}
+
+const removeLoader = () => {
+    $('#loader').remove();
+    $('body').css('overflow-y','auto');
+}
+
+const enableLoginModalButtons = () => {
+    const submitLoginButton = $('#enter');
+    if (window.inputLoginPhone && window.inputLoginPassword) submitLoginButton.removeAttr('disabled');
+    else submitLoginButton.attr('disabled','disabled');
+}
+
+const enableRegisterModalButtons = () => {
+    const submitRegisterButton = $('#register'),
+        getCodeRegisterCodeButton = $('#get-register-code');
+
+    if (window.inputRegisterPhone && window.inputRegisterPassword && window.inputRegisterConfirmPassword) {
+        getCodeRegisterCodeButton.removeAttr('disabled');
+        if (window.inputRegisterCode && window.inputIAgreeRegister) submitRegisterButton.removeAttr('disabled');
+        else submitRegisterButton.attr('disabled','disabled');
+    } else {
+        getCodeRegisterCodeButton.attr('disabled','disabled');
+        submitRegisterButton.attr('disabled','disabled');
+        submitRegisterButton.attr('disabled','disabled');
+    }
+}
+
 // const getNewMessageRow = (selfFlag) => {
 //     let messageRow = $('<div></div>').addClass('message-row');
 //     if (selfFlag) messageRow.addClass('my-self');
@@ -1256,34 +1209,6 @@ $(document).ready(function () {
 //     }
 // }
 //
-// const bindFancybox = () => {
-//     // Fancybox init
-//     $('.fancybox').fancybox({
-//         'autoScale': true,
-//         'touch': false,
-//         'transitionIn': 'elastic',
-//         'transitionOut': 'elastic',
-//         'speedIn': 500,
-//         'speedOut': 300,
-//         'autoDimensions': true,
-//         'centerOnScroll': true
-//     });
-// }
-//
-// const addLoader = () => {
-//     $('body').prepend(
-//         $('<div></div>').attr('id','loader').append($('<div></div>'))
-//     ).css({
-//         // 'overflow':'hidden',
-//         'padding-right':20
-//     });
-// }
-
-const removeLoader = () => {
-    $('#loader').remove();
-    $('body').css('overflow-y','auto');
-}
-
 // const getUrl = (form, url, callBack) => {
 //     let formData = new FormData(),
 //         submitButton = form.find('button[type=submit]');
@@ -1517,37 +1442,37 @@ const removeLoader = () => {
 //     window.myMap.setCenter(point, 17);
 // }
 //
-const dataTableAttributes = (dataTable, rows) => {
-    if (dataTable.length) {
-        dataTable = dataTable.DataTable({iDisplayLength: rows});
+// const dataTableAttributes = (dataTable, rows) => {
+//     if (dataTable.length) {
+//         dataTable = dataTable.DataTable({iDisplayLength: rows});
+//
+//         // Change pagination on data-tables
+//         bindChangePagination(dataTable);
+//         bindDelete();
+//
+//         $(window).resize(function () {
+//             resizeDTable(dataTable, rows);
+//         });
+//         return dataTable
+//     } else return false;
+// }
 
-        // Change pagination on data-tables
-        bindChangePagination(dataTable);
-        bindDelete();
-
-        $(window).resize(function () {
-            resizeDTable(dataTable, rows);
-        });
-        return dataTable
-    } else return false;
-}
-
-const clickYesDeleteOnModal = (dataTable, useCounter) => {
-    // Click YES on delete modal
-    $('.delete-yes').click(function () {
-        let deleteModal = $(this).parents('.modal');
-        deleteModal.modal('hide');
-        addLoader();
-
-        $.post(deleteModal.attr('del-function'), {
-            '_token': window.tokenField,
-            'id': window.deleteId,
-        }, () => {
-            deleteDataTableRows(window.deleteRow.parents('.content-block'), window.deleteRow, useCounter);
-            removeLoader();
-        });
-    });
-}
+// const clickYesDeleteOnModal = (dataTable, useCounter) => {
+//     // Click YES on delete modal
+//     $('.delete-yes').click(function () {
+//         let deleteModal = $(this).parents('.modal');
+//         deleteModal.modal('hide');
+//         addLoader();
+//
+//         $.post(deleteModal.attr('del-function'), {
+//             '_token': window.tokenField,
+//             'id': window.deleteId,
+//         }, () => {
+//             deleteDataTableRows(window.deleteRow.parents('.content-block'), window.deleteRow, useCounter);
+//             removeLoader();
+//         });
+//     });
+// }
 //
 // const movingOrderToApproving = (tableRow) => {
 //     changeTableRowLabel(tableRow, 'closed', 'in-approve', window.orderStatuses[3]);

@@ -6,13 +6,13 @@
             :type="type"
             :name="name"
             :value="value"
-            :class="'form-control has-icon' + (error.length ? 'error' : '' )"
+            :class="'form-control has-icon' + (error ? ' error' : '' )"
             :placeholder="placeholder"
             :minlength="min"
             :maxlength="max"
             @input="$emit('update:value', $event.target.value)"
         >
-        <div class="error" v-if="error.length">{{ error }}</div>
+        <div class="error" v-if="error">{{ error }}</div>
     </div>
 </template>
 

@@ -54,194 +54,28 @@
 <div id="app" class="container">
     @csrf
     <div id="main-container">
-        <div id="top-line" class="w-100 d-flex align-items-center justify-content-between">
-            <a class="d-none d-lg-block" href="{{ route('home') }}">
-                <div class="logo-block d-none d-lg-flex align-items-center justify-content-between">
-                    @include('blocks.logo_block')
-                    <img class="logo-text" src="{{ asset('images/logo_text.svg') }}" />
-                </div>
-            </a>
-            @include('blocks.main_nav_block', [
-                'id' => 'main-nav',
-                'useHome' => false,
-                'nlAddClass' => 'brands'
-            ])
-
-            <div class="d-block d-lg-none">
-                <a href="{{ route('home') }}">
-                    @include('blocks.logo_block')
-                </a>
-            </div>
-            <div class="d-block d-lg-none">
-                <a id="account-href" {{ !auth()->check() ? 'class=d-none' : '' }} href="{{ route('account.change') }}">@include('blocks.account_icon_block')</a>
-                @if (!auth()->check())
-                    <a id="login-href" href="#" {{ auth()->check() ? 'class=d-none' : '' }} data-bs-toggle="modal" data-bs-target="#login-modal">@include('blocks.account_icon_block')</a>
-                @endif
-            </div>
-
-            <div id="right-button-block" class="buttons-block d-none d-lg-flex align-items-center justify-content-{{ !auth()->check() ? 'end' : 'between' }}" {{ request()->path() == '/' ? 'style=width:250px;' : '' }}>
-                <a class="nav-link dropdown-toggle {{ !auth()->check() ? 'd-none' : '' }}" id="navbar-dropdown-messages" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="fa fa-bell-o"></i>
-                </a>
-                <div class="dropdown-menu" aria-labelledby="navbar-dropdown-messages">
-                    <ul id="dropdown"></ul>
-                </div>
-                @if (auth()->check() && request()->path() != '/')
-                    <a href="{{ route('order.new_order') }}">
-                        @include('blocks.button_block',[
-                            'primary' => false,
-                            'icon' => 'icon-magazine',
-                            'buttonText' => trans('content.home_head3')
-                        ])
-                    </a>
-                @endif
-                <a href="{{ route('account.change') }}">
-                    @include('blocks.button_block',[
-                        'id' => 'account-button',
-                        'addClass' => !auth()->check() ? 'd-none' : '',
-                        'primary' => false,
-                        'icon' => 'icon-user-lock',
-                        'buttonText' => trans('menu.account')
-                    ])
-                </a>
-                @if (!auth()->check())
-                    @include('blocks.button_block',[
-                    'id' => 'login-button',
-                    'addAttr' => ['style' => 'width:200px'],
-                    'addClass' => auth()->check() ? 'd-none' : '',
-                    'primary' => false,
-                    'dataTarget' => 'login-modal',
-                    'icon' => 'icon-enter3',
-                    'buttonText' => trans('menu.login_or_register')
-                ])
-                @endif
-            </div>
-        </div>
+        <top-line-component
+            auth="{{ auth()->check() }}"
+            on_root="{{ (int)request()->path() == '/' }}"
+            home_url="{{ route('home') }}"
+            login_url="{{ route('auth.login') }}"
+            register_url="{{ route('auth.register') }}"
+            get_code_url="{{ route('auth.generate_code') }}"
+            reset_pass_url="{{ route('auth.reset_password') }}"
+            logo_image="{{ asset('images/logo.svg') }}"
+            logo_text_image="{{ asset('images/logo_text.svg') }}"
+            main_menu="{{ json_encode($mainMenu) }}"
+            account_icon="{{ asset('images/account.svg') }}"
+            new_order_url="{{ route('order.new_order') }}"
+            account_change_url="{{ route('account.change') }}"
+            messages_url="{{ route('account.messages') }}"
+            active_main_menu="{{ $activeMainMenu }}"
+        ></top-line-component>
         @yield('content')
     </div>
-
-    <x-modal id="login-modal" v-if="{{ (int)!auth()->check() }}" head="{{ trans('menu.login_or_register') }}">
-        <login-component
-            url="{{ route('auth.login') }}"
-            lphone="{{ trans('auth.phone') }}"
-            lpassword="{{ trans('auth.password') }}"
-            lcheckbox="{{ trans('auth.remember_me') }}"
-            lenter="{{ trans('auth.enter') }}"
-            lregister="{{ trans('auth.register') }}"
-            entertext="{{ trans('auth.enter') }}"
-            registertext="{{ trans('auth.register') }}"
-        ></login-component>
-        @include('blocks.forgot_password_block')
-
-{{--        <form method="post" action="{{ route('auth.login') }}">--}}
-{{--            @csrf--}}
-{{--            @include('blocks.input_phone_block')--}}
-{{--            @include('blocks.input_block',[--}}
-{{--                'name' => 'password',--}}
-{{--                'addClass' => 'password',--}}
-{{--                'type' => 'password',--}}
-{{--                'label' => trans('auth.password'),--}}
-{{--                'icon' => 'icon-eye',--}}
-{{--                'ajax' => true--}}
-{{--            ])--}}
-{{--            @include('blocks.button_block',[--}}
-{{--                'id' => 'enter-button',--}}
-{{--                'primary' => true,--}}
-{{--                'buttonType' => 'submit',--}}
-{{--                'icon' => 'icon-enter3',--}}
-{{--                'buttonText' => trans('auth.enter'),--}}
-{{--                'disabled' => true--}}
-{{--            ])--}}
-{{--            @include('blocks.button_block',[--}}
-{{--                'id' => null,--}}
-{{--                'primary' => false,--}}
-{{--                'addClass' => 'mb-3',--}}
-{{--                'dataTarget' => 'register-modal',--}}
-{{--                'dataDismiss' => true,--}}
-{{--                'icon' => 'icon-user-plus',--}}
-{{--                'buttonText' => trans('auth.register')--}}
-{{--            ])--}}
-{{--            @include('blocks.checkbox_block',[--}}
-{{--                'checked' => true,--}}
-{{--                'addClass' => 'text-center',--}}
-{{--                'name' => 'remember',--}}
-{{--                'label' => trans('auth.remember_me'),--}}
-{{--                'ajax' => true--}}
-{{--            ])--}}
-{{--        </form>--}}
-    </x-modal>
 </div>
 
-<x-modal id="message-modal" head="{{ trans('content.message') }}">
-    <h4 class="text-center p-4">{{ session()->has('message') ? session()->get('message') : '' }}</h4>
-</x-modal>
-
 <div id="loader"><div></div></div>
-
-
-
-
-    <x-modal id="register-modal" head="{{ trans('auth.register') }}">
-        <form method="post" action="{{ route('auth.register') }}">
-            @csrf
-            @include('blocks.input_phone_block')
-            @include('blocks.input_passwords_block')
-            @include('blocks.input_code_block')
-            @include('blocks.button_block',[
-                'id' => 'get-register-code',
-                'disabled' => true,
-                'addClass' => 'mb-3',
-                'primary' => true,
-                'buttonType' => 'submit',
-                'icon' => 'icon-key',
-                'buttonText' => trans('auth.get_code'),
-                'disabled' => true
-            ])
-            @include('blocks.button_block',[
-                'id' => 'register-button',
-                'disabled' => true,
-                'addClass' => 'mb-3 d-none',
-                'primary' => true,
-                'buttonType' => 'submit',
-                'icon' => 'icon-reset',
-                'buttonText' => trans('auth.register'),
-                'disabled' => true
-            ])
-            @include('blocks.checkbox_block',[
-                'checked' => false,
-                'addClass' => 'text-center',
-                'name' => 'i_agree',
-                'label' => trans('content.i_agree'),
-                'ajax' => true
-            ])
-            @include('blocks.forgot_password_block')
-        </form>
-        @include('blocks.get_code_again_block')
-    </x-modal>
-
-    <x-modal id="restore-password-modal" head="{{ trans('auth.reset_password') }}">
-        <form method="post" action="{{ route('auth.reset_password') }}">
-            @csrf
-            @include('blocks.input_phone_block')
-            @include('blocks.button_block',[
-                'id' => 'reset-button',
-                'primary' => true,
-                'buttonType' => 'submit',
-                'icon' => 'icon-user-plus',
-                'buttonText' => trans('auth.restore_password'),
-                'disabled' => true
-            ])
-            @include('blocks.button_block',[
-                'id' => null,
-                'primary' => false,
-                'addClass' => 'mb-3',
-                'dataTarget' => 'register-modal',
-                'dataDismiss' => true,
-                'icon' => 'icon-enter3',
-                'buttonText' => trans('auth.enter')
-            ])
-        </form>
-    </x-modal>
 
 {{--<script>--}}
 {{--    const userId = parseInt("{{ auth()->check() }}") ? parseInt("{{ auth()->id() }}") : null,--}}
@@ -281,9 +115,3 @@
 
 </body>
 </html>
-{{--<script>--}}
-{{--    import TestComponent from "../js/TestComponent.vue";--}}
-{{--    export default {--}}
-{{--        components: {TestComponent}--}}
-{{--    }--}}
-{{--</script>--}}

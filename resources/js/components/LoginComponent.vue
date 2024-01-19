@@ -1,85 +1,97 @@
 <template>
-    <InputComponent
-        :label="lphone"
-        icon=""
-        type="text"
-        name="phone"
-        placeholder="+_(___)___-__-__"
-        value=""
-        error=""
-    ></InputComponent>
-    <InputComponent
-        :label="lpassword"
-        icon="icon-eye"
-        type="password"
-        name="password"
-        :placeholder="lpassword"
-        value=""
-        error=""
-    ></InputComponent>
-    <ButtonComponent
-        id="enter"
-        class="btn btn-primary"
-        :data-bs-toggle=false
-        :data-bs-target=false
-        :disabled=true
-        :data-bs-dismiss=false
-        :data-dismiss=false
-        icon="icon-enter3"
-        :btext="entertext"
-        @click="onSubmit"
-    ></ButtonComponent>
-    <ButtonComponent
-        id="register"
-        class="btn btn-primary"
-        data-bs-toggle="modal"
-        data-bs-target="register-modal"
-        :disabled=false
-        data-bs-dismiss="modal"
-        data-dismiss="modal"
-        icon="icon-user-plus"
-        :btext="registertext"
-    ></ButtonComponent>
-    <CheckboxComponent
-        id="remember_me"
-        name="remember"
-        :checked=rememberMe
-        :label="lcheckbox"
-        v-model:checked="rememberMe"
-    ></CheckboxComponent>
+    <ModalComponent id="login-modal" head="Вход/регистрация" :close_text=false>
+        <InputComponent
+            label="Телефон"
+            icon=""
+            type="text"
+            name="phone"
+            placeholder="+_(___)___-__-__"
+            :value="phone"
+            :error="errors['phone']"
+        ></InputComponent>
+        <InputComponent
+            label="Пароль"
+            icon="icon-eye"
+            type="password"
+            name="password"
+            placeholder="Пароль"
+            :value="password"
+            :error="errors['password']"
+        ></InputComponent>
+        <ButtonComponent
+            id="enter"
+            class_name="btn btn-primary"
+            :disabled=true
+            icon="icon-enter3"
+            text="Войти"
+            @click="onSubmit"
+        ></ButtonComponent>
+        <ButtonComponent
+            id="register"
+            class_name="btn btn-secondary"
+            target="#register-modal"
+            :disabled=false
+            :dismiss=true
+            icon="icon-user-plus"
+            text="Зарегистрироваться"
+        ></ButtonComponent>
+        <CheckboxComponent
+            id="remember_me"
+            name="remember"
+            :checked=rememberMe
+            label="Запомнить меня"
+            v-model:checked="rememberMe"
+        ></CheckboxComponent>
+        <ForgotPasswordComponent></ForgotPasswordComponent>
+    </ModalComponent>
 </template>
 
 <script>
+import ModalComponent from "./blocks/ModalComponent.vue";
 import InputComponent from "./blocks/InputComponent.vue";
 import CheckboxComponent from "./blocks/CheckboxComponent.vue";
 import ButtonComponent from "./blocks/ButtonComponent.vue";
-export default {name: "LoginComponent",
-    components: {ButtonComponent, CheckboxComponent, InputComponent},
-    props: ['url', 'lphone', 'lpassword', 'lcheckbox', 'lenter', 'lregister','entertext','registertext'],
+import ForgotPasswordComponent from "./blocks/ForgotPasswordComponent.vue";
+
+export default {
+    name: "LoginComponent",
+    components: {ModalComponent, ButtonComponent, CheckboxComponent, InputComponent, ForgotPasswordComponent},
+    props: {
+        'login_url': String,
+    },
     data() {
         return {
-            rememberMe:false,
+            rememberMe: false,
+            phone: '',
+            password: '',
+            errors: {
+                phone: null,
+                password: null
+            }
         }
     },
+    emits: ['loggedIn'],
     methods: {
-        validationPassword(event) {
-            this.passwordVal = event.target.value;
-            this.disableSubmit = !(this.passwordVal.length && window.window.inputPhone);
-        },
         onSubmit(event) {
-            console.log(window.inputPhone + ' – ' + window.inputPassword + ' – ' + this.rememberMe);
-            // axios.post(this.url, {
-            //     _token: window.tokenField,
-            //     phone: window.inputPhone,
-            //     password: window.inputPassword,
-            //     remember: this.rememberMe
-            // })
-            // .then(function (response) {
-            //     console.log(response);
-            // })
-            // .catch(function (error) {
-            //     console.log(error.response.data.errors);
-            // });
+            let self = this;
+            this.phone = window.inputLoginPhone;
+            this.password = window.inputLoginPassword;
+
+            axios.post(this.login_url, {
+                _token: window.tokenField,
+                phone: window.inputLoginPhone,
+                password: window.inputLoginPassword,
+                remember: this.rememberMe
+            })
+                .then(function (response) {
+                    $('#login-modal').modal('hide');
+                    this.$emit('loggedIn');
+                })
+                .catch(function (error) {
+                    $.each(error.response.data.errors, (name,error) => {
+                        self.errors[name] = error[0];
+                    });
+                });
         }
     }
 }

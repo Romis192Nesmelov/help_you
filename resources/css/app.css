@@ -480,6 +480,10 @@ button.btn > i {
     width: 440px;
 }
 
+#top-line .buttons-block.on-root {
+    width: 250px;
+}
+
 #top-line .buttons-block i {
     font-size: 20px;
     color: black;
@@ -489,6 +493,10 @@ button.btn > i {
     margin-top: -5px;
     margin-left: -5px;
     position: absolute;
+}
+
+#right-button-block {
+    width: 250px;
 }
 
 .main-nav {

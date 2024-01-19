@@ -42,17 +42,20 @@ class BaseController extends Controller
         return view($view, array_merge(
             $this->data,
             [
-                'mainMenu' => ['about', 'how_does_it_work', 'partners',],
+                'mainMenu' => [
+                    ['key' => 'about', 'name' => trans('menu.about'), 'url' => route('about')],
+                    ['key' => 'how_does_it_work', 'name' => trans('menu.how_does_it_work'), 'url' => route('how_does_it_work')],
+                    ['key' => 'partners', 'name' => trans('menu.partners'), 'url' => route('partners')]
+                ],
                 'leftMenu' => [
-                    ['id' => 'my-messages', 'icon' => 'icon-bubbles4', 'key' => 'messages.chats'],
-                    ['id' => 'my-subscriptions', 'icon' => 'icon-mail-read', 'key' => 'account.my_subscriptions'],
-                    ['id' => 'my-orders', 'icon' => 'icon-drawer-out', 'key' => 'account.my_orders'],
-                    ['id' => 'my-help', 'icon' => 'icon-lifebuoy', 'key' => 'account.my_help'],
-                    ['id' => 'incentives', 'icon' => 'icon-gift', 'key' => 'account.incentives']
+                    ['id' => 'my-messages', 'icon' => 'icon-bubbles4', 'key' => 'messages.chats', 'url' => route('messages.chats')],
+                    ['id' => 'my-subscriptions', 'icon' => 'icon-mail-read', 'key' => 'account.my_subscriptions', 'url' => route('account.my_subscriptions')],
+                    ['id' => 'my-orders', 'icon' => 'icon-drawer-out', 'key' => 'account.my_orders', 'url' => route('account.my_orders')],
+                    ['id' => 'my-help', 'icon' => 'icon-lifebuoy', 'key' => 'account.my_help', 'url' => route('account.my_help')],
+                    ['id' => 'incentives', 'icon' => 'icon-gift', 'key' => 'account.incentives', 'url' => route('account.incentives')]
                 ],
                 'activeMainMenu' => $this->activeMainMenu,
                 'activeLeftMenu' => $this->activeLeftMenu,
-                'activeSubMenu' => $this->activeSubMenu
             ]
         ));
     }
