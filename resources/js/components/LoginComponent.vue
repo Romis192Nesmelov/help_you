@@ -1,5 +1,5 @@
 <template>
-    <ModalComponent id="login-modal" head="Вход/регистрация" :close_text=false>
+    <ModalComponent id="login-modal" head="Вход/регистрация" :close_text=false v-on:keyup.enter="onSubmit">
         <InputComponent
             label="Телефон"
             icon=""
@@ -85,7 +85,7 @@ export default {
             })
                 .then(function (response) {
                     $('#login-modal').modal('hide');
-                    this.$emit('loggedIn');
+                    self.$emit('loggedIn');
                 })
                 .catch(function (error) {
                     $.each(error.response.data.errors, (name,error) => {

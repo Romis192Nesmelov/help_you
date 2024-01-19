@@ -23,8 +23,6 @@ window.inputRestorePasswordPhone = '';
 
 app.mount('#app');
 
-// window.eventBus = new Vue();
-
 $(document).ready(function () {
     // MAIN BLOCK BEGIN
     window.showMessage = (message) => {
@@ -43,6 +41,19 @@ $(document).ready(function () {
             input.attr('type','password');
             $(this).removeClass('icon-eye-blocked').addClass('icon-eye');
         }
+    });
+
+    $('.dropdown-menu').mCustomScrollbar({
+        axis: 'y',
+        theme: 'light-3',
+        alwaysShowScrollbar: 1
+    });
+
+    $('#messages').mCustomScrollbar({
+        axis: 'y',
+        theme: 'light-3',
+        alwaysShowScrollbar: 1,
+        scrollTo: 'bottom'
     });
 
     $.mask.definitions['n'] = "[7-8]";
@@ -231,13 +242,6 @@ $(document).ready(function () {
     //
     // // Open message modal
     // if (openMessageModalFlag) messageModal.modal('show');
-    //
-    // // Custom scroll dropdown menu
-    // $('.dropdown-menu').mCustomScrollbar({
-    //     axis: 'y',
-    //     theme: 'light-3',
-    //     alwaysShowScrollbar: 1
-    // });
     //
     // // Getting news for dropdown
     // if (userId) {
@@ -1627,130 +1631,6 @@ const enableRegisterModalButtons = () => {
 //     containerCounter.html(counterVal);
 // }
 //
-// const getNews = () => {
-//     window.dropDown.html('');
-//
-//     $.get(getUnreadMessagesUrl).done((data) => {
-//         if (data.unread.length !== 0) {
-//             checkNotices();
-//             $.each(data.unread, function (id, counter) {
-//                 let orderId = parseInt(id.replace('order',''));
-//                 appendDropdownUnreadMessageRow(orderId, counter);
-//             });
-//         }
-//     });
-//
-//     $.get(getSubscriptionsUrl).done((data) => {
-//         if (data.subscriptions.length) {
-//             $.each(data.subscriptions, function (k,subscription) {
-//                 if (subscription.unread_orders.length) {
-//                     checkNotices();
-//                     $.each(subscription.unread_orders, function (k,unreadOrder) {
-//                         appendDropdownUnreadOrder(unreadOrder.order.id, unreadOrder.order.user.name + ' ' + unreadOrder.order.user.family);
-//                     });
-//                 }
-//             });
-//         }
-//     });
-//
-//     $.get(getUnreadOrderPerformersUrl).done((data) => {
-//         if (data.performers.length) {
-//             checkNotices();
-//             $.each(data.performers, function (k,performer) {
-//                 appendDropdownUnreadPerformer(performer.order_id, performer.user.name + ' ' + performer.user.family);
-//             });
-//         }
-//     });
-//
-//     $.get(getUnreadOrderRemovedPerformersUrl).done((data) => {
-//         if (data.performers.length) {
-//             checkNotices();
-//             $.each(data.performers, function (k,performer) {
-//                 appendDropdownUnreadRemovedPerformer(performer.order.id);
-//             });
-//         }
-//     });
-//
-//     $.get(getUnreadOrderStatusUrl).done((data) => {
-//         if (data.orders.length) {
-//             $.each(data.orders, function (k,order) {
-//                 appendDropdownUnreadOrderStatus(order.id, order.status);
-//             });
-//         }
-//     });
-// }
-//
-// const appendDropdownUnreadMessageRow = (orderId, counter) => {
-//     window.dropDown.append(
-//         $('<li></li>').attr('id','unread-messages-' + orderId).addClass('unread-messages').append(
-//             $('<div></div>')
-//                 .append(
-//                     $('<span></span>').html(unreadMessagesText)
-//                 ).append(
-//                     $('<span></span>').addClass('counter').html(counter)
-//                 ).append(
-//                     $('<br/>')
-//                 ).append(
-//                     $('<a></a>').attr('href', chatUrl + '/?order_id=' + orderId).html(inChatNumberText + orderId)
-//                 )
-//             ).append('<hr>')
-//     );
-//     appendDotInLeftMenu('left-menu-my-messages');
-// }
-//
-// const appendDropdownUnreadOrder = (orderId, userName) => {
-//     window.dropDown.append(
-//         $('<li></li>').attr('id','unread-subscriptions-' + orderId).addClass('unread-subscriptions').append(
-//             $('<div></div>')
-//                 .append(
-//                     $('<a></a>').attr('href', mySubscriptionsUrl).html(newOrderFromText + '<br>')
-//                 ).append(
-//                     $('<span></span>').html(userName)
-//                 )
-//             ).append('<hr>')
-//     );
-//     appendDotInLeftMenu('left-menu-my-subscriptions');
-// }
-//
-// const appendDropdownUnreadPerformer = (orderId, userName) => {
-//     window.dropDown.append(
-//         $('<li></li>').attr('id','unread-performer-' + orderId).addClass('unread-orders').append(
-//             $('<div></div>')
-//                 .append(
-//                     $('<a></a>').attr('href', myOrdersUrl).html(newPerformerText + orderId + ':<br>')
-//                 ).append(
-//                     $('<span></span>').html(userName)
-//                 )
-//             ).append('<hr>')
-//     );
-//     appendDotInLeftMenu('left-menu-my-orders');
-// }
-//
-// const appendDropdownUnreadOrderStatus = (orderId, orderStatus) => {
-//     window.dropDown.append(
-//         $('<li></li>').attr('id','unread-status-' + orderId).addClass('unread-orders').append(
-//             $('<div></div>')
-//                 .append(
-//                     $('<a></a>').attr('href', myOrdersUrl).html(newOrderStatusText + orderId + ':<br>')
-//                 ).append(
-//                     $('<span></span>').html('«' + window.orderStatuses[orderStatus] + '»')
-//                 )
-//             ).append('<hr>')
-//     );
-//     appendDotInLeftMenu('left-menu-my-orders');
-// }
-//
-// const appendDropdownUnreadRemovedPerformer = (orderId) => {
-//     window.dropDown.append(
-//         $('<li></li>').attr('id','unread-help-' + orderId).addClass('unread-help').append(
-//             $('<div></div>').append(
-//                 $('<a></a>').attr('href', myHelpUrl).html(removedPerformerText + orderId)
-//             )
-//         ).append('<hr>')
-//     );
-//     appendDotInLeftMenu('left-menu-my-help');
-// }
-//
 // const appendDotInLeftMenu = (leftMenuId) => {
 //     let leftMenu = $('#' + leftMenuId);
 //     if (!leftMenu.find('.dot').length) {
@@ -2282,9 +2162,6 @@ const enableRegisterModalButtons = () => {
 //     return returnInt ? parseInt(id) : id;
 // }
 //
-// const getUserName = (user) => {
-//     return user.name + ' ' + user.family;
-// }
 //
 // const getUserAge = (userId) => {
 //     $.get(

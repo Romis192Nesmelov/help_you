@@ -69,13 +69,33 @@ class OrderController extends BaseController
         return response()->json([],200);
     }
 
-    public function getSubscriptionsNews(): JsonResponse
+    public function getOrdersNews(): JsonResponse
     {
+        $orderStatuses = [];
+        for ($i=0;$i<3;$i++) {
+            $orderStatuses[] = trans('content.status_'.$i);
+        }
+
         return response()->json([
-            'subscriptions' => Subscription::query()
+            'news_subscriptions' => Subscription::query()
                 ->with('unreadOrders.order.user')
                 ->default()
-                ->get()
+                ->get(),
+            'news_performers' => ReadPerformer::query()
+                ->whereIn('order_id',Order::where('user_id',Auth::id())->pluck('id')->toArray())
+                ->where('read',null)
+                ->with(['user'])
+                ->get(),
+            'news_removed_performers' => ReadRemovedPerformer::query()
+                ->where('user_id', Auth::id())
+                ->where('read', null)
+                ->with(['order'])
+                ->get(),
+            'news_status_orders' => ReadStatusOrder::query()
+                ->whereIn('order_id',Order::where('user_id',Auth::id())->pluck('id')->toArray())
+                ->where('read',null)
+                ->get(),
+            'orders_statuses' => $orderStatuses
         ]);
     }
 
@@ -113,38 +133,6 @@ class OrderController extends BaseController
         ],
             200
         );
-    }
-
-    public function getUnreadOrderPerformers(): JsonResponse
-    {
-        return response()->json([
-            'performers' => ReadPerformer::query()
-                ->whereIn('order_id',Order::where('user_id',Auth::id())->pluck('id')->toArray())
-                ->where('read',null)
-                ->with(['user'])
-                ->get()
-        ]);
-    }
-
-    public function getUnreadOrderRemovedPerformers(): JsonResponse
-    {
-        return response()->json([
-            'performers' => ReadRemovedPerformer::query()
-                ->where('user_id', Auth::id())
-                ->where('read', null)
-                ->with(['order'])
-                ->get()
-        ]);
-    }
-
-    public function getUnreadOrderStatus(): JsonResponse
-    {
-        return response()->json([
-            'orders' => ReadStatusOrder::query()
-                ->whereIn('order_id',Order::where('user_id',Auth::id())->pluck('id')->toArray())
-                ->where('read',null)
-                ->get()
-        ]);
     }
 
     public function getUserAge(UserAgeRequest $request): JsonResponse

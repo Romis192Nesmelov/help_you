@@ -1,5 +1,5 @@
 <template>
-    <ModalComponent id="register-modal" head="Зарегистрироваться" :close_text=false>
+    <ModalComponent id="register-modal" head="Зарегистрироваться" :close_text=false v-on:keyup.enter="onSubmit">
         <InputComponent
             label="Телефон"
             icon=""

@@ -51,6 +51,13 @@
 </head>
 
 <body style="overflow-y: hidden;">
+
+<script>window.orderStatuses = [];</script>
+@for ($i=0;$i<3;$i++)
+    <script>window.orderStatuses.push("{{ trans('content.status_'.$i) }}");</script>
+@endfor
+<script>window.orderStatuses.push("{{ trans('content.in_approve') }}");</script>
+
 <div id="app" class="container">
     @csrf
     <div id="main-container">
@@ -69,7 +76,13 @@
             new_order_url="{{ route('order.new_order') }}"
             account_change_url="{{ route('account.change') }}"
             messages_url="{{ route('account.messages') }}"
+            my_subscriptions_url="{{ route('account.my_subscriptions') }}"
             active_main_menu="{{ $activeMainMenu }}"
+            get_unread_messages_url="{{ route('messages.get_unread_messages') }}"
+            chat_url = "{{ route('messages.chat') }}"
+            my_orders_url = "{{ route('account.my_orders') }}"
+            my_help_url = "{{ route('account.my_help') }}"
+            get_orders_new_url="{{ route('order.get_orders_news') }}"
         ></top-line-component>
         @yield('content')
     </div>
@@ -103,14 +116,6 @@
 {{--        openMessageModalFlag = parseInt("{{ session()->has('message') }}");--}}
 {{--        window.orderStatuses = [];--}}
 {{--        window.orderStatusClasses = ['closed','in-progress','open','in-approve'];--}}
-{{--</script>--}}
-{{--@for ($i=0;$i<3;$i++)--}}
-{{--    <script>--}}
-{{--        window.orderStatuses.push("{{ trans('content.status_'.$i) }}");--}}
-{{--    </script>--}}
-{{--@endfor--}}
-{{--<script>--}}
-{{--    window.orderStatuses.push("{{ trans('content.in_approve') }}");--}}
 {{--</script>--}}
 
 </body>

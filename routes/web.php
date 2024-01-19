@@ -55,7 +55,7 @@ Route::middleware(['auth','account.completed'])->name('order.')->controller(Orde
     Route::get('/orders', 'orders')->name('orders');
     Route::get('/edit-order', 'editOrder')->name('edit_order');
     Route::get('/read-order', 'readOrder')->name('read_order');
-    Route::get('/get-subscriptions-news', 'getSubscriptionsNews')->name('get_subscriptions_news');
+    Route::get('/get-orders-news', 'getOrdersNews')->name('get_orders_news');
 
     Route::get('/get-user-age', 'getUserAge')->name('get_user_age');
     Route::post('/get-order-performers', 'getOrderPerformers')->name('get_order_performers');
@@ -63,9 +63,6 @@ Route::middleware(['auth','account.completed'])->name('order.')->controller(Orde
 
     Route::post('/get-orders', 'getOrders')->name('get_orders');
     Route::post('/get-preview', 'getPreview')->name('get_preview');
-    Route::get('/get-unread-order-performers', 'getUnreadOrderPerformers')->name('get_unread_order_performers');
-    Route::get('/get-unread-order-removed-performers', 'getUnreadOrderRemovedPerformers')->name('get_unread_order_removed_performers');
-    Route::get('/get-unread-order-status', 'getUnreadOrderStatus')->name('get_unread_order_status');
     Route::post('/order-response', 'orderResponse')->name('order_response');
 
     Route::post('/next-step', 'nextStep')->name('next_step');

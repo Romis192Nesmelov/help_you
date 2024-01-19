@@ -61,6 +61,16 @@
             :account_icon="account_icon"
             :account_change_url="account_change_url"
             :new_order_url="new_order_url"
+            :my_subscriptions_url="my_subscriptions_url"
+            :news_messages="newsMessages"
+            :chat_url="chat_url"
+            :my_orders_url="my_orders_url"
+            :my_help_url="my_help_url"
+            :news_subscriptions="newsSubscriptions"
+            :news_performers="newsPerformers"
+            :news_removed_performers="newsRemovedPerformers"
+            :news_status_orders="newsStatusOrders"
+            :orders_statuses="ordersStatuses"
         ></right-block-component>
     </div>
 </template>
@@ -79,16 +89,57 @@ export default {
     created() {
         this.authCheck = !isNaN(parseInt(this.auth));
         this.mainMenu = JSON.parse(this.main_menu);
+
+        if (this.authCheck) {
+            this.getNewsMessages();
+            this.getNewsOrders();
+        }
     },
     data() {
         return {
             authCheck: false,
-            mainMenu: []
+            mainMenu: {},
+            newsMessages: {},
+            newsSubscriptions: {},
+            newsPerformers: [],
+            newsRemovedPerformers: [],
+            newsStatusOrders: [],
+            ordersStatuses: []
         }
     },
     methods: {
         loggedIn() {
             this.authCheck = true;
+        },
+        getNewsMessages() {
+            let self = this;
+            axios.get(this.get_unread_messages_url).then(function (response) {
+                self.newsMessages = response.data.unread;
+            });
+        },
+        getNewsOrders() {
+            let self = this;
+            axios.get(this.get_orders_new_url).then(function (response) {
+                if (response.data.news_subscriptions.length) {
+                    $.each(response.data.news_subscriptions, function (k,subscription) {
+                        if (subscription.unread_orders.length) {
+                            $.each(subscription.unread_orders, function (k,unreadOrder) {
+                                self.newsSubscriptions[unreadOrder.order_id] = unreadOrder.order;
+                            });
+                        }
+                    });
+                }
+                if (response.data.news_performers.length) {
+                    self.newsPerformers = response.data.news_performers;
+                }
+                if (response.data.news_removed_performers.length) {
+                    self.newsRemovedPerformers = response.data.news_removed_performers;
+                }
+                if (response.data.news_status_orders.length) {
+                    self.newsStatusOrders = response.data.news_status_orders;
+                    self.ordersStatuses = response.data.orders_statuses;
+                }
+            });
         }
     },
     components: {
@@ -115,7 +166,13 @@ export default {
         'new_order_url': String,
         'account_change_url': String,
         'messages_url': String,
-        'active_main_menu': String
+        'my_subscriptions_url': String,
+        'active_main_menu': String,
+        'get_unread_messages_url': String,
+        'chat_url': String,
+        'get_orders_new_url': String,
+        'my_orders_url': String,
+        'my_help_url': String
     },
 }
 </script>
