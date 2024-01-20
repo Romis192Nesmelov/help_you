@@ -85,6 +85,7 @@
             my_help_url = "{{ route('account.my_help') }}"
             get_orders_new_url="{{ route('order.get_orders_news') }}"
             order_statuses="{{ json_encode([trans('content.status_0'),trans('content.status_1'),trans('content.status_2'),trans('content.approved')]) }}"
+            bell_sound="{{ asset('sounds/so-proud-notification.mp3') }}"
         ></top-line-component>
         @yield('content')
     </div>

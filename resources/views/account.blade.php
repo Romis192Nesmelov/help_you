@@ -54,32 +54,40 @@
         </form>
     </x-modal>
 
-    <x-modal
-        id="tune-avatar-modal"
-        head="{{ trans('auth.tune_avatar') }}"
-        footer="1"
-        yes_button="1"
-        yes_button_id="save-tune-avatar"
-        yes_button_text="{{ trans('content.save') }}"
-    >
-        <div class="w-100 d-flex align-items-center justify-content-center">
-            <div class="avatar cir big">
-                <div id="avatar-container"></div>
-            </div>
-        </div>
-        <div class="w-100 d-flex justify-content-center">
-            <div class="w-75 mt-3 ui-slider-value"></div>
-        </div>
-    </x-modal>
+{{--    <x-modal--}}
+{{--        id="tune-avatar-modal"--}}
+{{--        head="{{ trans('auth.tune_avatar') }}"--}}
+{{--        footer="1"--}}
+{{--        yes_button="1"--}}
+{{--        yes_button_id="save-tune-avatar"--}}
+{{--        yes_button_text="{{ trans('content.save') }}"--}}
+{{--    >--}}
+{{--        <div class="w-100 d-flex align-items-center justify-content-center">--}}
+{{--            <div class="avatar cir big">--}}
+{{--                <div id="avatar-container"></div>--}}
+{{--            </div>--}}
+{{--        </div>--}}
+{{--        <div class="w-100 d-flex justify-content-center">--}}
+{{--            <div class="w-75 mt-3 ui-slider-value"></div>--}}
+{{--        </div>--}}
+{{--    </x-modal>--}}
 
-    <form id="account-form" class="row" enctype="multipart/form-data" method="post" action="{{ route('account.edit_account') }}">
-        @csrf
+    <div class="row">
 
-        <input type="hidden" name="avatar_size">
-        <input type="hidden" name="avatar_position_x">
-        <input type="hidden" name="avatar_position_y">
+{{--        <input type="hidden" name="avatar_size">--}}
+{{--        <input type="hidden" name="avatar_position_x">--}}
+{{--        <input type="hidden" name="avatar_position_y">--}}
 
-        @include('blocks.left_menu_block',['hasChangeAvatar' => true])
+        <left-menu-component
+            user="{{ json_encode(auth()->user()) }}"
+            allow_change_avatar="1"
+            input_image_hover="{{ asset('images/input_image_hover.svg') }}"
+            left_menu="{{ json_encode($leftMenu) }}"
+            logout_url="{{ route('auth.logout') }}"
+            edit_account_url="{{ route('account.edit_account') }}"
+            active_left_menu=="{{ $active_left_menu }}"
+        ></left-menu-component>
+
         <div class="col-12 col-lg-8">
             <div class="rounded-block tall">
                 <div class="row">
@@ -135,10 +143,10 @@
                 </div>
             </div>
         </div>
-    </form>
-    <script>
-        const getCodeUrl = "{{ route('account.get_code') }}",
-            currentPhone = "{{ substr(auth()->user()->phone,2) }}",
-            errorBornMessage = "{{ trans('validation.wrong_date') }}";
-    </script>
+    </div>
+{{--    <script>--}}
+{{--        const getCodeUrl = "{{ route('account.get_code') }}",--}}
+{{--            currentPhone = "{{ substr(auth()->user()->phone,2) }}",--}}
+{{--            errorBornMessage = "{{ trans('validation.wrong_date') }}";--}}
+{{--    </script>--}}
 @endsection

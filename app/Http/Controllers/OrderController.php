@@ -348,6 +348,8 @@ class OrderController extends BaseController
         $order->status = 0;
         $order->save();
         ReadOrder::where('order_id')->delete();
+        ReadPerformer::where('order_id')->delete();
+        ReadRemovedPerformer::where('order_id')->delete();
 
         broadcast(new OrderEvent('remove_order', $order));
 

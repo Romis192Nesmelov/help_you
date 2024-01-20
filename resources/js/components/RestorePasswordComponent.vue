@@ -1,5 +1,5 @@
 <template>
-    <ModalComponent id="restore-password-modal" head="Восстановление пароля" :close_text=false v-on:keyup.enter="onSubmit">
+    <ModalComponent id="restore-password-modal" head="Восстановление пароля" v-on:keyup.enter="onSubmit">
         <InputComponent
             label="Телефон"
             icon=""

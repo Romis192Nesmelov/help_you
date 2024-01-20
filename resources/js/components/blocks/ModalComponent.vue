@@ -9,23 +9,6 @@
                 <div class="modal-body">
                     <slot></slot>
                 </div>
-                <div class="modal-footer d-flex justify-content-center" v-if="show_footer">
-                    <ButtonComponent
-                        v-if="yes_button_text"
-                        class="btn btn-primary"
-                        :text="yes_button_text"
-                    ></ButtonComponent>
-                    <ButtonComponent
-                        v-if="no_button_text"
-                        class="btn btn-primary w-25 mt-3"
-                        :text="no_button_text"
-                    ></ButtonComponent>
-                    <ButtonComponent
-                        v-if="show_close_button"
-                        class="btn btn-primary w-50 m-auto mt-3"
-                        text="Закрыть"
-                    ></ButtonComponent>
-                </div>
             </div>
         </div>
     </div>
@@ -39,11 +22,7 @@ export default {
     components: {ButtonComponent},
     props: {
         id: String,
-        head: String|Boolean,
-        show_close_button: Boolean,
-        show_footer: Boolean,
-        yes_button_text: String|Boolean,
-        no_button_text: String|Boolean,
+        head: String|Boolean
     }
 }
 </script>

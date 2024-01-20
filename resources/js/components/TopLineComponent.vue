@@ -55,25 +55,91 @@
                 <logo-component :image="logo_image"></logo-component>
             </a>
         </div>
-        <right-block-component
-            :auth_check="authCheck"
-            :user_id="userId"
-            :on_root="on_root"
-            :account_icon="account_icon"
-            :account_change_url="account_change_url"
-            :new_order_url="new_order_url"
-            :my_subscriptions_url="my_subscriptions_url"
-            :news_messages="newsMessages"
-            :chat_url="chat_url"
-            :my_orders_url="my_orders_url"
-            :my_help_url="my_help_url"
-            :news_subscriptions="newsSubscriptions"
-            :news_performers="newsPerformers"
-            :news_removed_performers="newsRemovedPerformers"
-            :news_status_orders="newsStatusOrders"
-            :new_orders_approved="newOrdersApproved"
-            :orders_statuses="ordersStatuses"
-        ></right-block-component>
+
+        <div class="d-block d-lg-none">
+            <a id="account-href" :href="account_change_url" v-if="authCheck">
+                <AccountIconComponent :icon="account_icon"></AccountIconComponent>
+            </a>
+            <a id="login-href" href="#" data-bs-toggle="modal" data-bs-target="#login-modal" v-else>
+                <AccountIconComponent :icon="account_icon"></AccountIconComponent>
+            </a>
+        </div>
+
+        <!-- Right block begin-->
+        <div id="right-button-block" :class="'buttons-block d-none d-lg-flex align-items-center justify-content-'+(authCheck ? 'between' : 'end')+(on_root ? ' on-root' : '')">
+            <a
+                id="navbar-dropdown-messages"
+                :class="'nav-link'+(countMessages ? ' dropdown-toggle' : '')"
+                role="button"
+                :data-bs-toggle="countMessages ? 'dropdown' : ''"
+                aria-expanded="false"
+                v-if="authCheck"
+            >
+                <i class="fa fa-bell-o">
+                    <span class="dot" v-if="countMessages"></span>
+                </i>
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbar-dropdown-messages" v-show="authCheck && countMessages">
+                <ul id="dropdown">
+                    <li v-for="(counter, id) in newsMessages" :key="id">
+                        Новых сообщений: <span class="counter">{{ counter }}</span><br>
+                        <a :href="chat_url+'?order_id='+(id.replace('order',''))">в чате по заявке №{{ id.replace('order','') }}</a>
+                        <hr>
+                    </li>
+                    <li v-for="(news, id) in newsSubscriptions" :key="id">
+                        <a :href="my_subscriptions_url">Новая заяка №{{ news.id }} от:</a><br>
+                        {{ news.user.name+' '+news.user.family }}
+                        <hr>
+                    </li>
+                    <li v-for="(news, id) in newsPerformers" :key="id">
+                        <a :href="my_orders_url">Новый исполнитель у заявки №:{{ news.order_id }}:</a><br>
+                        {{ news.user.name+' '+news.user.family }}
+                        <hr>
+                    </li>
+                    <li v-for="(news, id) in newsRemovedPerformers" :key="id">
+                        <a :href="my_help_url">Вам было отказано в участии</a><br>
+                        в выполнении заяки №{{ news.order_id }}
+                        <hr>
+                    </li>
+                    <li v-for="(news, id) in newsStatusOrders" :key="id">
+                        <a :href="my_orders_url">Новый статус у заявки №:{{ news.order_id }}</a>:<br>
+                        «{{ ordersStatuses[news.status] }}»
+                        <hr>
+                    </li>
+                    <li v-for="(news, id) in newOrdersApproved" :key="id">
+                        <a :href="my_orders_url">Заявка №:{{ news.order_id }} одобрена!</a>
+                        <hr>
+                    </li>
+                </ul>
+            </div>
+
+            <a :href="new_order_url" v-if="authCheck && !on_root">
+                <ButtonComponent
+                    class_name="btn btn-secondary"
+                    icon="icon-magazine"
+                    text="Создать заявку"
+                ></ButtonComponent>
+            </a>
+
+            <a :href="account_change_url" v-if="authCheck">
+                <ButtonComponent
+                    id="account-button"
+                    class_name="btn btn-secondary"
+                    icon="icon-user-lock"
+                    text="Личный кабинет"
+                ></ButtonComponent>
+            </a>
+            <ButtonComponent
+                id="login-button"
+                class_name="btn btn-secondary"
+                toggle="modal"
+                target="#login-modal"
+                icon="icon-user-lock"
+                text="Вход/регистрация"
+                v-else
+            ></ButtonComponent>
+        </div>
+        <!-- Right block end-->
     </div>
 </template>
 
@@ -84,7 +150,8 @@ import RestorePasswordComponent from "./RestorePasswordComponent.vue";
 import MessageComponent from "./MessageComponent.vue";
 import LogoComponent from "./blocks/LogoComponent.vue";
 import TopMenuItemComponent from "./blocks/TopMenuItemComponent.vue";
-import RightBlockComponent from "./RightBlockComponent.vue";
+import ButtonComponent from "./blocks/ButtonComponent.vue";
+import AccountIconComponent from "./blocks/AccountIconComponent.vue";
 
 export default {
     name: "TopLineComponent",
@@ -115,6 +182,16 @@ export default {
         }
     },
     methods: {
+        countMessages() {
+            return (
+                this.newsMessages.length ||
+                this.newsSubscriptions.length ||
+                this.newsPerformers.length ||
+                this.newsRemovedPerformers.length ||
+                this.newsStatusOrders ||
+                this.newOrdersApproved
+            );
+        },
         loggedIn(id) {
             this.userId = id;
             this.authCheck = true;
@@ -126,10 +203,14 @@ export default {
             let self = this;
             axios.get(this.get_unread_messages_url).then(function (response) {
                 self.newsMessages = response.data.unread;
+                window.emitter.emit('my-messages', !$.isEmptyObject(self.newsMessages));
             });
         },
         getNewsOrders() {
-            let self = this;
+            let self = this,
+                otherEventsFlag = false,
+                ordersEventFlag = false;
+
             axios.get(this.get_orders_new_url).then(function (response) {
                 if (response.data.news_subscriptions.length) {
                     $.each(response.data.news_subscriptions, function (k,subscription) {
@@ -139,51 +220,87 @@ export default {
                             });
                         }
                     });
+                    otherEventsFlag = true;
+                    window.emitter.emit('my-subscriptions', !$.isEmptyObject(self.newsSubscriptions));
                 }
                 if (response.data.news_performers.length) {
                     $.each(response.data.news_performers, function (k,news) {
                         self.newsPerformers['new_performer'+news.order_id] = news;
                     });
+                    ordersEventFlag = true;
                 }
                 if (response.data.news_removed_performers.length) {
                     $.each(response.data.news_performers, function (k,news) {
                         self.newsRemovedPerformers['removed_performer'+news.order_id] = news;
                     });
+                    window.emitter.emit('my-help', !$.isEmptyObject(self.newsRemovedPerformers));
+                    otherEventsFlag = true;
                 }
                 if (response.data.news_status_orders.length) {
                     $.each(response.data.news_status_orders, function (k,news) {
                         self.newsStatusOrders['status'+news.order_id] = news;
                     });
+                    ordersEventFlag = true;
                 }
+                self.eventOrderChange(ordersEventFlag);
+                self.bellAlert(otherEventsFlag, ordersEventFlag);
             });
         },
         listenEvents() {
-            let self = this;
+            let self = this,
+                otherEventsFlag = false,
+                ordersEventFlag = false;
+
             window.Echo.private('notice_' + this.userId).listen('.notice', res => {
-                if (res.notice === 'new_message') {
-                    let messageKey = 'order'+res.order.id;
-                    if (self.newsMessages[messageKey]) {
-                        let counter = self.newsMessages[messageKey];
-                        counter++;
-                        self.newsMessages[messageKey] = counter;
-                    } else {
-                        self.newsMessages[messageKey] = 1;
-                    }
-                } else if (res.notice === 'new_order_in_subscription') {
-                    self.newsSubscriptions['subscription'+res.order.id] = res.order;
-                } else if (res.notice === 'new_performer') {
-                    self.newsPerformers['new_performer'+res.order.id] = res.order;
-                } else if (res.notice === 'order_approved') {
-                    self.newOrdersApproved['status'+res.order.d] = res.order;
-                } else if (res.notice === 'new_order_status') {
-                    self.newsStatusOrders['status'+res.order.d] = res.order;
-                    if (!res.order.status) this.deleteOrderNotice(res.order.id);
-                } else if (res.notice === 'remove_performer') {
-                    self.newsRemovedPerformers['removed_performer'+res.order.id] = res.order;
-                } else if (res.notice === 'delete_order') {
-                    this.deleteOrderNotice(res.order.id);
+                switch (res.notice) {
+                    case 'new_message':
+                        let messageKey = 'order'+res.order.id;
+                        if (self.newsMessages[messageKey]) {
+                            let counter = self.newsMessages[messageKey];
+                            counter++;
+                            self.newsMessages[messageKey] = counter;
+                        } else {
+                            self.newsMessages[messageKey] = 1;
+                        }
+                        window.emitter.emit('my-messages', !$.isEmptyObject(self.newsMessages));
+                        otherEventsFlag = true;
+                        break;
+                    case 'new_order_in_subscription':
+                        self.newsSubscriptions['subscription'+res.order.id] = res.order;
+                        window.emitter.emit('my-subscriptions', !$.isEmptyObject(self.newsSubscriptions));
+                        otherEventsFlag = true;
+                        break;
+                    case 'new_performer':
+                        self.newsPerformers['new_performer'+res.order.id] = res.order;
+                        ordersEventFlag = true;
+                        break;
+                    case 'order_approved':
+                        self.newOrdersApproved['status'+res.order.d] = res.order;
+                        ordersEventFlag = true;
+                        break;
+                    case 'new_order_status':
+                        self.newsStatusOrders['status'+res.order.d] = res.order;
+                        if (!res.order.status) this.deleteOrderNotice(res.order.id);
+                        ordersEventFlag = true;
+                        break;
+                    case 'remove_performer':
+                        self.newsRemovedPerformers['removed_performer'+res.order.id] = res.order;
+                        window.emitter.emit('my-help', !$.isEmptyObject(self.newsRemovedPerformers));
+                        otherEventsFlag = true;
+                        break;
+                    case 'delete_order':
+                        this.deleteOrderNotice(res.order.id);
+                        ordersEventFlag = true;
+                        break;
                 }
+                self.eventOrderChange(ordersEventFlag);
+                self.bellAlert(otherEventsFlag, ordersEventFlag);
             });
+        },
+        eventOrderChange(ordersEventFlag) {
+            if (ordersEventFlag) {
+                window.emitter.emit('my-orders', !$.isEmptyObject(this.newsPerformers) || !$.isEmptyObject(this.newOrdersApproved) || !$.isEmptyObject(this.newsStatusOrders));
+            }
         },
         deleteOrderNotice(orderId) {
             let orderKeyNewMessages = 'order'+orderId,
@@ -192,11 +309,39 @@ export default {
                 orderKeyOrderApproved = 'status'+orderId,
                 orderKeyOrderStatus = 'status'+orderId;
 
-            if (self.newsMessages[orderKeyNewMessages]) delete self.newsMessages[orderKeyNewMessages];
-            if (self.newsSubscriptions[orderKeySubscriptions]) delete self.newsSubscriptions[orderKeySubscriptions];
-            if (self.newsPerformers[orderKeyNewPerformer]) delete self.newsPerformers[orderKeyNewPerformer];
-            if (self.newOrdersApproved[orderKeyOrderApproved]) delete self.newOrdersApproved[orderKeyOrderApproved];
-            if (self.newsStatusOrders[orderKeyOrderStatus]) delete self.newsStatusOrders[orderKeyOrderStatus];
+            if (this.newsMessages[orderKeyNewMessages]) delete this.newsMessages[orderKeyNewMessages];
+            if (this.newsSubscriptions[orderKeySubscriptions]) delete this.newsSubscriptions[orderKeySubscriptions];
+            if (this.newsPerformers[orderKeyNewPerformer]) delete this.newsPerformers[orderKeyNewPerformer];
+            if (this.newOrdersApproved[orderKeyOrderApproved]) delete this.newOrdersApproved[orderKeyOrderApproved];
+            if (this.newsStatusOrders[orderKeyOrderStatus]) delete this.newsStatusOrders[orderKeyOrderStatus];
+        },
+        bellAlert(otherEventsFlag, ordersEventFlag) {
+            if (otherEventsFlag || ordersEventFlag) {
+                let counter = 0,
+                    degrees = 15;
+
+                const bellIcon = $('#right-button-block .fa.fa-bell-o'),
+                    audio = new Audio(this.bell_sound),
+                    bellRinging = setInterval(() => {
+                        degrees *= -1;
+                        bellRing(degrees);
+                        counter++;
+                        if (counter > 5) {
+                            clearInterval(bellRinging);
+                            bellRing(0);
+                        }
+                    }, 200);
+
+                audio.muted = false;
+                audio.play();
+
+                const bellRing = (degrees) => {
+                    bellIcon.css({'-webkit-transform' : 'rotate('+ degrees +'deg)',
+                        '-moz-transform' : 'rotate('+ degrees +'deg)',
+                        '-ms-transform' : 'rotate('+ degrees +'deg)',
+                        'transform' : 'rotate('+ degrees +'deg)'});
+                }
+            }
         }
     },
     components: {
@@ -206,7 +351,8 @@ export default {
         RestorePasswordComponent,
         MessageComponent,
         TopMenuItemComponent,
-        RightBlockComponent
+        ButtonComponent,
+        AccountIconComponent,
     },
     props: {
         'auth': String,
@@ -231,7 +377,8 @@ export default {
         'get_orders_new_url': String,
         'my_orders_url': String,
         'my_help_url': String,
-        'order_statuses': String
+        'order_statuses': String,
+        'bell_sound': String
     },
 }
 </script>
