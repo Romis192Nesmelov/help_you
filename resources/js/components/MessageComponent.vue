@@ -9,11 +9,8 @@ import ModalComponent from "./blocks/ModalComponent.vue";
 
 export default {
     name: "MessageComponent",
-    components: {ModalComponent},
-    created() {
-        // window.eventBus.$on('auth',(data) => {
-        //     console.log(121111);
-        // });
+    components: {
+        ModalComponent
     },
     data() {
         return {

@@ -4,7 +4,6 @@
         <register-component :register_url="register_url" :get_code_url="get_code_url"></register-component>
         <restore-password-component :reset_pass_url="reset_pass_url"></restore-password-component>
     </div>
-    <message-component></message-component>
 
     <div id="top-line" class="w-100 d-flex align-items-center justify-content-between">
         <a class="d-none d-lg-block" :href="home_url">
@@ -147,7 +146,6 @@
 import LoginComponent from "./LoginComponent.vue";
 import RegisterComponent from "./RegisterComponent.vue";
 import RestorePasswordComponent from "./RestorePasswordComponent.vue";
-import MessageComponent from "./MessageComponent.vue";
 import LogoComponent from "./blocks/LogoComponent.vue";
 import TopMenuItemComponent from "./blocks/TopMenuItemComponent.vue";
 import ButtonComponent from "./blocks/ButtonComponent.vue";
@@ -184,12 +182,12 @@ export default {
     methods: {
         countMessages() {
             return (
-                this.newsMessages.length ||
-                this.newsSubscriptions.length ||
-                this.newsPerformers.length ||
-                this.newsRemovedPerformers.length ||
-                this.newsStatusOrders ||
-                this.newOrdersApproved
+                !isEmptyObject(this.newsMessages) ||
+                !isEmptyObject(this.newsSubscriptions) ||
+                !isEmptyObject(this.newsPerformers) ||
+                !isEmptyObject(this.newsRemovedPerformers) ||
+                !isEmptyObject(this.newOrdersApproved) ||
+                !isEmptyObject(this.newsStatusOrders)
             );
         },
         loggedIn(id) {
@@ -275,7 +273,7 @@ export default {
                         ordersEventFlag = true;
                         break;
                     case 'order_approved':
-                        self.newOrdersApproved['status'+res.order.d] = res.order;
+                        self.newOrdersApproved['approve'+res.order.d] = res.order;
                         ordersEventFlag = true;
                         break;
                     case 'new_order_status':
@@ -299,21 +297,25 @@ export default {
         },
         eventOrderChange(ordersEventFlag) {
             if (ordersEventFlag) {
-                window.emitter.emit('my-orders', !$.isEmptyObject(this.newsPerformers) || !$.isEmptyObject(this.newOrdersApproved) || !$.isEmptyObject(this.newsStatusOrders));
+                window.emitter.emit('my-orders',
+                    !$.isEmptyObject(this.newsPerformers) ||
+                    !$.isEmptyObject(this.newOrdersApproved) ||
+                    !$.isEmptyObject(this.newsStatusOrders)
+                );
             }
         },
         deleteOrderNotice(orderId) {
-            let orderKeyNewMessages = 'order'+orderId,
-                orderKeySubscriptions = 'subscription'+orderId,
-                orderKeyNewPerformer = 'performer'+orderId,
-                orderKeyOrderApproved = 'status'+orderId,
-                orderKeyOrderStatus = 'status'+orderId;
-
-            if (this.newsMessages[orderKeyNewMessages]) delete this.newsMessages[orderKeyNewMessages];
-            if (this.newsSubscriptions[orderKeySubscriptions]) delete this.newsSubscriptions[orderKeySubscriptions];
-            if (this.newsPerformers[orderKeyNewPerformer]) delete this.newsPerformers[orderKeyNewPerformer];
-            if (this.newOrdersApproved[orderKeyOrderApproved]) delete this.newOrdersApproved[orderKeyOrderApproved];
-            if (this.newsStatusOrders[orderKeyOrderStatus]) delete this.newsStatusOrders[orderKeyOrderStatus];
+            let self = this;
+            $.each({
+                'order':self.newsMessages,
+                'subscription:':self.newsSubscriptions,
+                'performer':self.newsPerformers,
+                'approve':self.newOrdersApproved,
+                'status':self.newsStatusOrders
+            }, function (key,news) {
+                let newsKey = key + orderId;
+                if (news[newsKey]) delete news[newsKey];
+            });
         },
         bellAlert(otherEventsFlag, ordersEventFlag) {
             if (otherEventsFlag || ordersEventFlag) {
@@ -349,7 +351,6 @@ export default {
         LoginComponent,
         RegisterComponent,
         RestorePasswordComponent,
-        MessageComponent,
         TopMenuItemComponent,
         ButtonComponent,
         AccountIconComponent,

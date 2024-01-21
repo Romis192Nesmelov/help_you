@@ -1,13 +1,17 @@
 import './bootstrap';
 import {createApp} from "vue/dist/vue.esm-bundler";
 import mitt from 'mitt';
+import MessageComponent from "./components/MessageComponent.vue";
 import TopLineComponent from "./components/TopLineComponent.vue";
 import LeftMenuComponent from "./components/LeftMenuComponent.vue";
+import AccountComponent from "./components/AccountComponent.vue";
 
 const app = createApp({
     components: {
+        MessageComponent,
         TopLineComponent,
         LeftMenuComponent,
+        AccountComponent,
     }
 });
 
@@ -16,6 +20,7 @@ app.config.globalProperties.emitter = window.emitter;
 app.mount('#app');
 
 window.tokenField = $('input[name=_token]').val();
+window.avatarBlock = $('#avatar-block .avatar.cir');
 window.inputLoginPhone = '';
 window.inputLoginPassword = '';
 window.inputRegisterPhone = '';
@@ -24,14 +29,37 @@ window.inputRegisterConfirmPassword = '';
 window.inputRegisterCode = '';
 window.inputIAgreeRegister = false;
 window.inputRestorePasswordPhone = '';
+window.inputChangePhone = '';
+window.inputChangePhoneCode = '';
+window.inputChangePasswordOldPassword = '';
+window.inputChangePasswordPassword = '';
+window.inputChangePasswordConfirmPassword = '';
+
+window.toCamelize = str => str.replace(/-|_./g, x=>x[1].toUpperCase());
 
 $(document).ready(function () {
+    // console.log(window.toCamelize('kebab_case'));
+
     // MAIN BLOCK BEGIN
     window.showMessage = (message) => {
         const messageModal = $('#message-modal');
         messageModal.find('h4').html(message);
         messageModal.modal('show');
+    };
+
+    window.addLoader = () => {
+        $('body').prepend(
+            $('<div></div>').attr('id','loader').append($('<div></div>'))
+        ).css({
+            'overflow-y':'hidden',
+            'padding-right':20
+        });
     }
+
+    window.removeLoader = () => {
+        $('#loader').remove();
+        $('body').css('overflow-y','auto');
+    };
 
     $('.form-group.has-label i.icon-eye').click(function () {
         let cover = $(this).parents('.form-group'),
@@ -59,13 +87,97 @@ $(document).ready(function () {
     });
 
     $.mask.definitions['n'] = "[7-8]";
+    $.mask.definitions['c'] = "[1-2]";
 
+    // Setting datatable defaults
+    $.extend( $.fn.dataTable.defaults, {
+        autoWidth: false,
+        columnDefs: [{
+            targets: [4]
+        }],
+        order: [],
+        dom: '<"datatable-header"fl><"datatable-scroll"t><"datatable-footer"ip>',
+        bLengthChange: false,
+        info: false,
+        language: {
+            search: '<span>Фильтр:</span> _INPUT_',
+            lengthMenu: '<span>Показывать:</span> _MENU_',
+            paginate: { 'next': '&rarr;', 'previous': '&larr;' },
+            thousands:      ',',
+            loadingRecords: 'Загрузка...',
+            zeroRecords:    'Нет данных',
+        },
+        drawCallback: function () {
+            $(this).find('tbody tr').slice(-3).find('.dropdown, .btn-group').addClass('dropup');
+        },
+        preDrawCallback: function() {
+            $(this).find('tbody tr').slice(-3).find('.dropdown, .btn-group').removeClass('dropup');
+        }
+    });
+
+    setTimeout(function () {
+        removeLoader();
+    },500);
+
+    // Fancybox init
+    bindFancybox();
+
+    $('#main-nav .navbar-toggler').click(function () {
+        if (!$(this).hasClass('collapsed')) {
+            $(this).find('span').css({
+                'background-image':'url("data:image/svg+xml,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 16 16\' fill=\'%23000\'%3e%3cpath d=\'M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z\'/%3e%3c/svg%3e")',
+                'background-size': '70%',
+                'opacity':0.5
+            });
+        } else {
+            $(this).find('span').css({
+                'background-image':'url("data:image/svg+xml,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 30 30\'%3e%3cpath stroke=\'rgba%280, 0, 0, 0.55%29\' stroke-linecap=\'round\' stroke-miterlimit=\'10\' stroke-width=\'2\' d=\'M4 7h22M4 15h22M4 23h22\'/%3e%3c/svg%3e")',
+                'background-size': '100%',
+                'opacity':1
+            });
+        }
+    });
+
+    // Datatable
+    const baseDataTable = dataTableAttributes($('.datatable-basic.default'), 8);
+    const subscrDataTable = dataTableAttributes($('.datatable-basic.subscriptions'), 6);
+    if (baseDataTable) clickYesDeleteOnModal(baseDataTable, true);
+    if (subscrDataTable) clickYesDeleteOnModal(subscrDataTable, false);
+
+    // Click to delete items
+    // window.deleteId = null;
+    // window.deleteRow = null;
+
+    // Top menu tabs
+    const topMenu = $('.rounded-block.tall .top-submenu');
+    topMenu.find('a').click(function (e) {
+        e.preventDefault();
+        const parent = $(this).parents('.tab');
+        if (!parent.hasClass('active')) {
+            let currentActiveTab = topMenu.find('.tab.active'),
+                currentActiveTabId = getId(currentActiveTab.find('a'), 'top-submenu-', false),
+                currentContent = $('#content-'+currentActiveTabId),
+                newActiveIdTabId = getId($(this), 'top-submenu-', false),
+                newContent = $('#content-'+newActiveIdTabId);
+
+            currentActiveTab.removeClass('active');
+            parent.addClass('active');
+            currentContent.fadeOut(() => {
+                newContent.css('display','none').fadeIn();
+            });
+        }
+    });
+    // MAIN BLOCK END
+
+    // AUTH BLOCK BEGIN
     const loginModal = $('#login-modal'),
         loginModalLogin = loginModal.find('input[name=phone]'),
         loginModalPassword = loginModal.find('input[name=password]'),
         phoneMask = "+n(999)999-99-99",
         codeMask = "99-99-99",
+        bornMask = "99-99-9999",
         phoneRegExp = /^((\+)?(\d)(\s)?(\()?[0-9]{3}(\))?(\s)?([0-9]{3})(\-)?([0-9]{2})(\-)?([0-9]{2}))$/gi,
+        bornRegExp = /^([0-3][0-9])-([0-1][0-9])-((19([0-9][0-9]))|(20[0-9][0-9]))$/gi,
         emailRegExp = /^[a-zA-Z0-9][\-_\.\+\!\#\$\%\&\'\*\/\=\?\^\`\{\|]{0,1}([a-zA-Z0-9][\-_\.\+\!\#\$\%\&\'\*\/\=\?\^\`\{\|]{0,1})*[a-zA-Z0-9]@[a-zA-Z0-9][-\.]{0,1}([a-zA-Z][-\.]{0,1})*[a-zA-Z0-9]\.[a-zA-Z0-9]{1,}([\.\-]{0,1}[a-zA-Z]){0,}[a-zA-Z0-9]{0,}$/gi,
         codeRegExp = /^((\d){2}(\-)(\d){2}(\-)(\d){2})$/gi;
 
@@ -151,8 +263,7 @@ $(document).ready(function () {
             submitRestorePasswordButton.attr('disabled','disabled');
         }
     });
-
-    // window.dropDown = $('#dropdown');
+    // AUTH BLOCK END
 
     // window.modalClosingConfirm = $('#order-closing-confirm-modal');
     // window.modalResumedConfirm = $('#order-resume-confirm-modal');
@@ -161,300 +272,119 @@ $(document).ready(function () {
     //     orderResumedModal = $('#order-resumed-modal'),
     //     ordersActiveTable = $('#content-active').find('table.datatable-basic.default');
 
-    // Setting datatable defaults
-    $.extend( $.fn.dataTable.defaults, {
-        autoWidth: false,
-        columnDefs: [{
-            targets: [4]
-        }],
-        order: [],
-        dom: '<"datatable-header"fl><"datatable-scroll"t><"datatable-footer"ip>',
-        bLengthChange: false,
-        info: false,
-        language: {
-            search: '<span>Фильтр:</span> _INPUT_',
-            lengthMenu: '<span>Показывать:</span> _MENU_',
-            paginate: { 'next': '&rarr;', 'previous': '&larr;' },
-            thousands:      ',',
-            loadingRecords: 'Загрузка...',
-            zeroRecords:    'Нет данных',
-        },
-        drawCallback: function () {
-            $(this).find('tbody tr').slice(-3).find('.dropdown, .btn-group').addClass('dropup');
-        },
-        preDrawCallback: function() {
-            $(this).find('tbody tr').slice(-3).find('.dropdown, .btn-group').removeClass('dropup');
-        }
-    });
-
-    setTimeout(function () {
-        removeLoader();
-    },500);
-
-    // Fancybox init
-    bindFancybox();
-
-    $('#main-nav .navbar-toggler').click(function () {
-        if (!$(this).hasClass('collapsed')) {
-            $(this).find('span').css({
-                'background-image':'url("data:image/svg+xml,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 16 16\' fill=\'%23000\'%3e%3cpath d=\'M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z\'/%3e%3c/svg%3e")',
-                'background-size': '70%',
-                'opacity':0.5
-            });
-        } else {
-            $(this).find('span').css({
-                'background-image':'url("data:image/svg+xml,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 30 30\'%3e%3cpath stroke=\'rgba%280, 0, 0, 0.55%29\' stroke-linecap=\'round\' stroke-miterlimit=\'10\' stroke-width=\'2\' d=\'M4 7h22M4 15h22M4 23h22\'/%3e%3c/svg%3e")',
-                'background-size': '100%',
-                'opacity':1
-            });
-        }
-    });
-
-    // Datatable
-    const baseDataTable = dataTableAttributes($('.datatable-basic.default'), 8);
-    const subscrDataTable = dataTableAttributes($('.datatable-basic.subscriptions'), 6);
-    if (baseDataTable) clickYesDeleteOnModal(baseDataTable, true);
-    if (subscrDataTable) clickYesDeleteOnModal(subscrDataTable, false);
-
-    // Click to delete items
-    // window.deleteId = null;
-    // window.deleteRow = null;
-
-    // Top menu tabs
-    const topMenu = $('.rounded-block.tall .top-submenu');
-    topMenu.find('a').click(function (e) {
-        e.preventDefault();
-        const parent = $(this).parents('.tab');
-        if (!parent.hasClass('active')) {
-            let currentActiveTab = topMenu.find('.tab.active'),
-                currentActiveTabId = getId(currentActiveTab.find('a'), 'top-submenu-', false),
-                currentContent = $('#content-'+currentActiveTabId),
-                newActiveIdTabId = getId($(this), 'top-submenu-', false),
-                newContent = $('#content-'+newActiveIdTabId);
-
-            currentActiveTab.removeClass('active');
-            parent.addClass('active');
-            currentContent.fadeOut(() => {
-                newContent.css('display','none').fadeIn();
-            });
-        }
-    });
-    // MAIN BLOCK END
-
     // ACCOUNT BLOCK BEGIN
-    const accountForm = $('#account-form'),
-        bornDateField = $('input[name=born]'),
-        emailField = $('input[name=email]'),
-        changePhoneModal = $('#change-phone-modal'),
-        phoneField = changePhoneModal.find('input[name=phone]'),
-        codeField = changePhoneModal.find('input[name=code]'),
-        getCodeButton = $('#get-code'),
-        changePhoneButton = $('#change-phone-button'),
+    imagePreview(window.avatarBlock, '/images/def_avatar.svg');
 
-        changePasswordModal = $('#change-password-modal'),
-        oldPassword = changePasswordModal.find('input[name=old_password]'),
-        passwordField = changePasswordModal.find('input[name=password]'),
-        errorPassword = changePasswordModal.find('.error.password'),
-        passwordConfirmField = changePasswordModal.find('input[name=password_confirmation]'),
-        errorConfirmPassword = changePasswordModal.find('.error.password_confirmation'),
-        changePasswordButton = $('#change-password-button'),
-        avatarBlock = $('#avatar-block .avatar.cir'),
-        avatarContainer = $('#avatar-container'),
-        saveButton =$('#account-save');
+    const changePhoneModal = $('#change-phone-modal'),
+        phoneChangePhoneModal = changePhoneModal.find('input[name=phone]'),
+        codeChangePhoneModal = changePhoneModal.find('input[name=code]');
 
-    imagePreview(avatarBlock, '/images/def_avatar.svg');
+    phoneChangePhoneModal.mask(phoneMask).keyup(function () {
+        if ($(this).val().match(phoneRegExp)) {
+            window.inputChangePhone = $(this).val();
+            enableChangePhoneModalButton();
+        } else {
+            window.inputChangePhone = null;
+            enableChangePhoneModalButton();
+        }
+    });
 
-    // $.mask.definitions['c'] = "[1-2]";
-    // bornDateField.mask("99-99-9999");
-    //
-    // const preValidationChangeAccount = (e) => {
-    //     let born = bornDateField.val().split('-'),
-    //         currentDate = new Date();
-    //
-    //     resetErrors(accountForm);
-    //
-    //     let validationFlag = lengthValidate(accountForm, ['name','family','born']);
-    //
-    //     if (
-    //         !validationDate(born) ||
-    //         born[2] <= currentDate.getFullYear() - 100 ||
-    //         born[2] > currentDate.getFullYear() ||
-    //         (born[2] >= currentDate.getFullYear() - 18 && born[1] >= currentDate.getMonth() && born[0] < currentDate.getDate()) ||
-    //         born[2] > currentDate.getFullYear() - 18 ||
-    //         (born[2] === currentDate.getFullYear() - 18 && born[1] < currentDate.getMonth()) ||
-    //         (born[2] === currentDate.getFullYear() - 18 && born[1] === currentDate.getMonth() && born[0] < currentDate.getDate())
-    //     ) {
-    //         bornDateField.addClass('error');
-    //         $('.error.born').html(errorBornMessage);
-    //         validationFlag = false;
-    //     }
-    //
-    //     if (emailField.val().length && !emailField.val().match(emailRegExp)) {
-    //         emailField.addClass('error');
-    //         $('.error.email').html(errorWrongValueText);
-    //     }
-    //
-    //     if (validationFlag) {
-    //         saveButton.removeAttr('disabled');
-    //         return true;
-    //     } else {
-    //         saveButton.attr('disabled','disabled');
-    //         return false;
-    //     }
-    // }
+    codeChangePhoneModal.mask(codeMask).keyup(function () {
+        if ($(this).val().match(codeRegExp)) {
+            window.inputChangePhoneCode = $(this).val();
+            enableChangePhoneModalButton();
+        } else {
+            window.inputChangePhoneCode = null;
+            enableChangePhoneModalButton();
+        }
+    });
 
-    // //Unlock save button
-    // $.each(['name','family','born', 'email'], (k, field) => {
-    //     accountForm.find('input[name='+field+']').on('change', preValidationChangeAccount).keyup(preValidationChangeAccount);
-    // });
+    const changePasswordModal = $('#change-password-modal'),
+        oldPasswordChangePasswordModal = changePasswordModal.find('input[name=old_password]'),
+        passwordChangePasswordModal = changePasswordModal.find('input[name=password]'),
+        confirmPasswordChangePasswordModal = changePasswordModal.find('input[name=password_confirmation]');
 
-    // const unlockGetCodeAndChangePhoneButtons = () => {
-    //     if (phoneField.val().match(phoneRegExp) && phoneField.val().substr(2) !== currentPhone) {
-    //         getCodeButton.removeAttr('disabled');
-    //         if (codeField.val().match(codeRegExp)) changePhoneButton.removeAttr('disabled');
-    //         else changePhoneButton.attr('disabled','disabled');
-    //     } else {
-    //         getCodeButton.attr('disabled','disabled');
-    //         changePhoneButton.attr('disabled','disabled');
-    //     }
-    // };
-    //
-    // //Unlock get code button
-    // phoneField.on('change', unlockGetCodeAndChangePhoneButtons);
-    //
-    // //Unlock change phone button
-    // codeField.on('change', unlockGetCodeAndChangePhoneButtons).keyup(unlockGetCodeAndChangePhoneButtons);
-    //
-    // //Change phone form generate code
-    // getCodeButton.click((e) => {
-    //     e.preventDefault();
-    //     getCodeButton.addClass('d-none');
-    //     changePhoneButton.removeClass('d-none');
-    //     changePhoneModal.find('.form-group.d-none').removeClass('d-none');
-    //
-    //     getCodeAgainCounter(getCodeButton, 45);
-    //
-    //     getUrl(changePhoneModal.find('form'), getCodeUrl, (data) => {
-    //         messageModal.find('h4').html(data.message);
-    //         messageModal.modal('show');
-    //     });
-    // });
-    //
-    // //Change phone form change phone
-    // changePhoneButton.click((e) => {
-    //     e.preventDefault();
-    //     getUrl(changePhoneModal.find('form'), null, (data) => {
-    //         $('#phone-number').html(data.number);
-    //         messageModal.find('h4').html(data.message);
-    //         changePhoneModal.modal('hide');
-    //         messageModal.modal('show');
-    //     });
-    // });
-    //
-    // const unlockChangePasswordButton = () => {
-    //     if (oldPassword.val().length && passwordField.val().length && passwordConfirmField.val().length)
-    //         changePasswordButton.removeAttr('disabled');
-    //     else changePasswordButton.attr('disabled','disabled');
-    // };
+    oldPasswordChangePasswordModal.keyup(function () {
+        if ($(this).val().length) {
+            window.inputChangePasswordOldPassword = $(this).val();
+            enableChangePasswordModalButton();
+        } else {
+            window.inputChangePasswordOldPassword = null;
+            enableChangePasswordModalButton();
+        }
+    });
 
-    //Unlock change password button
-    // oldPassword.on('change', unlockChangePasswordButton).keyup(unlockChangePasswordButton);
-    // passwordField.on('change', unlockChangePasswordButton).keyup(unlockChangePasswordButton);
-    // passwordConfirmField.on('change', unlockChangePasswordButton).keyup(unlockChangePasswordButton);
+    passwordChangePasswordModal.keyup(function () {
+        if ($(this).val().length) {
+            window.inputChangePasswordPassword = $(this).val();
+            enableChangePasswordModalButton();
+        } else {
+            window.inputChangePasswordPassword = null;
+            enableChangePasswordModalButton();
+        }
+    });
 
-    // const preValidationChangePassword = (e) => {
-    //     let form = $(e.target).parents('form');
-    //
-    //     resetErrors(form);
-    //
-    //     if (passwordField.val().length < 6) {
-    //         passwordField.addClass('error');
-    //         errorPassword.html(passwordCannotBeLess);
-    //         return false;
-    //     } else if (passwordField.val() !== passwordConfirmField.val()) {
-    //         passwordField.addClass('error');
-    //         errorPassword.html(passwordsMismatch);
-    //         passwordConfirmField.addClass('error');
-    //         errorConfirmPassword.html(passwordsMismatch);
-    //         return false;
-    //     } else return true;
-    // };
-    //
-    // //Change password form
-    // changePasswordButton.click((e) => {
-    //     e.preventDefault();
-    //     if (preValidationChangePassword()) {
-    //         getUrl(changePasswordModal.find('form'), null, (data) => {
-    //             messageModal.find('h4').html(data.message);
-    //             changePasswordModal.modal('hide');
-    //             messageModal.modal('show');
-    //         });
-    //     }
-    // });
+    confirmPasswordChangePasswordModal.keyup(function () {
+        if ($(this).val().length) {
+            window.inputChangePasswordConfirmPassword = $(this).val();
+            enableChangePasswordModalButton();
+        } else {
+            window.inputChangePasswordConfirmPassword = null;
+            enableChangePasswordModalButton();
+        }
+    });
 
-    // Save account form
-    // saveButton.click((e) => {
-    //     e.preventDefault();
-    //     if (preValidationChangeAccount) {
-    //         getUrl(saveButton.parents('form'), null, (data) => {
-    //             console.log(data);
-    //             // messageModal.find('h4').html(data.message);
-    //             // messageModal.modal('show');
-    //         });
-    //     }
-    // });
+    const accountBlock = $('#account-block'),
+        userNameInput = accountBlock.find('input[name=name]'),
+        userFamilyInput = accountBlock.find('input[name=family]'),
+        userBornInput = accountBlock.find('input[name=born]'),
+        useEmailInput = accountBlock.find('input[name=email]');
 
-    // Init slider
-    // $(".ui-slider-value").slider({
-    //     value: 0,
-    //     min: -100,
-    //     max: 100,
-    //     slide: function (event, ui) {
-    //         window.avatarSize = ui.value;
-    //         avatarContainer.css({
-    //             'justify-content': 'start',
-    //             'align-items': 'start'
-    //         });
-    //
-    //         if (!window.avatarHeight) window.avatarHeight = window.avatarImage.height();
-    //         window.avatarImage.css({
-    //             'width': 200 + ui.value * 2,
-    //             'height': window.avatarHeight + (window.avatarHeight / 100 * ui.value)
-    //         });
-    //         window.avatarImage.css({
-    //             'top': (200 - window.avatarImage.height()) / 2 + 150,
-    //             'left': (200 - window.avatarImage.width()) / 2 + 150
-    //         });
-    //     }
-    // });
+    window.userName = userNameInput.val();
+    window.userFamily = userFamilyInput.val();
+    window.userBorn = userBornInput.val();
+    window.userEmail = useEmailInput.val();
 
-    // Preview and edit avatar
+    userNameInput.keyup(function () {
+        if ($(this).val().length) {
+            window.userName = $(this).val();
+            enableAccountButton();
+        } else {
+            window.userName = null;
+            enableAccountButton();
+        }
+    });
 
+    userFamilyInput.keyup(function () {
+        if ($(this).val().length) {
+            window.userFamily = $(this).val();
+            enableAccountButton();
+        } else {
+            window.userFamily = null;
+            enableAccountButton();
+        }
+    });
 
-    // Save tune avatar
-    // $('#save-tune-avatar').click(() => {
-    //     let posX = parseInt(window.avatarImage.css('left')),
-    //         basePosY = 200 / 2 - window.avatarImage.height() / 2,
-    //         posY = parseInt(window.avatarImage.css('top')) + basePosY,
-    //         size = 100 + window.avatarSize;
-    //
-    //     if (size !== 100) {
-    //         posX -= 150;
-    //         posY -= 150 + basePosY;
-    //     }
-    //
-    //     $('#avatar-block .avatar.cir').css({
-    //         'background-position-x': posX * 0.35,
-    //         'background-position-y': posY * 0.35,
-    //         'background-size': size + '%'
-    //     });
-    //     $('input[name=avatar_size]').val(size);
-    //     $('input[name=avatar_position_x]').val(posX);
-    //     $('input[name=avatar_position_y]').val(posY);
-    //     // tuneAvatarModal.modal('hide');
-    // });
-    // // ACCOUNT BLOCK END
-    //
+    userBornInput.mask(bornMask).keyup(function () {
+        if ($(this).val().match(bornRegExp)) {
+            window.userBorn = $(this).val();
+            enableAccountButton();
+        } else {
+            window.userBorn = null;
+            enableAccountButton();
+        }
+    });
+
+    useEmailInput.keyup(function () {
+        if ($(this).val().match(emailRegExp)) {
+            window.userEmail = $(this).val();
+            enableAccountButton();
+        } else {
+            window.userEmail = null;
+            enableAccountButton();
+        }
+    });
+
     // // EDIT ORDER BLOCK BEGIN
     // const progressBarContainer = $('#progress-bar'),
     //     progressBar = progressBarContainer.find('.progress-bar'),
@@ -910,20 +840,6 @@ const bindFancybox = () => {
     });
 }
 
-const addLoader = () => {
-    $('body').prepend(
-        $('<div></div>').attr('id','loader').append($('<div></div>'))
-    ).css({
-        // 'overflow':'hidden',
-        'padding-right':20
-    });
-}
-
-const removeLoader = () => {
-    $('#loader').remove();
-    $('body').css('overflow-y','auto');
-}
-
 const enableLoginModalButtons = () => {
     const submitLoginButton = $('#enter');
     if (window.inputLoginPhone && window.inputLoginPassword) submitLoginButton.removeAttr('disabled');
@@ -941,8 +857,54 @@ const enableRegisterModalButtons = () => {
     } else {
         getCodeRegisterCodeButton.attr('disabled','disabled');
         submitRegisterButton.attr('disabled','disabled');
-        submitRegisterButton.attr('disabled','disabled');
     }
+}
+
+const enableChangePhoneModalButton = () => {
+    const submitChangePhoneButton = $('#change-phone-button'),
+        getCodeChangePhoneButton = $('#get-register-code'),
+        getCodeAgainBlock = $('#get-code-again');
+
+    if (window.inputChangePhone) {
+        if (!getCodeAgainBlock.length) getCodeChangePhoneButton.removeAttr('disabled');
+        else getCodeChangePhoneButton.attr('disabled','disabled');
+
+        if (window.inputChangePhoneCode) submitChangePhoneButton.removeAttr('disabled');
+        else submitChangePhoneButton.attr('disabled','disabled');
+    } else {
+        submitChangePhoneButton.attr('disabled','disabled');
+        getCodeChangePhoneButton.attr('disabled','disabled');
+    }
+}
+
+const enableChangePasswordModalButton = () => {
+    const submitChangePasswordButton = $('#change-password-button');
+
+    if (window.inputChangePasswordOldPassword && window.inputChangePasswordPassword && window.inputChangePasswordConfirmPassword) {
+        submitChangePasswordButton.removeAttr('disabled');
+    } else {
+        submitChangePasswordButton.attr('disabled','disabled');
+    }
+}
+
+const enableAccountButton = () => {
+    const submitChangeAccountButton = $('#account-save');
+
+    if (window.userName && window.userFamily && window.userBorn && window.userEmail) {
+        submitChangeAccountButton.removeAttr('disabled');
+    } else {
+        submitChangeAccountButton.attr('disabled','disabled');
+    }
+}
+
+const enablePointImagesCarousel = (container, autoplay) => {
+    container.owlCarousel(owlSettings(
+        10,
+        autoplay,
+        6000,
+        {0: {items: 1}},
+        autoplay
+    ));
 }
 
 const imagePreview = (container, defImage) => {
@@ -1889,15 +1851,6 @@ const dataTableAttributes = (dataTable, rows) => {
 //     });
 // }
 //
-// const enablePointImagesCarousel = (container, autoplay) => {
-//     container.owlCarousel(owlSettings(
-//         10,
-//         autoplay,
-//         6000,
-//         {0: {items: 1}},
-//         autoplay
-//     ));
-// }
 //
 // const getPlaceMarkOnMap = (obj) => {
 //     let placemarkId = getId((obj).parents('.order-block'), 'order-', true);

@@ -53,17 +53,21 @@ export default {
         onSubmit(event) {
             let self = this;
             this.phone = window.inputRestorePasswordPhone;
+            window.addLoader();
+
             axios.post(this.reset_pass_url, {
                 _token: window.tokenField,
                 phone: window.inputRestorePasswordPhone,
             })
                 .then(function (response) {
                     window.showMessage(response.data.message);
+                    window.removeLoader();
                 })
                 .catch(function (error) {
                     $.each(error.response.data.errors, (name,error) => {
                         self.errors[name] = error[0];
                     });
+                    window.removeLoader();
                 });
         }
     }

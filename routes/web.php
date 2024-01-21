@@ -38,6 +38,7 @@ Route::prefix('account')->name('account.')->controller(AccountController::class)
     Route::post('/get-code', 'getCode')->name('get_code');
     Route::post('/change-phone', 'changePhone')->name('change_phone');
     Route::post('/change-password', 'changePassword')->name('change_password');
+    Route::post('/change-avatar', 'changeAvatar')->name('change_avatar');
     Route::post('/edit-account', 'editAccount')->name('edit_account');
     Route::post('/delete-subscription', 'deleteSubscription')->name('delete_subscription');
 

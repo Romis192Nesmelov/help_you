@@ -6,7 +6,7 @@ use App\Http\Controllers\HelperTrait;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 
-class EditAccountRequest extends FormRequest
+class ChangeAvatarRequest extends FormRequest
 {
     use HelperTrait;
 
@@ -26,12 +26,10 @@ class EditAccountRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => $this->validationString,
-            'family' => $this->validationString,
-            'born' => $this->validationBorn,
-            'email' => 'nullable|email|unique:users,email,'.Auth::id(),
-            'info_about' => $this->validationText,
-            'mail_notice' => 'nullable'
+            'avatar' => 'required|'.$this->validationJpgAndPng,
+            'avatar_size' => 'nullable|integer',
+            'avatar_position_x' => 'nullable',
+            'avatar_position_y' => 'nullable',
         ];
     }
 }

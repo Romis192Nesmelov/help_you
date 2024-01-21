@@ -89,9 +89,10 @@
         ></top-line-component>
         @yield('content')
     </div>
+    <message-component></message-component>
 </div>
 
-<div id="loader"><div></div></div>
+<div id="loader"><div></div></div
 
 {{--<script>--}}
 {{--    const userId = parseInt("{{ auth()->check() }}") ? parseInt("{{ auth()->id() }}") : null,--}}

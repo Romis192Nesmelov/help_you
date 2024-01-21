@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Account\ChangeAvatarRequest;
 use App\Http\Requests\Account\ChangePasswordRequest;
 use App\Http\Requests\Account\ChangePhoneRequest;
 use App\Http\Requests\Account\EditAccountRequest;
 use App\Http\Requests\Account\GetCodeRequest;
 use App\Http\Requests\Account\SubscriptionRequest;
-use App\Models\Order;
 use App\Models\ReadOrder;
 use App\Models\ReadPerformer;
 use App\Models\ReadStatusOrder;
@@ -89,14 +89,9 @@ class AccountController extends BaseController
         }
     }
 
-    public function editAccount(EditAccountRequest $request): JsonResponse
+    public function changeAvatar(ChangeAvatarRequest $request): JsonResponse
     {
         $fields = $request->validated();
-        $fields = $this->processingSpecialField($fields, 'mail_notice');
-        $birthday = Carbon::parse($fields['born']);
-        $currentDate = Carbon::now();
-        $age = $currentDate->diffInYears($birthday);
-        if ($age < 18 || $age > 100) return response()->json(['errors' => ['born' => [trans('validation.wrong_date')]]], 401);
         $fields['avatar_props'] = [];
         foreach (['size','position_x','position_y'] as $avatarProp) {
             $fieldProp = 'avatar_'.$avatarProp;
@@ -105,6 +100,18 @@ class AccountController extends BaseController
             unset($fields[$fieldProp]);
         }
         $fields = $this->processingImage($request, $fields,'avatar', 'images/avatars/', 'avatar'.Auth::id());
+        Auth::user()->update($fields);
+        return response()->json(['message' => trans('content.save_complete')],200);
+    }
+
+    public function editAccount(EditAccountRequest $request): JsonResponse
+    {
+        $fields = $request->validated();
+        $fields = $this->processingSpecialField($fields, 'mail_notice');
+        $birthday = Carbon::parse($fields['born']);
+        $currentDate = Carbon::now();
+        $age = $currentDate->diffInYears($birthday);
+        if ($age < 18 || $age > 100) return response()->json(['errors' => ['born' => [trans('validation.wrong_date')]]], 401);
         Auth::user()->update($fields);
         return response()->json(['message' => trans('content.save_complete')],200);
     }

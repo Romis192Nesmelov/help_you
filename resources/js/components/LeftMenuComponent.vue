@@ -13,6 +13,7 @@
                 class="btn btn-primary w-50 m-auto mt-3"
                 data-bs-dismiss='modal'
                 text="Закрыть"
+                @click="resetAvatar"
             ></ButtonComponent>
             <ButtonComponent
                 class="btn btn-primary w-50 m-auto mt-3"
@@ -80,7 +81,7 @@ export default {
                 self.newsFlags[menu.id] = flag;
             });
         });
-        // console.log(self.newsFlags);
+        this.avatarSize = 0;
     },
     data() {
         return {
@@ -91,7 +92,6 @@ export default {
             avatarHeight: Number,
             avatarPosX: Number,
             avatarPosY: Number,
-            avatarBlock: Object,
             leftMenu: Array,
             errors: {
                 avatar: null
@@ -103,7 +103,6 @@ export default {
                 'my-help': false,
                 'incentives': false
             },
-
         }
     },
     props: {
@@ -112,17 +111,24 @@ export default {
         'input_image_hover': String|NaN,
         'left_menu': String,
         'logout_url': String,
-        'edit_account_url': String|NaN,
+        'change_avatar_url': String|NaN,
         'active_left_menu': String,
     },
     methods: {
+        resetAvatar() {
+            let self = this;
+            window.avatarBlock.removeAttr('style');
+            window.avatarBlock.css('background-image','url(/'+self.userObj.avatar+')');
+            if (self.userObj.avatar_props['background-size']) window.avatarBlock.css('background-size',self.userObj.avatar_props['background-size']);
+            $.each(['background-position-x','background-position-y'],function (k, prop) {
+                if (self.userObj.avatar_props[prop]) window.avatarBlock.css(prop,(self.userObj.avatar_props[prop] * 0.35));
+            });
+        },
         avatarTune() {
             const self = this,
                 tuneAvatarModal = $('#tune-avatar-modal'),
                 avatarCirBig = $('.avatar.cir.big'),
                 avatarContainer = $('#avatar-container');
-
-            this.avatarBlock = $('#avatar-block .avatar.cir');
 
             $(".ui-slider-value").slider({
                 value: 0,
@@ -147,7 +153,7 @@ export default {
                 }
             });
 
-            this.avatarBlock.on('onload_image', function (event, target) {
+            window.avatarBlock.on('onload_image', function (event, target) {
                 $(this).css({
                     'background-size': '100%',
                     'background-position-x': 'center',
@@ -173,25 +179,42 @@ export default {
             let basePosY = 200 / 2 - this.avatarImage.height() / 2,
                 avatarPosX = parseInt(this.avatarImage.css('left')),
                 avatarPosY = parseInt(this.avatarImage.css('top')) + basePosY;
-            this.avatarSize += 100;
+
+            this.avatarSize += this.avatarSize !== 100 ? 100 : 0;
 
             if (this.avatarSize !== 100) {
                 avatarPosX -= 150;
                 avatarPosY -= 150 + basePosY;
             }
 
-            this.avatarBlock.css({
+            window.avatarBlock.css({
                 'background-position-x': avatarPosX * 0.35,
                 'background-position-y': avatarPosY * 0.35,
                 'background-size': this.avatarSize + '%'
             });
 
-            window.emitter.emit('changed-avatar', {
-                'avatar': $('input[name=avatar]')[0].files[0],
-                'avatar_size': this.avatarSize,
-                'avatar_position_x': avatarPosX,
-                'avatar_position_y': avatarPosY
-            });
+            let self = this,
+                formData = new FormData();
+
+            formData.append('_token', window.tokenField);
+            formData.append('avatar', $('input[name=avatar]')[0].files[0]);
+            formData.append('avatar_size', this.avatarSize);
+            formData.append('avatar_position_x', avatarPosX);
+            formData.append('avatar_position_y', avatarPosY);
+
+            window.addLoader();
+            axios.post(this.change_avatar_url, formData)
+                .then(function (response) {
+                    window.showMessage(response.data.message);
+                    window.removeLoader();
+                })
+                .catch(function (error) {
+                    console.log(error);
+                    $.each(error.response.data.errors, (name,error) => {
+                        self.errors[name] = error[0];
+                    });
+                    window.removeLoader();
+                });
         }
     }
 }

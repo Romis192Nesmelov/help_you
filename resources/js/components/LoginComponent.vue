@@ -55,7 +55,13 @@ import ForgotPasswordComponent from "./blocks/ForgotPasswordComponent.vue";
 
 export default {
     name: "LoginComponent",
-    components: {ModalComponent, ButtonComponent, CheckboxComponent, InputComponent, ForgotPasswordComponent},
+    components: {
+        ModalComponent,
+        ButtonComponent,
+        CheckboxComponent,
+        InputComponent,
+        ForgotPasswordComponent
+    },
     props: {
         'login_url': String,
     },
@@ -72,10 +78,11 @@ export default {
     },
     emits: ['loggedIn'],
     methods: {
-        onSubmit(event) {
+        onSubmit() {
             let self = this;
             this.phone = window.inputLoginPhone;
             this.password = window.inputLoginPassword;
+            window.addLoader();
 
             axios.post(this.login_url, {
                 _token: window.tokenField,
@@ -86,11 +93,13 @@ export default {
                 .then(function (response) {
                     $('#login-modal').modal('hide');
                     self.$emit('loggedIn',response.data.id);
+                    window.removeLoader();
                 })
                 .catch(function (error) {
                     $.each(error.response.data.errors, (name,error) => {
                         self.errors[name] = error[0];
                     });
+                    window.removeLoader();
                 });
         }
     }
