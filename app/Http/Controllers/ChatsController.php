@@ -5,11 +5,14 @@ namespace App\Http\Controllers;
 use App\Events\ChatMessageEvent;
 use App\Http\Requests\Chats\ChatRequest;
 use App\Http\Resources\Message\MessageResource;
+use App\Models\InformingOrder;
 use App\Models\Message;
 use App\Http\Requests\Chats\MessageRequest;
+use App\Models\MessageKeyword;
 use App\Models\MessageUser;
 use App\Models\Order;
 use App\Models\OrderUser;
+use App\Models\ReadPerformer;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -18,6 +21,13 @@ use Illuminate\View\View;
 class ChatsController extends BaseController
 {
     use HelperTrait;
+
+    private array $keywords;
+
+    public function __construct()
+    {
+        $this->keywords = MessageKeyword::pluck('phrase')->toArray();
+    }
 
     public function chats(): View
     {
@@ -33,6 +43,7 @@ class ChatsController extends BaseController
     {
         $this->data['active_left_menu'] = 'messages.chats';
         $this->data['order'] = Order::find($request->input('order_id'));
+        $this->setReadUnread(new ReadPerformer());
 		$this->setReadAllMessagesInChatForUser($this->data['order']->id);
         return $this->showView('chat');
     }
@@ -54,6 +65,20 @@ class ChatsController extends BaseController
         $this->setNewMessages($message);
 
         broadcast(new ChatMessageEvent($message));
+
+        foreach ($this->keywords as $phrase) {
+            $checkingTime = $message->order->updated_at->timestamp + (60 * 60 * 24);
+            if (
+                preg_match('/'.$phrase.'/ui',$message->body) &&
+                (!$message->order->lastInformingOrder->count() || $message->order->lastInformingOrder[0]->created_at->timestamp >= $checkingTime)
+            ) {
+                $this->chatMessage($message->order, trans('content.to_over_order'));
+                InformingOrder::create([
+                    'message' => trans('content.to_over_order'),
+                    'order_id' => $message->order->id
+                ]);
+            }
+        }
 
         return response()->json(MessageResource::make($message)->resolve(), 200);
 //        return response()->json(['data' => $data], 200);

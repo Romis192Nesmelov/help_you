@@ -50,7 +50,7 @@ $(document).ready(function () {
     },500);
 
     // Datatable
-    const baseDataTable = dataTableAttributes($('.datatable-basic.default'), 8);
+    const baseDataTable = dataTableAttributes($('.datatable-basic.default'), 7);
     const subscrDataTable = dataTableAttributes($('.datatable-basic.subscriptions'), 6);
     if (baseDataTable) clickYesDeleteOnModal(baseDataTable, true);
     if (subscrDataTable) clickYesDeleteOnModal(subscrDataTable, false);
@@ -810,9 +810,10 @@ $(document).ready(function () {
                             let updatedAddress = data.response.GeoObjectCollection.featureMember[0].GeoObject.name;
 
                             if (window.placemark) window.myMap.geoObjects.remove(window.placemark);
-                            let coordinates = data.response.GeoObjectCollection.featureMember[0].GeoObject.Point.pos.split(' ');
-                            point = [parseFloat(coordinates[1]),parseFloat(coordinates[0])];
-                            let newPlacemark = getPlaceMark(point,{});
+                            let coordinates = data.response.GeoObjectCollection.featureMember[0].GeoObject.Point.pos.split(' '),
+                                point = [parseFloat(coordinates[1]),parseFloat(coordinates[0])],
+                                newPlacemark = getPlaceMark(point,{});
+
                             window.myMap.geoObjects.add(newPlacemark)
                             zoomAndCenterMap();
 
@@ -1752,7 +1753,7 @@ const appendDropdownUnreadPerformer = (orderId, userName) => {
         $('<li></li>').attr('id','unread-performer-' + orderId).addClass('unread-orders').append(
             $('<div></div>')
                 .append(
-                    $('<a></a>').attr('href', myOrdersUrl).html(newPerformerText + orderId + ':<br>')
+                    $('<a></a>').attr('href', chatUrl + '?id=' +orderId).html(newPerformerText + orderId + ':<br>')
                 ).append(
                     $('<span></span>').html(userName)
                 )
@@ -2048,13 +2049,14 @@ const showOrder = (point) => {
                         ).append(
                             $('<div></div>').css('width',215)
                                 .append(
-                                    $('<div></div>').addClass('ms-3 fs-lg-6 fs-sm-7 user-name').html(user.family+' '+user.name)
+                                    $('<div></div>').addClass('ms-3 fs-lg-6 fs-sm-7 user-name').html(getUserName(user))
                                 ).append(
-                                    $('<div></div>').addClass('fs-lg-6 fs-sm-7 ms-3 user-age').html(window.useAge)
+                                    $('<div></div>').addClass('fs-lg-6 fs-sm-7 ms-3 user-age').html('')
                                 )
                             )
                     ).append($('<i></i>').addClass('subscribe-icon ' + subscribeBellClass))
         );
+    getUserAge(user.id);
 
     if (images.length) {
         let imagesContainer = $('<div></div>').addClass('images owl-carousel mt-3');
@@ -2286,8 +2288,6 @@ const checkDropDownMenuEmpty = () => {
     if (!window.dropDown.html()) {
         window.rightButtonBlock.find('.dot').remove();
     }
-
-
 }
 
 const bellRing = (degrees) => {

@@ -120,4 +120,14 @@ class Order extends Model
     {
         return $this->hasMany(Rating::class);
     }
+
+    public function informingOrder(): HasMany
+    {
+        return $this->hasMany(InformingOrder::class, 'order_id');
+    }
+
+    public function lastInformingOrder(): HasMany
+    {
+        return $this->hasMany(InformingOrder::class, 'order_id')->select('created_at')->orderBy('created_at','desc');
+    }
 }

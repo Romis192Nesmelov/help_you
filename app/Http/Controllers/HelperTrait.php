@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use App\Events\NotificationEvent;
 use App\Jobs\SendMessage;
+use App\Models\InformingOrder;
 use App\Models\Message;
 use App\Models\MessageUser;
 use App\Models\Order;
@@ -60,11 +61,29 @@ trait HelperTrait
         return $request->has('id') && (int)$request->input('id') ? 'edit'.$request->id.'_steps' : 'steps';
     }
 
-    public function newChatMessage(Order $order): void
+    public function checkOrdersInProgress(): void
+    {
+        $ordersInProgress = Order::where('status',1)->get();
+        foreach ($ordersInProgress as $order) {
+            $checkingTime = $order->updated_at->timestamp + (60 * 60 * 24 * 7);
+            if (
+                time() >= $checkingTime &&
+                (!$order->lastInformingOrder->count() || $order->lastInformingOrder[0]->created_at->timestamp >= $checkingTime)
+            ) {
+                $this->chatMessage($order, trans('content.to_over_order'));
+                InformingOrder::create([
+                    'message' => trans('content.to_over_order'),
+                    'order_id' => $order->id
+                ]);
+            }
+        }
+    }
+
+    public function chatMessage(Order $order, string $message): void
     {
         if (!$order->messages->count()) {
             $message = Message::create([
-                'body' => trans('content.new_chat_message'),
+                'body' => $message,
                 'user_id' => 1,
                 'order_id' => $order->id
             ]);
