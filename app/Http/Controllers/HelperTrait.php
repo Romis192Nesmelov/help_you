@@ -96,7 +96,7 @@ trait HelperTrait
 
     public function setNewMessages(Message $message): void
     {
-        if (Auth::id() != $message->order->user_id) {
+        if (!Auth::check() || Auth::id() != $message->order->user_id) {
             MessageUser::create([
                 'message_id' => $message->id,
                 'user_id' => $message->order->user_id,
@@ -105,8 +105,9 @@ trait HelperTrait
             broadcast(new NotificationEvent('new_message', $message->order, $message->order->user_id));
             $this->mailNotice($message->order, $message->order->userCredentials, 'new_message_notice');
         }
+
         foreach ($message->order->performers as $performer) {
-            if (Auth::id() != $performer->id) {
+            if (!Auth::check() || Auth::id() != $performer->id) {
                 MessageUser::create([
                     'message_id' => $message->id,
                     'user_id' => $performer->id,
