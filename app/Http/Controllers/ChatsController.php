@@ -67,17 +67,8 @@ class ChatsController extends BaseController
         broadcast(new ChatMessageEvent($message));
 
         foreach ($this->keywords as $phrase) {
-            $checkingTime = $message->order->updated_at->timestamp + (60 * 60 * 24);
-            if (
-                preg_match('/'.$phrase.'/ui',$message->body) &&
-                (!$message->order->lastInformingOrder->count() || $message->order->lastInformingOrder[0]->created_at->timestamp >= $checkingTime)
-            ) {
-                $this->chatMessage($message->order, trans('content.to_over_order'));
-                InformingOrder::create([
-                    'message' => trans('content.to_over_order'),
-                    'order_id' => $message->order->id
-                ]);
-            }
+            if (preg_match('/'.$phrase.'/ui',$message->body))
+                $this->checkAndSendInforming($message->order, trans('content.to_over_order'), (60 * 60 * 24));
         }
 
         return response()->json(MessageResource::make($message)->resolve(), 200);

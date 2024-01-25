@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Events\ChatMessageEvent;
 use App\Events\NotificationEvent;
 use App\Jobs\SendMessage;
 use App\Models\InformingOrder;
@@ -66,29 +67,31 @@ trait HelperTrait
         $ordersInProgress = Order::where('status',1)->get();
         foreach ($ordersInProgress as $order) {
             $checkingTime = $order->updated_at->timestamp + (60 * 60 * 24 * 7);
-            if (
-                time() >= $checkingTime &&
-                (!$order->lastInformingOrder->count() || $order->lastInformingOrder[0]->created_at->timestamp >= $checkingTime)
-            ) {
-                $this->chatMessage($order, trans('content.to_over_order'));
-                InformingOrder::create([
-                    'message' => trans('content.to_over_order'),
-                    'order_id' => $order->id
-                ]);
-            }
+            if (time() >= $checkingTime) $this->checkAndSendInforming($order, trans('content.to_over_order'), (60 * 60 * 24));
+        }
+    }
+
+    public function checkAndSendInforming(Order $order, string $message, int $checkingTime): void
+    {
+        $lastMessage = InformingOrder::where('message',$message)->where('order_id',$order->id)->orderBy('created_at','desc')->first();
+        if (!$lastMessage || time() >= $lastMessage->created_at->timestamp + $checkingTime) {
+            $this->chatMessage($order, $message);
+            InformingOrder::create([
+                'message' => $message,
+                'order_id' => $order->id
+            ]);
         }
     }
 
     public function chatMessage(Order $order, string $message): void
     {
-        if (!$order->messages->count()) {
-            $message = Message::create([
-                'body' => $message,
-                'user_id' => 1,
-                'order_id' => $order->id
-            ]);
-            $this->setNewMessages($message);
-        }
+        $message = Message::create([
+            'body' => $message,
+            'user_id' => 1,
+            'order_id' => $order->id
+        ]);
+        $this->setNewMessages($message);
+        broadcast(new ChatMessageEvent($message));
     }
 
     public function setNewMessages(Message $message): void

@@ -223,7 +223,7 @@ class OrderController extends BaseController
 
             broadcast(new NotificationEvent('new_performer', $order, $order->user_id));
             $this->mailNotice($order, $order->userCredentials, 'new_performer_notice');
-            $this->chatMessage($order, trans('content.new_chat_message'));
+            if (!$order->messages->count()) $this->chatMessage($order, trans('content.new_chat_message'));
 
             broadcast(new NotificationEvent('new_order_status', $order, $order->user_id));
             $this->mailNotice($order, $order->userCredentials, 'new_order_status_notice');
