@@ -68,34 +68,49 @@
 </x-modal>
 
 <div class="row">
-    @include('blocks.left_menu_block',['hasChangeAvatar' => false])
-    <div id="my-orders" class="col-12 col-lg-8 right-block">
-        <div class="rounded-block tall">
-            <h2>{{ trans('account.my_orders') }}</h2>
-            @include('blocks.top_sub_menu_block',[
-                'menus' => ['active','approving','archive'],
-                'prefix' => 'auth',
-                'postfix' => '_orders',
-                'items' => $orders
-            ])
-            @include('blocks.tab_orders_block', [
-                'menus' => ['active','approving','archive'],
-                'useButton' => true,
-                'editRoute' => 'order.edit_order'
-            ])
-        </div>
-    </div>
+    <left-menu-component
+        user="{{ json_encode(auth()->user()) }}"
+        allow_change_avatar="0"
+        left_menu="{{ json_encode($leftMenu) }}"
+        logout_url="{{ route('auth.logout') }}"
+        active_left_menu="{{ $active_left_menu }}"
+    ></left-menu-component>
+    <order-list-component
+        order_list="{{ json_encode($orders) }}"
+        edit_order_url="{{ route('order.edit_order') }}"
+    ></order-list-component>
+
+{{--    <div id="my-orders" class="col-12 col-lg-8 right-block">--}}
+{{--        <div class="rounded-block tall">--}}
+{{--            <h2>Мои запросы</h2>--}}
+{{--            <tabs-component--}}
+{{--                tabs="{{ json_encode([['key' => 'active', 'name' => 'Активные'],['key' => 'approving', 'name' => 'На модерации'],['key' => 'archive', 'name' => 'Архив']]) }}"--}}
+{{--                counters="{{ json_encode(['active' => count($orders['active']),'approving' => count($orders['approving']),'archive' => count($orders['archive'])]) }}"--}}
+{{--            ></tabs-component>--}}
+{{--            @include('blocks.top_sub_menu_block',[--}}
+{{--                'menus' => ['active','approving','archive'],--}}
+{{--                'prefix' => 'auth',--}}
+{{--                'postfix' => '_orders',--}}
+{{--                'items' => $orders--}}
+{{--            ])--}}
+{{--            @include('blocks.tab_orders_block', [--}}
+{{--                'menus' => ['active','approving','archive'],--}}
+{{--                'useButton' => true,--}}
+{{--                'editRoute' => 'order.edit_order'--}}
+{{--            ])--}}
+{{--        </div>--}}
+{{--    </div>--}}
 </div>
-<script>
-    const closeOrderUrl = "{{ route('order.close_order') }}",
-        resumeOrderUrl = "{{ route('order.resume_order') }}",
-        editOrderUrl = "{{ route('order.edit_order') }}",
-        getOrderPerformersUrl = "{{ route('order.get_order_performers') }}",
-        removeOrderPerformerUrl = "{{ route('order.remove_order_performer') }}",
-        closeOrderText = "{{ trans('content.close') }}",
-        resumeOrderText = "{{ trans('content.resume') }}",
-        editOrderText = "{{ trans('content.edit') }}",
-        deleteOrderText = "{{ trans('content.delete') }}",
-        participantsText = "{{ trans('messages.participants') }}";
-</script>
+{{--<script>--}}
+{{--    const closeOrderUrl = "{{ route('order.close_order') }}",--}}
+{{--        resumeOrderUrl = "{{ route('order.resume_order') }}",--}}
+{{--        editOrderUrl = "{{ route('order.edit_order') }}",--}}
+{{--        getOrderPerformersUrl = "{{ route('order.get_order_performers') }}",--}}
+{{--        removeOrderPerformerUrl = "{{ route('order.remove_order_performer') }}",--}}
+{{--        closeOrderText = "{{ trans('content.close') }}",--}}
+{{--        resumeOrderText = "{{ trans('content.resume') }}",--}}
+{{--        editOrderText = "{{ trans('content.edit') }}",--}}
+{{--        deleteOrderText = "{{ trans('content.delete') }}",--}}
+{{--        participantsText = "{{ trans('messages.participants') }}";--}}
+{{--</script>--}}
 @endsection

@@ -15,7 +15,6 @@ export default defineConfig({
                 'resources/js/owl.carousel.min.js',
                 'resources/css/icons/fontawesome/styles.min.css',
                 'resources/css/icons/icomoon/styles.css',
-                'resources/css/datatables.css',
                 'resources/css/jquery.fancybox.min.css',
                 'resources/css/owl.carousel.min.css',
                 'resources/css/loader.css',

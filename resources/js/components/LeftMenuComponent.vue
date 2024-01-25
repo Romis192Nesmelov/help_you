@@ -46,7 +46,7 @@
 
             <ul class="menu">
                 <li v-for="menu in leftMenu" :key="menu.id" :class="(menu.key === active_left_menu ? 'active' : '')">
-                    <a href="{{ menu.url }}"><i class="{{ menu.icon }}"></i>{{ menu.name }}</a>
+                    <a :href="menu.url"><i :class="menu.icon"></i>{{ menu.name }}</a>
                     <span class="dot" v-if="newsFlags[menu.id]"></span>
                 </li>
             </ul>

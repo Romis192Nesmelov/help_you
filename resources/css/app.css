@@ -155,7 +155,6 @@ h2 {
     font-weight: bold;
     text-transform: uppercase;
     font-size: 20px;
-    margin-bottom: 20px;
 }
 
 h2 i {
@@ -342,10 +341,6 @@ div.error {
     padding-left: 12px;
     padding-bottom: 5px;
     font-size: 13px;
-}
-
-.datatable-basic div.error {
-    padding: 0;
 }
 
 .checkbox-block div.error {
@@ -862,63 +857,6 @@ button.btn > i {
     border-bottom: 3px solid #b52407;
 }
 
-table.datatable-basic td {
-    vertical-align: middle;
-}
-
-table.datatable-basic > :not(:last-child) > :last-child > * {
-    border-bottom-color: grey;
-}
-
-table.datatable-basic td.id,
-table.datatable-basic td.icon {
-    width: 10%;
-    text-align: center;
-    font-size: 12px;
-    color: grey;
-}
-
-table.datatable-basic td .head {
-    font-size: 16px;
-}
-
-table.datatable-basic td .content {
-    font-size: 13px;
-    color: grey;
-}
-
-table.datatable-basic td .label {
-    padding: 5px;
-    border-radius: 5px;
-    font-size: 12px;
-    color: white;
-}
-
-table.datatable-basic td .label.in-approve {
-    background-color: #004d2a;
-}
-
-table.datatable-basic td .label.open {
-    background-color: #008e7c;
-}
-
-table.datatable-basic td .label.in-progress {
-    background-color: #e65639;
-}
-
-table.datatable-basic td .label.closed {
-    background-color: #6a6a6a;
-}
-
-table.datatable-basic td.icon {
-    width: 7%;
-}
-
-table.datatable-basic td.empty {
-    width: 0;
-    padding: 0;
-}
-
 .rounded-block.tall .content-block .datatable-scroll {
     height: 520px;
 }
@@ -1235,75 +1173,6 @@ table.datatable-basic td.empty {
 .sub-types-block label {
     font-size: 14px;
     color: #808080;
-}
-
-@media (max-height: 800px) and (min-width: 991px) {
-    .rounded-block {
-        font-size: 18px;
-        padding-top: 45px;
-        padding-bottom: 45px;
-    }
-
-    .rounded-block h1 {
-        font-size: 40px;
-    }
-
-    .rounded-block p {
-        font-size: 18px;
-    }
-
-    .rounded-block.tall {
-        height: auto;
-        min-height: 685px;
-        margin-bottom: 25px;
-    }
-
-    #map-container {
-        min-height: 585px;
-        margin-bottom: 25px;
-    }
-
-    .rounded-block.tall .content-block {
-        height: 500px;
-    }
-
-    .rounded-block.tall .content-block.simple {
-        height: 550px;
-    }
-
-    .rounded-block.tall .content-block .datatable-scroll {
-        height: 400px !important;
-    }
-
-    .rounded-block.three-quarter {
-        height: 460px;
-        min-height: 460px
-    }
-
-    .rounded-block.half {
-        height: 330px;
-        margin-bottom: 25px;
-    }
-
-    .rounded-block h1 > div {
-        width: 100%;
-    }
-
-    .rounded-block.tall .absolute-bottom {
-        bottom: 45px;
-    }
-
-    .form-group textarea[name=description_full] {
-        height: 115px;
-    }
-
-    #info-about textarea {
-        height: 455px;
-    }
-
-    #messages {
-        height: 468px;
-    }
 }
 
 @media (max-width: 1200px) {

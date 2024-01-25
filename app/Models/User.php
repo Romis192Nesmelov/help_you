@@ -109,6 +109,7 @@ class User extends Authenticatable
     {
         return $this->hasMany(Order::class)
             ->where('approved',0)
+            ->with('performers')
             ->orderByDesc('created_at');
     }
 
@@ -117,6 +118,7 @@ class User extends Authenticatable
         return $this->hasMany(Order::class)
             ->where('status','>',0)
             ->where('approved',1)
+            ->with('performers')
             ->orderByDesc('created_at');
     }
 
@@ -125,6 +127,7 @@ class User extends Authenticatable
         return $this->hasMany(Order::class)
             ->where('status',0)
             ->where('approved',1)
+            ->with('performers')
             ->orderByDesc('created_at');
     }
 

@@ -5,6 +5,7 @@ import MessageComponent from "./components/MessageComponent.vue";
 import TopLineComponent from "./components/TopLineComponent.vue";
 import LeftMenuComponent from "./components/LeftMenuComponent.vue";
 import AccountComponent from "./components/AccountComponent.vue";
+import OrderListComponent from "./components/OrderListComponent.vue";
 
 const app = createApp({
     components: {
@@ -12,6 +13,7 @@ const app = createApp({
         TopLineComponent,
         LeftMenuComponent,
         AccountComponent,
+        OrderListComponent
     }
 });
 
@@ -139,34 +141,34 @@ $(document).ready(function () {
     });
 
     // Datatable
-    const baseDataTable = dataTableAttributes($('.datatable-basic.default'), 8);
-    const subscrDataTable = dataTableAttributes($('.datatable-basic.subscriptions'), 6);
-    if (baseDataTable) clickYesDeleteOnModal(baseDataTable, true);
-    if (subscrDataTable) clickYesDeleteOnModal(subscrDataTable, false);
+    dataTableAttributes($('.datatable-basic.default'), 8);
+    dataTableAttributes($('.datatable-basic.subscriptions'), 6);
+    // if (baseDataTable) clickYesDeleteOnModal(baseDataTable, true);
+    // if (subscrDataTable) clickYesDeleteOnModal(subscrDataTable, false);
 
     // Click to delete items
     // window.deleteId = null;
     // window.deleteRow = null;
 
     // Top menu tabs
-    const topMenu = $('.rounded-block.tall .top-submenu');
-    topMenu.find('a').click(function (e) {
-        e.preventDefault();
-        const parent = $(this).parents('.tab');
-        if (!parent.hasClass('active')) {
-            let currentActiveTab = topMenu.find('.tab.active'),
-                currentActiveTabId = getId(currentActiveTab.find('a'), 'top-submenu-', false),
-                currentContent = $('#content-'+currentActiveTabId),
-                newActiveIdTabId = getId($(this), 'top-submenu-', false),
-                newContent = $('#content-'+newActiveIdTabId);
-
-            currentActiveTab.removeClass('active');
-            parent.addClass('active');
-            currentContent.fadeOut(() => {
-                newContent.css('display','none').fadeIn();
-            });
-        }
-    });
+    // const topMenu = $('.rounded-block.tall .top-submenu');
+    // topMenu.find('a').click(function (e) {
+    //     e.preventDefault();
+    //     const parent = $(this).parents('.tab');
+    //     if (!parent.hasClass('active')) {
+    //         let currentActiveTab = topMenu.find('.tab.active'),
+    //             currentActiveTabId = getId(currentActiveTab.find('a'), 'top-submenu-', false),
+    //             currentContent = $('#content-'+currentActiveTabId),
+    //             newActiveIdTabId = getId($(this), 'top-submenu-', false),
+    //             newContent = $('#content-'+newActiveIdTabId);
+    //
+    //         currentActiveTab.removeClass('active');
+    //         parent.addClass('active');
+    //         currentContent.fadeOut(() => {
+    //             newContent.css('display','none').fadeIn();
+    //         });
+    //     }
+    // });
     // MAIN BLOCK END
 
     // AUTH BLOCK BEGIN
@@ -1137,24 +1139,15 @@ const imagePreview = (container, defImage) => {
 //     form.find('div.error').html('');
 // };
 //
-const resizeDTable = (dataTable, rows) => {
-    if ($(window).width() >= 991 && $(window).height() >= 800) dataTable.context[0]._iDisplayLength = rows;
-    else if ($(window).width() >= 991) dataTable.context[0]._iDisplayLength = rows - 2;
-    else dataTable.context[0]._iDisplayLength = rows + 2;
-
-    dataTable.draw();
-    bindDelete();
-}
-
-const bindChangePagination = (dataTable) => {
-    const paginationEvent = ('draw.dt');
-    dataTable.off(paginationEvent);
-    dataTable.on(paginationEvent, function () {
-        bindOrderOperation(window.modalClosingConfirm,'close-order');
-        bindOrderOperation(window.modalResumedConfirm,'resume-order');
-        bindDelete();
-    });
-}
+// const bindChangePagination = (dataTable) => {
+//     const paginationEvent = ('draw.dt');
+//     dataTable.off(paginationEvent);
+//     dataTable.on(paginationEvent, function () {
+//         // bindOrderOperation(window.modalClosingConfirm,'close-order');
+//         // bindOrderOperation(window.modalResumedConfirm,'resume-order');
+//         // bindDelete();
+//     });
+// }
 //
 // const bindOrderPerformersList = () => {
 //     const iconPerformersList =  $('i.performers-list'),
@@ -1231,22 +1224,22 @@ const bindChangePagination = (dataTable) => {
 //     });
 // }
 //
-const bindDelete = () => {
-    let deleteIcon = $('.icon-close2, .icon-bell-cross');
-    deleteIcon.unbind();
-    deleteIcon.click(function () {
-        window.deleteId = $(this).attr('del-data');
-        let deleteModal = $('#'+$(this).attr('modal-data')),
-            inputId = deleteModal.find('input[name=id]'),
-            possibleParentRow = $('#row-' + window.deleteId),
-            altParentRow = $('.row-' + window.deleteId);
-
-        window.deleteRow = possibleParentRow.length ? possibleParentRow : altParentRow;
-
-        if (inputId.length) inputId.val(window.deleteId);
-        deleteModal.modal('show');
-    });
-}
+// const bindDelete = () => {
+//     let deleteIcon = $('.icon-close2, .icon-bell-cross');
+//     deleteIcon.unbind();
+//     deleteIcon.click(function () {
+//         window.deleteId = $(this).attr('del-data');
+//         let deleteModal = $('#'+$(this).attr('modal-data')),
+//             inputId = deleteModal.find('input[name=id]'),
+//             possibleParentRow = $('#row-' + window.deleteId),
+//             altParentRow = $('.row-' + window.deleteId);
+//
+//         window.deleteRow = possibleParentRow.length ? possibleParentRow : altParentRow;
+//
+//         if (inputId.length) inputId.val(window.deleteId);
+//         deleteModal.modal('show');
+//     });
+// }
 //
 // const mapInit = (container) => {
 //     window.myMap = new ymaps.Map(container, {
@@ -1271,14 +1264,9 @@ const dataTableAttributes = (dataTable, rows) => {
         dataTable = dataTable.DataTable({iDisplayLength: rows});
 
         // Change pagination on data-tables
-        bindChangePagination(dataTable);
-        bindDelete();
-
-        $(window).resize(function () {
-            resizeDTable(dataTable, rows);
-        });
-        return dataTable
-    } else return false;
+        // bindChangePagination(dataTable);
+        // bindDelete();
+    }
 }
 
 // const clickYesDeleteOnModal = (dataTable, useCounter) => {
