@@ -68,8 +68,7 @@ trait HelperTrait
         $dayToCheck = Carbon::now()->subDays(7);
         $ordersInProgress = Order::where('status',1)->whereDate('created_at','<=',$dayToCheck)->get();
         foreach ($ordersInProgress as $order) {
-            $checkingTime = $order->updated_at->timestamp + (60 * 60 * 24 * 7);
-            if (time() >= $checkingTime) $this->checkAndSendInforming($order, trans('content.to_over_order'), 0);
+            $this->checkAndSendInforming($order, trans('content.to_over_order'), 0);
         }
     }
 
