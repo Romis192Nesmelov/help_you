@@ -10,6 +10,7 @@ use App\Models\MessageUser;
 use App\Models\Order;
 use App\Models\ReadRemovedPerformer;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
@@ -64,7 +65,8 @@ trait HelperTrait
 
     public function checkOrdersInProgress(): void
     {
-        $ordersInProgress = Order::where('status',1)->get();
+        $dayToCheck = Carbon::now()->subDays(7);
+        $ordersInProgress = Order::where('status',1)->whereDate('created_at','<=',$dayToCheck)->get();
         foreach ($ordersInProgress as $order) {
             $checkingTime = $order->updated_at->timestamp + (60 * 60 * 24 * 7);
             if (time() >= $checkingTime) $this->checkAndSendInforming($order, trans('content.to_over_order'), 0);
