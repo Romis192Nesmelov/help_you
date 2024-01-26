@@ -9,6 +9,9 @@
                 @change-tab="changeTab"
             ></TabsComponent>
             <div class="content-block" v-for="(orderList, key) in orders" v-show="key === activeTab">
+                <div class="row" v-if="orderList.length">
+
+                </div>
 <!--                <table class="table datatable-basic default" v-if="orderList.length">-->
 <!--                    <tr v-for="order in orderList" :key="order.id">-->
 <!--                        <td class="id">{{ order.id }}</td>-->
@@ -27,7 +30,8 @@
 
 <!--                    </tr>-->
 <!--                </table>-->
-                <h4 class="no-data-block text-uppercase text-secondary">Нет данных</h4>
+
+                <NoDataComponent v-else></NoDataComponent>
             </div>
         </div>
     </div>
@@ -35,11 +39,13 @@
 
 <script>
 import TabsComponent from "./blocks/TabsComponent.vue";
+import NoDataComponent from "./blocks/NoDataComponent.vue";
 
 export default {
     name: "OrderListComponent",
     components: {
-        TabsComponent
+        TabsComponent,
+        NoDataComponent
     },
     created() {
         let self = this;
@@ -48,7 +54,6 @@ export default {
         $.each(this.orders, function (key,tab) {
             self.counters[key] = tab.length;
         });
-        console.log(this.orders);
     },
     data() {
         return {
