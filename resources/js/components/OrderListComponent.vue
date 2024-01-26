@@ -27,7 +27,7 @@
 
 <!--                    </tr>-->
 <!--                </table>-->
-                <h4 class="no-data-block text-uppercase text-secondary" v-else>Нет данных</h4>
+                <h4 class="no-data-block text-uppercase text-secondary">Нет данных</h4>
             </div>
         </div>
     </div>

@@ -51,26 +51,26 @@ $(document).ready(function () {
 
     window.addLoader = () => {
         $('body').prepend(
-            $('<div></div>').attr('id','loader').append($('<div></div>'))
+            $('<div></div>').attr('id', 'loader').append($('<div></div>'))
         ).css({
-            'overflow-y':'hidden',
-            'padding-right':20
+            'overflow-y': 'hidden',
+            'padding-right': 20
         });
     }
 
     window.removeLoader = () => {
         $('#loader').remove();
-        $('body').css('overflow-y','auto');
+        $('body').css('overflow-y', 'auto');
     };
 
     $('.form-group.has-label i.icon-eye').click(function () {
         let cover = $(this).parents('.form-group'),
             input = cover.find('input');
         if ($(this).hasClass('icon-eye')) {
-            input.attr('type','text');
+            input.attr('type', 'text');
             $(this).removeClass('icon-eye').addClass('icon-eye-blocked');
         } else {
-            input.attr('type','password');
+            input.attr('type', 'password');
             $(this).removeClass('icon-eye-blocked').addClass('icon-eye');
         }
     });
@@ -91,35 +91,9 @@ $(document).ready(function () {
     $.mask.definitions['n'] = "[7-8]";
     $.mask.definitions['c'] = "[1-2]";
 
-    // Setting datatable defaults
-    $.extend( $.fn.dataTable.defaults, {
-        autoWidth: false,
-        columnDefs: [{
-            targets: [4]
-        }],
-        order: [],
-        dom: '<"datatable-header"fl><"datatable-scroll"t><"datatable-footer"ip>',
-        bLengthChange: false,
-        info: false,
-        language: {
-            search: '<span>Фильтр:</span> _INPUT_',
-            lengthMenu: '<span>Показывать:</span> _MENU_',
-            paginate: { 'next': '&rarr;', 'previous': '&larr;' },
-            thousands:      ',',
-            loadingRecords: 'Загрузка...',
-            zeroRecords:    'Нет данных',
-        },
-        drawCallback: function () {
-            $(this).find('tbody tr').slice(-3).find('.dropdown, .btn-group').addClass('dropup');
-        },
-        preDrawCallback: function() {
-            $(this).find('tbody tr').slice(-3).find('.dropdown, .btn-group').removeClass('dropup');
-        }
-    });
-
     setTimeout(function () {
         removeLoader();
-    },500);
+    }, 500);
 
     // Fancybox init
     bindFancybox();
@@ -127,22 +101,22 @@ $(document).ready(function () {
     $('#main-nav .navbar-toggler').click(function () {
         if (!$(this).hasClass('collapsed')) {
             $(this).find('span').css({
-                'background-image':'url("data:image/svg+xml,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 16 16\' fill=\'%23000\'%3e%3cpath d=\'M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z\'/%3e%3c/svg%3e")',
+                'background-image': 'url("data:image/svg+xml,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 16 16\' fill=\'%23000\'%3e%3cpath d=\'M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z\'/%3e%3c/svg%3e")',
                 'background-size': '70%',
-                'opacity':0.5
+                'opacity': 0.5
             });
         } else {
             $(this).find('span').css({
-                'background-image':'url("data:image/svg+xml,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 30 30\'%3e%3cpath stroke=\'rgba%280, 0, 0, 0.55%29\' stroke-linecap=\'round\' stroke-miterlimit=\'10\' stroke-width=\'2\' d=\'M4 7h22M4 15h22M4 23h22\'/%3e%3c/svg%3e")',
+                'background-image': 'url("data:image/svg+xml,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 30 30\'%3e%3cpath stroke=\'rgba%280, 0, 0, 0.55%29\' stroke-linecap=\'round\' stroke-miterlimit=\'10\' stroke-width=\'2\' d=\'M4 7h22M4 15h22M4 23h22\'/%3e%3c/svg%3e")',
                 'background-size': '100%',
-                'opacity':1
+                'opacity': 1
             });
         }
     });
 
     // Datatable
-    dataTableAttributes($('.datatable-basic.default'), 8);
-    dataTableAttributes($('.datatable-basic.subscriptions'), 6);
+    // dataTableAttributes($('.datatable-basic.default'), 8);
+    // dataTableAttributes($('.datatable-basic.subscriptions'), 6);
     // if (baseDataTable) clickYesDeleteOnModal(baseDataTable, true);
     // if (subscrDataTable) clickYesDeleteOnModal(subscrDataTable, false);
 
@@ -201,7 +175,7 @@ $(document).ready(function () {
             window.inputLoginPassword = null;
             enableLoginModalButtons();
         }
-    })
+    });
 
     const registerModal = $('#register-modal'),
         loginRegisterModal = registerModal.find('input[name=phone]'),
@@ -262,7 +236,7 @@ $(document).ready(function () {
             submitRestorePasswordButton.removeAttr('disabled');
         } else {
             window.inputRestorePasswordPhone = null;
-            submitRestorePasswordButton.attr('disabled','disabled');
+            submitRestorePasswordButton.attr('disabled', 'disabled');
         }
     });
     // AUTH BLOCK END
@@ -336,6 +310,104 @@ $(document).ready(function () {
         }
     });
 
+    // backButton.click(() => {
+    //     backButton.attr('disabled','disabled');
+    //     $.get(backStepUrl, {
+    //         'id': window.orderId ? window.orderId : '',
+    //     }, () => {
+    //         nextPrevStep(true, () => {
+    //             backButton.removeAttr('disabled');
+    //             if (step === 1) {
+    //                 progressBarContainer.addClass('d-none');
+    //                 backButton.addClass('d-none');
+    //             }
+    //             step--;
+    //             setProgressBar(progressBar);
+    //         });
+    //     });
+    // });
+    //
+    // nextButton.click((e) => {
+    //     e.preventDefault();
+    //     resetErrors(form);
+    //     if (preValidation[step]()) {
+    //         if (step === 2) {
+    //             let address = addressInput.val().indexOf('Москва') >= 0 ? addressInput.val() : 'Москва, '+addressInput.val();
+    //             $.get(
+    //                 'https://geocode-maps.yandex.ru/1.x/',
+    //                 {
+    //                     apikey: yandexApiKey,
+    //                     geocode: address,
+    //                     format: 'json'
+    //                 },
+    //                 (data) => {
+    //                     if (parseInt(data.response.GeoObjectCollection.metaDataProperty.GeocoderResponseMetaData.found) === 1) {
+    //                         let updatedAddress = data.response.GeoObjectCollection.featureMember[0].GeoObject.name;
+    //
+    //                         if (window.placemark) window.myMap.geoObjects.remove(window.placemark);
+    //                         let coordinates = data.response.GeoObjectCollection.featureMember[0].GeoObject.Point.pos.split(' '),
+    //                             point = [parseFloat(coordinates[1]),parseFloat(coordinates[0])],
+    //                             newPlacemark = getPlaceMark(point,{});
+    //
+    //                         window.myMap.geoObjects.add(newPlacemark)
+    //                         zoomAndCenterMap();
+    //
+    //                         backButton.attr('disabled','disabled');
+    //                         nextButton.attr('disabled','disabled');
+    //
+    //                         let hiddenIdInput = $('input[name=id]'),
+    //                             fields = {
+    //                             '_token': window.tokenField,
+    //                             'address': updatedAddress,
+    //                             'latitude': point[0],
+    //                             'longitude': point[1]
+    //                         };
+    //
+    //                         if (hiddenIdInput.length) {
+    //                             fields['id'] = hiddenIdInput.val();
+    //                         }
+    //
+    //                         $.post(nextStepUrl, fields,
+    //                         () => {
+    //                             setTimeout(function () {
+    //                                 step++;
+    //                                 setProgressBar(progressBar);
+    //                                 nextPrevStep(false, () => {
+    //                                     backButton.removeAttr('disabled');
+    //                                     nextButton.removeAttr('disabled');
+    //                                 });
+    //                             }, 1500);
+    //                         });
+    //                     } else {
+    //                         addressInput.addClass('error');
+    //                         addressInputError.html(errorCheckAddress);
+    //                     }
+    //                 }
+    //             );
+    //         } else {
+    //             backButton.attr('disabled','disabled');
+    //             getUrl(form, null, () => {
+    //                 step++;
+    //                 if (step) {
+    //                     backButton.removeClass('d-none');
+    //                     progressBarContainer.removeClass('d-none');
+    //                 }
+    //                 setProgressBar(progressBar);
+    //                 if (step !== 4) {
+    //                     nextPrevStep(false, () => {
+    //                         backButton.removeAttr('disabled');
+    //                     });
+    //                 } else {
+    //                     setTimeout(function () {
+    //                         window.location.href = orderPreviewUrl;
+    //                     }, 3000);
+    //                     completeModal.modal('show').on('hidden.bs.modal', () => {
+    //                         window.location.href = orderPreviewUrl;
+    //                     })
+    //                 }
+    //             });
+    //         }
+
     const accountBlock = $('#account-block'),
         userNameInput = accountBlock.find('input[name=name]'),
         userFamilyInput = accountBlock.find('input[name=family]'),
@@ -386,6 +458,7 @@ $(document).ready(function () {
             enableAccountButton();
         }
     });
+});
 
     // // EDIT ORDER BLOCK BEGIN
     // const progressBarContainer = $('#progress-bar'),
@@ -826,7 +899,6 @@ $(document).ready(function () {
     //     });
     // }
     //CHATS BLOCK END
-});
 
 const bindFancybox = () => {
     // Fancybox init
@@ -885,7 +957,7 @@ const enableChangePasswordModalButton = () => {
     if (window.inputChangePasswordOldPassword && window.inputChangePasswordPassword && window.inputChangePasswordConfirmPassword) {
         submitChangePasswordButton.removeAttr('disabled');
     } else {
-        submitChangePasswordButton.attr('disabled','disabled');
+        submitChangePasswordButton.attr('disabled', 'disabled');
     }
 }
 
@@ -1259,15 +1331,296 @@ const imagePreview = (container, defImage) => {
 //     window.myMap.setCenter(point, 17);
 // }
 //
-const dataTableAttributes = (dataTable, rows) => {
-    if (dataTable.length) {
-        dataTable = dataTable.DataTable({iDisplayLength: rows});
+const owlSettings = (margin, nav, timeout, responsive, autoplay) => {
+    let navButtonBlack1 = '<img src="/images/arrow_left.svg" />',
+        navButtonBlack2 = '<img src="/images/arrow_right.svg" />';
+
+    return {
+        margin: margin,
+        loop: autoplay,
+        nav: nav,
+        autoplay: autoplay,
+        autoplayTimeout: timeout,
+        dots: !nav,
+        responsive: responsive,
+        navText: [navButtonBlack1, navButtonBlack2]
+    }
+}
+
+// const nextPrevStep = (reverse, callBack) => {
+//     let stepFadeOut = reverse ? step + 1 : step,
+//         stepFadeIn = reverse ? step : step + 1,
+//         tags = ['head1','head2','inputs','image','description'],
+//         fadeOutSting = '',
+//         fadeInSting = '',
+//         callBackFlag = false;
+//
+//     $.each(tags, (k, tag) => {
+//         let comma = (k + 1 !== tags.length ? ', ' : '');
+//         fadeOutSting += '#' + tag + '-step' + stepFadeOut + comma;
+//         fadeInSting += '#' + tag + '-step' + stepFadeIn + comma;
+//     });
+//
+//     $(fadeOutSting).removeClass('d-block').fadeOut('slow',() => {
+//         $(fadeInSting).removeClass('d-none').fadeIn();
+//         if (callBack && !callBackFlag) {
+//             callBack();
+//             callBackFlag = true;
+//         }
+//     });
+// }
+
+// const setProgressBar = (progressBar) => {
+//     let progress = step * 25 + '%';
+//     progressBar.html(progress);
+//     progressBar.animate({
+//         'width': progress
+//     },'fast');
+// }
+
+// const mapInitWithContainerForEditOrder = () => {
+//     mapInit('image-step3');
+//     if (point.length) {
+//         window.placemark = getPlaceMark(point,{});
+//         window.myMap.geoObjects.add(window.placemark);
+//         zoomAndCenterMap();
+//     }
+// }
+
+// const mapInitWithContainerForOrders = () => {
+//     mapInit('map');
+//     getPoints();
+// }
+
+// const getPoints = () => {
+//     getUrl($('form'), (window.getPreviewFlag ? getPreviewUrl : null), (data) => {
+//         window.placemarks = [];
+//         let orders = data.orders;
+//         window.subscriptions = [];
+//         window.unreadOrders = [];
+//         if (data.subscriptions.length) {
+//             $.each(data.subscriptions, function (k,subscription) {
+//                 window.subscriptions.push(subscription.user_id);
+//                 if (subscription.orders.length) {
+//                     $.each(subscription.orders, function (k,order) {
+//                         window.unreadOrders.push(order.id);
+//                     });
+//                 }
+//             });
+//         }
+//         if (data) {
+//             $.each(orders, function (k,point) {
+//                 let createdAt = new Date(point.created_at),
+//                     meIsPerformer = false;
+//                 if (point.performers.length) {
+//                     for (let p=0;p<point.performers.length;p++) {
+//                         if (point.performers[p].id === userId) {
+//                             meIsPerformer = true;
+//                             break;
+//                         }
+//                     }
+//                 }
+//
+//                 if (!meIsPerformer) {
+//                     window.placemarks.push(getPlaceMark([point.latitude, point.longitude], {
+//                         placemarkId: k,
+//                         // balloonContentHeader: point.order_type.name,
+//                         // balloonContentBody: point.address,
+//                         orderId: point.id,
+//                         name: point.name,
+//                         address: point.address,
+//                         orderType: point.order_type.name,
+//                         images: point.images,
+//                         subtype: point.sub_type ? point.sub_type.name : null,
+//                         need_performers: point.need_performers,
+//                         performers: point.performers.length,
+//                         user: point.user,
+//                         date: createdAt.toLocaleDateString('ru-RU'),
+//                         description_short: point.description_short,
+//                         description_full: point.description_full
+//                     }));
+//
+//                     if (window.getPreviewFlag) {
+//                         window.getPreviewFlag = false;
+//                         forceOpenOrder(0);
+//                     } else if (window.openOrderId && window.openOrderId === point.id) {
+//                         forceOpenOrder(k);
+//                     }
+//                 }
+//             });
+//
+//             // Создаем собственный макет с информацией о выбранном геообъекте.
+//             // let customBalloonContentLayout = ymaps.templateLayoutFactory.createClass([
+//             //     '<ul class=list>',
+//             //     // Выводим в цикле список всех геообъектов.
+//             //     '{% for geoObject in properties.geoObjects %}',
+//             //     '<li><div class="balloon-head">{{ geoObject.properties.balloonContentHeader|raw }}</div><div class="balloon-content">{{ geoObject.properties.balloonContentBody|raw }}</div></li>',
+//             //     '{% endfor %}',
+//             //     '</ul>'
+//             // ].join(''));
+//
+//             window.clusterer = new ymaps.Clusterer({
+//                 preset: 'islands#darkOrangeClusterIcons',
+//                 clusterDisableClickZoom: true,
+//                 clusterOpenBalloonOnClick: false,
+//                 // Устанавливаем режим открытия балуна.
+//                 // В данном примере балун никогда не будет открываться в режиме панели.
+//                 clusterBalloonPanelMaxMapArea: 0,
+//                 // По умолчанию опции балуна balloonMaxWidth и balloonMaxHeight не установлены для кластеризатора,
+//                 // так как все стандартные макеты имеют определенные размеры.
+//                 clusterBalloonMaxHeight: 200,
+//                 // Устанавливаем собственный макет контента балуна.
+//                 // clusterBalloonContentLayout: customBalloonContentLayout,
+//             });
+//
+//             // Click on cluster
+//             // window.clusterer.events.add('click', function (e) {
+//             //     $.each(e.get('target').properties._data.geoObjects, function (k, object) {
+//             //         console.log(object.properties.get('user'));
+//             //     });
+//             // });
+//
+//             window.myMap.geoObjects.events.add('click', function (e) {
+//                 var target = e.get('target');
+//
+//                 target.options.set('iconColor', '#bc202e');
+//                 if (target.properties.get('geoObjects')) {
+//                     if (window.selectedPointsOpened) {
+//                         removeSelectedPoints(target,() => { clickedToCluster(target);});
+//                     } else clickedToCluster(target);
+//                 } else {
+//                     if (window.selectedPointsOpened) {
+//                         removeSelectedPoints(target,() => { clickedToPoint(target);});
+//                     } else clickedToPoint(target);
+//                 }
+//             });
+//             addPointsToMap();
+//         }
+//     });
+// }
+
+// const addPointsToMap = () => {
+//     window.clusterer.add(window.placemarks);
+//     window.myMap.geoObjects.add(window.clusterer);
+// }
+
+// const showOrder = (point) => {
+//     let properties = point.properties,
+//         orderId = properties.get('orderId'),
+//         currentSubType = properties.get('subtype'),
+//         user = properties.get('user'),
+//         orderName = properties.get('name'),
+//         images = properties.get('images'),
+//         descriptionShort = properties.get('description_short'),
+//         descriptionFull = properties.get('description_full'),
+//         orderContainer = $('<div></div>').addClass('order-block mb-3').attr('id','order-'+properties.get('placemarkId'));
+//
+//     // Check subscriptions
+//     let subscribeBellClass = window.subscriptions.includes(user.id) ? 'icon-bell-cross' : 'icon-bell-check',
+//         posUnreadOrder = window.unreadOrders.indexOf(orderId);
+//
+//     if (posUnreadOrder !== -1) {
+//         delete window.unreadOrders[posUnreadOrder];
+//         $.get(
+//             readOrderUrl,
+//             {'order_id': orderId}
+//         ).done(() => {
+//             $('#unread-order-' + orderId).remove();
+//             checkDropDownMenuEmpty();
+//         });
+//     }
+//
+//     orderContainer
+//         .append(
+//             $('<h6></h6>').addClass('order-number').html(orderNumberText + orderId + fromText + properties.get('date'))
+//         ).append(
+//             $('<div></div>').addClass('w-100 d-flex align-items-center justify-content-between')
+//                 .append(
+//                     $('<div></div>').addClass('d-flex align-items-center justify-content-center')
+//                         .append(
+//                             getAvatarBlock(user, 0.35)
+//                         ).append(
+//                             $('<div></div>').css('width',215)
+//                                 .append(
+//                                     $('<div></div>').addClass('ms-3 fs-lg-6 fs-sm-7 user-name').html(getUserName(user))
+//                                 ).append(
+//                                     $('<div></div>').addClass('fs-lg-6 fs-sm-7 ms-3 user-age').html('')
+//                                 )
+//                             )
+//                     ).append($('<i></i>').addClass('subscribe-icon ' + subscribeBellClass))
+//         );
+//     getUserAge(user.id);
+//
+//     if (images.length) {
+//         let imagesContainer = $('<div></div>').addClass('images owl-carousel mt-3');
+//         $.each(images, function (k, image) {
+//             imagesContainer.append(
+//                 $('<a></a>').addClass('fancybox').attr('href','/' + image.image).append(
+//                     $('<div></div>').addClass('image').css('background-image','url(/'+image.image+')')
+//                 )
+//             );
+//         });
+//         orderContainer.append(imagesContainer);
+//         enablePointImagesCarousel(imagesContainer,images.length > 1);
+//     }
+//
+//     orderContainer.append($('<h2></h2>').addClass('order-name text-dark text-left mt-3 mb-4').html(orderName));
+//     orderContainer.append($('<h2></h2>').addClass('order-type text-dark text-left mt-3 h5').html(properties.get('orderType')));
+//
+//     if (currentSubType) {
+//         let subTypesContainer = $('<ul></ul>').addClass('subtypes').append($('<li></li>').html(currentSubType));
+//         orderContainer.append(subTypesContainer);
+//     }
+//
+//     orderContainer.append($('<p></p>').addClass('mb-1 text-left').html('<b>' + addressText +'</b>: ' + properties.get('address')));
+//
+//     if (descriptionShort) {
+//         orderContainer
+//             .append(
+//                 $('<p></p>').addClass('fw-bold text-left mt-2 mb-0').html(descriptionShortText + ':')
+//             ).append(
+//             $('<p></p>').addClass('text-left order-description mb-1').html(descriptionShort)
+//         );
+//     }
+//
+//     if (descriptionFull) {
+//         orderContainer
+//             .append(
+//                 $('<p></p>').addClass('fw-bold text-left mt-0 mb-2')
+//                     .append($('<a></a>').addClass('description-full').html(descriptionFullText + ' »'))
+//             );
+//     }
+//
+//     orderContainer
+//         .append(
+//             $('<p></p>').addClass('text-left mb-2').html(
+//                 '<b>' + numberOfPerformersText + ':</b> ' + properties.get('performers') + outOfText + properties.get('need_performers')
+//             )
+//         );
+//
+//     if (userId !== user.id) {
+//         orderContainer.append($('<button></button>').addClass('respond-button btn btn-primary w-100').attr('type','button').append($('<span></span>').html(respondToAnOrderText)));
+//     }
+//
+//     orderContainer.append($('<button></button>').addClass('cb-copy btn btn-primary w-100 mt-3').attr({
+//         'type':'button',
+//         'order_id':properties.get('orderId')
+//     }).append($('<span></span>').html(copyOrderHrefToClipboardText)));
+//
+//     orderContainer.append($('<hr>'));
+//     window.pointsContainer.append(orderContainer);
+//     bindFancybox();
+// }
+
+// const removeSelectedPoints = (target, callBack) => {
+//     if ( (window.cickedTarget && !target) || (window.cickedTarget && target && window.cickedTarget !== target) ) {
+//         window.cickedTarget.options.set('iconColor', '#e6761b');
 
         // Change pagination on data-tables
         // bindChangePagination(dataTable);
         // bindDelete();
-    }
-}
+//     }
+// }
 
 // const clickYesDeleteOnModal = (dataTable, useCounter) => {
 //     // Click YES on delete modal
@@ -1853,15 +2206,16 @@ const dataTableAttributes = (dataTable, rows) => {
 //     setBindsAndOpen();
 // }
 //
-const bindOrderOperation = (modalConfirm, buttonClass) => {
-    let buttons = $('.' + buttonClass);
-    buttons.unbind();
-    buttons.click(function () {
-        window.tableRow = $(this).parents('tr');
-        window.orderId = getId(window.tableRow, 'row-', true);
-        modalConfirm.modal('show');
-    });
-}
+// const bindOrderOperation = (modalConfirm, buttonClass) => {
+//     let buttons = $('.' + buttonClass);
+//     buttons.unbind();
+//     buttons.click(function () {
+//         window.tableRow = $(this).parents('tr');
+//         window.orderId = getId(window.tableRow, 'row-', true);
+//         modalConfirm.modal('show');
+//     });
+// }
+
 //
 // const checkDropDownMenuEmpty = () => {
 //     if (!window.dropDown.html()) {
@@ -1901,3 +2255,29 @@ const bindOrderOperation = (modalConfirm, buttonClass) => {
 //         }
 //     );
 // }
+
+const bellRing = (degrees) => {
+    window.rightButtonBlock.css({'-webkit-transform' : 'rotate('+ degrees +'deg)',
+        '-moz-transform' : 'rotate('+ degrees +'deg)',
+        '-ms-transform' : 'rotate('+ degrees +'deg)',
+        'transform' : 'rotate('+ degrees +'deg)'});
+}
+
+const getAvatarBlock = (user, coof) => {
+    let avatar = user.avatar ? user.avatar : '/images/def_avatar.svg';
+    return $('<div></div>').addClass('avatar cir').css(getAvatarProps(avatar, user.avatar_props, coof));
+}
+
+const getAvatarProps = (avatar, props, coof) => {
+    let avatarProps = {'background-image':'url('+avatar+')'};
+    if (props) {
+        $.each(props, function (prop, value) {
+            avatarProps[prop] = (prop === 'background-size' ? value : value * coof);
+        });
+    }
+    return avatarProps;
+}
+
+const getUserName = (user) => {
+    return user.name + ' ' + user.family;
+}

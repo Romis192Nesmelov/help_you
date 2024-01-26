@@ -39,7 +39,6 @@ class AccountController extends BaseController
 
     public function myOrders(): View
     {
-        $this->setReadUnread(new ReadPerformer());
         $this->setReadUnread(new ReadStatusOrder());
         $this->data['orders'] = [
             'active' => Auth::user()->ordersActiveAndApproving,

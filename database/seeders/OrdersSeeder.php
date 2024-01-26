@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\InformingOrder;
 use App\Models\Order;
 //use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use App\Models\OrderUser;
@@ -30,25 +31,17 @@ class OrdersSeeder extends Seeder
             'longitude' => 37.612245,
             'description_short' => 'Чета с кем-то где-то что-то и когда-то надо срочно сделать, а то край!',
             'approved' => 1,
-            'status' => 2
+            'status' => 1
         ]);
 
-//        OrderUser::create([
-//            'order_id' => $order->id,
-//            'user_id' => $anotherUser->id
-//        ]);
+        OrderUser::create([
+            'order_id' => $order->id,
+            'user_id' => $anotherUser->id
+        ]);
 
-//        $performers = [
-//            User::where('phone','+7(958)815-85-65')->select('id')->first(),
-//            User::where('phone','+7(925)521-37-45')->select('id')->first(),
-//            User::where('phone','+7(926)206-39-77')->select('id')->first()
-//        ];
-//
-//        foreach ($performers as $performer) {
-//            OrderUser::create([
-//                'order_id' => $order->id,
-//                'user_id' => $performer->id
-//            ]);
-//        }
+//        InformingOrder::create([
+//            'message' => trans('content.to_over_order'),
+//            'order_id' => $order->id
+//        ]);
     }
 }

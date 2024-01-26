@@ -205,7 +205,7 @@ class OrderController extends BaseController
 
             broadcast(new NotificationEvent('new_performer', $order, $order->user_id));
             $this->mailNotice($order, $order->userCredentials, 'new_performer_notice');
-            $this->newChatMessage($order);
+            if (!$order->messages->count()) $this->chatMessage($order, trans('content.new_chat_message'));
 
             broadcast(new NotificationEvent('new_order_status', $order, $order->user_id));
             $this->mailNotice($order, $order->userCredentials, 'new_order_status_notice');
@@ -274,14 +274,23 @@ class OrderController extends BaseController
                 $fieldName = 'photo'.$i;
                 $imageFields = $this->processingImage($request, [], $fieldName, 'images/orders_images/', 'order'.$order->id.'_'.$i);
                 if (count($imageFields)) {
-                    OrderImage::create([
-                        'position' => $i,
-                        'image' => $imageFields[$fieldName],
-                        'order_id' => $order->id
-                    ]);
+                    $orderImage = OrderImage::where('position',$i)->where('order_id',$order->id)->first();
+                    if ($orderImage) {
+                        $orderImage->image = $imageFields[$fieldName];
+                        $orderImage->save();
+                    } else {
+                        OrderImage::create([
+                            'position' => $i,
+                            'image' => $imageFields[$fieldName],
+                            'order_id' => $order->id
+                        ]);
+                    }
                 }
             }
-            return response()->json(['order' => $order],200);
+            return response()->json([
+                'order' => $order,
+                'image_fields' => $imageFields ?? 'none'
+            ],200);
         } else {
             return response()->json([],200);
         }

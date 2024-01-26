@@ -53,7 +53,7 @@
                     @include('blocks.button_block',[
                         'addClass' => 'close-order micro',
                         'primary' => false,
-                        'buttonText' => trans('content.close')
+                        'buttonText' => trans('content.over')
                     ])
                 </td>
             @elseif ($order->status == 2 && (!isset($chatMode) || !$chatMode))

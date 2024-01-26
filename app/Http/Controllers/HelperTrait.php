@@ -1,8 +1,10 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Events\ChatMessageEvent;
 use App\Events\NotificationEvent;
 use App\Jobs\SendMessage;
+use App\Models\InformingOrder;
 use App\Models\Message;
 use App\Models\MessageUser;
 use App\Models\Order;
@@ -60,21 +62,41 @@ trait HelperTrait
         return $request->has('id') && (int)$request->input('id') ? 'edit'.$request->id.'_steps' : 'steps';
     }
 
-    public function newChatMessage(Order $order): void
+    public function checkOrdersInProgress(): void
     {
-        if (!$order->messages->count()) {
-            $message = Message::create([
-                'body' => trans('content.new_chat_message'),
-                'user_id' => 1,
+        $ordersInProgress = Order::where('status',1)->get();
+        foreach ($ordersInProgress as $order) {
+            $checkingTime = $order->updated_at->timestamp + (60 * 60 * 24 * 7);
+            if (time() >= $checkingTime) $this->checkAndSendInforming($order, trans('content.to_over_order'), 0);
+        }
+    }
+
+    public function checkAndSendInforming(Order $order, string $message, int $checkingTime): void
+    {
+        $lastMessage = InformingOrder::where('message',$message)->where('order_id',$order->id)->orderBy('created_at','desc')->first();
+        if (!$lastMessage || time() >= $lastMessage->created_at->timestamp + $checkingTime) {
+            $this->chatMessage($order, $message);
+            InformingOrder::create([
+                'message' => $message,
                 'order_id' => $order->id
             ]);
-            $this->setNewMessages($message);
         }
+    }
+
+    public function chatMessage(Order $order, string $message): void
+    {
+        $message = Message::create([
+            'body' => $message,
+            'user_id' => 1,
+            'order_id' => $order->id
+        ]);
+        $this->setNewMessages($message);
+        broadcast(new ChatMessageEvent($message));
     }
 
     public function setNewMessages(Message $message): void
     {
-        if (Auth::id() != $message->order->user_id) {
+        if (!Auth::check() || Auth::id() != $message->order->user_id) {
             MessageUser::create([
                 'message_id' => $message->id,
                 'user_id' => $message->order->user_id,
@@ -83,8 +105,9 @@ trait HelperTrait
             broadcast(new NotificationEvent('new_message', $message->order, $message->order->user_id));
             $this->mailNotice($message->order, $message->order->userCredentials, 'new_message_notice');
         }
+
         foreach ($message->order->performers as $performer) {
-            if (Auth::id() != $performer->id) {
+            if (!Auth::check() || Auth::id() != $performer->id) {
                 MessageUser::create([
                     'message_id' => $message->id,
                     'user_id' => $performer->id,
