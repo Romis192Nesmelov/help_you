@@ -8,15 +8,15 @@
         <div class="w-100 d-flex justify-content-center">
             <div class="w-75 mt-3 ui-slider-value"></div>
         </div>
-        <div class="modal-footer">
+        <div class="modal-footer justify-content-center">
             <ButtonComponent
-                class="btn btn-primary w-50 m-auto mt-3"
+                class="btn btn-primary w-25 mt-3"
                 data-bs-dismiss='modal'
                 text="Закрыть"
                 @click="resetAvatar"
             ></ButtonComponent>
             <ButtonComponent
-                class="btn btn-primary w-50 m-auto mt-3"
+                class="btn btn-primary w-25 mt-3"
                 text="Сохранить"
                 data-bs-dismiss='modal'
                 @click="saveAvatar"
@@ -30,6 +30,7 @@
                 <div class="w-100">
                     <div class="d-flex align-items-center justify-content-start">
                         <AvatarComponent
+                            :small=false
                             :avatar_image="userObj.avatar"
                             :avatar_props="userObj.avatar_props"
                             :avatar_coof=0.35
@@ -38,7 +39,7 @@
                             :input_image_hover="input_image_hover"
                             @onload-avatar="avatarTune"
                         ></AvatarComponent>
-                        <div class="fs-lg-6 fs-sm-7 ms-3">Добро пожаловать,<br>{{ userObj.name ? userObj.name + ' ' + userObj.family : userObj.phone }}!</div>
+                        <div class="fs-lg-6 fs-sm-7 ms-3">Добро пожаловать,<br><UserNameComponent :user="userObj"></UserNameComponent>!</div>
                         <div class="error" v-if="errors['avatar']">{{ errors['avatar'] }}</div>
                     </div>
                 </div>
@@ -61,12 +62,14 @@
 
 <script>
 import AvatarComponent from "./blocks/AvatarComponent.vue";
+import UserNameComponent from "./blocks/UserNameComponent.vue";
 import ModalComponent from "./blocks/ModalComponent.vue";
 import ButtonComponent from "./blocks/ButtonComponent.vue";
 export default {
     name: "LeftMenuComponent",
     components: {
         AvatarComponent,
+        UserNameComponent,
         ModalComponent,
         ButtonComponent
     },

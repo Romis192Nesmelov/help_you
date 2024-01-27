@@ -1,47 +1,18 @@
 @extends('layouts.main')
 
 @section('content')
-
-@include('blocks.modal_delete_block',[
-    'action' => 'account.delete_subscription',
-    'head' => trans('content.do_you_really_want_to_unsubscribe')
-])
-
 <div class="row">
-    @include('blocks.left_menu_block',['hasChangeAvatar' => false])
-    <div id="my-subscriptions" class="col-12 col-lg-8 right-block">
-        <div class="rounded-block tall">
-            <h2>{{ trans('account.my_subscriptions') }}</h2>
-            <div id="content-my-subscriptions" class="content-block simple">
-                @if ($unread_orders->count())
-                    <table class="table datatable-basic default">
-                        @foreach ($unread_orders as $unread_order)
-                            <tr class="row-{{ $unread_order->order->id }}">
-                                <td class="id">{{ $unread_order->order->id }}</td>
-                                <td class="cell-avatar">
-                                    @include('blocks.avatar_block', ['user' => $unread_order->order->user, 'coof' => 0.35])
-                                </td>
-                                <td>
-                                    <div class="head">@include('blocks.user_name_block',['user' => $unread_order->order->user])</div>
-                                    <div class="content user-age">{{ getUserAge($unread_order->order->user) }}</div>
-                                </td>
-                                <td>
-                                    <div class="head"><a href="{{ route('order.orders',['id' => $unread_order->order->id]) }}">{{ $unread_order->order->orderType->name }}</a></div>
-                                    <div class="content">{{ trans('content.address').': '.$unread_order->order->address }}</div>
-                                </td>
-                                @include('blocks.del_dt_row_block', [
-                                    'id' => $unread_order->subscription->id,
-                                    'icon' => 'icon-bell-cross',
-                                    'title' => trans('account.unsubscribe')
-                                ])
-                            </tr>
-                        @endforeach
-                    </table>
-                @endif
-                <h4 class="no-data-block text-uppercase text-secondary {{ $unread_orders->count() ? 'd-none' : '' }}">{{ trans('content.no_data') }}</h4>
-            </div>
-        </div>
-    </div>
+    <left-menu-component
+        user="{{ json_encode(auth()->user()) }}"
+        allow_change_avatar="0"
+        left_menu="{{ json_encode($leftMenu) }}"
+        logout_url="{{ route('auth.logout') }}"
+        active_left_menu="{{ $active_left_menu }}"
+    ></left-menu-component>
+    <my-subscriptions-component
+        user_id="{{ auth()->id() }}"
+        unsubscribe_url="{{ route('account.delete_subscription') }}"
+        orders_urls="{{ json_encode(['open' => route('account.my_unread_subscriptions')]) }}"
+    ></my-subscriptions-component>
 </div>
-<script> const unsubscribeText = "{{ trans('account.unsubscribe') }}";</script>
 @endsection

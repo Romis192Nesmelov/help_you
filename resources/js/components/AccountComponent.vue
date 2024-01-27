@@ -159,7 +159,6 @@ import ModalComponent from "./blocks/ModalComponent.vue";
 import InputComponent from "./blocks/InputComponent.vue";
 import TextAreaComponent from "./blocks/TextAreaComponent.vue";
 import ButtonComponent from "./blocks/ButtonComponent.vue";
-import AvatarComponent from "./blocks/AvatarComponent.vue";
 import GetCodeAgainComponent from "./blocks/GetCodeAgainComponent.vue";
 import RegisterComponent from "./RegisterComponent.vue";
 
@@ -167,7 +166,6 @@ export default {
     extends: RegisterComponent,
     name: "AccountComponent",
     components: {
-        AvatarComponent,
         InputComponent,
         TextAreaComponent,
         ModalComponent,

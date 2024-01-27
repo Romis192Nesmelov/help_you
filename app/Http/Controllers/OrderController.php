@@ -117,7 +117,6 @@ class OrderController extends BaseController
             'orders' => Order::query()
                 ->where('user_id',Auth::id())
                 ->where('status',2)
-                ->where('approved',0)
                 ->filtered()
                 ->with(['orderType','subType','images','user','performers'])
                 ->orderByDesc('created_at')
@@ -129,10 +128,10 @@ class OrderController extends BaseController
         );
     }
 
-    public function getUserAge(UserAgeRequest $request): JsonResponse
-    {
-        return response()->json(['age' => getUserAge(User::find($request->id))]);
-    }
+//    public function getUserAge(UserAgeRequest $request): JsonResponse
+//    {
+//        return response()->json(['age' => getUserAge(User::find($request->id))]);
+//    }
 
     /**
      * @throws \Illuminate\Auth\Access\AuthorizationException
@@ -246,8 +245,7 @@ class OrderController extends BaseController
             $fields = [
                 'city_id' => 1,
                 'user_id' => Auth::id(),
-                'status' => 2,
-                'approved' => 1
+                'status' => 3
             ];
             // Statuses: 2 – new; 1 – in progress; 0 – closed
 
@@ -391,8 +389,7 @@ class OrderController extends BaseController
     {
         $order = Order::find($request->id);
         $this->authorize('owner', $order);
-        $order->status = 2;
-        $order->approved = 0;
+        $order->status = 3;
         $order->save();
 
         OrderUser::where('order_id',$request->id)->delete();

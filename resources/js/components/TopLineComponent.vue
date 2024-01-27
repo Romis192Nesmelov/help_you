@@ -105,10 +105,6 @@
                         «{{ ordersStatuses[news.status] }}»
                         <hr>
                     </li>
-                    <li v-for="(news, id) in newOrdersApproved" :key="id">
-                        <a :href="my_orders_url">Заявка №:{{ news.order_id }} одобрена!</a>
-                        <hr>
-                    </li>
                 </ul>
             </div>
 
@@ -175,7 +171,6 @@ export default {
             newsPerformers: {},
             newsRemovedPerformers: {},
             newsStatusOrders: {},
-            newOrdersApproved: {},
             ordersStatuses: []
         }
     },
@@ -186,7 +181,6 @@ export default {
                 !isEmptyObject(this.newsSubscriptions) ||
                 !isEmptyObject(this.newsPerformers) ||
                 !isEmptyObject(this.newsRemovedPerformers) ||
-                !isEmptyObject(this.newOrdersApproved) ||
                 !isEmptyObject(this.newsStatusOrders)
             );
         },
@@ -272,10 +266,6 @@ export default {
                         self.newsPerformers['new_performer'+res.order.id] = res.order;
                         ordersEventFlag = true;
                         break;
-                    case 'order_approved':
-                        self.newOrdersApproved['approve'+res.order.d] = res.order;
-                        ordersEventFlag = true;
-                        break;
                     case 'new_order_status':
                         self.newsStatusOrders['status'+res.order.d] = res.order;
                         if (!res.order.status) this.deleteOrderNotice(res.order.id);
@@ -299,7 +289,6 @@ export default {
             if (ordersEventFlag) {
                 window.emitter.emit('my-orders',
                     !$.isEmptyObject(this.newsPerformers) ||
-                    !$.isEmptyObject(this.newOrdersApproved) ||
                     !$.isEmptyObject(this.newsStatusOrders)
                 );
             }
@@ -310,7 +299,6 @@ export default {
                 'order':self.newsMessages,
                 'subscription:':self.newsSubscriptions,
                 'performer':self.newsPerformers,
-                'approve':self.newOrdersApproved,
                 'status':self.newsStatusOrders
             }, function (key,news) {
                 let newsKey = key + orderId;

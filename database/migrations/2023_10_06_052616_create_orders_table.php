@@ -28,7 +28,6 @@ return new class extends Migration
             $table->double('longitude',8, 6);
             $table->string('description_short')->nullable();
             $table->text('description_full')->nullable();
-            $table->boolean('approved');
             $table->tinyInteger('status');
             $table->timestamps();
         });

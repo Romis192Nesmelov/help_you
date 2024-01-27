@@ -5,7 +5,9 @@ import MessageComponent from "./components/MessageComponent.vue";
 import TopLineComponent from "./components/TopLineComponent.vue";
 import LeftMenuComponent from "./components/LeftMenuComponent.vue";
 import AccountComponent from "./components/AccountComponent.vue";
-import OrderListComponent from "./components/OrderListComponent.vue";
+import MyOrdersListComponent from "./components/MyOrdersListComponent.vue";
+import MyHelpListComponent from "./components/MyHelpListComponent.vue";
+import MySubscriptionsComponent from "./components/MySubscriptionsComponent.vue";
 
 const app = createApp({
     components: {
@@ -13,9 +15,58 @@ const app = createApp({
         TopLineComponent,
         LeftMenuComponent,
         AccountComponent,
-        OrderListComponent
+        MyOrdersListComponent,
+        MyHelpListComponent,
+        MySubscriptionsComponent
     }
 });
+
+window.toCamelize = str => str.replace(/-|_./g, x=>x[1].toUpperCase());
+window.getUserAge = (born) => {
+    let now = new Date(),
+        bornArr = born.split('-');
+    let age = now.getFullYear() - parseInt(bornArr[2]);
+    if (now.getMonth() + 1 <= parseInt(bornArr[1]) && now.getDay() < parseInt(bornArr[1])) {
+        age--;
+    }
+    let lastDigit = age.toString().substr(-1,1),
+        word;
+
+    if (lastDigit === 0) word = 'лет';
+    else if (lastDigit === 1) word = 'год';
+    else if (lastDigit > 1 && lastDigit < 5) word = 'года';
+    else word = 'лет';
+
+    return age + ' ' + word;
+};
+window.userRating = (ratings) => {
+    if (ratings.length) {
+        let ratingVal = 0;
+        $.each(ratings, function (k,rating) {
+            ratingVal += rating.value;
+        });
+        return Math.round(ratingVal/ratings.length);
+    } else return 0;
+};
+window.showMessage = (message) => {
+    const messageModal = $('#message-modal');
+    messageModal.find('h4').html(message);
+    messageModal.modal('show');
+};
+
+window.addLoader = () => {
+    $('body').prepend(
+        $('<div></div>').attr('id', 'loader').append($('<div></div>'))
+    ).css({
+        'overflow-y': 'hidden',
+        'padding-right': 20
+    });
+}
+
+window.removeLoader = () => {
+    $('#loader').remove();
+    $('body').css('overflow-y', 'auto');
+};
 
 window.emitter = mitt();
 app.config.globalProperties.emitter = window.emitter;
@@ -37,32 +88,10 @@ window.inputChangePasswordOldPassword = '';
 window.inputChangePasswordPassword = '';
 window.inputChangePasswordConfirmPassword = '';
 
-window.toCamelize = str => str.replace(/-|_./g, x=>x[1].toUpperCase());
-
 $(document).ready(function () {
     // console.log(window.toCamelize('kebab_case'));
 
     // MAIN BLOCK BEGIN
-    window.showMessage = (message) => {
-        const messageModal = $('#message-modal');
-        messageModal.find('h4').html(message);
-        messageModal.modal('show');
-    };
-
-    window.addLoader = () => {
-        $('body').prepend(
-            $('<div></div>').attr('id', 'loader').append($('<div></div>'))
-        ).css({
-            'overflow-y': 'hidden',
-            'padding-right': 20
-        });
-    }
-
-    window.removeLoader = () => {
-        $('#loader').remove();
-        $('body').css('overflow-y', 'auto');
-    };
-
     $('.form-group.has-label i.icon-eye').click(function () {
         let cover = $(this).parents('.form-group'),
             input = cover.find('input');
@@ -113,36 +142,6 @@ $(document).ready(function () {
             });
         }
     });
-
-    // Datatable
-    // dataTableAttributes($('.datatable-basic.default'), 8);
-    // dataTableAttributes($('.datatable-basic.subscriptions'), 6);
-    // if (baseDataTable) clickYesDeleteOnModal(baseDataTable, true);
-    // if (subscrDataTable) clickYesDeleteOnModal(subscrDataTable, false);
-
-    // Click to delete items
-    // window.deleteId = null;
-    // window.deleteRow = null;
-
-    // Top menu tabs
-    // const topMenu = $('.rounded-block.tall .top-submenu');
-    // topMenu.find('a').click(function (e) {
-    //     e.preventDefault();
-    //     const parent = $(this).parents('.tab');
-    //     if (!parent.hasClass('active')) {
-    //         let currentActiveTab = topMenu.find('.tab.active'),
-    //             currentActiveTabId = getId(currentActiveTab.find('a'), 'top-submenu-', false),
-    //             currentContent = $('#content-'+currentActiveTabId),
-    //             newActiveIdTabId = getId($(this), 'top-submenu-', false),
-    //             newContent = $('#content-'+newActiveIdTabId);
-    //
-    //         currentActiveTab.removeClass('active');
-    //         parent.addClass('active');
-    //         currentContent.fadeOut(() => {
-    //             newContent.css('display','none').fadeIn();
-    //         });
-    //     }
-    // });
     // MAIN BLOCK END
 
     // AUTH BLOCK BEGIN
@@ -240,13 +239,6 @@ $(document).ready(function () {
         }
     });
     // AUTH BLOCK END
-
-    // window.modalClosingConfirm = $('#order-closing-confirm-modal');
-    // window.modalResumedConfirm = $('#order-resume-confirm-modal');
-
-    // const orderClosedModal = $('#order-closed-modal'),
-    //     orderResumedModal = $('#order-resumed-modal'),
-    //     ordersActiveTable = $('#content-active').find('table.datatable-basic.default');
 
     // ACCOUNT BLOCK BEGIN
     imagePreview(window.avatarBlock, '/images/def_avatar.svg');
@@ -715,66 +707,6 @@ $(document).ready(function () {
     //     }
     // });
     // // ORDERS BLOCK END
-    //
-    // // ORDERS LIST BLOCK BEGIN
-    // bindOrderOperation(window.modalClosingConfirm,'close-order');
-    // bindOrderOperation(window.modalResumedConfirm,'resume-order');
-    //
-    // // Moving order to archive
-    // $('button.close-yes').click(function (e) {
-    //     e.preventDefault();
-    //     window.modalClosingConfirm.modal('hide');
-    //     orderClosedModal.find('input[name=order_id]').val(window.orderId);
-    //     $.post(closeOrderUrl, {
-    //         '_token': window.tokenField,
-    //         'id': window.orderId,
-    //     }, () => {
-    //         movingOrderToArchive(window.tableRow);
-    //         orderClosedModal.modal('show');
-    //     });
-    // });
-    //
-    // // Moving order to in approving
-    // $('button.resume-yes').click(function (e) {
-    //     e.preventDefault();
-    //     window.modalResumedConfirm.modal('hide');
-    //     $.post(resumeOrderUrl, {
-    //         '_token': window.tokenField,
-    //         'id': window.orderId,
-    //     }, () => {
-    //         movingOrderToApproving(window.tableRow);
-    //         orderResumedModal.modal('show');
-    //     });
-    // });
-    //
-    // // Set rating
-    // let ratingForm = $('form.rating-form');
-    // ratingForm.find('i').click(function () {
-    //     let parentForm = $(this).parents('form'),
-    //         ratingInput = parentForm.find('input[name=rating]'),
-    //         ratingVal = getId($(this), 'rating-star-', true);
-    //
-    //     ratingInput.val(ratingVal);
-    //     ratingForm.find('i').each(function () {
-    //         let currentStarVal = getId($(this), 'rating-star-', true);
-    //         if (currentStarVal <= ratingVal && $(this).hasClass('icon-star-empty3')) {
-    //             $(this).removeClass('icon-star-empty3').addClass('icon-star-full2');
-    //         } else if (currentStarVal > ratingVal && $(this).hasClass('icon-star-full2')) {
-    //             $(this).removeClass('icon-star-full2').addClass('icon-star-empty3');
-    //         }
-    //     });
-    // });
-    //
-    // ratingForm.submit(function (e) {
-    //     e.preventDefault();
-    //     getUrl(ratingForm, null, (data) => {
-    //         orderClosedModal.modal('hide');
-    //     });
-    // });
-    //
-    // // Show order performers modal
-    // bindOrderPerformersList();
-    // // ORDERS LIST BLOCK END
     //
     // //CHATS BLOCK BEGIN
     // const messagesBlock = $('#messages'),
@@ -2223,21 +2155,6 @@ const owlSettings = (margin, nav, timeout, responsive, autoplay) => {
 //     }
 //
 //
-// }
-//
-// const getAvatarBlock = (user, coof) => {
-//     let avatar = user.avatar ? user.avatar : '/images/def_avatar.svg';
-//     return $('<div></div>').addClass('avatar cir').css(getAvatarProps(avatar, user.avatar_props, coof));
-// }
-//
-// const getAvatarProps = (avatar, props, coof) => {
-//     let avatarProps = {'background-image':'url('+avatar+')'};
-//     if (props) {
-//         $.each(props, function (prop, value) {
-//             avatarProps[prop] = (prop === 'background-size' ? value : value * coof);
-//         });
-//     }
-//     return avatarProps;
 // }
 //
 // const getId = (obj, replace, returnInt) => {

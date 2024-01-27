@@ -45,8 +45,17 @@ Route::prefix('account')->name('account.')->controller(AccountController::class)
     Route::get('/change', 'account')->name('change');
     Route::get('/messages', 'messages')->name('messages');
     Route::get('/my-subscriptions', 'mySubscriptions')->name('my_subscriptions');
+    Route::get('/my-unread-subscriptions', 'getMyUnreadSubscriptions')->name('my_unread_subscriptions');
     Route::get('/my-orders', 'myOrders')->name('my_orders');
+
+    Route::get('/my-orders-active', 'getMyOrdersActive')->name('my_orders_active');
+    Route::get('/my-orders-open', 'getMyOrdersOpen')->name('my_orders_open');
+    Route::get('/my-orders-approving', 'getMyOrdersApproving')->name('my_orders_approving');
+    Route::get('/my-orders-archive', 'getMyOrdersArchive')->name('my_orders_archive');
+
     Route::get('/my-help', 'myHelp')->name('my_help');
+    Route::get('/my-help-active', 'getMyHelpActive')->name('my_help_active');
+    Route::get('/my-help-archive', 'getMyHelpArchive')->name('my_help_archive');
     Route::get('/incentives', 'account')->name('incentives');
     Route::get('/subscription', 'subscription')->name('subscription');
 });

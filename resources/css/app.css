@@ -168,6 +168,11 @@ ul.subtypes li {
     color: grey;
 }
 
+i.orange {
+    color: #e65639;
+    cursor: pointer;
+}
+
 ul.subtypes li::before {
     content: "\2022";
     color: #e65639;
@@ -254,7 +259,42 @@ table {
     height: 230px;
 }
 
+.item-in-list {
+    height: 100%;
+    background: inherit;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border-radius: 10px;
+    margin-top: 10px;
+    border: 1px solid #e65639;
+    box-shadow: 1px 1px 3px #adadad;
+}
 
+.paginate-button {
+    width: 30px;
+    height: 30px;
+    border-radius: 3px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 3px;
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+    color: #e65639;
+    border: 1px solid #e65639;
+}
+
+.paginate-button i {
+    font-size: 14px;
+}
+
+.paginate-button:hover,
+.paginate-button.active {
+    background: #e65639;
+    color: white;
+}
 
 .order-photo {
     width: 100%;
@@ -531,7 +571,7 @@ button.btn > i {
     width: 100%;
     border-radius: 20px;
     padding: 54px;
-    font-size: 20px;
+    font-size: 18px;
     background-color: #f5f3f0;
     position: relative;
     overflow: hidden;
@@ -572,6 +612,10 @@ button.btn > i {
 .rounded-block.tall {
     min-height: 825px;
     height: auto;
+}
+
+.rounded-block.tall .h-100 {
+    height: 630px !important;
 }
 
 #map-container {
@@ -642,24 +686,6 @@ button.btn > i {
     height: 250px;
     background-size: cover;
     background-position: center center;
-}
-
-.rounded-block.tall .content-block {
-    width: 100%;
-    height: 625px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-.rounded-block.tall .content-block.simple {
-    height: 675px;
-}
-
-.rounded-block.tall .content-block .dataTables_wrapper {
-    width: 100%;
-    align-self: flex-start;
 }
 
 .rounded-block.three-quarter {
@@ -837,12 +863,8 @@ button.btn > i {
 }
 
 .rounded-block .top-submenu {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: start;
-    border-bottom: 1px solid #e65639;
     margin-bottom: 5px;
+    border-bottom: 1px solid #e65639;
 }
 
 .rounded-block .top-submenu > div {
@@ -857,14 +879,6 @@ button.btn > i {
 
 .rounded-block .top-submenu > div.active {
     border-bottom: 3px solid #b52407;
-}
-
-.rounded-block.tall .content-block .datatable-scroll {
-    height: 520px;
-}
-
-.rounded-block.tall .content-block.simple .datatable-scroll {
-    height: 575px;
 }
 
 #messages {
@@ -925,7 +939,7 @@ button.btn > i {
     padding: 10px;
 }
 
-#messages .message-row .message-block .avatar.cir {
+.avatar.cir.small {
     width: 40px;
     min-width: 40px;
     height: 40px;
@@ -966,7 +980,7 @@ button.btn > i {
 }
 
 .rating-line i {
-    font-size: 25px;
+    font-size: 22px;
     margin-left: 5px;
     cursor: pointer;
 }
@@ -1024,12 +1038,6 @@ button.btn > i {
 .chat-input .chat-attach-file:hover i,
 .chat-input i:hover {
     color: #e65639;
-}
-
-.rounded-block.tall .absolute-bottom {
-    position: absolute;
-    bottom: 55px;
-    right: 55px;
 }
 
 #map-image-block {
@@ -1213,7 +1221,6 @@ button.btn > i {
 
     .rounded-block {
         height: 280px;
-        font-size: 14px;
         padding: 30px;
     }
 
@@ -1223,16 +1230,6 @@ button.btn > i {
 
     .rounded-block ul.menu li {
         font-size: 14px;
-    }
-
-    .rounded-block.tall .content-block,
-    .rounded-block.tall .content-block-simple {
-        height: auto;
-        min-height: 200px;
-    }
-
-    .rounded-block.tall .content-block .datatable-scroll {
-        height: auto;
     }
 
     .rounded-block.tall,
@@ -1286,11 +1283,6 @@ button.btn > i {
         bottom: auto;
     }
 
-    .rounded-block.tall .absolute-bottom {
-        right: 30px;
-        bottom: 30px;
-    }
-
     #avatar-block {
         width: calc(100% + 60px);
         margin-left: -30px;
@@ -1302,14 +1294,6 @@ button.btn > i {
 }
 
 @media (max-width: 768px) {
-    .rounded-block.tall .absolute-bottom {
-        position: static;
-        bottom: auto;
-        margin-top: auto;
-        margin-left: 50%;
-        transform: translateX(-50%);
-    }
-
     #selected-points {
         width: 100%;
         margin-left: -105%;
@@ -1328,47 +1312,12 @@ button.btn > i {
         margin-right: auto;
     }
 
-    .rounded-block .top-submenu > div {
-        font-size: 11px;
-        padding: 5px;
-    }
-
     #messages .message-row .message-block .message {
         max-width: 98%;
     }
-}
 
-@media (max-width: 300px) {
-    .rounded-block {
-        font-size: 10px;
-    }
-
-    .rounded-block h1 {
-        font-size: 20px;
-        padding-bottom: 0;
-    }
-
-    .rounded-block p {
-        font-size: 10px;
-        margin-bottom: 20px;
-    }
-
-    .rounded-block .link {
-        width: 50px;
-        height: 25px;
-    }
-
-    .rounded-block .link i {
+    .paginate-button,
+    .paginate-button i {
         font-size: 12px;
-    }
-
-    .rounded-block .top-submenu > div {
-        font-size: 9px;
-    }
-}
-
-@media (max-width: 210px) {
-    .rounded-block h1 {
-        font-size: 15px;
     }
 }
