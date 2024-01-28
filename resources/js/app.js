@@ -8,6 +8,7 @@ import AccountComponent from "./components/AccountComponent.vue";
 import MyOrdersListComponent from "./components/MyOrdersListComponent.vue";
 import MyHelpListComponent from "./components/MyHelpListComponent.vue";
 import MySubscriptionsComponent from "./components/MySubscriptionsComponent.vue";
+import MyChatsComponent from "./components/MyChatsComponent.vue";
 
 const app = createApp({
     components: {
@@ -17,7 +18,8 @@ const app = createApp({
         AccountComponent,
         MyOrdersListComponent,
         MyHelpListComponent,
-        MySubscriptionsComponent
+        MySubscriptionsComponent,
+        MyChatsComponent
     }
 });
 

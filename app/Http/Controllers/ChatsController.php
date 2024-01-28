@@ -32,14 +32,37 @@ class ChatsController extends BaseController
     public function chats(): View
     {
         $this->data['active_left_menu'] = 'messages.chats';
-        $this->data['chats'] = [
-            'my_orders' => Order::where('status','>',0)->where('user_id',Auth::id())->whereIn('id',OrderUser::groupBy('order_id')->pluck('order_id')->toArray())->orderByDesc('created_at')->get(),
-            'im_performer' => Order::where('status','>',0)->whereIn('id',OrderUser::where('user_id',Auth::id())->pluck('order_id')->toArray())->orderByDesc('created_at')->get()
-        ];
         return $this->showView('chats');
     }
 
+    public function chatsMyOrders(): JsonResponse
+    {
+        return response()->json([
+            'orders' => Order::query()
+                ->where('status',1)
+                ->where('user_id',Auth::id())
+                ->whereIn('id',OrderUser::groupBy('order_id')->pluck('order_id')->toArray())
+                ->with('user.ratings')
+                ->with('performers.ratings')
+                ->with('orderType')
+                ->orderByDesc('created_at')
+                ->paginate(4)
+        ],200);
+    }
 
+    public function chatsPerformer(): JsonResponse
+    {
+        return response()->json([
+            'orders' => Order::query()
+                ->where('status',1)
+                ->whereIn('id',OrderUser::where('user_id',Auth::id())->pluck('order_id')->toArray())
+                ->with('user.ratings')
+                ->with('performers.ratings')
+                ->with('orderType')
+                ->orderByDesc('created_at')
+                ->paginate(4)
+        ],200);
+    }
 
     public function chat(ChatRequest $request): View
     {

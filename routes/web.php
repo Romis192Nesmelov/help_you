@@ -48,14 +48,14 @@ Route::prefix('account')->name('account.')->controller(AccountController::class)
     Route::get('/my-unread-subscriptions', 'getMyUnreadSubscriptions')->name('my_unread_subscriptions');
     Route::get('/my-orders', 'myOrders')->name('my_orders');
 
-    Route::get('/my-orders-active', 'getMyOrdersActive')->name('my_orders_active');
-    Route::get('/my-orders-open', 'getMyOrdersOpen')->name('my_orders_open');
-    Route::get('/my-orders-approving', 'getMyOrdersApproving')->name('my_orders_approving');
-    Route::get('/my-orders-archive', 'getMyOrdersArchive')->name('my_orders_archive');
+    Route::get('/my-orders-active', 'myOrdersActive')->name('my_orders_active');
+    Route::get('/my-orders-open', 'myOrdersOpen')->name('my_orders_open');
+    Route::get('/my-orders-approving', 'myOrdersApproving')->name('my_orders_approving');
+    Route::get('/my-orders-archive', 'myOrdersArchive')->name('my_orders_archive');
 
     Route::get('/my-help', 'myHelp')->name('my_help');
-    Route::get('/my-help-active', 'getMyHelpActive')->name('my_help_active');
-    Route::get('/my-help-archive', 'getMyHelpArchive')->name('my_help_archive');
+    Route::get('/my-help-active', 'myHelpActive')->name('my_help_active');
+    Route::get('/my-help-archive', 'myHelpArchive')->name('my_help_archive');
     Route::get('/incentives', 'account')->name('incentives');
     Route::get('/subscription', 'subscription')->name('subscription');
 });
@@ -88,6 +88,8 @@ Route::middleware(['auth','account.completed'])->name('order.')->controller(Orde
 
 Route::middleware(['auth','account.completed'])->name('messages.')->controller(ChatsController::class)->group(function () {
     Route::get('/chats', 'chats')->name('chats');
+    Route::get('/chats-my-orders', 'chatsMyOrders')->name('chats_my_orders');
+    Route::get('/chats-performer', 'chatsPerformer')->name('chats_performer');
     Route::get('/chat', 'chat')->name('chat');
     Route::get('/get-unread-messages', 'getUnreadMessages')->name('get_unread_messages');
     Route::post('/read-message', 'readMessage')->name('read_message');

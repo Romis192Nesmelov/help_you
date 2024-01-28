@@ -3,7 +3,6 @@
         <h4 class="text-center">Вы действительно хотите отписаться от этого пользователя?</h4>
         <ModalPairButtonsComponent @click-yes="unsubscribing"></ModalPairButtonsComponent>
     </ModalComponent>
-
     <div id="my-subscriptions" class="col-12 col-lg-8 right-block">
         <div class="rounded-block tall">
             <h2>Мои подписки</h2>
@@ -47,6 +46,10 @@ export default {
                 window.emitter.emit('my-subscriptions', false);
             }
         });
+
+        window.Echo.private('notice_' + this.userId).listen('.notice', res => {
+            if (res.notice === 'new_order_in_subscription') this.refreshOrders();
+        });
     },
     data() {
         return {
@@ -59,13 +62,10 @@ export default {
                     links: []
                 }
             },
-            activeTab: 'open',
             subscription: 0,
         }
     },
     props: {
-        'user_id': String,
-        'orders_url': String,
         'unsubscribe_url': String,
     },
     methods: {
@@ -86,7 +86,6 @@ export default {
                 id: self.subscription.id
             }).then(function (response) {
                 self.refreshOrders();
-                // console.log(self.tabs.open.orders.length);
             });
         }
     },

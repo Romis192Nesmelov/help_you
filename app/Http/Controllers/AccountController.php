@@ -68,22 +68,22 @@ class AccountController extends BaseController
         return $this->showView('my_orders');
     }
 
-    public function getMyOrdersArchive(): JsonResponse
+    public function myOrdersArchive(): JsonResponse
     {
         return response()->json(['orders' => $this->getMyOrders(0)],200);
     }
 
-    public function getMyOrdersActive(): JsonResponse
+    public function myOrdersActive(): JsonResponse
     {
         return response()->json(['orders' => $this->getMyOrders(1)],200);
     }
 
-    public function getMyOrdersOpen(): JsonResponse
+    public function myOrdersOpen(): JsonResponse
     {
         return response()->json(['orders' => $this->getMyOrders(2)],200);
     }
 
-    public function getMyOrdersApproving(): JsonResponse
+    public function myOrdersApproving(): JsonResponse
     {
         return response()->json(['orders' => $this->getMyOrders(3)],200);
     }
@@ -96,7 +96,6 @@ class AccountController extends BaseController
             ->with('user.ratings')
             ->with('performers.ratings')
             ->with('orderType')
-            ->with('subType')
             ->orderByDesc('created_at')
             ->paginate(4);
     }
@@ -108,12 +107,12 @@ class AccountController extends BaseController
         return $this->showView('my_help');
     }
 
-    public function getMyHelpActive(): JsonResponse
+    public function myHelpActive(): JsonResponse
     {
         return response()->json(['orders' => $this->getMyHelp(1)],200);
     }
 
-    public function getMyHelpArchive(): JsonResponse
+    public function myHelpArchive(): JsonResponse
     {
         return response()->json(['orders' => $this->getMyHelp(0)],200);
     }
@@ -127,7 +126,6 @@ class AccountController extends BaseController
             ->with('user.ratings')
             ->with('performers.ratings')
             ->with('orderType')
-            ->with('subType')
             ->orderByDesc('created_at')
             ->paginate(4);
     }

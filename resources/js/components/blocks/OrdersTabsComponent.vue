@@ -87,6 +87,9 @@ export default {
         ButtonComponent,
         PaginatorComponent
     },
+    created() {
+        console.log(this.tabs);
+    },
     props: {
         'user_id': Number,
         'tabs': Object,

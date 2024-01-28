@@ -50,12 +50,7 @@ export default {
                     links: []
                 }
             },
-            activeTab: String,
         }
     },
-    props: {
-        'user_id': String,
-        'orders_urls': String,
-    }
 }
 </script>

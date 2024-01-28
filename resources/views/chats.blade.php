@@ -10,10 +10,12 @@
         logout_url="{{ route('auth.logout') }}"
         active_left_menu="{{ $active_left_menu }}"
     ></left-menu-component>
+    <my-chats-component
+        user_id="{{ auth()->id() }}"
+        orders_urls="{{ json_encode(['my_orders' => route('messages.chats_my_orders'), 'performer' => route('messages.chats_performer')]) }}"
+        chat_url="{{ route('messages.chat') }}"
+    ></my-chats-component>
 
-{{--    <div id="my-chats" class="col-12 col-lg-8 right-block">--}}
-{{--        <div class="rounded-block tall">--}}
-{{--            <h2>{{ trans('messages.chats') }}</h2>--}}
 {{--            @include('blocks.top_sub_menu_block',[--}}
 {{--                'menus' => ['my_orders','im_performer'],--}}
 {{--                'prefix' => 'messages',--}}

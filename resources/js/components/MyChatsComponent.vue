@@ -1,5 +1,24 @@
 <template>
-
+    <div id="my-chats" class="col-12 col-lg-8 right-block">
+        <div class="rounded-block tall">
+            <h2>Мои чаты</h2>
+            <TabsComponent
+                :tabs="tabs"
+                :show_counters=true
+                :active="activeTab"
+                @change-tab="changeTab"
+            ></TabsComponent>
+            <OrdersTabsComponent
+                :user_id="userId"
+                :tabs="tabs"
+                :active_tab="activeTab"
+                :subscription_mode=false
+                :chat_mode=true
+                :chat_url="chat_url"
+                @change-page="changePage"
+            ></OrdersTabsComponent>
+        </div>
+    </div>
 </template>
 
 <script>
@@ -16,28 +35,8 @@ export default {
         OrdersTabsComponent,
         NoDataComponent
     },
-    created() {
-        this.userId = parseInt(this.user_id);
-        this.activeTab = Object.keys(this.tabs)[0];
-        this.ordersUrls = JSON.parse(this.orders_urls);
-        this.refreshOrders();
-
-        window.Echo.private('notice_' + this.userId).listen('.notice', res => {
-            let self = this,
-                orderIndex;
-
-            if (res.notice === 'new_performer' || res.notice === 'remove_performer') {
-                orderIndex = self.getOrderIndex('active', res.order.id);
-                if (orderIndex !== null) {
-                    self.tabs.active.orders[orderIndex].performers = res.performers;
-                }
-            } else if (res.notice === 'new_order_status') {
-                orderIndex = self.getOrderIndex('active', res.order.id);
-                if (orderIndex !== null) {
-                    this.refreshOrders();
-                }
-            }
-        });
+    props: {
+        'chat_url': String
     },
     data() {
         return {
@@ -49,19 +48,14 @@ export default {
                     orders: Array,
                     links: []
                 },
-                im_performer: {
+                performer: {
                     name: 'Я исполнитель',
                     counter: 0,
                     orders: Array,
                     links: []
                 }
             },
-            activeTab: String
         }
-    },
-    props: {
-        'user_id': String,
-        'orders_url': String,
     },
 }
 </script>
