@@ -14,7 +14,6 @@ use App\Http\Requests\Order\NextStepRequest;
 use App\Http\Requests\Order\OrderRequest;
 use App\Http\Requests\Order\PrevStepRequest;
 use App\Http\Requests\Order\ReadOrderRequest;
-use App\Http\Requests\Order\UserAgeRequest;
 use App\Models\Order;
 use App\Models\OrderImage;
 use App\Models\OrderType;
@@ -33,7 +32,7 @@ class OrderController extends BaseController
 
     public function newOrder(): View
     {
-        $this->getItems('order_types', new OrderType());
+        $this->data['order_types'] = OrderType::where('active',1)->with('subtypesActive')->get();
         $this->data['session_key'] = 'steps';
         return $this->showView('edit_order');
     }
@@ -41,7 +40,7 @@ class OrderController extends BaseController
     public function orders(): View
     {
         $this->setReadUnreadRemovedPerformers();
-        $this->getItems('order_types', new OrderType());
+        $this->data['order_types'] = OrderType::where('active',1)->with('subtypesActive')->get();
         return $this->showView('orders');
     }
 
@@ -50,9 +49,9 @@ class OrderController extends BaseController
      */
     public function editOrder(OrderRequest $request): View
     {
-        $this->data['order'] = Order::find($request->id);
+        $this->data['order'] = Order::with('images')->find($request->id);
         $this->authorize('owner', $this->data['order']);
-        $this->getItems('order_types', new OrderType());
+        $this->data['order_types'] = OrderType::where('active',1)->with('subtypesActive')->get();
         $this->data['session_key'] = 'edit'.$this->data['order']->id.'_steps';
         return $this->showView('edit_order');
     }
@@ -247,7 +246,6 @@ class OrderController extends BaseController
                 'user_id' => Auth::id(),
                 'status' => 3
             ];
-            // Statuses: 2 – new; 1 – in progress; 0 – closed
 
             foreach ($steps as $step) {
                 $fields = array_merge($fields,$step);
@@ -298,11 +296,8 @@ class OrderController extends BaseController
     {
         $sessionKey = $this->getSessionKey($request);
         $steps = Session::get($sessionKey);
-        if (count($steps) == 1) Session::forget($sessionKey);
-        else {
-            array_pop($steps);
-            Session::put($sessionKey,$steps);
-        }
+        array_pop($steps);
+        Session::put($sessionKey,$steps);
         return response()->json([],200);
     }
 

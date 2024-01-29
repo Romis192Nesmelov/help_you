@@ -1,7 +1,7 @@
 <template>
     <div class="form-group has-label mt-2">
         <i :class="icon" v-if="icon"></i>
-        <label>{{ label }}</label>
+        <label v-if="label">{{ label }}</label>
         <input
             :type="type"
             :name="name"

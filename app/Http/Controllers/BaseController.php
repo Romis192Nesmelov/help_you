@@ -27,7 +27,7 @@ class BaseController extends Controller
             $this->getItem('partner', new Partner(), $request->id);
             return $this->showView('partner');
         } else {
-            $this->getItems('partners', new Partner());
+            $this->data['partners'] = Partner::where('active',1)->get();
             return $this->showView('partners');
         }
     }
@@ -58,11 +58,6 @@ class BaseController extends Controller
                 'activeLeftMenu' => $this->activeLeftMenu,
             ]
         ));
-    }
-
-    protected function getItems(string $itemName, Model $model): void
-    {
-        $this->data[$itemName] = $model->where('active',1)->get();
     }
 
     protected function getItem(string $itemName, Model $model, $id): void

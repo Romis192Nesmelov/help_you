@@ -9,6 +9,7 @@ import MyOrdersListComponent from "./components/MyOrdersListComponent.vue";
 import MyHelpListComponent from "./components/MyHelpListComponent.vue";
 import MySubscriptionsComponent from "./components/MySubscriptionsComponent.vue";
 import MyChatsComponent from "./components/MyChatsComponent.vue";
+import EditOrderComponent from "./components/EditOrderComponent.vue";
 
 const app = createApp({
     components: {
@@ -19,60 +20,10 @@ const app = createApp({
         MyOrdersListComponent,
         MyHelpListComponent,
         MySubscriptionsComponent,
-        MyChatsComponent
+        MyChatsComponent,
+        EditOrderComponent
     }
 });
-
-window.toCamelize = str => str.replace(/-|_./g, x=>x[1].toUpperCase());
-window.getUserAge = (born) => {
-    let now = new Date(),
-        bornArr = born.split('-');
-    let age = now.getFullYear() - parseInt(bornArr[2]);
-    if (now.getMonth() + 1 <= parseInt(bornArr[1]) && now.getDay() < parseInt(bornArr[1])) {
-        age--;
-    }
-    let lastDigit = age.toString().substr(-1,1),
-        word;
-
-    if (lastDigit === 0) word = 'лет';
-    else if (lastDigit === 1) word = 'год';
-    else if (lastDigit > 1 && lastDigit < 5) word = 'года';
-    else word = 'лет';
-
-    return age + ' ' + word;
-};
-window.userRating = (ratings) => {
-    if (ratings.length) {
-        let ratingVal = 0;
-        $.each(ratings, function (k,rating) {
-            ratingVal += rating.value;
-        });
-        return Math.round(ratingVal/ratings.length);
-    } else return 0;
-};
-window.showMessage = (message) => {
-    const messageModal = $('#message-modal');
-    messageModal.find('h4').html(message);
-    messageModal.modal('show');
-};
-
-window.addLoader = () => {
-    $('body').prepend(
-        $('<div></div>').attr('id', 'loader').append($('<div></div>'))
-    ).css({
-        'overflow-y': 'hidden',
-        'padding-right': 20
-    });
-}
-
-window.removeLoader = () => {
-    $('#loader').remove();
-    $('body').css('overflow-y', 'auto');
-};
-
-window.emitter = mitt();
-app.config.globalProperties.emitter = window.emitter;
-app.mount('#app');
 
 window.tokenField = $('input[name=_token]').val();
 window.avatarBlock = $('#avatar-block .avatar.cir');
@@ -89,10 +40,73 @@ window.inputChangePhoneCode = '';
 window.inputChangePasswordOldPassword = '';
 window.inputChangePasswordPassword = '';
 window.inputChangePasswordConfirmPassword = '';
+window.singlePoint = null;
+
+window.toCamelize = str => str.replace(/-|_./g, x=>x[1].toUpperCase());
+
+window.getUserAge = (born) => {
+    let now = new Date(),
+        bornArr = born.split('-');
+    let age = now.getFullYear() - parseInt(bornArr[2]);
+    if (now.getMonth() + 1 <= parseInt(bornArr[1]) && now.getDay() < parseInt(bornArr[1])) {
+        age--;
+    }
+    let lastDigit = age.toString().substr(-1,1),
+        word;
+
+    if (lastDigit === 0) word = 'лет';
+    else if (lastDigit === 1) word = 'год';
+    else if (lastDigit > 1 && lastDigit < 5) word = 'года';
+    else word = 'лет';
+
+    return age + ' ' + word;
+}
+
+window.userRating = (ratings) => {
+    if (ratings.length) {
+        let ratingVal = 0;
+        $.each(ratings, function (k,rating) {
+            ratingVal += rating.value;
+        });
+        return Math.round(ratingVal/ratings.length);
+    } else return 0;
+}
+
+window.showMessage = (message) => {
+    const messageModal = $('#message-modal');
+    messageModal.find('h4').html(message);
+    messageModal.modal('show');
+}
+
+window.addLoader = () => {
+    $('body').prepend(
+        $('<div></div>').attr('id', 'loader').append($('<div></div>'))
+    ).css({
+        'overflow-y': 'hidden',
+        'padding-right': 20
+    });
+}
+
+window.removeLoader = () => {
+    $('#loader').remove();
+    $('body').css('overflow-y', 'auto');
+}
+
+window.getPlaceMark = (point, data) => {
+    return new ymaps.Placemark(point, data, {
+        preset: 'islands#darkOrangeCircleDotIcon'
+    });
+}
+
+window.zoomAndCenterMap = () => {
+    window.myMap.setCenter(window.singlePoint, 17);
+}
+
+window.emitter = mitt();
+app.config.globalProperties.emitter = window.emitter;
+app.mount('#app');
 
 $(document).ready(function () {
-    // console.log(window.toCamelize('kebab_case'));
-
     // MAIN BLOCK BEGIN
     $('.form-group.has-label i.icon-eye').click(function () {
         let cover = $(this).parents('.form-group'),
@@ -304,104 +318,6 @@ $(document).ready(function () {
         }
     });
 
-    // backButton.click(() => {
-    //     backButton.attr('disabled','disabled');
-    //     $.get(backStepUrl, {
-    //         'id': window.orderId ? window.orderId : '',
-    //     }, () => {
-    //         nextPrevStep(true, () => {
-    //             backButton.removeAttr('disabled');
-    //             if (step === 1) {
-    //                 progressBarContainer.addClass('d-none');
-    //                 backButton.addClass('d-none');
-    //             }
-    //             step--;
-    //             setProgressBar(progressBar);
-    //         });
-    //     });
-    // });
-    //
-    // nextButton.click((e) => {
-    //     e.preventDefault();
-    //     resetErrors(form);
-    //     if (preValidation[step]()) {
-    //         if (step === 2) {
-    //             let address = addressInput.val().indexOf('Москва') >= 0 ? addressInput.val() : 'Москва, '+addressInput.val();
-    //             $.get(
-    //                 'https://geocode-maps.yandex.ru/1.x/',
-    //                 {
-    //                     apikey: yandexApiKey,
-    //                     geocode: address,
-    //                     format: 'json'
-    //                 },
-    //                 (data) => {
-    //                     if (parseInt(data.response.GeoObjectCollection.metaDataProperty.GeocoderResponseMetaData.found) === 1) {
-    //                         let updatedAddress = data.response.GeoObjectCollection.featureMember[0].GeoObject.name;
-    //
-    //                         if (window.placemark) window.myMap.geoObjects.remove(window.placemark);
-    //                         let coordinates = data.response.GeoObjectCollection.featureMember[0].GeoObject.Point.pos.split(' '),
-    //                             point = [parseFloat(coordinates[1]),parseFloat(coordinates[0])],
-    //                             newPlacemark = getPlaceMark(point,{});
-    //
-    //                         window.myMap.geoObjects.add(newPlacemark)
-    //                         zoomAndCenterMap();
-    //
-    //                         backButton.attr('disabled','disabled');
-    //                         nextButton.attr('disabled','disabled');
-    //
-    //                         let hiddenIdInput = $('input[name=id]'),
-    //                             fields = {
-    //                             '_token': window.tokenField,
-    //                             'address': updatedAddress,
-    //                             'latitude': point[0],
-    //                             'longitude': point[1]
-    //                         };
-    //
-    //                         if (hiddenIdInput.length) {
-    //                             fields['id'] = hiddenIdInput.val();
-    //                         }
-    //
-    //                         $.post(nextStepUrl, fields,
-    //                         () => {
-    //                             setTimeout(function () {
-    //                                 step++;
-    //                                 setProgressBar(progressBar);
-    //                                 nextPrevStep(false, () => {
-    //                                     backButton.removeAttr('disabled');
-    //                                     nextButton.removeAttr('disabled');
-    //                                 });
-    //                             }, 1500);
-    //                         });
-    //                     } else {
-    //                         addressInput.addClass('error');
-    //                         addressInputError.html(errorCheckAddress);
-    //                     }
-    //                 }
-    //             );
-    //         } else {
-    //             backButton.attr('disabled','disabled');
-    //             getUrl(form, null, () => {
-    //                 step++;
-    //                 if (step) {
-    //                     backButton.removeClass('d-none');
-    //                     progressBarContainer.removeClass('d-none');
-    //                 }
-    //                 setProgressBar(progressBar);
-    //                 if (step !== 4) {
-    //                     nextPrevStep(false, () => {
-    //                         backButton.removeAttr('disabled');
-    //                     });
-    //                 } else {
-    //                     setTimeout(function () {
-    //                         window.location.href = orderPreviewUrl;
-    //                     }, 3000);
-    //                     completeModal.modal('show').on('hidden.bs.modal', () => {
-    //                         window.location.href = orderPreviewUrl;
-    //                     })
-    //                 }
-    //             });
-    //         }
-
     const accountBlock = $('#account-block'),
         userNameInput = accountBlock.find('input[name=name]'),
         userFamilyInput = accountBlock.find('input[name=family]'),
@@ -452,207 +368,16 @@ $(document).ready(function () {
             enableAccountButton();
         }
     });
-});
+    // ACCOUNT BLOCK END
 
-    // // EDIT ORDER BLOCK BEGIN
-    // const progressBarContainer = $('#progress-bar'),
-    //     progressBar = progressBarContainer.find('.progress-bar'),
-    //     form = $('form'),
-    //     nextButton = $('#next'),
-    //     backButton = $('#back'),
-    //     performersInput = $('input[name=performers]'),
-    //     performersInputError = $('.error.performers'),
-    //     addressInput = $('input[name=address]'),
-    //     addressInputError = $('.error.address'),
-    //     completeModal = $('#complete-modal'),
-    //     preValidation = [
-    //         () => {
-    //             return true
-    //         },
-    //         () => {
-    //             resetErrors(form);
-    //             if (performersInput.val() <= 0 || performersInput.val() > 20) {
-    //                 performersInput.addClass('error');
-    //                 performersInputError.html(errorWrongValueText);
-    //                 return false;
-    //             } else return true;
-    //         },
-    //         () => {
-    //             resetErrors(form);
-    //             if (addressInput.val() < 5) {
-    //                 addressInput.addClass('error');
-    //                 addressInputError.html(errorFieldMustBeFilledInText);
-    //                 return false;
-    //             } else if (addressInput.val() > 200) {
-    //                 addressInput.addClass('error');
-    //                 addressInputError.html(errorWrongValueText);
-    //                 return false;
-    //             } else return true;
-    //         },
-    //         () => {
-    //             return true;
-    //         }
-    //     ];
-    //
-    // if ($('#image-step3').length) {
-    //     ymaps.ready(mapInitWithContainerForEditOrder);
-    // }
-    //
-    // $('input[name=order_type_id]').change(function () {
-    //     let thisRadioGroup = $(this).parents('.radio-group'),
-    //         thisSubTypesBlocks = thisRadioGroup.find('.sub-types-block'),
-    //         anotherSubTypesBlocks = $('.radio-group').not(thisRadioGroup).find('.sub-types-block');
-    //
-    //     anotherSubTypesBlocks.css('display','block');
-    //     anotherSubTypesBlocks.animate({
-    //         'height':0,
-    //         'padding-bottom':0
-    //     },'slow');
-    //
-    //     if (thisSubTypesBlocks.length) {
-    //         thisSubTypesBlocks.css({
-    //             'display':'table',
-    //             'opacity':0
-    //         });
-    //
-    //         let heightBlock = thisSubTypesBlocks.height();
-    //         thisSubTypesBlocks.css({
-    //             'display':'block',
-    //             'height':0,
-    //             'opacity':1
-    //         });
-    //
-    //         thisSubTypesBlocks.animate({
-    //             'height':heightBlock
-    //         },'slow');
-    //     }
-    // });
-    //
-    // $('.sub-types-block input[type=checkbox]').change(function () {
-    //     let subTypesBlock = $(this).parents('.sub-types-block');
-    //     if (subTypesBlock.find('input[type=checkbox]:checked').length && subTypesBlock.find('input.error').length) {
-    //         subTypesBlock.find('input.error').removeClass('error');
-    //         subTypesBlock.find('.error.subtype').last().html('');
-    //         subTypesBlock.css('height',subTypesBlock.height() - 20);
-    //     }
-    // });
-    //
-    // backButton.click(() => {
-    //     backButton.attr('disabled','disabled');
-    //     $.get(backStepUrl, {
-    //         'id': window.orderId ? window.orderId : '',
-    //     }, () => {
-    //         nextPrevStep(true, () => {
-    //             backButton.removeAttr('disabled');
-    //             if (step === 1) {
-    //                 progressBarContainer.addClass('d-none');
-    //                 backButton.addClass('d-none');
-    //             }
-    //             step--;
-    //             setProgressBar(progressBar);
-    //         });
-    //     });
-    // });
-    //
-    // nextButton.click((e) => {
-    //     e.preventDefault();
-    //     resetErrors(form);
-    //     if (preValidation[step]()) {
-    //         if (step === 2) {
-    //             let address = addressInput.val().indexOf('Москва') >= 0 ? addressInput.val() : 'Москва, '+addressInput.val();
-    //             $.get(
-    //                 'https://geocode-maps.yandex.ru/1.x/',
-    //                 {
-    //                     apikey: yandexApiKey,
-    //                     geocode: address,
-    //                     format: 'json'
-    //                 },
-    //                 (data) => {
-    //                     if (parseInt(data.response.GeoObjectCollection.metaDataProperty.GeocoderResponseMetaData.found) === 1) {
-    //                         let updatedAddress = data.response.GeoObjectCollection.featureMember[0].GeoObject.name;
-    //
-    //                         if (window.placemark) window.myMap.geoObjects.remove(window.placemark);
-    //                         let coordinates = data.response.GeoObjectCollection.featureMember[0].GeoObject.Point.pos.split(' ');
-    //                         point = [parseFloat(coordinates[1]),parseFloat(coordinates[0])];
-    //                         let newPlacemark = getPlaceMark(point,{});
-    //                         window.myMap.geoObjects.add(newPlacemark)
-    //                         zoomAndCenterMap();
-    //
-    //                         backButton.attr('disabled','disabled');
-    //                         nextButton.attr('disabled','disabled');
-    //
-    //                         let hiddenIdInput = $('input[name=id]'),
-    //                             fields = {
-    //                             '_token': window.tokenField,
-    //                             'address': updatedAddress,
-    //                             'latitude': point[0],
-    //                             'longitude': point[1]
-    //                         };
-    //
-    //                         if (hiddenIdInput.length) {
-    //                             fields['id'] = hiddenIdInput.val();
-    //                         }
-    //
-    //                         $.post(nextStepUrl, fields,
-    //                         () => {
-    //                             setTimeout(function () {
-    //                                 step++;
-    //                                 setProgressBar(progressBar);
-    //                                 nextPrevStep(false, () => {
-    //                                     backButton.removeAttr('disabled');
-    //                                     nextButton.removeAttr('disabled');
-    //                                 });
-    //                             }, 1500);
-    //                         });
-    //                     } else {
-    //                         addressInput.addClass('error');
-    //                         addressInputError.html(errorCheckAddress);
-    //                     }
-    //                 }
-    //             );
-    //         } else {
-    //             backButton.attr('disabled','disabled');
-    //             getUrl(form, null, () => {
-    //                 step++;
-    //                 if (step) {
-    //                     backButton.removeClass('d-none');
-    //                     progressBarContainer.removeClass('d-none');
-    //                 }
-    //                 setProgressBar(progressBar);
-    //                 if (step !== 4) {
-    //                     nextPrevStep(false, () => {
-    //                         backButton.removeAttr('disabled');
-    //                     });
-    //                 } else {
-    //                     setTimeout(function () {
-    //                         window.location.href = orderPreviewUrl;
-    //                     }, 3000);
-    //                     completeModal.modal('show').on('hidden.bs.modal', () => {
-    //                         window.location.href = orderPreviewUrl;
-    //                     })
-    //                 }
-    //             });
-    //         }
-    //     }
-    // });
-    //
-    // performersInput.on('change', preValidation[1]).keyup(preValidation[1]);
-    // addressInput.on('change', preValidation[2]).keyup(preValidation[2]);
-    // imagePreview($('.order-photo'));
-    //
-    // // Delete image in edit order
-    // if (window.orderId) {
-    //     $('.order-photo .icon-close2.d-block').click(function () {
-    //         let photoPos = parseInt($(this).parents('.order-photo').find('input[type=file]').attr('name').replace('photo',''));
-    //         $.post(deleteOrderImageUrl, {
-    //             '_token': window.tokenField,
-    //             'id': window.orderId,
-    //             'pos': photoPos
-    //         });
-    //     });
-    // }
-    // // EDIT ORDER BLOCK END
-    //
+    // EDIT ORDER BLOCK BEGIN
+    imagePreview($('.order-photo'));
+
+    if ($('#map-steps').length) {
+        ymaps.ready(mapInitWithContainerForEditOrder);
+    }
+    // EDIT ORDER BLOCK END
+});
     // // ORDERS BLOCK BEGIN
     // window.selectedPoints = $('#selected-points');
     // window.selectedPoint = null;
@@ -935,6 +660,7 @@ const imagePreview = (container, defImage) => {
                 };
                 reader.readAsDataURL(input);
                 addFileIcon.hide();
+                clearInputIcon.removeClass('d-none');
                 clearInputIcon.show();
 
             } else if (defImage) {
@@ -954,22 +680,29 @@ const imagePreview = (container, defImage) => {
             addFileIcon.show();
             clearInputIcon.removeClass('d-block');
             clearInputIcon.hide();
+
+            if (currentContainer.hasClass('order-photo')) {
+                let id = parseInt(currentContainer.attr('id').replace('photo',''));
+                currentContainer.find('.icon-file-plus2').show();
+                window.emitter.emit('remove-order-photo',id);
+            }
         });
     });
+}
+
+const mapInitWithContainerForEditOrder = () => {
+    mapInit('map-steps');
+    if (window.singlePoint) {
+        window.placemark = window.getPlaceMark(window.singlePoint,{});
+        window.myMap.geoObjects.add(window.placemark);
+        window.zoomAndCenterMap();
+    }
 }
 
 // const getNewMessageRow = (selfFlag) => {
 //     let messageRow = $('<div></div>').addClass('message-row');
 //     if (selfFlag) messageRow.addClass('my-self');
 //     return messageRow;
-// }
-//
-// const getTableRow = (orderId) => {
-//     return $('#row-' + orderId);
-// }
-//
-// const getPerformersCountContainer = (orderId) => {
-//     return $('#order-performers-' + window.orderId).next('span');
 // }
 //
 // const removeLastMessageRowWithPreviewImage = () => {
@@ -1108,163 +841,14 @@ const imagePreview = (container, defImage) => {
 //         }
 //     });
 // }
-//
-// const getCodeAgainCounter = (getCodeButton, timer) => {
-//     let getRegisterCodeAgain = $('#get-code-again'),
-//         countDown = setInterval(() => {
-//         if (!timer) {
-//             getCodeButton.removeClass('d-none');
-//             clearInterval(countDown);
-//         }
-//         getRegisterCodeAgain.removeClass('d-none');
-//         getRegisterCodeAgain.find('span').html(timer);
-//         timer--;
-//     }, 1000);
-// };
-//
-// const validationDate = (date) => {
-//     let inputDate = new Date(date[2], date[1], 0);
-//     return date[0] && date[1] && date[2] && date[0] <= inputDate.getDate() && date[1] <= 12;
-// };
-//
-// const lengthValidate = (form, fields) => {
-//     let validationFlag = true;
-//     $.each(fields, (k, field) => {
-//         let input = form.find('input[name=' + field + ']');
-//         if (!input.val().length) {
-//             input.addClass('error');
-//             form.find('.error.' + field).html(errorFieldMustBeFilledIn);
-//             validationFlag = false;
-//         }
-//     });
-//     return validationFlag;
-// };
-//
-// const resetErrors = (form) => {
-//     form.find('input.error').removeClass('error');
-//     form.find('div.error').html('');
-// };
-//
-// const bindChangePagination = (dataTable) => {
-//     const paginationEvent = ('draw.dt');
-//     dataTable.off(paginationEvent);
-//     dataTable.on(paginationEvent, function () {
-//         // bindOrderOperation(window.modalClosingConfirm,'close-order');
-//         // bindOrderOperation(window.modalResumedConfirm,'resume-order');
-//         // bindDelete();
-//     });
-// }
-//
-// const bindOrderPerformersList = () => {
-//     const iconPerformersList =  $('i.performers-list'),
-//         removePerformerModal = $('#remove-performer-modal'),
-//         removePerformerModalYesButton = removePerformerModal.find('button.delete-yes'),
-//         orderPerformersModal = $('#order-performers-modal'),
-//         tablePerformers = orderPerformersModal.find('table.table.table-striped'),
-//         headNoPerformers = orderPerformersModal.find('h4');
-//
-//     iconPerformersList.unbind();
-//     iconPerformersList.click(function () {
-//         let orderId = getId($(this), 'order-performers-', true);
-//         $.post(getOrderPerformersUrl, {
-//             '_token': window.tokenField,
-//             'id': orderId,
-//         }, (data) => {
-//             if (data.performers.length) {
-//                 headNoPerformers.addClass('d-none');
-//                 tablePerformers.removeClass('d-none');
-//
-//                 $.each(data.performers, function (k, performer) {
-//                     let tableRowLast = tablePerformers.find('tr').last(),
-//                         tableRow = !k ? tableRowLast : tableRowLast.clone(),
-//                         removePerformerIcon = tableRow.find('.order-cell-delete i');
-//
-//                     if (k) tablePerformers.append(tableRow);
-//                     if (performer.avatar) tableRow.find('.avatar.cir').css(getAvatarProps(performer.avatar,performer.avatar_props,0.35))
-//                     tableRow.find('.user-name').html(performer.full_name);
-//                     tableRow.find('.user-age').html(performer.age);
-//                     // removePerformerIcon.attr('id',performer.id);
-//
-//                     removePerformerIcon.click(function () {
-//                         window.removingPerformerId = performer.id;
-//                         window.orderId = orderId;
-//                         orderPerformersModal.modal('hide');
-//                         removePerformerModal.modal('show');
-//                     });
-//
-//                     let ratingLine = tableRow.find('.rating-line');
-//                     if (performer.rating) {
-//                         for (let i=1;i<=ratingLine.find('i').length;i++) {
-//                             let ratingStar = ratingLine.find('#rating-star-' + i);
-//                             if (i <= performer.rating && ratingStar.hasClass('icon-star-empty3')) {
-//                                 ratingStar.removeClass('icon-star-empty3').addClass('icon-star-full2');
-//                             } else if (i > performer.rating && ratingStar.hasClass('icon-star-full2')) ratingStar.removeClass('icon-star-full2').addClass('icon-star-empty3');
-//                         }
-//                     } else ratingLine.find('i.icon-star-full2').removeClass('icon-star-full2').addClass('icon-star-empty3');
-//
-//                 });
-//             } else {
-//                 headNoPerformers.removeClass('d-none');
-//                 tablePerformers.addClass('d-none');
-//             }
-//         });
-//         orderPerformersModal.modal('show');
-//     });
-//
-//     removePerformerModalYesButton.unbind();
-//     removePerformerModalYesButton.click(function () {
-//         $.post(removeOrderPerformerUrl, {
-//             '_token': window.tokenField,
-//             'order_id': window.orderId,
-//             'user_id': window.removingPerformerId
-//         }, (data) => {
-//             if (data.performers_count) {
-//                 getPerformersCountContainer(window.orderId).html(data.performers_count);
-//             } else {
-//                 movingOrderToOpen(getTableRow(window.orderId));
-//             }
-//             messageModal.find('h4').html(data.message);
-//             removePerformerModal.modal('hide');
-//             messageModal.modal('show');
-//         });
-//     });
-// }
-//
-// const bindDelete = () => {
-//     let deleteIcon = $('.icon-close2, .icon-bell-cross');
-//     deleteIcon.unbind();
-//     deleteIcon.click(function () {
-//         window.deleteId = $(this).attr('del-data');
-//         let deleteModal = $('#'+$(this).attr('modal-data')),
-//             inputId = deleteModal.find('input[name=id]'),
-//             possibleParentRow = $('#row-' + window.deleteId),
-//             altParentRow = $('.row-' + window.deleteId);
-//
-//         window.deleteRow = possibleParentRow.length ? possibleParentRow : altParentRow;
-//
-//         if (inputId.length) inputId.val(window.deleteId);
-//         deleteModal.modal('show');
-//     });
-// }
-//
-// const mapInit = (container) => {
-//     window.myMap = new ymaps.Map(container, {
-//         center: [55.76, 37.64],
-//         zoom: 10,
-//         controls: []
-//     });
-// }
-//
-// const getPlaceMark = (point, data) => {
-//     return new ymaps.Placemark(point, data, {
-//         preset: 'islands#darkOrangeCircleDotIcon'
-//     });
-// }
-//
-// const zoomAndCenterMap = () => {
-//     window.myMap.setCenter(point, 17);
-// }
-//
+const mapInit = (container) => {
+    window.myMap = new ymaps.Map(container, {
+        center: [55.76, 37.64],
+        zoom: 10,
+        controls: []
+    });
+}
+
 const owlSettings = (margin, nav, timeout, responsive, autoplay) => {
     let navButtonBlack1 = '<img src="/images/arrow_left.svg" />',
         navButtonBlack2 = '<img src="/images/arrow_right.svg" />';
@@ -1280,46 +864,6 @@ const owlSettings = (margin, nav, timeout, responsive, autoplay) => {
         navText: [navButtonBlack1, navButtonBlack2]
     }
 }
-
-// const nextPrevStep = (reverse, callBack) => {
-//     let stepFadeOut = reverse ? step + 1 : step,
-//         stepFadeIn = reverse ? step : step + 1,
-//         tags = ['head1','head2','inputs','image','description'],
-//         fadeOutSting = '',
-//         fadeInSting = '',
-//         callBackFlag = false;
-//
-//     $.each(tags, (k, tag) => {
-//         let comma = (k + 1 !== tags.length ? ', ' : '');
-//         fadeOutSting += '#' + tag + '-step' + stepFadeOut + comma;
-//         fadeInSting += '#' + tag + '-step' + stepFadeIn + comma;
-//     });
-//
-//     $(fadeOutSting).removeClass('d-block').fadeOut('slow',() => {
-//         $(fadeInSting).removeClass('d-none').fadeIn();
-//         if (callBack && !callBackFlag) {
-//             callBack();
-//             callBackFlag = true;
-//         }
-//     });
-// }
-
-// const setProgressBar = (progressBar) => {
-//     let progress = step * 25 + '%';
-//     progressBar.html(progress);
-//     progressBar.animate({
-//         'width': progress
-//     },'fast');
-// }
-
-// const mapInitWithContainerForEditOrder = () => {
-//     mapInit('image-step3');
-//     if (point.length) {
-//         window.placemark = getPlaceMark(point,{});
-//         window.myMap.geoObjects.add(window.placemark);
-//         zoomAndCenterMap();
-//     }
-// }
 
 // const mapInitWithContainerForOrders = () => {
 //     mapInit('map');
@@ -1783,14 +1327,7 @@ const owlSettings = (margin, nav, timeout, responsive, autoplay) => {
 //     },'fast');
 // }
 //
-// const mapInitWithContainerForEditOrder = () => {
-//     mapInit('image-step3');
-//     if (point.length) {
-//         window.placemark = getPlaceMark(point,{});
-//         window.myMap.geoObjects.add(window.placemark);
-//         zoomAndCenterMap();
-//     }
-// }
+
 //
 // const mapInitWithContainerForOrders = () => {
 //     mapInit('map');

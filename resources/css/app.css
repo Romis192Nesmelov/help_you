@@ -313,7 +313,6 @@ table {
     position: absolute;
     top: 5px;
     right: 5px;
-    display: none;
     font-size: 25px;
     z-index: 999;
 }
@@ -698,7 +697,7 @@ button.btn > i {
     height: 100%;
 }
 
-.rounded-block.three-quarter #image-step3 {
+#map-steps {
     width: 100%;
     height: 100%;
     position: absolute;

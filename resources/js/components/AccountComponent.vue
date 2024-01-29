@@ -137,6 +137,7 @@
                         name="info_about"
                         placeholder=""
                         :value="infoAbout"
+                        v-model:value="infoAbout"
                         :error="errors['info_about']"
                     ></TextAreaComponent>
                     <div class="w-100 text-end mt-4">

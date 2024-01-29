@@ -72,7 +72,7 @@
             logo_text_image="{{ asset('images/logo_text.svg') }}"
             main_menu="{{ json_encode($mainMenu) }}"
             account_icon="{{ asset('images/account.svg') }}"
-            new_order_url="{{ route('order.new_order') }}"
+            new_order_url="{{ route('order.edit_order') }}"
             account_change_url="{{ route('account.change') }}"
             messages_url="{{ route('account.messages') }}"
             my_subscriptions_url="{{ route('account.my_subscriptions') }}"

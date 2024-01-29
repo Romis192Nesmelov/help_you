@@ -53,7 +53,7 @@
                                 text="Удалить"
                                 @click="$emit('deletingOrder',{'key':tabKey,'id':order.id})"
                             ></ButtonComponent>
-                            <a :href="edit_order_url">
+                            <a :href="edit_order_url + '?id=' + order.id">
                                 <ButtonComponent
                                     class="btn btn-primary"
                                     text="Редактировать"
