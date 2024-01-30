@@ -6,7 +6,7 @@
         :data-bs-toggle="target ? 'modal' : ''"
         :data-bs-target="target"
         :disabled=disabled
-        :data-bs-dismiss="dismiss"
+        :data-bs-dismiss="dismiss ? 'modal' : ''"
         :data-dismiss="dismiss"
     >
         <i v-if="icon" :class="icon"></i>

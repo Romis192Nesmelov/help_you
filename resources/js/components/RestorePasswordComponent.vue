@@ -2,7 +2,6 @@
     <ModalComponent id="restore-password-modal" head="Восстановление пароля" v-on:keyup.enter="onSubmit">
         <InputComponent
             label="Телефон"
-            icon=""
             type="text"
             name="phone"
             placeholder="+_(___)___-__-__"
@@ -12,7 +11,7 @@
         <ButtonComponent
             id="reset-button"
             class_name="btn btn-primary"
-            :disabled=true
+            :disabled="disabledSubmit"
             icon="icon-user-plus"
             text="Восстановить пароль"
             @click="onSubmit"
@@ -41,9 +40,22 @@ export default {
     props: {
         'reset_pass_url': String,
     },
+    created() {
+        const self = this;
+        $.mask.definitions['n'] = "[7-8]";
+
+        $(document).ready(function () {
+            $('#restore-password-modal input[name=phone]').mask(window.phoneMask).on('blur keypress keyup change', function () {
+                self.phone = $(this).val();
+                self.disabledSubmit = self.phone.match(window.phoneRegExp) !== null;
+                self.errors['phone'] = null;
+            });
+        });
+    },
     data() {
         return {
             phone: '',
+            disabledSubmit: true,
             errors: {
                 phone: null
             }
@@ -53,6 +65,7 @@ export default {
         onSubmit(event) {
             let self = this;
             this.phone = window.inputRestorePasswordPhone;
+            this.disabledSubmit = true;
             window.addLoader();
 
             axios.post(this.reset_pass_url, {

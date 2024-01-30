@@ -17,11 +17,13 @@
             placeholder="Пароль"
             :value="password"
             :error="errors['password']"
+            v-model:value="password"
+            @keyup="checkDisableSubmit"
         ></InputComponent>
         <ButtonComponent
             id="enter"
             class_name="btn btn-primary"
-            :disabled=true
+            :disabled=disabledSubmit
             icon="icon-enter3"
             text="Войти"
             @click="onSubmit"
@@ -62,6 +64,19 @@ export default {
         InputComponent,
         ForgotPasswordComponent
     },
+    created() {
+        const self = this;
+        $.mask.definitions['n'] = "[7-8]";
+
+        $(document).ready(function () {
+            $('#login-modal input[name=phone]').mask(window.phoneMask).on('blur keypress keyup change', function () {
+                self.phone = $(this).val();
+                self.checkDisableSubmit();
+                self.errors['phone'] = null;
+                self.errors['password'] = null
+            });
+        });
+    },
     props: {
         'login_url': String,
     },
@@ -70,6 +85,7 @@ export default {
             rememberMe: false,
             phone: '',
             password: '',
+            disabledSubmit: true,
             errors: {
                 phone: null,
                 password: null
@@ -78,16 +94,18 @@ export default {
     },
     emits: ['loggedIn'],
     methods: {
+        checkDisableSubmit() {
+            this.disabledSubmit = this.phone.match(window.phoneRegExp) === null || !this.password.length;
+        },
         onSubmit() {
             let self = this;
-            this.phone = window.inputLoginPhone;
-            this.password = window.inputLoginPassword;
+            this.disabledSubmit = true;
             window.addLoader();
 
             axios.post(this.login_url, {
                 _token: window.tokenField,
-                phone: window.inputLoginPhone,
-                password: window.inputLoginPassword,
+                phone: this.phone,
+                password: this.password,
                 remember: this.rememberMe
             })
                 .then(function (response) {

@@ -7,8 +7,9 @@
             :placeholder="placeholder"
             :minlength="min"
             :maxlength="max"
+            :value="value"
             @input="$emit('update:value', $event.target.value)"
-        >{{ value }}</textarea>
+        ></textarea>
         <div class="error" v-if="error">{{ error }}</div>
     </div>
 </template>

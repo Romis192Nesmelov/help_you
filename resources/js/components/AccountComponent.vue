@@ -17,7 +17,7 @@
         <ButtonComponent
             id="get-register-code"
             class_name="btn btn-primary"
-            :disabled=true
+            :disabled=disabledGetCode
             icon="icon-key"
             text="Получить код"
             @click="getCode"
@@ -29,13 +29,12 @@
         <ButtonComponent
             id="change-phone-button"
             class_name="btn btn-primary"
-            :disabled=true
+            :disabled=disabledChangePhone
             icon="icon-reset"
             text="Изменить телефон"
             @click="changePhone"
         ></ButtonComponent>
     </ModalComponent>
-
     <ModalComponent id="change-password-modal" head="Изменить пароль" v-on:keyup.enter="changePassword">
         <InputComponent
             label="Старый пароль"
@@ -45,6 +44,7 @@
             placeholder="Пароль"
             :error="errors['old_password']"
             v-model:value="oldPassword"
+            @change="errors['old_password']=null"
         ></InputComponent>
         <InputComponent
             label="Новый пароль"
@@ -54,6 +54,7 @@
             placeholder="Новый пароль"
             :error="errors['password']"
             v-model:value="password"
+            @change="errors['password']=null"
         ></InputComponent>
         <InputComponent
             label="Подтверждение пароля"
@@ -63,11 +64,12 @@
             placeholder="Подтверждение пароля"
             :error="errors['password']"
             v-model:value="passwordConfirmation"
+            @change="errors['password']=null"
         ></InputComponent>
         <ButtonComponent
             id="change-password-button"
             class_name="btn btn-primary"
-            :disabled=true
+            :disabled="!(oldPassword.length && password.length && passwordConfirmation.length)"
             icon="icon-file-locked2"
             text="Изменить пароль"
             @click="changePassword"
@@ -86,6 +88,7 @@
                         :value="name"
                         :error="errors['name']"
                         v-model:value="name"
+                        @change="checkDisableSubmit"
                     ></InputComponent>
                     <InputComponent
                         label="Ваша фамилия"
@@ -95,6 +98,7 @@
                         :value="family"
                         :error="errors['family']"
                         v-model:value="family"
+                        @change="checkDisableSubmit"
                     ></InputComponent>
                     <InputComponent
                         label="Дата рождения"
@@ -111,6 +115,7 @@
                         placeholder="Введите ваш E-Mail"
                         :error="errors['email']"
                         v-model:value="email"
+                        @change="checkDisableSubmit"
                     ></InputComponent>
                     <CheckboxComponent
                         name="mail_notice"
@@ -145,7 +150,7 @@
                             id="account-save"
                             class_name="btn btn-primary"
                             text="Сохранить"
-                            :disabled="!(name.length && family.length && born.length && email.length)"
+                            :disabled=disabledSubmit
                             @click="onSubmit"
                         ></ButtonComponent>
                     </div>
@@ -174,7 +179,9 @@ export default {
         GetCodeAgainComponent
     },
     created() {
-        let user = JSON.parse(this.user);
+        let self = this,
+            user = JSON.parse(this.user);
+
         this.name = user.name;
         this.family = user.family;
         this.born = user.born;
@@ -182,6 +189,34 @@ export default {
         this.email = user.email;
         this.infoAbout = user.info_about;
         this.mailNotice = user.mail_notice;
+        self.checkDisableSubmit();
+
+        $.mask.definitions['c'] = "[1-2]";
+        $(document).ready(function () {
+            const changePhoneModal = $('#change-phone-modal'),
+                phoneChangePhoneModal = changePhoneModal.find('input[name=phone]'),
+                codeChangePhoneModal = changePhoneModal.find('input[name=code]'),
+                accountBlock = $('#account-block'),
+                userBornInput = accountBlock.find('input[name=born]');
+
+            phoneChangePhoneModal.mask(window.phoneMask).on('blur keypress keyup change', function () {
+                self.phone = $(this).val();
+                self.disabledGetCode = self.phone.match(window.phoneRegExp) === null;
+                self.enableChangePhoneModalButton();
+                self.errors['phone'] = null;
+            });
+
+            codeChangePhoneModal.mask(window.codeMask).on('blur keypress keyup change', function () {
+                self.code = $(this).val();
+                self.enableChangePhoneModalButton();
+                self.errors['code'] = null;
+            });
+
+            userBornInput.mask(window.bornMask).on('blur keypress keyup change', function () {
+                self.born = $(this).val();
+                self.checkDisableSubmit();
+            });
+        });
     },
     data() {
         return {
@@ -197,6 +232,9 @@ export default {
             passwordConfirmation: '',
             infoAbout: String,
             mailNotice: Boolean,
+            disabledSubmit: true,
+            disabledGetCode: true,
+            disabledChangePhone: true,
             errors: {
                 name: null,
                 family: null,
@@ -218,16 +256,27 @@ export default {
         'change_password_url': String
     },
     methods: {
+        checkDisableSubmit() {
+            let self = this;
+            $.each(['name','family','born','email'],function (k,field) {
+                self.errors[field] = null;
+            });
+            this.disabledSubmit = !(this.name.length && this.family.length && this.born.match(window.bornRegExp) && this.email.match(window.emailRegExp));
+        },
+        enableChangePhoneModalButton() {
+            this.disabledChangePhone = this.phone.match(window.phoneRegExp) === null || this.code.match(window.codeRegExp) === null;
+        },
         getCode() {
             if (!this.getCodeAgainTimer) {
                 let self = this;
-                this.runTimer();
+                this.disabledGetCode = true;
 
                 axios.post(this.get_code_url, {
                     _token: window.tokenField,
-                    phone: window.inputChangePhone
+                    phone: this.phone
                 })
                     .then(function (response) {
+                        self.runTimer();
                         window.showMessage(response.data.message);
                     })
                     .catch(function (error) {
@@ -239,23 +288,24 @@ export default {
         },
         changePhone() {
             let self = this;
-            this.phone = window.inputChangePhone;
-            this.code = window.inputChangePhoneCode;
+            this.disabledChangePhone = true;
             window.addLoader();
 
-            axios.post(this.get_code_url, {
+            axios.post(this.change_phone_url, {
                 _token: window.tokenField,
-                phone: window.inputChangePhone,
-                code:  window.inputChangePhoneCode
+                phone: this.phone,
+                code:  this.code
             })
                 .then(function (response) {
                     $('#change-phone-modal').modal('hide');
                     window.showMessage(response.data.message);
+                    window.removeLoader();
                 })
                 .catch(function (error) {
                     $.each(error.response.data.errors, (name,error) => {
                         self.errors[name] = error[0];
                     });
+                    window.removeLoader();
                 });
 
         },
@@ -281,6 +331,7 @@ export default {
         onSubmit() {
             let self = this;
             this.born = window.userBorn;
+            this.disabledSubmit = true;
             window.addLoader();
 
             axios.post(this.edit_account_url, {
@@ -289,8 +340,8 @@ export default {
                 family: self.family,
                 born: self.born,
                 email: self.email,
-                info_about: self.info_about,
-                mail_notice: self.mail_notice
+                info_about: self.infoAbout,
+                mail_notice: self.mailNotice
             })
                 .then(function (response) {
                     window.removeLoader();

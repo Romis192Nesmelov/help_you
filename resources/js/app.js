@@ -26,20 +26,13 @@ const app = createApp({
 });
 
 window.tokenField = $('input[name=_token]').val();
-window.avatarBlock = $('#avatar-block .avatar.cir');
-window.inputLoginPhone = '';
-window.inputLoginPassword = '';
-window.inputRegisterPhone = '';
-window.inputRegisterPassword = '';
-window.inputRegisterConfirmPassword = '';
-window.inputRegisterCode = '';
-window.inputIAgreeRegister = false;
-window.inputRestorePasswordPhone = '';
-window.inputChangePhone = '';
-window.inputChangePhoneCode = '';
-window.inputChangePasswordOldPassword = '';
-window.inputChangePasswordPassword = '';
-window.inputChangePasswordConfirmPassword = '';
+window.phoneMask = "+n(999)999-99-99";
+window.codeMask = "99-99-99";
+window.bornMask = "99-99-9999";
+window.phoneRegExp = /^((\+)?(\d)(\s)?(\()?[0-9]{3}(\))?(\s)?([0-9]{3})(\-)?([0-9]{2})(\-)?([0-9]{2}))$/gi;
+window.bornRegExp = /^([0-3][0-9])-([0-1][0-9])-((19([0-9][0-9]))|(20[0-9][0-9]))$/gi;
+window.emailRegExp = /^[a-zA-Z0-9][\-_\.\+\!\#\$\%\&\'\*\/\=\?\^\`\{\|]{0,1}([a-zA-Z0-9][\-_\.\+\!\#\$\%\&\'\*\/\=\?\^\`\{\|]{0,1})*[a-zA-Z0-9]@[a-zA-Z0-9][-\.]{0,1}([a-zA-Z][-\.]{0,1})*[a-zA-Z0-9]\.[a-zA-Z0-9]{1,}([\.\-]{0,1}[a-zA-Z]){0,}[a-zA-Z0-9]{0,}$/gi;
+window.codeRegExp = /^((\d){2}(\-)(\d){2}(\-)(\d){2})$/gi;
 window.singlePoint = null;
 
 window.toCamelize = str => str.replace(/-|_./g, x=>x[1].toUpperCase());
@@ -98,6 +91,14 @@ window.getPlaceMark = (point, data) => {
     });
 }
 
+window.mapInit = (container) => {
+    window.myMap = new ymaps.Map(container, {
+        center: [55.76, 37.64],
+        zoom: 10,
+        controls: []
+    });
+}
+
 window.zoomAndCenterMap = () => {
     window.myMap.setCenter(window.singlePoint, 17);
 }
@@ -133,9 +134,6 @@ $(document).ready(function () {
         scrollTo: 'bottom'
     });
 
-    $.mask.definitions['n'] = "[7-8]";
-    $.mask.definitions['c'] = "[1-2]";
-
     setTimeout(function () {
         removeLoader();
     }, 500);
@@ -160,221 +158,24 @@ $(document).ready(function () {
     });
     // MAIN BLOCK END
 
-    // AUTH BLOCK BEGIN
-    const loginModal = $('#login-modal'),
-        loginModalLogin = loginModal.find('input[name=phone]'),
-        loginModalPassword = loginModal.find('input[name=password]'),
-        phoneMask = "+n(999)999-99-99",
-        codeMask = "99-99-99",
-        bornMask = "99-99-9999",
-        phoneRegExp = /^((\+)?(\d)(\s)?(\()?[0-9]{3}(\))?(\s)?([0-9]{3})(\-)?([0-9]{2})(\-)?([0-9]{2}))$/gi,
-        bornRegExp = /^([0-3][0-9])-([0-1][0-9])-((19([0-9][0-9]))|(20[0-9][0-9]))$/gi,
-        emailRegExp = /^[a-zA-Z0-9][\-_\.\+\!\#\$\%\&\'\*\/\=\?\^\`\{\|]{0,1}([a-zA-Z0-9][\-_\.\+\!\#\$\%\&\'\*\/\=\?\^\`\{\|]{0,1})*[a-zA-Z0-9]@[a-zA-Z0-9][-\.]{0,1}([a-zA-Z][-\.]{0,1})*[a-zA-Z0-9]\.[a-zA-Z0-9]{1,}([\.\-]{0,1}[a-zA-Z]){0,}[a-zA-Z0-9]{0,}$/gi,
-        codeRegExp = /^((\d){2}(\-)(\d){2}(\-)(\d){2})$/gi;
-
-    loginModalLogin.mask(phoneMask).keyup(function () {
-        if ($(this).val().match(phoneRegExp)) {
-            window.inputLoginPhone = $(this).val();
-            enableLoginModalButtons();
-        } else {
-            window.inputLoginPhone = null;
-            enableLoginModalButtons();
-        }
-    });
-
-    loginModalPassword.keyup(function () {
-        if ($(this).val().length) {
-            window.inputLoginPassword = $(this).val();
-            enableLoginModalButtons();
-        } else {
-            window.inputLoginPassword = null;
-            enableLoginModalButtons();
-        }
-    });
-
-    const registerModal = $('#register-modal'),
-        loginRegisterModal = registerModal.find('input[name=phone]'),
-        passwordRegisterModal = registerModal.find('input[name=password]'),
-        confirmPasswordRegisterModal = registerModal.find('input[name=password_confirmation]'),
-        codeRegisterModal = registerModal.find('input[name=code]'),
-        iAgreeRegisterModal = registerModal.find('input[name=i_agree]');
-
-    loginRegisterModal.mask(phoneMask).keyup(function () {
-        if ($(this).val().match(phoneRegExp)) {
-            window.inputRegisterPhone = $(this).val();
-            enableRegisterModalButtons();
-        } else {
-            window.inputRegisterPhone = null;
-            enableRegisterModalButtons();
-        }
-    });
-
-    passwordRegisterModal.keyup(function () {
-        if ($(this).val().length) {
-            window.inputRegisterPassword = $(this).val();
-            enableRegisterModalButtons();
-        } else {
-            window.inputRegisterPassword = null;
-            enableRegisterModalButtons();
-        }
-    });
-
-    confirmPasswordRegisterModal.keyup(function () {
-        if ($(this).val().length) {
-            window.inputRegisterConfirmPassword = $(this).val();
-            enableRegisterModalButtons();
-        } else {
-            window.inputRegisterConfirmPassword = null;
-            enableRegisterModalButtons();
-        }
-    });
-
-    codeRegisterModal.mask(codeMask).keyup(function () {
-        if ($(this).val().match(codeRegExp)) {
-            window.inputRegisterCode = $(this).val();
-            enableRegisterModalButtons();
-        } else {
-            window.inputRegisterCode = null;
-            enableRegisterModalButtons();
-        }
-    });
-
-    iAgreeRegisterModal.change(function () {
-        window.inputIAgreeRegister = $(this).is(':checked');
-        enableRegisterModalButtons();
-    });
-
-    const submitRestorePasswordButton = $('#reset-button');
-    $('#restore-password-modal input[name=phone]').mask(phoneMask).keyup(function () {
-        if ($(this).val().match(phoneRegExp)) {
-            window.inputRestorePasswordPhone = $(this).val();
-            submitRestorePasswordButton.removeAttr('disabled');
-        } else {
-            window.inputRestorePasswordPhone = null;
-            submitRestorePasswordButton.attr('disabled', 'disabled');
-        }
-    });
-    // AUTH BLOCK END
-
     // ACCOUNT BLOCK BEGIN
-    imagePreview(window.avatarBlock, '/images/def_avatar.svg');
-
-    const changePhoneModal = $('#change-phone-modal'),
-        phoneChangePhoneModal = changePhoneModal.find('input[name=phone]'),
-        codeChangePhoneModal = changePhoneModal.find('input[name=code]');
-
-    phoneChangePhoneModal.mask(phoneMask).keyup(function () {
-        if ($(this).val().match(phoneRegExp)) {
-            window.inputChangePhone = $(this).val();
-            enableChangePhoneModalButton();
-        } else {
-            window.inputChangePhone = null;
-            enableChangePhoneModalButton();
-        }
-    });
-
-    codeChangePhoneModal.mask(codeMask).keyup(function () {
-        if ($(this).val().match(codeRegExp)) {
-            window.inputChangePhoneCode = $(this).val();
-            enableChangePhoneModalButton();
-        } else {
-            window.inputChangePhoneCode = null;
-            enableChangePhoneModalButton();
-        }
-    });
-
-    const changePasswordModal = $('#change-password-modal'),
-        oldPasswordChangePasswordModal = changePasswordModal.find('input[name=old_password]'),
-        passwordChangePasswordModal = changePasswordModal.find('input[name=password]'),
-        confirmPasswordChangePasswordModal = changePasswordModal.find('input[name=password_confirmation]');
-
-    oldPasswordChangePasswordModal.keyup(function () {
-        if ($(this).val().length) {
-            window.inputChangePasswordOldPassword = $(this).val();
-            enableChangePasswordModalButton();
-        } else {
-            window.inputChangePasswordOldPassword = null;
-            enableChangePasswordModalButton();
-        }
-    });
-
-    passwordChangePasswordModal.keyup(function () {
-        if ($(this).val().length) {
-            window.inputChangePasswordPassword = $(this).val();
-            enableChangePasswordModalButton();
-        } else {
-            window.inputChangePasswordPassword = null;
-            enableChangePasswordModalButton();
-        }
-    });
-
-    confirmPasswordChangePasswordModal.keyup(function () {
-        if ($(this).val().length) {
-            window.inputChangePasswordConfirmPassword = $(this).val();
-            enableChangePasswordModalButton();
-        } else {
-            window.inputChangePasswordConfirmPassword = null;
-            enableChangePasswordModalButton();
-        }
-    });
-
-    const accountBlock = $('#account-block'),
-        userNameInput = accountBlock.find('input[name=name]'),
-        userFamilyInput = accountBlock.find('input[name=family]'),
-        userBornInput = accountBlock.find('input[name=born]'),
-        useEmailInput = accountBlock.find('input[name=email]');
-
-    window.userName = userNameInput.val();
-    window.userFamily = userFamilyInput.val();
-    window.userBorn = userBornInput.val();
-    window.userEmail = useEmailInput.val();
-
-    userNameInput.keyup(function () {
-        if ($(this).val().length) {
-            window.userName = $(this).val();
-            enableAccountButton();
-        } else {
-            window.userName = null;
-            enableAccountButton();
-        }
-    });
-
-    userFamilyInput.keyup(function () {
-        if ($(this).val().length) {
-            window.userFamily = $(this).val();
-            enableAccountButton();
-        } else {
-            window.userFamily = null;
-            enableAccountButton();
-        }
-    });
-
-    userBornInput.mask(bornMask).keyup(function () {
-        if ($(this).val().match(bornRegExp)) {
-            window.userBorn = $(this).val();
-            enableAccountButton();
-        } else {
-            window.userBorn = null;
-            enableAccountButton();
-        }
-    });
-
-    useEmailInput.keyup(function () {
-        if ($(this).val().match(emailRegExp)) {
-            window.userEmail = $(this).val();
-            enableAccountButton();
-        } else {
-            window.userEmail = null;
-            enableAccountButton();
-        }
-    });
+    window.avatarBlock = $('#avatar-block .avatar.cir');
+    window.defAvatar = '/images/def_avatar.svg';
+    imagePreview(window.avatarBlock, window.defAvatar);
     // ACCOUNT BLOCK END
 
     // EDIT ORDER BLOCK BEGIN
     imagePreview($('.order-photo'));
 
     if ($('#map-steps').length) {
-        ymaps.ready(mapInitWithContainerForEditOrder);
+        ymaps.ready(() => {
+            mapInit('map-steps');
+            if (window.singlePoint) {
+                window.placemark = window.getPlaceMark(window.singlePoint,{});
+                window.myMap.geoObjects.add(window.placemark);
+                window.zoomAndCenterMap();
+            }
+        });
     }
     // EDIT ORDER BLOCK END
 });
@@ -573,63 +374,6 @@ const bindFancybox = () => {
     });
 }
 
-const enableLoginModalButtons = () => {
-    const submitLoginButton = $('#enter');
-    if (window.inputLoginPhone && window.inputLoginPassword) submitLoginButton.removeAttr('disabled');
-    else submitLoginButton.attr('disabled','disabled');
-}
-
-const enableRegisterModalButtons = () => {
-    const submitRegisterButton = $('#register'),
-        getCodeRegisterCodeButton = $('#get-register-code');
-
-    if (window.inputRegisterPhone && window.inputRegisterPassword && window.inputRegisterConfirmPassword) {
-        getCodeRegisterCodeButton.removeAttr('disabled');
-        if (window.inputRegisterCode && window.inputIAgreeRegister) submitRegisterButton.removeAttr('disabled');
-        else submitRegisterButton.attr('disabled','disabled');
-    } else {
-        getCodeRegisterCodeButton.attr('disabled','disabled');
-        submitRegisterButton.attr('disabled','disabled');
-    }
-}
-
-const enableChangePhoneModalButton = () => {
-    const submitChangePhoneButton = $('#change-phone-button'),
-        getCodeChangePhoneButton = $('#get-register-code'),
-        getCodeAgainBlock = $('#get-code-again');
-
-    if (window.inputChangePhone) {
-        if (!getCodeAgainBlock.length) getCodeChangePhoneButton.removeAttr('disabled');
-        else getCodeChangePhoneButton.attr('disabled','disabled');
-
-        if (window.inputChangePhoneCode) submitChangePhoneButton.removeAttr('disabled');
-        else submitChangePhoneButton.attr('disabled','disabled');
-    } else {
-        submitChangePhoneButton.attr('disabled','disabled');
-        getCodeChangePhoneButton.attr('disabled','disabled');
-    }
-}
-
-const enableChangePasswordModalButton = () => {
-    const submitChangePasswordButton = $('#change-password-button');
-
-    if (window.inputChangePasswordOldPassword && window.inputChangePasswordPassword && window.inputChangePasswordConfirmPassword) {
-        submitChangePasswordButton.removeAttr('disabled');
-    } else {
-        submitChangePasswordButton.attr('disabled', 'disabled');
-    }
-}
-
-const enableAccountButton = () => {
-    const submitChangeAccountButton = $('#account-save');
-
-    if (window.userName && window.userFamily && window.userBorn && window.userEmail) {
-        submitChangeAccountButton.removeAttr('disabled');
-    } else {
-        submitChangeAccountButton.attr('disabled','disabled');
-    }
-}
-
 const enablePointImagesCarousel = (container, autoplay) => {
     container.owlCarousel(owlSettings(
         10,
@@ -688,15 +432,6 @@ const imagePreview = (container, defImage) => {
             }
         });
     });
-}
-
-const mapInitWithContainerForEditOrder = () => {
-    mapInit('map-steps');
-    if (window.singlePoint) {
-        window.placemark = window.getPlaceMark(window.singlePoint,{});
-        window.myMap.geoObjects.add(window.placemark);
-        window.zoomAndCenterMap();
-    }
 }
 
 // const getNewMessageRow = (selfFlag) => {
@@ -841,13 +576,6 @@ const mapInitWithContainerForEditOrder = () => {
 //         }
 //     });
 // }
-const mapInit = (container) => {
-    window.myMap = new ymaps.Map(container, {
-        center: [55.76, 37.64],
-        zoom: 10,
-        controls: []
-    });
-}
 
 const owlSettings = (margin, nav, timeout, responsive, autoplay) => {
     let navButtonBlack1 = '<img src="/images/arrow_left.svg" />',

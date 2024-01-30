@@ -96,6 +96,7 @@ export default {
             avatarPosX: Number,
             avatarPosY: Number,
             leftMenu: Array,
+            saveAvatarFlag: false,
             errors: {
                 avatar: null
             },
@@ -121,11 +122,15 @@ export default {
         resetAvatar() {
             let self = this;
             window.avatarBlock.removeAttr('style');
-            window.avatarBlock.css('background-image','url(/'+self.userObj.avatar+')');
-            if (self.userObj.avatar_props['background-size']) window.avatarBlock.css('background-size',self.userObj.avatar_props['background-size']);
-            $.each(['background-position-x','background-position-y'],function (k, prop) {
-                if (self.userObj.avatar_props[prop]) window.avatarBlock.css(prop,(self.userObj.avatar_props[prop] * 0.35));
-            });
+            if (this.userObj.avatar) {
+                window.avatarBlock.css('background-image','url(/'+this.userObj.avatar+')');
+                if (self.userObj.avatar_props['background-size']) window.avatarBlock.css('background-size',this.userObj.avatar_props['background-size']);
+                $.each(['background-position-x','background-position-y'],function (k, prop) {
+                    if (self.userObj.avatar_props[prop]) window.avatarBlock.css(prop,(self.userObj.avatar_props[prop] * 0.35));
+                });
+            } else {
+                window.avatarBlock.css('background-image','url('+window.defAvatar+')');
+            }
         },
         avatarTune() {
             const self = this,
@@ -175,10 +180,14 @@ export default {
                 self.avatarImage.draggable({
                     containment: "#avatar-container"
                 });
-                tuneAvatarModal.modal('show');
+                tuneAvatarModal.modal('show').on('hidden.bs.modal', () => {
+                    if (!self.saveAvatarFlag) self.resetAvatar();
+                });
             });
         },
         saveAvatar() {
+            this.saveAvatarFlag = true;
+
             let basePosY = 200 / 2 - this.avatarImage.height() / 2,
                 avatarPosX = parseInt(this.avatarImage.css('left')),
                 avatarPosY = parseInt(this.avatarImage.css('top')) + basePosY;
