@@ -63,7 +63,6 @@
         <CheckboxComponent
             id="i_agree"
             name="i_agree"
-            :checked=iAgree
             label="Даю согласие на обработку персональных данных"
             v-model:checked="iAgree"
             @change="enableRegisterButtons"

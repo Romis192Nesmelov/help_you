@@ -59,6 +59,7 @@ class NotificationEvent implements ShouldBroadcast
         return [
             'notice' => $this->noticeType,
             'order' => $this->order,
+            'images' => $this->order->images,
             'performers' => $this->order->performers,
             'user' => $this->order->user,
             'order_type' => $this->order->orderType,

@@ -284,6 +284,11 @@ export default {
                 self.eventOrderChange(ordersEventFlag);
                 self.bellAlert(otherEventsFlag, ordersEventFlag);
             });
+
+            window.emitter.on('read-order', orderId => {
+                if (this.newsSubscriptions['subscription'+orderId])
+                    delete this.newsSubscriptions['subscription'+orderId];
+            });
         },
         eventOrderChange(ordersEventFlag) {
             if (ordersEventFlag) {
@@ -307,30 +312,10 @@ export default {
         },
         bellAlert(otherEventsFlag, ordersEventFlag) {
             if (otherEventsFlag || ordersEventFlag) {
-                let counter = 0,
-                    degrees = 15;
-
-                const bellIcon = $('#right-button-block .fa.fa-bell-o'),
-                    audio = new Audio(this.bell_sound),
-                    bellRinging = setInterval(() => {
-                        degrees *= -1;
-                        bellRing(degrees);
-                        counter++;
-                        if (counter > 5) {
-                            clearInterval(bellRinging);
-                            bellRing(0);
-                        }
-                    }, 200);
-
+                window.bellRinging($('#right-button-block .fa.fa-bell-o'));
+                const audio = new Audio(this.bell_sound);
                 audio.muted = false;
                 audio.play();
-
-                const bellRing = (degrees) => {
-                    bellIcon.css({'-webkit-transform' : 'rotate('+ degrees +'deg)',
-                        '-moz-transform' : 'rotate('+ degrees +'deg)',
-                        '-ms-transform' : 'rotate('+ degrees +'deg)',
-                        'transform' : 'rotate('+ degrees +'deg)'});
-                }
             }
         }
     },

@@ -5,6 +5,7 @@ use App\Events\NotificationEvent;
 use App\Events\OrderEvent;
 use App\Http\Requests\Order\RemovePerformerRequest;
 use App\Http\Requests\Order\SetRatingRequest;
+use App\Http\Resources\Orders\OrdersResource;
 use App\Models\Rating;
 use App\Models\ReadPerformer;
 use App\Models\ReadRemovedPerformer;
@@ -94,20 +95,18 @@ class OrderController extends BaseController
 
     public function getOrders(): JsonResponse
     {
-        return response()->json([
+        return response()->json(OrdersResource::make([
             'orders' => Order::query()
                 ->default()
-//                ->filtered()
-//                ->searched()
+                ->filtered()
+                ->searched()
                 ->with(['orderType','subType','images','user','performers'])
                 ->get(),
             'subscriptions' => Subscription::query()
                 ->with('orders')
                 ->default()
                 ->get()
-        ],
-            200
-        );
+        ])->resolve(), 200);
     }
 
     public function getPreview(): JsonResponse

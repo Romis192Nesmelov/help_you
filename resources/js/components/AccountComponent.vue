@@ -330,7 +330,6 @@ export default {
         },
         onSubmit() {
             let self = this;
-            this.born = window.userBorn;
             this.disabledSubmit = true;
             window.addLoader();
 

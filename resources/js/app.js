@@ -10,6 +10,7 @@ import MyHelpListComponent from "./components/MyHelpListComponent.vue";
 import MySubscriptionsComponent from "./components/MySubscriptionsComponent.vue";
 import MyChatsComponent from "./components/MyChatsComponent.vue";
 import EditOrderComponent from "./components/EditOrderComponent.vue";
+import OrdersComponent from "./components/OrdersComponent.vue";
 
 const app = createApp({
     components: {
@@ -21,7 +22,8 @@ const app = createApp({
         MyHelpListComponent,
         MySubscriptionsComponent,
         MyChatsComponent,
-        EditOrderComponent
+        EditOrderComponent,
+        OrdersComponent
     }
 });
 
@@ -36,24 +38,6 @@ window.codeRegExp = /^((\d){2}(\-)(\d){2}(\-)(\d){2})$/gi;
 window.singlePoint = null;
 
 window.toCamelize = str => str.replace(/-|_./g, x=>x[1].toUpperCase());
-
-window.getUserAge = (born) => {
-    let now = new Date(),
-        bornArr = born.split('-');
-    let age = now.getFullYear() - parseInt(bornArr[2]);
-    if (now.getMonth() + 1 <= parseInt(bornArr[1]) && now.getDay() < parseInt(bornArr[1])) {
-        age--;
-    }
-    let lastDigit = age.toString().substr(-1,1),
-        word;
-
-    if (lastDigit === 0) word = 'лет';
-    else if (lastDigit === 1) word = 'год';
-    else if (lastDigit > 1 && lastDigit < 5) word = 'года';
-    else word = 'лет';
-
-    return age + ' ' + word;
-}
 
 window.userRating = (ratings) => {
     if (ratings.length) {
@@ -85,22 +69,62 @@ window.removeLoader = () => {
     $('body').css('overflow-y', 'auto');
 }
 
+window.bellRinging = (bellIcon) => {
+    let counter = 0,
+        degrees = 15,
+        bellRinging = setInterval(() => {
+            degrees *= -1;
+            bellRing(degrees);
+            counter++;
+            if (counter > 5) {
+                clearInterval(bellRinging);
+                bellRing(0);
+            }
+        }, 200);
+
+    const bellRing = (degrees) => {
+        bellIcon.css({'-webkit-transform' : 'rotate('+ degrees +'deg)',
+            '-moz-transform' : 'rotate('+ degrees +'deg)',
+            '-ms-transform' : 'rotate('+ degrees +'deg)',
+            'transform' : 'rotate('+ degrees +'deg)'});
+    }
+}
+
 window.getPlaceMark = (point, data) => {
     return new ymaps.Placemark(point, data, {
         preset: 'islands#darkOrangeCircleDotIcon'
     });
 }
 
-window.mapInit = (container) => {
-    window.myMap = new ymaps.Map(container, {
-        center: [55.76, 37.64],
-        zoom: 10,
-        controls: []
-    });
-}
-
 window.zoomAndCenterMap = () => {
     window.myMap.setCenter(window.singlePoint, 17);
+}
+
+window.bindFancybox = () => {
+    setTimeout(() => {
+        $('.fancybox').fancybox({
+            'autoScale': true,
+            'touch': false,
+            'transitionIn': 'elastic',
+            'transitionOut': 'elastic',
+            'speedIn': 500,
+            'speedOut': 300,
+            'autoDimensions': true,
+            'centerOnScroll': true
+        });
+    }, 200);
+}
+
+window.enablePointImagesCarousel = () => {
+    setTimeout(() => {
+        $('.images.owl-carousel').owlCarousel(owlSettings(
+            10,
+            false,
+            6000,
+            {0: {items: 1}},
+            true
+        ));
+    }, 200);
 }
 
 window.emitter = mitt();
@@ -139,7 +163,7 @@ $(document).ready(function () {
     }, 500);
 
     // Fancybox init
-    bindFancybox();
+    window.bindFancybox();
 
     $('#main-nav .navbar-toggler').click(function () {
         if (!$(this).hasClass('collapsed')) {
@@ -178,64 +202,52 @@ $(document).ready(function () {
         });
     }
     // EDIT ORDER BLOCK END
-});
-    // // ORDERS BLOCK BEGIN
-    // window.selectedPoints = $('#selected-points');
-    // window.selectedPoint = null;
-    // window.respondButton = $('#respond-button');
-    // window.pointsContainer = $('#points-container');
-    // window.selectedPointsOpened = false;
-    // window.cickedTarget = null;
-    //
-    // if ($('#map').length) {
-    //     ymaps.ready(mapInitWithContainerForOrders);
-    //     window.Echo.channel('order_event').listen('.order', res => {
-    //         if (res.notice === 'remove_order') {
-    //             for (let i=0;i<window.placemarks.length;i++) {
-    //                 if (window.placemarks[i].properties.get('orderId') === res.order.id) {
-    //                     window.clusterer.remove(window.placemarks[i]);
-    //                     break;
-    //                 }
+
+    // ORDERS BLOCK BEGIN
+    if ($('#map').length) {
+        window.selectedPointsDie = $('#selected-points');
+        window.selectedPointsDie.mCustomScrollbar({
+            axis: 'y',
+            theme: 'light-3',
+            alwaysShowScrollbar: 0
+        });
+        ymaps.ready(() => {
+            mapInit('map');
+            window.emitter.emit('map-is-ready');
+        });
+    }
+    // window.Echo.channel('order_event').listen('.order', res => {
+    //     if (res.notice === 'remove_order') {
+    //         for (let i=0;i<window.placemarks.length;i++) {
+    //             if (window.placemarks[i].properties.get('orderId') === res.order.id) {
+    //                 window.clusterer.remove(window.placemarks[i]);
+    //                 break;
     //             }
-    //         } else {
-    //             let markId = window.placemarks.length,
-    //                 createdAt = new Date(res.order.created_at);
-    //
-    //             window.placemarks.push(getPlaceMark([res.order.latitude, res.order.longitude], {
-    //                 placemarkId: markId,
-    //                 orderId: res.order.id,
-    //                 name: res.order_type.name,
-    //                 address: res.order.address,
-    //                 orderType: res.order_type.name,
-    //                 images: res.images,
-    //                 subtype: res.sub_type.name,
-    //                 need_performers: res.order.need_performers,
-    //                 performers: res.performers.length,
-    //                 user: res.user,
-    //                 date: createdAt.toLocaleDateString('ru-RU'),
-    //                 description_short: res.order.description_short,
-    //                 description_full: res.order.description_full
-    //             }));
-    //             window.clusterer.add(window.placemarks);
     //         }
-    //     });
-    // }
+    //     } else {
+    //         let markId = window.placemarks.length,
+    //             createdAt = new Date(res.order.created_at);
     //
-    // $('#apply-button').click((e) => {
-    //     e.preventDefault();
-    //     removeSelectedPoints();
-    //     window.myMap.geoObjects.removeAll();
-    //     getPoints();
-    // });
-    //
-    // $('#selected-points i.icon-close2').click(() => {
-    //     if (window.selectedPointsOpened) {
-    //         removeSelectedPoints();
-    //         // window.myMap.balloon.close();
+    //         window.placemarks.push(getPlaceMark([res.order.latitude, res.order.longitude], {
+    //             placemarkId: markId,
+    //             orderId: res.order.id,
+    //             name: res.order_type.name,
+    //             address: res.order.address,
+    //             orderType: res.order_type.name,
+    //             images: res.images,
+    //             subtype: res.sub_type.name,
+    //             need_performers: res.order.need_performers,
+    //             performers: res.performers.length,
+    //             user: res.user,
+    //             date: createdAt.toLocaleDateString('ru-RU'),
+    //             description_short: res.order.description_short,
+    //             description_full: res.order.description_full
+    //         }));
+    //         window.clusterer.add(window.placemarks);
     //     }
     // });
-    // // ORDERS BLOCK END
-    //
+    // ORDERS BLOCK END
+});
     // //CHATS BLOCK BEGIN
     // const messagesBlock = $('#messages'),
     //     orderDataModal = $('#order-data-modal');
@@ -360,28 +372,12 @@ $(document).ready(function () {
     // }
     //CHATS BLOCK END
 
-const bindFancybox = () => {
-    // Fancybox init
-    $('.fancybox').fancybox({
-        'autoScale': true,
-        'touch': false,
-        'transitionIn': 'elastic',
-        'transitionOut': 'elastic',
-        'speedIn': 500,
-        'speedOut': 300,
-        'autoDimensions': true,
-        'centerOnScroll': true
+const mapInit = (container) => {
+    window.myMap = new ymaps.Map(container, {
+        center: [55.76, 37.64],
+        zoom: 10,
+        controls: []
     });
-}
-
-const enablePointImagesCarousel = (container, autoplay) => {
-    container.owlCarousel(owlSettings(
-        10,
-        autoplay,
-        6000,
-        {0: {items: 1}},
-        autoplay
-    ));
 }
 
 const imagePreview = (container, defImage) => {
@@ -508,74 +504,7 @@ const imagePreview = (container, defImage) => {
 //         );
 //     }
 // }
-//
-// const getUrl = (form, url, callBack) => {
-//     let formData = new FormData(),
-//         submitButton = form.find('button[type=submit]');
-//
-//     form.find('input.error').removeClass('error');
-//     form.find('div.error').html('');
-//     form.find('input, select, textarea').each(function () {
-//         if ($(this).attr('type') === 'file') formData.append($(this).attr('name'), $(this)[0].files[0]);
-//         else if ($(this).attr('type') === 'radio') {
-//             $(this).each(function () {
-//                 if ($(this).is(':checked')) formData.append($(this).attr('name'), $(this).val());
-//             });
-//         }
-//         else if ($(this).attr('type') === 'checkbox') {
-//             if ($(this).is(':checked')) formData.append($(this).attr('name'), $(this).val());
-//         }
-//         else {
-//             formData.append($(this).attr('name'), $(this).val());
-//         }
-//     });
-//     submitButton.attr('disabled','disabled');
-//
-//     processingAjax(
-//         url ? url : form.attr('action'),
-//         formData,
-//         form.attr('method'),
-//         (data) => {
-//             if (callBack) callBack(data);
-//             submitButton.removeAttr('disabled');
-//         },
-//         (data) => {
-//             submitButton.removeAttr('disabled');
-//         }
-//     );
-// }
-//
-// const processingAjax = (url, formData, method, successCallback, failCallback) => {
-//     $.ajax({
-//         url: url,
-//         data: formData,
-//         processData: false,
-//         contentType: false,
-//         type: method,
-//         cache: false,
-//         success: (data) => {
-//             if (successCallback) successCallback(data);
-//         },
-//         error: (data) => {
-//             let replaceErr = {
-//                 'body':'сообщения',
-//                 'phone':'телефон',
-//                 'email':'E-mail',
-//                 'user_name':'имя'
-//             };
-//
-//             $.each(data.responseJSON.errors, function (field, error) {
-//                 var errorMsg = error[0];
-//                 $.each(replaceErr, function (src,replace) {
-//                     errorMsg = errorMsg.replace(src,replace);
-//                 });
-//                 $('input[name='+field+']').addClass('error');
-//                 $('.error.'+field).html(errorMsg);
-//             });
-//             if (failCallback) failCallback(data);
-//         }
-//     });
-// }
+
 
 const owlSettings = (margin, nav, timeout, responsive, autoplay) => {
     let navButtonBlack1 = '<img src="/images/arrow_left.svg" />',
@@ -591,877 +520,4 @@ const owlSettings = (margin, nav, timeout, responsive, autoplay) => {
         responsive: responsive,
         navText: [navButtonBlack1, navButtonBlack2]
     }
-}
-
-// const mapInitWithContainerForOrders = () => {
-//     mapInit('map');
-//     getPoints();
-// }
-
-// const getPoints = () => {
-//     getUrl($('form'), (window.getPreviewFlag ? getPreviewUrl : null), (data) => {
-//         window.placemarks = [];
-//         let orders = data.orders;
-//         window.subscriptions = [];
-//         window.unreadOrders = [];
-//         if (data.subscriptions.length) {
-//             $.each(data.subscriptions, function (k,subscription) {
-//                 window.subscriptions.push(subscription.user_id);
-//                 if (subscription.orders.length) {
-//                     $.each(subscription.orders, function (k,order) {
-//                         window.unreadOrders.push(order.id);
-//                     });
-//                 }
-//             });
-//         }
-//         if (data) {
-//             $.each(orders, function (k,point) {
-//                 let createdAt = new Date(point.created_at),
-//                     meIsPerformer = false;
-//                 if (point.performers.length) {
-//                     for (let p=0;p<point.performers.length;p++) {
-//                         if (point.performers[p].id === userId) {
-//                             meIsPerformer = true;
-//                             break;
-//                         }
-//                     }
-//                 }
-//
-//                 if (!meIsPerformer) {
-//                     window.placemarks.push(getPlaceMark([point.latitude, point.longitude], {
-//                         placemarkId: k,
-//                         // balloonContentHeader: point.order_type.name,
-//                         // balloonContentBody: point.address,
-//                         orderId: point.id,
-//                         name: point.name,
-//                         address: point.address,
-//                         orderType: point.order_type.name,
-//                         images: point.images,
-//                         subtype: point.sub_type ? point.sub_type.name : null,
-//                         need_performers: point.need_performers,
-//                         performers: point.performers.length,
-//                         user: point.user,
-//                         date: createdAt.toLocaleDateString('ru-RU'),
-//                         description_short: point.description_short,
-//                         description_full: point.description_full
-//                     }));
-//
-//                     if (window.getPreviewFlag) {
-//                         window.getPreviewFlag = false;
-//                         forceOpenOrder(0);
-//                     } else if (window.openOrderId && window.openOrderId === point.id) {
-//                         forceOpenOrder(k);
-//                     }
-//                 }
-//             });
-//
-//             // Создаем собственный макет с информацией о выбранном геообъекте.
-//             // let customBalloonContentLayout = ymaps.templateLayoutFactory.createClass([
-//             //     '<ul class=list>',
-//             //     // Выводим в цикле список всех геообъектов.
-//             //     '{% for geoObject in properties.geoObjects %}',
-//             //     '<li><div class="balloon-head">{{ geoObject.properties.balloonContentHeader|raw }}</div><div class="balloon-content">{{ geoObject.properties.balloonContentBody|raw }}</div></li>',
-//             //     '{% endfor %}',
-//             //     '</ul>'
-//             // ].join(''));
-//
-//             window.clusterer = new ymaps.Clusterer({
-//                 preset: 'islands#darkOrangeClusterIcons',
-//                 clusterDisableClickZoom: true,
-//                 clusterOpenBalloonOnClick: false,
-//                 // Устанавливаем режим открытия балуна.
-//                 // В данном примере балун никогда не будет открываться в режиме панели.
-//                 clusterBalloonPanelMaxMapArea: 0,
-//                 // По умолчанию опции балуна balloonMaxWidth и balloonMaxHeight не установлены для кластеризатора,
-//                 // так как все стандартные макеты имеют определенные размеры.
-//                 clusterBalloonMaxHeight: 200,
-//                 // Устанавливаем собственный макет контента балуна.
-//                 // clusterBalloonContentLayout: customBalloonContentLayout,
-//             });
-//
-//             // Click on cluster
-//             // window.clusterer.events.add('click', function (e) {
-//             //     $.each(e.get('target').properties._data.geoObjects, function (k, object) {
-//             //         console.log(object.properties.get('user'));
-//             //     });
-//             // });
-//
-//             window.myMap.geoObjects.events.add('click', function (e) {
-//                 var target = e.get('target');
-//
-//                 target.options.set('iconColor', '#bc202e');
-//                 if (target.properties.get('geoObjects')) {
-//                     if (window.selectedPointsOpened) {
-//                         removeSelectedPoints(target,() => { clickedToCluster(target);});
-//                     } else clickedToCluster(target);
-//                 } else {
-//                     if (window.selectedPointsOpened) {
-//                         removeSelectedPoints(target,() => { clickedToPoint(target);});
-//                     } else clickedToPoint(target);
-//                 }
-//             });
-//             addPointsToMap();
-//         }
-//     });
-// }
-
-// const addPointsToMap = () => {
-//     window.clusterer.add(window.placemarks);
-//     window.myMap.geoObjects.add(window.clusterer);
-// }
-
-// const showOrder = (point) => {
-//     let properties = point.properties,
-//         orderId = properties.get('orderId'),
-//         currentSubType = properties.get('subtype'),
-//         user = properties.get('user'),
-//         orderName = properties.get('name'),
-//         images = properties.get('images'),
-//         descriptionShort = properties.get('description_short'),
-//         descriptionFull = properties.get('description_full'),
-//         orderContainer = $('<div></div>').addClass('order-block mb-3').attr('id','order-'+properties.get('placemarkId'));
-//
-//     // Check subscriptions
-//     let subscribeBellClass = window.subscriptions.includes(user.id) ? 'icon-bell-cross' : 'icon-bell-check',
-//         posUnreadOrder = window.unreadOrders.indexOf(orderId);
-//
-//     if (posUnreadOrder !== -1) {
-//         delete window.unreadOrders[posUnreadOrder];
-//         $.get(
-//             readOrderUrl,
-//             {'order_id': orderId}
-//         ).done(() => {
-//             $('#unread-order-' + orderId).remove();
-//             checkDropDownMenuEmpty();
-//         });
-//     }
-//
-//     orderContainer
-//         .append(
-//             $('<h6></h6>').addClass('order-number').html(orderNumberText + orderId + fromText + properties.get('date'))
-//         ).append(
-//             $('<div></div>').addClass('w-100 d-flex align-items-center justify-content-between')
-//                 .append(
-//                     $('<div></div>').addClass('d-flex align-items-center justify-content-center')
-//                         .append(
-//                             getAvatarBlock(user, 0.35)
-//                         ).append(
-//                             $('<div></div>').css('width',215)
-//                                 .append(
-//                                     $('<div></div>').addClass('ms-3 fs-lg-6 fs-sm-7 user-name').html(getUserName(user))
-//                                 ).append(
-//                                     $('<div></div>').addClass('fs-lg-6 fs-sm-7 ms-3 user-age').html('')
-//                                 )
-//                             )
-//                     ).append($('<i></i>').addClass('subscribe-icon ' + subscribeBellClass))
-//         );
-//     getUserAge(user.id);
-//
-//     if (images.length) {
-//         let imagesContainer = $('<div></div>').addClass('images owl-carousel mt-3');
-//         $.each(images, function (k, image) {
-//             imagesContainer.append(
-//                 $('<a></a>').addClass('fancybox').attr('href','/' + image.image).append(
-//                     $('<div></div>').addClass('image').css('background-image','url(/'+image.image+')')
-//                 )
-//             );
-//         });
-//         orderContainer.append(imagesContainer);
-//         enablePointImagesCarousel(imagesContainer,images.length > 1);
-//     }
-//
-//     orderContainer.append($('<h2></h2>').addClass('order-name text-dark text-left mt-3 mb-4').html(orderName));
-//     orderContainer.append($('<h2></h2>').addClass('order-type text-dark text-left mt-3 h5').html(properties.get('orderType')));
-//
-//     if (currentSubType) {
-//         let subTypesContainer = $('<ul></ul>').addClass('subtypes').append($('<li></li>').html(currentSubType));
-//         orderContainer.append(subTypesContainer);
-//     }
-//
-//     orderContainer.append($('<p></p>').addClass('mb-1 text-left').html('<b>' + addressText +'</b>: ' + properties.get('address')));
-//
-//     if (descriptionShort) {
-//         orderContainer
-//             .append(
-//                 $('<p></p>').addClass('fw-bold text-left mt-2 mb-0').html(descriptionShortText + ':')
-//             ).append(
-//             $('<p></p>').addClass('text-left order-description mb-1').html(descriptionShort)
-//         );
-//     }
-//
-//     if (descriptionFull) {
-//         orderContainer
-//             .append(
-//                 $('<p></p>').addClass('fw-bold text-left mt-0 mb-2')
-//                     .append($('<a></a>').addClass('description-full').html(descriptionFullText + ' »'))
-//             );
-//     }
-//
-//     orderContainer
-//         .append(
-//             $('<p></p>').addClass('text-left mb-2').html(
-//                 '<b>' + numberOfPerformersText + ':</b> ' + properties.get('performers') + outOfText + properties.get('need_performers')
-//             )
-//         );
-//
-//     if (userId !== user.id) {
-//         orderContainer.append($('<button></button>').addClass('respond-button btn btn-primary w-100').attr('type','button').append($('<span></span>').html(respondToAnOrderText)));
-//     }
-//
-//     orderContainer.append($('<button></button>').addClass('cb-copy btn btn-primary w-100 mt-3').attr({
-//         'type':'button',
-//         'order_id':properties.get('orderId')
-//     }).append($('<span></span>').html(copyOrderHrefToClipboardText)));
-//
-//     orderContainer.append($('<hr>'));
-//     window.pointsContainer.append(orderContainer);
-//     bindFancybox();
-// }
-
-// const removeSelectedPoints = (target, callBack) => {
-//     if ( (window.cickedTarget && !target) || (window.cickedTarget && target && window.cickedTarget !== target) ) {
-//         window.cickedTarget.options.set('iconColor', '#e6761b');
-
-        // Change pagination on data-tables
-        // bindChangePagination(dataTable);
-        // bindDelete();
-//     }
-// }
-
-// const clickYesDeleteOnModal = (dataTable, useCounter) => {
-//     // Click YES on delete modal
-//     $('.delete-yes').click(function () {
-//         let deleteModal = $(this).parents('.modal');
-//         deleteModal.modal('hide');
-//         addLoader();
-//
-//         $.post(deleteModal.attr('del-function'), {
-//             '_token': window.tokenField,
-//             'id': window.deleteId,
-//         }, () => {
-//             deleteDataTableRows(window.deleteRow.parents('.content-block'), window.deleteRow, useCounter);
-//             removeLoader();
-//         });
-//     });
-// }
-//
-// const movingOrderToApproving = (tableRow) => {
-//     changeTableRowLabel(tableRow, 'closed', 'in-approve', window.orderStatuses[3]);
-//     addEditOrderIcon(tableRow);
-//     addDeleteIcon(tableRow);
-//
-//     deleteDataTableRows($('#content-archive'), tableRow, true);
-//     addDataTableRow($('#content-approving'), tableRow, true);
-// }
-//
-// const movingOrderToOpen = (tableRow) => {
-//     if (tableRow.parents('.content-block').attr('id') !== 'content-active') {
-//         changeTableRowLabel(tableRow, 'in-approve', 'open', window.orderStatuses[2]);
-//         deleteDataTableRows($('#content-approving'), tableRow, true);
-//         addDataTableRow($('#content-active'), tableRow, true);
-//     } else {
-//         changeTableRowLabel(tableRow, 'in-progress', 'open', window.orderStatuses[2]);
-//         addEditOrderIcon(tableRow);
-//         addDeleteIcon(tableRow);
-//     }
-// }
-//
-// const movingOrderToInProgress = (tableRow, performers) => {
-//     changeTableRowLabel(tableRow, 'in-approve', 'in-progress', window.orderStatuses[1]);
-//     addPerformersIcon(tableRow, performers);
-//     addCloseOrderButton(tableRow);
-// }
-//
-// const movingOrderToArchive = (tableRow) => {
-//     changeTableRowLabel(tableRow, 'in-progress', 'closed', window.orderStatuses[0]);
-//     changeTableRowButton(tableRow, 'close-order', 'resume-order', resumeOrderText);
-//
-//     getOrderCellEdit(tableRow).addClass('empty').html('');
-//
-//     deleteDataTableRows($('#content-active'), tableRow, true);
-//     addDataTableRow($('#content-archive'), tableRow, true);
-//     bindOrderOperation(window.modalResumedConfirm,'resume-order');
-// }
-//
-// const getOrderCellEdit = (tableRow) => {
-//     return tableRow.find('.order-cell-edit');
-// }
-//
-// const addEditOrderIcon = (tableRow) => {
-//     tableRow.find('.order-cell-edit').html('').removeClass('empty').addClass('icon').append(
-//         $('<a></a>').attr({
-//             'title': editOrderText,
-//             'href': editOrderUrl + '?id=' + getId(tableRow, 'row-', false)
-//         }).append(
-//             $('<i></i>').addClass('icon-pencil5')
-//         )
-//     );
-// }
-//
-// const addPerformersIcon = (tableRow, performers) => {
-//     getOrderCellEdit(tableRow).html('').append(
-//         $('<nobr></nobr>').append(
-//             $('<i></i>').attr({
-//                 'id': 'order-performers-' + getId(tableRow, 'row-', false),
-//                 'title': participantsText,
-//             }).addClass('performers-list icon-users4 me-1')
-//         ).append(
-//             $('<span></span>').html(performers)
-//         )
-//     );
-//     bindOrderPerformersList();
-// }
-//
-// const addCloseOrderButton = (tableRow) => {
-//     tableRow.find('.order-cell-delete').html('').removeClass('order-cell-delete').addClass('order-cell-button').append(
-//         $('<button></button>').attr('type','button').addClass('btn btn-secondary close-order micro').append(
-//             $('<span></span>').html(closeOrderText)
-//         )
-//     );
-//     bindOrderOperation(window.modalClosingConfirm,'close-order');
-// }
-//
-// const addDeleteIcon = (tableRow) => {
-//     tableRow.find('.order-cell-button').html('').removeClass('order-cell-button').addClass('order-cell-delete').append(
-//         $('<i></i>').attr({
-//             'title': deleteOrderText,
-//             'modal-data': 'delete-modal',
-//             'del-data': getId(tableRow, 'row-', false)
-//         }).addClass('icon-close2')
-//     );
-//     bindDelete();
-// }
-//
-// const deleteDataTableRows = (contentBlockTab, row, useCounter) => {
-//     let baseTable = row.parents('.datatable-basic.default'),
-//         dataTable = contentBlockTab.find('table'+window.dataTableClasses).DataTable();
-//
-//     if (useCounter) changeDataCounter(contentBlockTab, -1);
-//
-//     if (row.length > 1) {
-//         row.each(function () {
-//             dataTable.row($(this)).remove();
-//         });
-//     } else dataTable.row(row).remove();
-//
-//     if (!dataTable.rows().count()) {
-//         dataTable.destroy();
-//         baseTable.remove();
-//         if (contentBlockTab) contentBlockTab.find('h4').removeClass('d-none');
-//     }
-//
-//     dataTable.draw();
-//     bindChangePagination(dataTable);
-//     bindDelete();
-// }
-//
-// const changeTableRowLabel = (tableRow, removingClass, addingClass, labelText) => {
-//     tableRow.find('.label').removeClass(removingClass).addClass(addingClass).html(labelText);
-// }
-//
-// const changeTableRowButton = (tableRow, removingClass, addingClass, buttonText) => {
-//     let button = tableRow.find('button.' + removingClass);
-//     button.removeClass(removingClass).addClass(addingClass);
-//     button.find('span').html(buttonText);
-// }
-//
-// const addDataTableRow = (contentBlockTab, row, useCounter) => {
-//     if (useCounter) changeDataCounter(contentBlockTab, 1);
-//     let dataTable = contentBlockTab.find('table'+window.dataTableClasses);
-//
-//     if (!dataTable.length) {
-//         contentBlockTab.find('h4').addClass('d-none');
-//         let newTable = $('<table></table>').addClass(window.dataTableClasses.replaceAll('.',' ').trim());
-//         contentBlockTab.prepend(newTable);
-//         dataTable = dataTableAttributes(newTable, 8);
-//     } else {
-//         dataTable = dataTable.DataTable();
-//     }
-//
-//     if (row.length > 1) {
-//         row.each(function () {
-//             dataTable.row.add($(this));
-//         });
-//     } else dataTable.row.add(row);
-//
-//     dataTable.draw();
-//     bindChangePagination(dataTable);
-//     bindDelete();
-// }
-//
-// const changeDataCounter = (contentBlockTab, increment) => {
-//     let contentId = getId(contentBlockTab, 'content-', false),
-//         containerCounter = $('#top-submenu-'+contentId).next('sup'),
-//         counterVal = parseInt(containerCounter.html());
-//
-//     counterVal += increment;
-//     containerCounter.html(counterVal);
-// }
-//
-// const appendDotInLeftMenu = (leftMenuId) => {
-//     let leftMenu = $('#' + leftMenuId);
-//     if (!leftMenu.find('.dot').length) {
-//         leftMenu.append(
-//             $('<div></div>').addClass('dot')
-//         );
-//     }
-// }
-//
-//
-// const owlSettings = (margin, nav, timeout, responsive, autoplay) => {
-//     let navButtonBlack1 = '<img src="/images/arrow_left.svg" />',
-//         navButtonBlack2 = '<img src="/images/arrow_right.svg" />';
-//
-//     return {
-//         margin: margin,
-//         loop: autoplay,
-//         nav: nav,
-//         autoplay: autoplay,
-//         autoplayTimeout: timeout,
-//         dots: !nav,
-//         responsive: responsive,
-//         navText: [navButtonBlack1, navButtonBlack2]
-//     }
-// }
-//
-// const nextPrevStep = (reverse, callBack) => {
-//     let stepFadeOut = reverse ? step + 1 : step,
-//         stepFadeIn = reverse ? step : step + 1,
-//         tags = ['head1','head2','inputs','image','description'],
-//         fadeOutSting = '',
-//         fadeInSting = '',
-//         callBackFlag = false;
-//
-//     $.each(tags, (k, tag) => {
-//         let comma = (k + 1 !== tags.length ? ', ' : '');
-//         fadeOutSting += '#' + tag + '-step' + stepFadeOut + comma;
-//         fadeInSting += '#' + tag + '-step' + stepFadeIn + comma;
-//     });
-//
-//     $(fadeOutSting).removeClass('d-block').fadeOut('slow',() => {
-//         $(fadeInSting).removeClass('d-none').fadeIn();
-//         if (callBack && !callBackFlag) {
-//             callBack();
-//             callBackFlag = true;
-//         }
-//     });
-// }
-//
-// const setProgressBar = (progressBar) => {
-//     let progress = step * 25 + '%';
-//     progressBar.html(progress);
-//     progressBar.animate({
-//         'width': progress
-//     },'fast');
-// }
-//
-
-//
-// const mapInitWithContainerForOrders = () => {
-//     mapInit('map');
-//     getPoints();
-// }
-//
-// const getPoints = () => {
-//     getUrl($('form'), (window.getPreviewFlag ? getPreviewUrl : null), (data) => {
-//         window.placemarks = [];
-//         let orders = data.orders;
-//         window.subscriptions = [];
-//         window.unreadOrders = [];
-//         if (data.subscriptions.length) {
-//             $.each(data.subscriptions, function (k,subscription) {
-//                 window.subscriptions.push(subscription.user_id);
-//                 if (subscription.orders.length) {
-//                     $.each(subscription.orders, function (k,order) {
-//                         window.unreadOrders.push(order.id);
-//                     });
-//                 }
-//             });
-//         }
-//         if (data) {
-//             $.each(orders, function (k,point) {
-//                 let createdAt = new Date(point.created_at),
-//                     meIsPerformer = false;
-//                 if (point.performers.length) {
-//                     for (let p=0;p<point.performers.length;p++) {
-//                         if (point.performers[p].id === userId) {
-//                             meIsPerformer = true;
-//                             break;
-//                         }
-//                     }
-//                 }
-//
-//                 if (!meIsPerformer) {
-//                     window.placemarks.push(getPlaceMark([point.latitude, point.longitude], {
-//                         placemarkId: k,
-//                         // balloonContentHeader: point.order_type.name,
-//                         // balloonContentBody: point.address,
-//                         orderId: point.id,
-//                         name: point.name,
-//                         address: point.address,
-//                         orderType: point.order_type.name,
-//                         images: point.images,
-//                         subtype: point.sub_type ? point.sub_type.name : null,
-//                         need_performers: point.need_performers,
-//                         performers: point.performers.length,
-//                         user: point.user,
-//                         date: createdAt.toLocaleDateString('ru-RU'),
-//                         description_short: point.description_short,
-//                         description_full: point.description_full
-//                     }));
-//
-//                     if (window.getPreviewFlag) {
-//                         window.getPreviewFlag = false;
-//                         forceOpenOrder(0);
-//                     } else if (window.openOrderId && window.openOrderId === point.id) {
-//                         forceOpenOrder(k);
-//                     }
-//                 }
-//             });
-//
-//             // Создаем собственный макет с информацией о выбранном геообъекте.
-//             // let customBalloonContentLayout = ymaps.templateLayoutFactory.createClass([
-//             //     '<ul class=list>',
-//             //     // Выводим в цикле список всех геообъектов.
-//             //     '{% for geoObject in properties.geoObjects %}',
-//             //     '<li><div class="balloon-head">{{ geoObject.properties.balloonContentHeader|raw }}</div><div class="balloon-content">{{ geoObject.properties.balloonContentBody|raw }}</div></li>',
-//             //     '{% endfor %}',
-//             //     '</ul>'
-//             // ].join(''));
-//
-//             window.clusterer = new ymaps.Clusterer({
-//                 preset: 'islands#darkOrangeClusterIcons',
-//                 clusterDisableClickZoom: true,
-//                 clusterOpenBalloonOnClick: false,
-//                 // Устанавливаем режим открытия балуна.
-//                 // В данном примере балун никогда не будет открываться в режиме панели.
-//                 clusterBalloonPanelMaxMapArea: 0,
-//                 // По умолчанию опции балуна balloonMaxWidth и balloonMaxHeight не установлены для кластеризатора,
-//                 // так как все стандартные макеты имеют определенные размеры.
-//                 clusterBalloonMaxHeight: 200,
-//                 // Устанавливаем собственный макет контента балуна.
-//                 // clusterBalloonContentLayout: customBalloonContentLayout,
-//             });
-//
-//             // Click on cluster
-//             // window.clusterer.events.add('click', function (e) {
-//             //     $.each(e.get('target').properties._data.geoObjects, function (k, object) {
-//             //         console.log(object.properties.get('user'));
-//             //     });
-//             // });
-//
-//             window.myMap.geoObjects.events.add('click', function (e) {
-//                 var target = e.get('target');
-//
-//                 target.options.set('iconColor', '#bc202e');
-//                 if (target.properties.get('geoObjects')) {
-//                     if (window.selectedPointsOpened) {
-//                         removeSelectedPoints(target,() => { clickedToCluster(target);});
-//                     } else clickedToCluster(target);
-//                 } else {
-//                     if (window.selectedPointsOpened) {
-//                         removeSelectedPoints(target,() => { clickedToPoint(target);});
-//                     } else clickedToPoint(target);
-//                 }
-//             });
-//             addPointsToMap();
-//         }
-//     });
-// }
-//
-// const addPointsToMap = () => {
-//     window.clusterer.add(window.placemarks);
-//     window.myMap.geoObjects.add(window.clusterer);
-// }
-//
-// const showOrder = (point) => {
-//     let properties = point.properties,
-//         orderId = properties.get('orderId'),
-//         currentSubType = properties.get('subtype'),
-//         user = properties.get('user'),
-//         orderName = properties.get('name'),
-//         images = properties.get('images'),
-//         descriptionShort = properties.get('description_short'),
-//         descriptionFull = properties.get('description_full'),
-//         orderContainer = $('<div></div>').addClass('order-block mb-3').attr('id','order-'+properties.get('placemarkId'));
-//
-//     // Check subscriptions
-//     let subscribeBellClass = window.subscriptions.includes(user.id) ? 'icon-bell-cross' : 'icon-bell-check',
-//         posUnreadOrder = window.unreadOrders.indexOf(orderId);
-//
-//     if (posUnreadOrder !== -1) {
-//         delete window.unreadOrders[posUnreadOrder];
-//         $.get(
-//             readOrderUrl,
-//             {'order_id': orderId}
-//         ).done(() => {
-//             $('#unread-order-' + orderId).remove();
-//             checkDropDownMenuEmpty();
-//         });
-//     }
-//
-//     orderContainer
-//         .append(
-//             $('<h6></h6>').addClass('order-number').html(orderNumberText + orderId + fromText + properties.get('date'))
-//         ).append(
-//             $('<div></div>').addClass('w-100 d-flex align-items-center justify-content-between')
-//                 .append(
-//                     $('<div></div>').addClass('d-flex align-items-center justify-content-center')
-//                         .append(
-//                             getAvatarBlock(user, 0.35)
-//                         ).append(
-//                             $('<div></div>').css('width',215)
-//                                 .append(
-//                                     $('<div></div>').addClass('ms-3 fs-lg-6 fs-sm-7 user-name').html(user.family+' '+user.name)
-//                                 ).append(
-//                                     $('<div></div>').addClass('fs-lg-6 fs-sm-7 ms-3 user-age').html(window.useAge)
-//                                 )
-//                             )
-//                     ).append($('<i></i>').addClass('subscribe-icon ' + subscribeBellClass))
-//         );
-//
-//     if (images.length) {
-//         let imagesContainer = $('<div></div>').addClass('images owl-carousel mt-3');
-//         $.each(images, function (k, image) {
-//             imagesContainer.append(
-//                 $('<a></a>').addClass('fancybox').attr('href','/' + image.image).append(
-//                     $('<div></div>').addClass('image').css('background-image','url(/'+image.image+')')
-//                 )
-//             );
-//         });
-//         orderContainer.append(imagesContainer);
-//         enablePointImagesCarousel(imagesContainer,images.length > 1);
-//     }
-//
-//     orderContainer.append($('<h2></h2>').addClass('order-name text-dark text-left mt-3 mb-4').html(orderName));
-//     orderContainer.append($('<h2></h2>').addClass('order-type text-dark text-left mt-3 h5').html(properties.get('orderType')));
-//
-//     if (currentSubType) {
-//         let subTypesContainer = $('<ul></ul>').addClass('subtypes').append($('<li></li>').html(currentSubType));
-//         orderContainer.append(subTypesContainer);
-//     }
-//
-//     orderContainer.append($('<p></p>').addClass('mb-1 text-left').html('<b>' + addressText +'</b>: ' + properties.get('address')));
-//
-//     if (descriptionShort) {
-//         orderContainer
-//             .append(
-//                 $('<p></p>').addClass('fw-bold text-left mt-2 mb-0').html(descriptionShortText + ':')
-//             ).append(
-//             $('<p></p>').addClass('text-left order-description mb-1').html(descriptionShort)
-//         );
-//     }
-//
-//     if (descriptionFull) {
-//         orderContainer
-//             .append(
-//                 $('<p></p>').addClass('fw-bold text-left mt-0 mb-2')
-//                     .append($('<a></a>').addClass('description-full').html(descriptionFullText + ' »'))
-//             );
-//     }
-//
-//     orderContainer
-//         .append(
-//             $('<p></p>').addClass('text-left mb-2').html(
-//                 '<b>' + numberOfPerformersText + ':</b> ' + properties.get('performers') + outOfText + properties.get('need_performers')
-//             )
-//         );
-//
-//     if (userId !== user.id) {
-//         orderContainer.append($('<button></button>').addClass('respond-button btn btn-primary w-100').attr('type','button').append($('<span></span>').html(respondToAnOrderText)));
-//     }
-//
-//     orderContainer.append($('<button></button>').addClass('cb-copy btn btn-primary w-100 mt-3').attr({
-//         'type':'button',
-//         'order_id':properties.get('orderId')
-//     }).append($('<span></span>').html(copyOrderHrefToClipboardText)));
-//
-//     orderContainer.append($('<hr>'));
-//     window.pointsContainer.append(orderContainer);
-//     bindFancybox();
-// }
-//
-// const removeSelectedPoints = (target, callBack) => {
-//     if ( (window.cickedTarget && !target) || (window.cickedTarget && target && window.cickedTarget !== target) ) {
-//         window.cickedTarget.options.set('iconColor', '#e6761b');
-//
-//         window.selectedPoints.animate({'margin-left': -1 * (window.selectedPoints.width() + 150)}, 'slow', function () {
-//             window.selectedPointsOpened = false;
-//             if (callBack) callBack();
-//         });
-//     }
-// }
-//
-// const clickedToCluster = (target, objects) => {
-//     window.cickedTarget = target;
-//     purgePointsContainer();
-//     $.each(target.properties.get('geoObjects'), function (k, object) {
-//         showOrder(object);
-//     });
-//     setBindsAndOpen();
-// }
-//
-// const clickedToPoint = (point) => {
-//     window.cickedTarget = point;
-//     purgePointsContainer();
-//     showOrder(point);
-//     setBindsAndOpen();
-// }
-//
-// const purgePointsContainer = () => {
-//     window.pointsContainer.removeAttr('class').html('');
-// }
-//
-// const setBindsAndOpen = () => {
-//     // Set custom scroll bar
-//     window.selectedPoints.mCustomScrollbar({
-//         axis: 'y',
-//         theme: 'light-3',
-//         alwaysShowScrollbar: 0
-//     });
-//
-//     // Bind click respond button
-//     $('.respond-button').click(function (e) {
-//         e.preventDefault();
-//         let point = getPlaceMarkOnMap($(this)),
-//             properties = point.properties,
-//             orderId = properties.get('orderId'),
-//             orderRespondModal = $('#order-respond-modal');
-//
-//         $.post(orderResponseUrl, {
-//             '_token': window.tokenField,
-//             'id': orderId,
-//         }, () => {
-//             orderRespondModal.find('.order-number').html(orderId);
-//             orderRespondModal.find('.order-date').html(properties.get('date'));
-//             orderRespondModal.find('.order-type').html(properties.get('orderType'));
-//             orderRespondModal.find('.order-address').html(properties.get('address'));
-//             orderRespondModal.modal('show');
-//             // window.clusterer.remove(point);
-//             removeSelectedPoints();
-//         });
-//     });
-//
-//     // Bind subscribe button
-//     $('.subscribe-icon').click(function (e) {
-//         e.preventDefault();
-//         let button = $(this),
-//             point = getPlaceMarkOnMap(button),
-//             userId = point.properties.get('user').id;
-//
-//         $.get(
-//             subscribeUrl,
-//             {'user_id': userId}
-//         ).done((data) => {
-//             button.fadeOut(() => {
-//                 button.toggleClass('icon-bell-cross',data.subscription).toggleClass('icon-bell-check',!data.subscription);
-//                 button.fadeIn();
-//             });
-//             window.subscriptions.push(userId);
-//         });
-//     });
-//
-//     // Click to description full
-//     $('.description-full').click(function (e) {
-//         e.preventDefault();
-//         let point = getPlaceMarkOnMap($(this)),
-//             properties = point.properties,
-//             fullDescriptionModal = $('#order-full-description-modal');
-//
-//         fullDescriptionModal.find('h5').html(descriptionFullOfOrderText + properties.get('orderId') + '<br>' + fromText + properties.get('date'));
-//         fullDescriptionModal.find('.modal-body p').html(properties.get('description_full'));
-//         fullDescriptionModal.modal('show');
-//     });
-//
-//     // Open selected points
-//     window.selectedPoints.animate({'margin-left': 0}, 'slow', function () {
-//         window.selectedPointsOpened = true;
-//     });
-//
-//     // Copy order href
-//     $('.cb-copy').click(function () {
-//         let orderId = $(this).attr('order_id'),
-//             href = ordersUrl + '?id=' + orderId;
-//         if (navigator.clipboard) {
-//             window.navigator.clipboard.writeText(href).then(() => {
-//                 window.messageModal.find('h4').html(hrefIsCopiedText);
-//                 window.messageModal.modal('show');
-//             });
-//         }
-//     });
-// }
-//
-//
-// const getPlaceMarkOnMap = (obj) => {
-//     let placemarkId = getId((obj).parents('.order-block'), 'order-', true);
-//     return window.placemarks[placemarkId];
-// }
-//
-// const forceOpenOrder = (k) => {
-//     window.openOrderId = null;
-//     window.cickedTarget = window.placemarks[k];
-//     window.placemarks[k].options.set('iconColor', '#bc202e');
-//     showOrder(window.placemarks[k]);
-//     setBindsAndOpen();
-// }
-//
-// const bindOrderOperation = (modalConfirm, buttonClass) => {
-//     let buttons = $('.' + buttonClass);
-//     buttons.unbind();
-//     buttons.click(function () {
-//         window.tableRow = $(this).parents('tr');
-//         window.orderId = getId(window.tableRow, 'row-', true);
-//         modalConfirm.modal('show');
-//     });
-// }
-
-//
-// const checkDropDownMenuEmpty = () => {
-//     if (!window.dropDown.html()) {
-//         window.rightButtonBlock.find('.dot').remove();
-//     }
-//
-//
-// }
-//
-// const getId = (obj, replace, returnInt) => {
-//     let id = obj.attr('id').replace(replace, '');
-//     return returnInt ? parseInt(id) : id;
-// }
-//
-//
-// const getUserAge = (userId) => {
-//     $.get(
-//         getUserAgeUrl,
-//         {'id': userId},
-//         (data) => {
-//             $('.user-age').html(data.age);
-//         }
-//     );
-// }
-
-const bellRing = (degrees) => {
-    window.rightButtonBlock.css({'-webkit-transform' : 'rotate('+ degrees +'deg)',
-        '-moz-transform' : 'rotate('+ degrees +'deg)',
-        '-ms-transform' : 'rotate('+ degrees +'deg)',
-        'transform' : 'rotate('+ degrees +'deg)'});
-}
-
-const getAvatarBlock = (user, coof) => {
-    let avatar = user.avatar ? user.avatar : '/images/def_avatar.svg';
-    return $('<div></div>').addClass('avatar cir').css(getAvatarProps(avatar, user.avatar_props, coof));
-}
-
-const getAvatarProps = (avatar, props, coof) => {
-    let avatarProps = {'background-image':'url('+avatar+')'};
-    if (props) {
-        $.each(props, function (prop, value) {
-            avatarProps[prop] = (prop === 'background-size' ? value : value * coof);
-        });
-    }
-    return avatarProps;
-}
-
-const getUserName = (user) => {
-    return user.name + ' ' + user.family;
 }

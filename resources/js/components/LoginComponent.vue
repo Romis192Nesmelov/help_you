@@ -82,7 +82,7 @@ export default {
     },
     data() {
         return {
-            rememberMe: false,
+            rememberMe: true,
             phone: '',
             password: '',
             disabledSubmit: true,
