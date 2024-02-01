@@ -24,7 +24,9 @@
                 <td>
                     <UserPropertiesComponent
                         :user="performer"
+                        :small=false
                         :avatar_coof=0.2
+                        :use_rating=true
                         :allow_change_rating=false
                     ></UserPropertiesComponent>
                 </td>
@@ -53,11 +55,12 @@
                 <RatingLineComponent
                     :income_rating=0
                     :allow_change_rating=true
+                    :center=true
                     v-model:value="rating"
                 ></RatingLineComponent>
             </div>
             <ButtonComponent
-                class="btn btn-primary w-50 m-auto mt-1"
+                class="btn btn-primary w-50 m-auto mt-3"
                 text="Отправить"
                 data-bs-dismiss='modal'
                 @click="setRating"

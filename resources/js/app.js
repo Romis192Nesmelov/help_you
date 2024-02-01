@@ -11,6 +11,7 @@ import MySubscriptionsComponent from "./components/MySubscriptionsComponent.vue"
 import MyChatsComponent from "./components/MyChatsComponent.vue";
 import EditOrderComponent from "./components/EditOrderComponent.vue";
 import OrdersComponent from "./components/OrdersComponent.vue";
+import ChatComponent from "./components/ChatComponent.vue";
 
 const app = createApp({
     components: {
@@ -23,7 +24,8 @@ const app = createApp({
         MySubscriptionsComponent,
         MyChatsComponent,
         EditOrderComponent,
-        OrdersComponent
+        OrdersComponent,
+        ChatComponent
     }
 });
 
@@ -90,6 +92,24 @@ window.bellRinging = (bellIcon) => {
     }
 }
 
+window.getUserAge = (born) => {
+    let now = new Date(),
+        bornArr = born.split('-');
+    let age = now.getFullYear() - parseInt(bornArr[2]);
+    if (now.getMonth() + 1 <= parseInt(bornArr[1]) && now.getDay() < parseInt(bornArr[1])) {
+        age--;
+    }
+    let lastDigit = age.toString().substr(-1,1),
+        word;
+
+    if (lastDigit === 0) word = 'лет';
+    else if (lastDigit === 1) word = 'год';
+    else if (lastDigit > 1 && lastDigit < 5) word = 'года';
+    else word = 'лет';
+
+    return age + ' ' + word;
+}
+
 window.getPlaceMark = (point, data) => {
     return new ymaps.Placemark(point, data, {
         preset: 'islands#darkOrangeCircleDotIcon'
@@ -100,18 +120,20 @@ window.zoomAndCenterMap = () => {
     window.myMap.setCenter(window.singlePoint, 17);
 }
 
+window.fancyBoxSettings = {
+    'autoScale': true,
+    'touch': false,
+    'transitionIn': 'elastic',
+    'transitionOut': 'elastic',
+    'speedIn': 500,
+    'speedOut': 300,
+    'autoDimensions': true,
+    'centerOnScroll': true
+}
+
 window.bindFancybox = () => {
     setTimeout(() => {
-        $('.fancybox').fancybox({
-            'autoScale': true,
-            'touch': false,
-            'transitionIn': 'elastic',
-            'transitionOut': 'elastic',
-            'speedIn': 500,
-            'speedOut': 300,
-            'autoDimensions': true,
-            'centerOnScroll': true
-        });
+        $('.fancybox').fancybox(window.fancyBoxSettings);
     }, 200);
 }
 
@@ -125,6 +147,10 @@ window.enablePointImagesCarousel = () => {
             true
         ));
     }, 200);
+}
+
+window.scrollBottomMessages = () => {
+    $('#messages').mCustomScrollbar('scrollTo','bottom');
 }
 
 window.emitter = mitt();
@@ -149,13 +175,6 @@ $(document).ready(function () {
         axis: 'y',
         theme: 'light-3',
         alwaysShowScrollbar: 1
-    });
-
-    $('#messages').mCustomScrollbar({
-        axis: 'y',
-        theme: 'light-3',
-        alwaysShowScrollbar: 1,
-        scrollTo: 'bottom'
     });
 
     setTimeout(function () {
@@ -216,161 +235,14 @@ $(document).ready(function () {
             window.emitter.emit('map-is-ready');
         });
     }
-    // window.Echo.channel('order_event').listen('.order', res => {
-    //     if (res.notice === 'remove_order') {
-    //         for (let i=0;i<window.placemarks.length;i++) {
-    //             if (window.placemarks[i].properties.get('orderId') === res.order.id) {
-    //                 window.clusterer.remove(window.placemarks[i]);
-    //                 break;
-    //             }
-    //         }
-    //     } else {
-    //         let markId = window.placemarks.length,
-    //             createdAt = new Date(res.order.created_at);
-    //
-    //         window.placemarks.push(getPlaceMark([res.order.latitude, res.order.longitude], {
-    //             placemarkId: markId,
-    //             orderId: res.order.id,
-    //             name: res.order_type.name,
-    //             address: res.order.address,
-    //             orderType: res.order_type.name,
-    //             images: res.images,
-    //             subtype: res.sub_type.name,
-    //             need_performers: res.order.need_performers,
-    //             performers: res.performers.length,
-    //             user: res.user,
-    //             date: createdAt.toLocaleDateString('ru-RU'),
-    //             description_short: res.order.description_short,
-    //             description_full: res.order.description_full
-    //         }));
-    //         window.clusterer.add(window.placemarks);
-    //     }
-    // });
     // ORDERS BLOCK END
+    $('#messages').mCustomScrollbar({
+        axis: 'y',
+        theme: 'light-3',
+        alwaysShowScrollbar: 1,
+        scrollTo: 'bottom'
+    });
 });
-    // //CHATS BLOCK BEGIN
-    // const messagesBlock = $('#messages'),
-    //     orderDataModal = $('#order-data-modal');
-    //
-    // enablePointImagesCarousel(orderDataModal.find('.images'),orderDataModal.find('.image').length > 1);
-    //
-    // if (messagesBlock.length) {
-    //     messagesBlock.mCustomScrollbar({
-    //         axis: 'y',
-    //         theme: 'light-3',
-    //         alwaysShowScrollbar: 1
-    //     });
-    //     messagesBlock.mCustomScrollbar('scrollTo','bottom');
-    //     const inputMessage = $('textarea[name=body]'),
-    //         inputMessageFile = $('input[name=image]'),
-    //         mainContainer = $('#mCSB_2_container');
-    //
-    //     inputMessageFile.change(function () {
-    //         let attachedImageContainer = getAttachedImageContainerNotLoaded(),
-    //             attachedFile = $(this)[0].files[0],
-    //             reader = new FileReader();
-    //
-    //         // Preview attaching image
-    //         if (inputMessageFile.val() && (attachedFile.type === 'image/jpeg' || attachedFile.type === 'image/png')) {
-    //             reader.onload = function (e) {
-    //                 if (attachedImageContainer.length) {
-    //                     attachedImageContainer.find('img').attr('src',e.target.result);
-    //                     $('.error.image').html('');
-    //                 } else {
-    //                     attachingImageContainer(
-    //                         mainContainer,
-    //                         messagesBlock,
-    //                         inputMessageFile,
-    //                         true,
-    //                         true,
-    //                         e.target.result
-    //                     );
-    //                 }
-    //             };
-    //             reader.readAsDataURL(attachedFile);
-    //         } else {
-    //             inputMessageFile.val('');
-    //             removeLastMessageRowWithPreviewImage();
-    //         }
-    //     });
-    //
-    //     // Send new message
-    //     inputMessage.keydown(function(e) {
-    //         if (e.keyCode === 13) {
-    //             e.preventDefault();
-    //             newMessageChat(inputMessage, inputMessageFile, messagesBlock);
-    //         }
-    //     });
-    //
-    //     messagesBlock.keydown(function(e) {
-    //         if (e.keyCode === 13) {
-    //             e.preventDefault();
-    //             newMessageChat(inputMessage, inputMessageFile, messagesBlock);
-    //         }
-    //     });
-    //
-    //     $('.chat-input i').click(() => {
-    //         newMessageChat(inputMessage, inputMessageFile, messagesBlock);
-    //     });
-    //
-    //     // Receiving new message
-    //     window.Echo.private('chat_' + window.orderId).listen('.chat', res => {
-    //         $.post(readMessageUrl, {
-    //             '_token': window.tokenField,
-    //             'order_id': window.orderId,
-    //         }, () => {
-    //             window.dropDown.find('li.unread-messages').remove();
-    //             if (!window.dropDown.find('li').length) window.rightButtonBlock.find('.dot').remove();
-    //         });
-    //
-    //         let messageData = res.message,
-    //             lastDate = $('.date-block').last().find('.date').html(),
-    //             messageBody = $('<div></div>').addClass('message-block')
-    //                 .append(getAvatarBlock(messageData.user, 0.2))
-    //                 .append(
-    //                     $('<div></div>').addClass('message')
-    //                         .append(
-    //                             $('<div></div>').addClass('author').html(getUserName(messageData.user))
-    //                                 .append($('<span></span>').html(messageData.time))
-    //                             ).append(
-    //                                 $('<div></div>').html(messageData.body)
-    //                             )
-    //                 );
-    //
-    //         // Set global date
-    //         if (messageData.date !== lastDate) {
-    //             let dateBlock = $('<div></div>').addClass('date-block').append(
-    //                 $('<span></span>').addClass('date').html(messageData.date)
-    //             )
-    //             if (lastDate) mainContainer.append(dateBlock);
-    //             else mainContainer.prepend(dateBlock);
-    //         }
-    //
-    //         // Removing last message row if that contains not-attached image
-    //         if (userId === messageData.user.id) {
-    //             inputMessageFile.val('');
-    //             removeLastMessageRowWithPreviewImage();
-    //         }
-    //
-    //         if (messageData.image) {
-    //             let attachedImageContainer = attachingImageContainer(
-    //                 mainContainer,
-    //                 messagesBlock,
-    //                 inputMessageFile,
-    //                 userId === messageData.user.id,
-    //                 false,
-    //                 messageData.image
-    //             );
-    //             attachedImageContainer.append(messageBody);
-    //         } else {
-    //             let messageRow = getNewMessageRow(userId === messageData.user.id);
-    //             messageRow.append(messageBody);
-    //             mainContainer.append(messageRow);
-    //         }
-    //         messagesBlock.mCustomScrollbar('scrollTo','bottom');
-    //     });
-    // }
-    //CHATS BLOCK END
 
 const mapInit = (container) => {
     window.myMap = new ymaps.Map(container, {
@@ -429,82 +301,6 @@ const imagePreview = (container, defImage) => {
         });
     });
 }
-
-// const getNewMessageRow = (selfFlag) => {
-//     let messageRow = $('<div></div>').addClass('message-row');
-//     if (selfFlag) messageRow.addClass('my-self');
-//     return messageRow;
-// }
-//
-// const removeLastMessageRowWithPreviewImage = () => {
-//     let attachedImageContainer = getAttachedImageContainerNotLoaded();
-//     if (attachedImageContainer.length) attachedImageContainer.parents('.message-row').remove();
-// }
-//
-// const getAttachedImageContainerNotLoaded = () => {
-//     return $('.attached-image.not-loaded').last();
-// }
-//
-// const attachingImageContainer = (mainContainer, messagesBlock, inputMessageFile, selfFlag, notLoadedFlag, imgSrc) => {
-//     let messageRow = getNewMessageRow(selfFlag),
-//         attachedImageContainer = $('<div></div>').addClass('attached-image');
-//
-//     attachedImageContainer
-//         .append(
-//             $('<a></a>').addClass('fancybox').attr('href',imgSrc)
-//                 .append(
-//                     $('<img>').attr('src',imgSrc).css('opacity',(notLoadedFlag ? 0.6 : 1))
-//                 )
-//         );
-//
-//     if (notLoadedFlag) {
-//         attachedImageContainer.addClass('not-loaded');
-//         attachedImageContainer.append($('<div></div>').addClass('error image'));
-//         attachedImageContainer.append(
-//             $('<i></i>').addClass('icon-close2').click(function () {
-//                 // $(this).parents('.attached-image.not-loaded').remove();
-//                 messageRow.remove();
-//                 inputMessageFile.val('');
-//             })
-//         );
-//     }
-//
-//     messageRow.append(attachedImageContainer);
-//     mainContainer.append(messageRow);
-//
-//     setTimeout(() => {
-//         bindFancybox();
-//         messagesBlock.mCustomScrollbar('scrollTo','bottom');
-//     }, 200);
-//
-//     return attachedImageContainer;
-// }
-//
-// const newMessageChat = (inputMessage, inputMessageFile, messagesBlock) => {
-//     if (inputMessage.val() || inputMessageFile.val()) {
-//         let formData = new FormData();
-//
-//         $('.error').html('');
-//         formData.append('_token', window.tokenField);
-//         formData.append('order_id', parseInt(window.orderId));
-//         formData.append('body', inputMessage.val());
-//
-//         if (inputMessageFile.val()) formData.append('image', inputMessageFile[0].files[0]);
-//
-//         processingAjax(
-//             newMessageUrl,
-//             formData,
-//             'post',
-//             (data) => {
-//                 inputMessage.val('');
-//             },
-//             (data) => {
-//                 messagesBlock.mCustomScrollbar('scrollTo','bottom');
-//             }
-//         );
-//     }
-// }
-
 
 const owlSettings = (margin, nav, timeout, responsive, autoplay) => {
     let navButtonBlack1 = '<img src="/images/arrow_left.svg" />',

@@ -72,19 +72,20 @@ class OrderController extends BaseController
     public function getOrdersNews(): JsonResponse
     {
         return response()->json([
-            'news_subscriptions' => Subscription::query()
-                ->with('unreadOrders.order.user')
-                ->default()
+            'news_subscriptions' => ReadOrder::query()
+                ->whereIn('subscription_id',Subscription::query()->default()->pluck('id')->toArray())
+                ->where('read',null)
+                ->with('order.user')
                 ->get(),
             'news_performers' => ReadPerformer::query()
                 ->whereIn('order_id',Order::where('user_id',Auth::id())->pluck('id')->toArray())
                 ->where('read',null)
-                ->with(['user'])
+                ->with('user')
                 ->get(),
             'news_removed_performers' => ReadRemovedPerformer::query()
                 ->where('user_id', Auth::id())
                 ->where('read', null)
-                ->with(['order'])
+                ->with('order')
                 ->get(),
             'news_status_orders' => ReadStatusOrder::query()
                 ->whereIn('order_id',Order::where('user_id',Auth::id())->pluck('id')->toArray())
@@ -100,7 +101,7 @@ class OrderController extends BaseController
                 ->default()
                 ->filtered()
                 ->searched()
-                ->with(['orderType','subType','images','user','performers'])
+                ->with(['orderType','subType','images','user.ratings','performers'])
                 ->get(),
             'subscriptions' => Subscription::query()
                 ->with('orders')
@@ -114,42 +115,14 @@ class OrderController extends BaseController
         return response()->json([
             'orders' => Order::query()
                 ->where('user_id',Auth::id())
-                ->where('status',2)
+                ->where('status',2) /*TODO: default: 3 (on moderation) */
                 ->filtered()
                 ->with(['orderType','subType','images','user','performers'])
                 ->orderByDesc('created_at')
                 ->limit(1)
                 ->get(),
             'subscriptions' => []
-        ],
-            200
-        );
-    }
-
-//    public function getUserAge(UserAgeRequest $request): JsonResponse
-//    {
-//        return response()->json(['age' => getUserAge(User::find($request->id))]);
-//    }
-
-    /**
-     * @throws \Illuminate\Auth\Access\AuthorizationException
-     */
-    public function getOrderPerformers(OrderRequest $request): JsonResponse
-    {
-        $order = Order::find($request->id);
-        $this->authorize('owner', $order);
-        $performers = [];
-        foreach ($order->performers as $performer) {
-            $performers[] = [
-                'id' => $performer->id,
-                'avatar' => $performer->avatar,
-                'avatar_props' => $performer->avatar_props,
-                'full_name' => $performer->name.' '.$performer->family,
-                'age' => getUserAge($performer),
-                'rating' => getUserRating($performer)
-            ];
-        }
-        return response()->json(['performers' => $performers],200);
+        ],200);
     }
 
     /**
@@ -243,7 +216,7 @@ class OrderController extends BaseController
             $fields = [
                 'city_id' => 1,
                 'user_id' => Auth::id(),
-                'status' => 3
+                'status' => 2 /*TODO: default: 3 (on moderation) */
             ];
 
             foreach ($steps as $step) {

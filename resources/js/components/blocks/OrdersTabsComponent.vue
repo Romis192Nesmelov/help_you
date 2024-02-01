@@ -6,15 +6,18 @@
                     <div class="item-in-list text-center p-3">
                         <UserPropertiesComponent
                             :user="order.user"
+                            :small=true
                             :avatar_coof=0.2
+                            :use_rating=true
                             :allow_change_rating=false
                         ></UserPropertiesComponent>
                         <hr class="mt-1 mb-1">
                         <div class="h6 fw-bold">«{{ cropContent(order.name,30) }}»</div>
                         <div class="h7 text-secondary">{{ order.order_type.name }}</div>
                         <hr class="mt-1 mb-1">
-                        <p class="text-secondary fs-6 mb-2"><small>{{ cropContent(order.address,40) }}</small></p>
-                        <div class="w-100 text-center mb-2" role="button" @click="$emit('performers',{'performers':order.performers,'orderId':order.id})">
+                        <p class="text-secondary fs-6 mb-1"><small>{{ cropContent(order.address,40) }}</small></p>
+
+                        <div class="w-100 text-center mb-1" role="button" @click="$emit('performers',{'performers':order.performers,'orderId':order.id})">
                             <span class="text-secondary me-1"><small>Исполнителей:</small></span>
                             <i title="Участники" class="orange icon-users4 me-1"></i>
                             <span class="text-secondary"><small>{{ order.performers.length }}</small></span>
@@ -26,6 +29,7 @@
                             @click="$emit('unsubscribe',order.read_subscriptions)"
                             v-if="subscription_mode"
                         ></ButtonComponent>
+
                         <div v-else-if="chat_mode">
                             <a :href="chat_url + '?id=' + order.id">
                                 <ButtonComponent
@@ -34,12 +38,11 @@
                                 ></ButtonComponent>
                             </a>
                         </div>
-
                         <ButtonComponent
-                            class="btn btn-primary w-50 m-auto mt-1"
+                            class="btn btn-primary w-50 m-auto"
                             text="Завершить"
                             @click="$emit('closingOrder',order.id)"
-                            v-if="user_id === order.user_id && order.status === 1"
+                            v-if="user_id === order.user_id && order.status === 1 && !chat_mode"
                         ></ButtonComponent>
                         <ButtonComponent
                             class="btn btn-primary w-50 m-auto mt-1"
@@ -86,9 +89,6 @@ export default {
         UserPropertiesComponent,
         ButtonComponent,
         PaginatorComponent
-    },
-    created() {
-        console.log(this.tabs);
     },
     props: {
         'user_id': Number,

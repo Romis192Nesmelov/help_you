@@ -65,20 +65,20 @@
         </div>
 
         <!-- Right block begin-->
-        <div id="right-button-block" :class="'buttons-block d-none d-lg-flex align-items-center justify-content-'+(authCheck ? 'between' : 'end')+(on_root ? ' on-root' : '')">
+        <div id="right-button-block" :class="'buttons-block d-none d-lg-flex align-items-center justify-content-'+(authCheck ? 'between' : 'end')+(onRoot ? ' on-root' : '')">
             <a
                 id="navbar-dropdown-messages"
-                :class="'nav-link'+(countMessages ? ' dropdown-toggle' : '')"
+                :class="'nav-link'+(countMessages() ? ' dropdown-toggle' : '')"
                 role="button"
-                :data-bs-toggle="countMessages ? 'dropdown' : ''"
+                :data-bs-toggle="countMessages() ? 'dropdown' : ''"
                 aria-expanded="false"
                 v-if="authCheck"
             >
                 <i class="fa fa-bell-o">
-                    <span class="dot" v-if="countMessages"></span>
+                    <span class="dot" v-if="countMessages()"></span>
                 </i>
             </a>
-            <div class="dropdown-menu" aria-labelledby="navbar-dropdown-messages" v-show="authCheck && countMessages">
+            <div class="dropdown-menu" aria-labelledby="navbar-dropdown-messages" v-show="authCheck && countMessages()">
                 <ul id="dropdown">
                     <li v-for="(counter, id) in newsMessages" :key="id">
                         Новых сообщений: <span class="counter">{{ counter }}</span><br>
@@ -86,7 +86,7 @@
                         <hr>
                     </li>
                     <li v-for="(news, id) in newsSubscriptions" :key="id">
-                        <a :href="my_subscriptions_url">Новая заяка №{{ news.id }} от:</a><br>
+                        <a :href="orders_url + '?id=' + news.id">Новая заяка №{{ news.id }} от:</a><br>
                         {{ news.user.name+' '+news.user.family }}
                         <hr>
                     </li>
@@ -108,7 +108,7 @@
                 </ul>
             </div>
 
-            <a :href="new_order_url" v-if="authCheck && !on_root">
+            <a :href="new_order_url" v-if="authCheck && !onRoot">
                 <ButtonComponent
                     class_name="btn btn-secondary"
                     icon="icon-magazine"
@@ -146,6 +146,7 @@ import LogoComponent from "./blocks/LogoComponent.vue";
 import TopMenuItemComponent from "./blocks/TopMenuItemComponent.vue";
 import ButtonComponent from "./blocks/ButtonComponent.vue";
 import AccountIconComponent from "./blocks/AccountIconComponent.vue";
+import {Static} from "vue";
 
 export default {
     name: "TopLineComponent",
@@ -160,10 +161,12 @@ export default {
             this.getNewsOrders();
             this.listenEvents();
         }
+        this.onRoot = parseInt(this.on_root);
     },
     data() {
         return {
             authCheck: false,
+            onRoot: Number,
             userId: 0,
             mainMenu: {},
             newsMessages: {},
@@ -177,11 +180,11 @@ export default {
     methods: {
         countMessages() {
             return (
-                !isEmptyObject(this.newsMessages) ||
-                !isEmptyObject(this.newsSubscriptions) ||
-                !isEmptyObject(this.newsPerformers) ||
-                !isEmptyObject(this.newsRemovedPerformers) ||
-                !isEmptyObject(this.newsStatusOrders)
+                !$.isEmptyObject(this.newsMessages) ||
+                !$.isEmptyObject(this.newsSubscriptions) ||
+                !$.isEmptyObject(this.newsPerformers) ||
+                !$.isEmptyObject(this.newsRemovedPerformers) ||
+                !$.isEmptyObject(this.newsStatusOrders)
             );
         },
         loggedIn(id) {
@@ -206,11 +209,7 @@ export default {
             axios.get(this.get_orders_new_url).then(function (response) {
                 if (response.data.news_subscriptions.length) {
                     $.each(response.data.news_subscriptions, function (k,subscription) {
-                        if (subscription.unread_orders.length) {
-                            $.each(subscription.unread_orders, function (k,unreadOrder) {
-                                self.newsSubscriptions['subscription'+unreadOrder.order_id] = unreadOrder.order;
-                            });
-                        }
+                        self.newsSubscriptions['subscription'+subscription.order_id] = subscription.order;
                     });
                     otherEventsFlag = true;
                     window.emitter.emit('my-subscriptions', !$.isEmptyObject(self.newsSubscriptions));
@@ -331,7 +330,7 @@ export default {
     props: {
         'auth': String,
         'user_id': String,
-        'on_root': Boolean,
+        'on_root': String,
         'home_url': String,
         'login_url': String,
         'register_url': String,
@@ -344,7 +343,7 @@ export default {
         'new_order_url': String,
         'account_change_url': String,
         'messages_url': String,
-        'my_subscriptions_url': String,
+        'orders_url': String,
         'active_main_menu': String,
         'get_unread_messages_url': String,
         'chat_url': String,
@@ -354,5 +353,6 @@ export default {
         'order_statuses': String,
         'bell_sound': String
     },
+
 }
 </script>

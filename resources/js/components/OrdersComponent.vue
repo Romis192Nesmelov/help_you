@@ -67,41 +67,24 @@
             <div id="points-container">
                 <div class="mb-3 order-block" v-for="point in selectedPoints" :key="point.properties.get('orderId')">
                     <h6 class="text-center">{{ 'Заявка №' + point.properties.get('orderId') + ' от' + point.properties.get('date') }}</h6>
-
                     <div class="w-100 d-flex align-items-center justify-content-between">
-                        <div class="d-flex align-items-center justify-content-center">
-                            <AvatarComponent
-                                :small=false
-                                :avatar_image="point.properties.get('user').avatar"
-                                :avatar_props="point.properties.get('user').avatar_props"
-                                :avatar_coof="0.35"
-                                :allow_change_avatar=0
-                            ></AvatarComponent>
-                            <div style="width: 215px;">
-                                <div class="ms-3 fs-lg-6 fs-sm-7 user-name">
-                                    <UserNameComponent :user="point.properties.get('user')"></UserNameComponent>
-                                </div>
-                                <div class="fs-lg-6 fs-sm-7 ms-3 user-age">{{ getUserAge(point.properties.get('user').born) }}</div>
-                            </div>
-                        </div>
+                        <UserPropertiesComponent
+                            :user="point.properties.get('user')"
+                            :small=false
+                            :avatar_coof=0.35
+                            :use_rating=true
+                            :allow_change_rating=false
+                        ></UserPropertiesComponent>
                         <i @click="setSubscription($event, point.properties.get('user').id)" :class="'subscribe-icon ' + (getSubscription(point.properties.get('user').id) ? 'icon-bell-cross' : 'icon-bell-check')"></i>
                     </div>
-
-                    <div class="images owl-carousel mt-3" v-if="point.properties.get('images').length">
-                        <a v-for="(image in point.properties.get('images')" class="fancybox" :key="image" :href="'/' + image.image">
-                            <div class="image" :style="`background-image:url(/${image.image ? image.image : 'images/def_avatar.svg'});`"></div>
-                        </a>
-                    </div>
-
-                    <h2 class="order-name text-dark text-left mt-3 mb-4">{{ point.properties.get('name') }}</h2>
-                    <h2 class="order-type text-dark text-left mt-3 h5">{{ point.properties.get('orderType') }}</h2>
-                    <ul class="subtypes" v-if="point.properties.get('subtype')">
-                        <li>{{ point.properties.get('subtype') }}</li>
-                    </ul>
-
-                    <p class="mb-1 text-left"><b>Адрес:</b> {{ point.properties.get('address') }}</p>
-                    <p class="fw-bold text-left mt-2 mb-0" v-if="point.properties.get('description_short')">Описание:</p>
-                    <p class="text-left order-description mb-1" v-if="point.properties.get('description_short')">{{ point.properties.get('description_short') }}</p>
+                    <OrderCarouselImagesComponent :images="point.properties.get('images')"></OrderCarouselImagesComponent>
+                    <OrderPropertiesComponent
+                        :name="point.properties.get('name')"
+                        :type="point.properties.get('orderType')"
+                        :subtype="point.properties.get('subtype')"
+                        :address="point.properties.get('address')"
+                        :description_short="point.properties.get('description_short')"
+                    ></OrderPropertiesComponent>
 
                     <p class="fw-bold text-left mt-0 mb-2" v-if="point.properties.get('description_full')">
                         <a href="#" @click.prevent="getOrderFullDescription(point.properties.get('description_full'))">Полное описание »</a>
@@ -126,19 +109,19 @@
 
 <script>
 import ModalComponent from "./blocks/ModalComponent.vue";
-import InputComponent from "./blocks/InputComponent.vue";
+import UserPropertiesComponent from "./blocks/UserPropertiesComponent.vue";
+import OrderCarouselImagesComponent from "./blocks/OrderCarouselImagesComponent.vue";
+import OrderPropertiesComponent from "./blocks/OrderPropertiesComponent.vue";
 import ButtonComponent from "./blocks/ButtonComponent.vue";
-import AvatarComponent from "./blocks/AvatarComponent.vue";
-import UserNameComponent from "./blocks/UserNameComponent.vue";
 
 export default {
     name: "OrdersComponent",
     components: {
-        AvatarComponent,
-        UserNameComponent,
         ModalComponent,
-        InputComponent,
-        ButtonComponent,
+        UserPropertiesComponent,
+        OrderCarouselImagesComponent,
+        OrderPropertiesComponent,
+        ButtonComponent
     },
     created() {
         let self = this;
@@ -248,9 +231,6 @@ export default {
                         });
                     }
 
-                    // console.log(window.subscriptions);
-                    // console.log(window.unreadOrders);
-
                     if (response.data.orders.length) {
                         $.each(response.data.orders, function (k,point) {
                             let createdAt = new Date(point.created_at),
@@ -346,23 +326,6 @@ export default {
             window.selectedPointsDie.animate({'margin-left': 0}, 'slow', () => {
                 window.pointsOpenedFlag = true;
             });
-        },
-        getUserAge(born) {
-            let now = new Date(),
-                bornArr = born.split('-');
-            let age = now.getFullYear() - parseInt(bornArr[2]);
-            if (now.getMonth() + 1 <= parseInt(bornArr[1]) && now.getDay() < parseInt(bornArr[1])) {
-                age--;
-            }
-            let lastDigit = age.toString().substr(-1,1),
-                word;
-
-            if (lastDigit === 0) word = 'лет';
-            else if (lastDigit === 1) word = 'год';
-            else if (lastDigit > 1 && lastDigit < 5) word = 'года';
-            else word = 'лет';
-
-            return age + ' ' + word;
         },
         getSubscription(userId) {
             return window.subscriptions.includes(userId)

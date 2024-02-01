@@ -1,5 +1,5 @@
 <template>
-    <div class="rating-line">
+    <div :class="'rating-line ' + (center ? ' d-flex justify-content-center' : '')">
         <i class="icon-star-full2" v-for="val in 5" :key="'full'+val" v-show="(val <= rating)" @click="setRating(val)"></i>
         <i class="icon-star-empty3" v-for="val in 5" :key="'empty'+val" v-show="(val > rating)" @click="setRating(val)"></i>
     </div>
@@ -12,6 +12,7 @@ export default {
         this.rating = this.income_rating;
     },
     props: {
+        'center': false,
         'income_rating': Number,
         'allow_change_rating': Boolean
     },

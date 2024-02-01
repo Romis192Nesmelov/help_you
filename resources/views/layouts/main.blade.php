@@ -62,7 +62,7 @@
         <top-line-component
             auth="{{ auth()->check() }}"
             user_id="{{ auth()->check() ? auth()->id() : 0 }}"
-            on_root="{{ (int)request()->path() == '/' }}"
+            on_root="{{ request()->path() == '/' ? 1 : 0 }}"
             home_url="{{ route('home') }}"
             login_url="{{ route('auth.login') }}"
             register_url="{{ route('auth.register') }}"
@@ -75,7 +75,7 @@
             new_order_url="{{ route('order.edit_order') }}"
             account_change_url="{{ route('account.change') }}"
             messages_url="{{ route('account.messages') }}"
-            my_subscriptions_url="{{ route('account.my_subscriptions') }}"
+            orders_url="{{ route('order.orders') }}"
             active_main_menu="{{ $activeMainMenu }}"
             get_unread_messages_url="{{ route('messages.get_unread_messages') }}"
             chat_url = "{{ route('messages.chat') }}"
@@ -90,35 +90,7 @@
     <message-component></message-component>
 </div>
 
-<div id="loader"><div></div></div
-
-{{--<script>--}}
-{{--    const userId = parseInt("{{ auth()->check() }}") ? parseInt("{{ auth()->id() }}") : null,--}}
-{{--        accountUrl = "{{ route('account.change') }}",--}}
-{{--        getUnreadMessagesUrl = "{{ route('messages.get_unread_messages') }}",--}}
-{{--        getSubscriptionsUrl = "{{ route('order.get_subscriptions_news') }}",--}}
-{{--        getUnreadOrderPerformersUrl = "{{ route('order.get_unread_order_performers') }}",--}}
-{{--        getUnreadOrderRemovedPerformersUrl  = "{{ route('order.get_unread_order_removed_performers') }}",--}}
-{{--        getUnreadOrderStatusUrl = "{{ route('order.get_unread_order_status') }}",--}}
-{{--        ordersUrl = "{{ route('order.orders') }}",--}}
-{{--        getUserAgeUrl = "{{ route('order.get_user_age') }}",--}}
-{{--        mySubscriptionsUrl = "{{ route('account.my_subscriptions') }}",--}}
-{{--        myOrdersUrl = "{{ route('account.my_orders') }}",--}}
-{{--        myHelpUrl = "{{ route('account.my_help') }}",--}}
-{{--        chatUrl = "{{ route('messages.chat') }}",--}}
-{{--        addressText = "{{ trans('content.address') }}",--}}
-{{--        newOrderFromText = "{{ trans('content.new_order_from') }}",--}}
-{{--        unreadMessagesText = "{{ trans('messages.unread_messages') }}",--}}
-{{--        newPerformerText = "{{ trans('content.new_performer') }}",--}}
-{{--        removedPerformerText = "{{ trans('content.removed_performer') }}",--}}
-{{--        newOrderStatusText = "{{ trans('content.new_order_status') }}",--}}
-{{--        inChatNumberText = "{{ trans('messages.in_chat_number') }}",--}}
-{{--        errorFieldMustBeFilledInText = "{{ trans('validation.field_must_be_filled_in') }}",--}}
-{{--        errorWrongValueText = "{{ trans('validation.wrong_value') }}",--}}
-{{--        openMessageModalFlag = parseInt("{{ session()->has('message') }}");--}}
-{{--        window.orderStatuses = [];--}}
-{{--        window.orderStatusClasses = ['closed','in-progress','open','in-approve'];--}}
-{{--</script>--}}
+<div id="loader"><div></div></div>
 
 </body>
 </html>

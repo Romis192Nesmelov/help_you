@@ -67,8 +67,6 @@ Route::middleware(['auth','account.completed'])->name('order.')->controller(Orde
     Route::get('/read-order', 'readOrder')->name('read_order');
     Route::get('/get-orders-news', 'getOrdersNews')->name('get_orders_news');
 
-    Route::get('/get-user-age', 'getUserAge')->name('get_user_age');
-    Route::post('/get-order-performers', 'getOrderPerformers')->name('get_order_performers');
     Route::post('/remove-order-performer', 'removeOrderPerformer')->name('remove_order_performer');
 
     Route::post('/get-orders', 'getOrders')->name('get_orders');

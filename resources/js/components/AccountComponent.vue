@@ -144,6 +144,7 @@
                         :value="infoAbout"
                         v-model:value="infoAbout"
                         :error="errors['info_about']"
+                        @change="errors['info_about']=null"
                     ></TextAreaComponent>
                     <div class="w-100 text-end mt-4">
                         <ButtonComponent

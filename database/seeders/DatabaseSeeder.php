@@ -18,8 +18,8 @@ class DatabaseSeeder extends Seeder
         $this->call(CitySeeder::class);
         Partner::factory(13)->create();
         $this->call(OrderTypesSeeder::class);
-        Order::factory(100)->create();
-//        $this->call(OrdersSeeder::class);
+//        Order::factory(100)->create();
+        $this->call(OrdersSeeder::class);
         $this->call(OrderImagesSeeder::class);
         $this->call(SubscriptionTypesSeeder::class);
         $this->call(MessageKeywordsSeeder::class);

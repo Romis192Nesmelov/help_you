@@ -24,7 +24,7 @@ class ChatRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'order_id' => $this->validationOrderId,
+            'id' => $this->validationOrderId,
         ];
     }
 }

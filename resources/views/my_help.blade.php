@@ -1,12 +1,6 @@
 @extends('layouts.main')
 
 @section('content')
-
-@include('blocks.modal_delete_block',[
-    'action' => 'order.delete_response',
-    'head' => trans('content.do_you_really_want_to_withdraw_your_response')
-])
-
 <div class="row">
     <left-menu-component
         user="{{ json_encode(auth()->user()) }}"

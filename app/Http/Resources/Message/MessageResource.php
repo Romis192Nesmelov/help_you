@@ -16,11 +16,10 @@ class MessageResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'image' => $this->image ? asset($this->image) : '',
+            'image' => $this->image,
             'body' => $this->body,
             'user' => $this->user,
-            'date' => getRussianDate($this->created_at->timestamp),
-            'time' => $this->created_at->format('H:m')
+            'created_at' => $this->created_at
         ];
     }
 }

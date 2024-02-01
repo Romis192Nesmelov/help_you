@@ -1,6 +1,7 @@
 <template>
-    <div :id="id" class="form-group text-area">
-        <label>{{ label }}</label>
+    <div :id="id" :class="'form-group text-area' + (icon ? ' has-icon' : '')">
+        <label v-if="label">{{ label }}</label>
+        <i :class="icon" v-if="icon" @click="$emit('iconClick')"></i>
         <textarea
             :name="name"
             :class="'form-control' + (error ? ' error' : '' )"
@@ -17,6 +18,6 @@
 <script>
 export default {
     name: "TextAreaComponent",
-    props: ['id', 'label','name','placeholder','value','min','max','error']
+    props: ['id', 'label','icon','name','placeholder','value','min','max','error']
 }
 </script>

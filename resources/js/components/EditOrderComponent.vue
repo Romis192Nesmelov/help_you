@@ -354,7 +354,6 @@ export default {
                         }
                     })
                     .catch(function (error) {
-                        console.log(error);
                         $.each(error.response.data.errors, (name,error) => {
                             self.errors[name] = error[0];
                         });

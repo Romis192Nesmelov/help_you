@@ -67,7 +67,15 @@ class ChatsController extends BaseController
     public function chat(ChatRequest $request): View
     {
         $this->data['active_left_menu'] = 'messages.chats';
-        $this->data['order'] = Order::find($request->input('order_id'));
+        $this->data['order'] = Order::query()
+            ->with('user.ratings')
+            ->with('performers.ratings')
+            ->with('orderType')
+            ->with('subType')
+            ->with('images')
+            ->with('messages.user')
+            ->where('id',$request->input('id'))
+            ->first();
         $this->setReadUnread(new ReadPerformer());
 		$this->setReadAllMessagesInChatForUser($this->data['order']->id);
         return $this->showView('chat');
