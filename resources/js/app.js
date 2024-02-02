@@ -138,14 +138,21 @@ window.bindFancybox = () => {
 }
 
 window.enablePointImagesCarousel = () => {
+    $('.images.owl-carousel').trigger('destroy.owl.carousel');
     setTimeout(() => {
-        $('.images.owl-carousel').owlCarousel(owlSettings(
-            10,
-            false,
-            6000,
-            {0: {items: 1}},
-            true
-        ));
+        let navButtonBlack1 = '<img src="/images/arrow_left.svg" />',
+            navButtonBlack2 = '<img src="/images/arrow_right.svg" />';
+
+        $('.images.owl-carousel').owlCarousel({
+            margin: 10,
+            loop: true,
+            nav: false,
+            autoplay: true,
+            autoplayTimeout: 6000,
+            dots: true,
+            responsive: {0: {items: 1}},
+            navText: [navButtonBlack1, navButtonBlack2]
+        });
     }, 200);
 }
 
@@ -300,20 +307,4 @@ const imagePreview = (container, defImage) => {
             }
         });
     });
-}
-
-const owlSettings = (margin, nav, timeout, responsive, autoplay) => {
-    let navButtonBlack1 = '<img src="/images/arrow_left.svg" />',
-        navButtonBlack2 = '<img src="/images/arrow_right.svg" />';
-
-    return {
-        margin: margin,
-        loop: autoplay,
-        nav: nav,
-        autoplay: autoplay,
-        autoplayTimeout: timeout,
-        dots: !nav,
-        responsive: responsive,
-        navText: [navButtonBlack1, navButtonBlack2]
-    }
 }

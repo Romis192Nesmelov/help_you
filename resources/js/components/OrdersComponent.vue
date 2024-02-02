@@ -41,11 +41,11 @@
                 <ButtonComponent
                     class="btn btn-primary w-100 mt-lg-0 mt-3"
                     text="Применить"
-                    @click="filter"
+                    @click=""
                 ></ButtonComponent>
             </div>
             <div class="col-lg-4 col-12 mt-lg-0 mt-2 row d-flex align-items-end m-0 p-0">
-                <label class="ms-3" @click="search">Поиск</label>
+                <label class="ms-3">Поиск</label>
                 <div class="form-group mt-2">
                     <i class="icon-search4"></i>
                     <input
@@ -139,8 +139,6 @@ export default {
                 self.checkUnreadOrders(point.properties.get('orderId'));
             });
             this.showSelectedPointsDie();
-            window.enablePointImagesCarousel();
-            window.bindFancybox();
         };
 
         window.clickedToPoint = (point) => {
@@ -148,8 +146,6 @@ export default {
             window.cickedTarget = point;
             this.selectedPoints = [point];
             this.showSelectedPointsDie();
-            window.enablePointImagesCarousel();
-            window.bindFancybox();
         };
 
         window.hideSelectedPointsDie = (target, callBack) => {
@@ -211,10 +207,23 @@ export default {
     },
     methods: {
         getOrders() {
-            let self = this, url = this.previewFlag ? this.get_preview_url : this.get_orders_url;
-            axios.post(url, {
-                _token: window.tokenField,
-            })
+            window.myMap.geoObjects.removeAll();
+            window.hideSelectedPointsDie();
+
+            let self = this, fields = {_token: window.tokenField}, url;
+
+            if (this.previewFlag) url = this.get_preview_url;
+            else {
+                url = this.get_orders_url;
+
+                if (this.filterType) fields.order_type = this.filterType;
+                if (this.searchingString) fields.search = this.searchingString;
+
+                fields.performers_from = this.filterPerformersFrom;
+                fields.performers_to = this.filterPerformersTo;
+            }
+
+                axios.post(url, fields)
                 .then(function (response) {
                     window.placemarks = [];
                     window.subscriptions = [];
@@ -323,6 +332,8 @@ export default {
             window.clickedToPoint(window.placemarks[k]);
         },
         showSelectedPointsDie() {
+            window.enablePointImagesCarousel();
+            window.bindFancybox();
             window.selectedPointsDie.animate({'margin-left': 0}, 'slow', () => {
                 window.pointsOpenedFlag = true;
             });
@@ -420,13 +431,7 @@ export default {
                     }
                 }
             });
-        },
-        filter() {
-
-        },
-        search() {
-
-        },
+        }
     }
 }
 </script>

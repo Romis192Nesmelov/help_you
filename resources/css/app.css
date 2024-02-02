@@ -90,6 +90,29 @@ body {
     transform: translateY(-50%);
 }
 
+.owl-dots {
+    width: 100%;
+    position: absolute;
+    text-align: center;
+    margin-top: -40px;
+}
+
+.owl-carousel .owl-dots button.owl-dot {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    margin-left: 10px;
+    background: white;
+}
+
+.owl-carousel .owl-dots button.owl-dot.active {
+    background: #e65639;
+}
+
+.owl-carousel .owl-dots button.owl-dot:first-child {
+    margin-left: 0;
+}
+
 .owl-carousel .owl-nav button {
     width: 15px;
     margin-left: 7px;
