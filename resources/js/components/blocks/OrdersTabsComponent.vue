@@ -13,7 +13,7 @@
                         ></UserPropertiesComponent>
                         <hr class="mt-1 mb-1">
                         <div class="h6 fw-bold">«{{ cropContent(order.name,30) }}»</div>
-                        <div class="h7 text-secondary">{{ order.order_type.name }}</div>
+                        <div class="h6 text-secondary">{{ order.order_type.name }}</div>
                         <hr class="mt-1 mb-1">
                         <p class="text-secondary fs-6 mb-1"><small>{{ cropContent(order.address,40) }}</small></p>
 

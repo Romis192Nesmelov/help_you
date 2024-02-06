@@ -124,8 +124,6 @@ export default {
         window.bindFancybox();
         this.scrollBottom();
 
-        this.getDate(this.messages[0].created_at);
-
         window.Echo.private('chat_' + this.chatOrder.id).listen('.chat', res => {
             if (res.message.user.id !== this.userId) {
                 self.messages.push(res.message);

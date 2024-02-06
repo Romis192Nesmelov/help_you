@@ -153,6 +153,8 @@ export default {
         this.wizardImages = JSON.parse(this.images);
         this.orderTypes = JSON.parse(this.order_types);
         this.sessionSteps = JSON.parse(this.session);
+        this.selectedOrderType = 1;
+        this.selectedOrderSubType = 1;
 
         if (this.order) {
             let order = JSON.parse(this.order),
@@ -161,13 +163,17 @@ export default {
             this.orderId = order.id;
             this.currentStep = 1;
             this.stepsHeadsH1[0] = 'Редактирование заявки №:' + order.id;
-            this.selectedOrderType = order.order_type_id;
-            this.selectedOrderSubType = order.subtype_id;
+            this.selectedOrderType = parseInt(order.order_type_id);
+            this.selectedOrderSubType = parseInt(order.subtype_id);
             this.orderName = order.name;
             this.needPerformers = order.need_performers;
 
+            for (let i=1;i<=3;i++) {
+                this.photo = null;
+            }
+
             $.each(order.images, function (k,image) {
-                self['photo' + (k + 1)] = image.image;
+                self['photo' + image.position] = image.image;
             });
 
             window.singlePoint = [order.latitude, order.longitude];
@@ -175,13 +181,13 @@ export default {
             this.latitude = order.latitude;
             this.longitude = order.longitude;
             this.descriptionShort = order.description_short;
-            this.descriptionShort = order.description_full;
+            this.descriptionFull = order.description_full;
         }
 
         if (this.sessionSteps.length) {
             this.currentStep = this.sessionSteps.length + 1;
-            this.selectedOrderType = this.sessionSteps[0].order_type_id;
-            this.selectedOrderSubType = this.sessionSteps[0].subtype_id;
+            this.selectedOrderType = parseInt(this.sessionSteps[0].order_type_id);
+            this.selectedOrderSubType = parseInt(this.sessionSteps[0].subtype_id);
             this.orderName = this.sessionSteps[0].name;
 
             if (this.sessionSteps.length > 1) {
@@ -197,7 +203,7 @@ export default {
 
             if (this.sessionSteps.length > 3) {
                 this.descriptionShort = this.sessionSteps[2].description_short;
-                this.descriptionShort = this.sessionSteps[2].description_full;
+                this.descriptionFull = this.sessionSteps[2].description_full;
             }
         }
 
@@ -333,7 +339,7 @@ export default {
                 formData.append('name', this.orderName);
                 formData.append('need_performers', this.needPerformers);
                 if (this.descriptionShort) formData.append('description_short', this.descriptionShort);
-                if (this.descriptionShort) formData.append('description_full', this.descriptionShort);
+                if (this.descriptionFull) formData.append('description_full', this.descriptionFull);
 
                 formData.append('photo1', $('input[name=photo1]')[0].files[0]);
                 formData.append('photo2', $('input[name=photo2]')[0].files[0]);
@@ -354,6 +360,7 @@ export default {
                         }
                     })
                     .catch(function (error) {
+                        console.log(error);
                         $.each(error.response.data.errors, (name,error) => {
                             self.errors[name] = error[0];
                         });

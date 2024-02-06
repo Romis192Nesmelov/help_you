@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use App\Events\NotificationEvent;
 use App\Events\OrderEvent;
+use App\Http\Requests\Order\EditOrderRequest;
 use App\Http\Requests\Order\RemovePerformerRequest;
 use App\Http\Requests\Order\SetRatingRequest;
 use App\Http\Resources\Orders\OrdersResource;
@@ -48,12 +49,14 @@ class OrderController extends BaseController
     /**
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    public function editOrder(OrderRequest $request): View
+    public function editOrder(EditOrderRequest $request): View
     {
-        $this->data['order'] = Order::with('images')->find($request->id);
-        $this->authorize('owner', $this->data['order']);
+        if ($request->has('id')) {
+            $this->data['order'] = Order::with('images')->find($request->id);
+            $this->authorize('owner', $this->data['order']);
+        }
+        $this->data['session_key'] = $this->getSessionKey($request);
         $this->data['order_types'] = OrderType::where('active',1)->with('subtypesActive')->get();
-        $this->data['session_key'] = 'edit'.$this->data['order']->id.'_steps';
         return $this->showView('edit_order');
     }
 
