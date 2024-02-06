@@ -932,6 +932,7 @@ button.btn > i {
     cursor: pointer;
     top: 20px;
     right: 20px;
+    z-index: 999;
 }
 
 #messages .date-block {

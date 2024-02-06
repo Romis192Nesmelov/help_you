@@ -49,25 +49,23 @@
             </div>
             <div class="content-block simple">
                 <div id="messages">
-                    <div v-if="messages.length">
-                        <div v-for="(message, k) in messages">
-                            <div class="date-block" v-if="newDate(k)">
-                                <span class="date">{{ getDate(message.created_at) }}</span>
-                            </div>
-                            <div :class="'message-row' + (message.user.id === userId ? ' my-self' : '')">
-                                <div class="attached-image" v-if="message.image">
-                                    <a :href="'/' + message.image" class="fancybox"><img :src="'/' + message.image" /></a>
-                                    <MessageComponent :message="message"></MessageComponent>
-                                </div>
-                                <MessageComponent :message="message" v-else></MessageComponent>
-                            </div>
+                    <div v-for="(message, k) in messages">
+                        <div class="date-block" v-if="newDate(k)">
+                            <span class="date">{{ getDate(message.created_at) }}</span>
                         </div>
-                        <div class="message-row my-self" v-if="previewImage">
-                            <div class="attached-image preview">
-                                <i class="icon-close2" @click="detachImage"></i>
-                                <a :href="previewImage" class="fancybox"><img :src="previewImage" /></a>
-                                <div class="error" v-if="errors['image']">{{ errors['image'] }}</div>
+                        <div :class="'message-row' + (message.user.id === userId ? ' my-self' : '')">
+                            <div class="attached-image" v-if="message.image">
+                                <a :href="'/' + message.image" class="fancybox"><img :src="'/' + message.image" /></a>
+                                <MessageComponent :message="message"></MessageComponent>
                             </div>
+                            <MessageComponent :message="message" v-else></MessageComponent>
+                        </div>
+                    </div>
+                    <div class="message-row my-self" v-if="previewImage">
+                        <div class="attached-image preview">
+                            <i class="icon-close2" @click="detachImage"></i>
+                            <a :href="previewImage" class="fancybox"><img :src="previewImage" /></a>
+                            <div class="error" v-if="errors['image']">{{ errors['image'] }}</div>
                         </div>
                     </div>
                 </div>
