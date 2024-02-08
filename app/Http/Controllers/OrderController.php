@@ -290,12 +290,8 @@ class OrderController extends BaseController
             foreach ($order->images as $image) {
                 $this->deleteFile($image->image);
             }
-            $unreadOrders = ReadOrder::where('order_id',$request->id)->where('read',null)->get();
-            foreach ($unreadOrders as $unreadOrder) {
-                broadcast(new NotificationEvent('delete_order', $request->id, $unreadOrder->subscription->subscriber_id));
-                $unreadOrder->delete();
-            }
 
+            $this->removeOrderUnreadMessages($request->id);
             broadcast(new OrderEvent('remove_order', $order));
 
             $order->delete();
@@ -326,10 +322,8 @@ class OrderController extends BaseController
         $this->authorize('owner', $order);
         $order->status = 0;
         $order->save();
-        ReadOrder::where('order_id')->delete();
-        ReadPerformer::where('order_id')->delete();
-        ReadRemovedPerformer::where('order_id')->delete();
 
+        $this->removeOrderUnreadMessages($request->id);
         broadcast(new OrderEvent('remove_order', $order));
 
         return response()->json([],200);
@@ -364,8 +358,6 @@ class OrderController extends BaseController
         $order->status = 3;
         $order->save();
 
-        Message::where('order_id',$order->id)->delete();
-
         OrderUser::where('order_id',$request->id)->delete();
         $this->newOrderInSubscription($order);
         return response()->json([],200);
@@ -390,5 +382,15 @@ class OrderController extends BaseController
 //            broadcast(new NotificationEvent('new_order_in_subscription', $order, $subscription->subscriber_id));
 //            $this->mailNotice($order, $subscription->subscriber, 'new_order_in_subscription');
         }
+    }
+
+    private function removeOrderUnreadMessages($orderId): void
+    {
+        Message::where('order_id',$orderId)->delete();
+        OrderUser::where('order_id',$orderId)->delete();
+        ReadOrder::where('order_id',$orderId)->delete();
+        ReadPerformer::where('order_id',$orderId)->delete();
+        ReadRemovedPerformer::where('order_id',$orderId)->delete();
+        ReadRemovedPerformer::where('order_id',$orderId)->delete();
     }
 }

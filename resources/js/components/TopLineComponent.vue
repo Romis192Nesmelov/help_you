@@ -263,7 +263,6 @@ export default {
                         break;
                     case 'new_order_status':
                         self.newsStatusOrders['status'+res.order.d] = res.order;
-                        if (!res.order.status) this.deleteOrderNotice(res.order.id);
                         ordersEventFlag = true;
                         break;
                     case 'remove_performer':
@@ -272,22 +271,34 @@ export default {
                         otherEventsFlag = true;
                         this.hasMessages = true;
                         break;
-                    case 'delete_order':
-                        this.deleteOrderNotice(res.order.id);
-                        ordersEventFlag = true;
-                        break;
                 }
                 self.eventOrderChange(ordersEventFlag);
                 self.bellAlert(otherEventsFlag, ordersEventFlag);
             });
 
             window.Echo.channel('order_event').listen('.order', res => {
-                if (res.notice === 'remove_order') self.deleteOrderNotice(res.order.id);
+                if (res.notice === 'remove_order') {
+                    if (this.newsMessages['order' + res.order.id]) {
+                        delete this.newsMessages['order' + res.order.id];
+                        window.emitter.emit('my-messages', !$.isEmptyObject(this.newsMessages));
+                    }
+
+                    if (this.newsSubscriptions['subscription' + res.order.id]) {
+                        delete this.newsSubscriptions['order' + res.order.id];
+                        window.emitter.emit('my-subscriptions', !$.isEmptyObject(this.newsSubscriptions));
+                    }
+
+                    if (this.newsRemovedPerformers['removed_performer' + res.order.id]) {
+                        delete this.newsRemovedPerformers['order' + res.order.id];
+                        window.emitter.emit('my-help', !$.isEmptyObject(this.newsRemovedPerformers));
+                    }
+                    this.hasMessages = !$.isEmptyObject(this.newsMessages) || !$.isEmptyObject(this.newsSubscriptions) || !$.isEmptyObject(this.newsRemovedPerformers);
+                }
             });
 
             window.emitter.on('read-order', orderId => {
                 if (this.newsSubscriptions['subscription'+orderId])
-                    delete this.newsSubscriptions['subscription'+orderId];
+                    delete this.newsSubscriptions['subscription' + orderId];
             });
         },
         eventOrderChange(ordersEventFlag) {
@@ -297,24 +308,6 @@ export default {
                     !$.isEmptyObject(this.newsStatusOrders)
                 );
             }
-        },
-        deleteOrderNotice(orderId) {
-            if (this.newsMessages['order'+orderId]) {
-                delete this.newsMessages['order'+orderId];
-                window.emitter.emit('my-messages', !$.isEmptyObject(this.newsMessages));
-            }
-
-            if (this.newsSubscriptions['subscription'+orderId]) {
-                delete this.newsSubscriptions['order'+orderId];
-                window.emitter.emit('my-subscriptions', !$.isEmptyObject(this.newsSubscriptions));
-            }
-
-            if (this.newsRemovedPerformers['removed_performer'+orderId]) {
-                delete this.newsRemovedPerformers['order'+orderId];
-                window.emitter.emit('my-help', !$.isEmptyObject(this.newsRemovedPerformers));
-            }
-
-            this.hasMessages = !$.isEmptyObject(this.newsMessages) || !$.isEmptyObject(this.newsSubscriptions) || !$.isEmptyObject(this.newsRemovedPerformers);
         },
         bellAlert(otherEventsFlag, ordersEventFlag) {
             if (otherEventsFlag || ordersEventFlag) {
@@ -360,6 +353,5 @@ export default {
         'order_statuses': String,
         'bell_sound': String
     },
-
 }
 </script>
