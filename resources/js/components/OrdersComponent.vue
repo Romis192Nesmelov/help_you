@@ -1,12 +1,12 @@
 <template xmlns="http://www.w3.org/1999/html">
     <ModalComponent id="order-respond-modal" head="Сообщение">
-        <h5 class="bg-gray">Спасибо, что откликнулись<br>на заяку №{{ respondOrder ? respondOrder.properties.get('orderId') : '' }} от {{ respondOrder ? respondOrder.properties.get('date') : '' }}</h5>
+        <h3 class="bg-gray">Спасибо, что откликнулись<br>на заяку «{{ respondOrderName }}» от {{ respondOrderDate }}</h3>
         <hr>
         <h2 class="order-type text-center mt-3"></h2>
         <p class="small text-center"><b>Вас ждут вас по адресу:</b></p>
-        <h6 class="order-address text-center mt-0">{{ respondOrder ? respondOrder.properties.get('address') : '' }}</h6>
+        <h6 class="order-address text-center mt-0">{{ respondOrderAddress }}</h6>
         <hr>
-        <p class="w-100 text-center"><a :href="chat_url + 'id=' + (respondOrder ? respondOrder.properties.get('orderId') : '')">Подробности вы можете обсудить в чате.</a></p>
+        <p class="w-100 text-center"><a :href="chat_url + '?id=' + respondOrderId">Подробности вы можете обсудить в чате.</a></p>
         <hr>
         <h1 class="text-orange text-center">Спасибо!</h1>
     </ModalComponent>
@@ -66,7 +66,7 @@
             <i id="close-selected-points" class="icon-close2"></i>
             <div id="points-container">
                 <div class="mb-3 order-block" v-for="point in selectedPoints" :key="point.properties.get('orderId')">
-                    <h6 class="text-center">{{ 'Заявка №' + point.properties.get('orderId') + ' от' + point.properties.get('date') }}</h6>
+                    <h2 class="text-center mt-4 pt-1">{{ point.properties.get('name') + ' от ' + point.properties.get('date') }}</h2>
                     <div class="w-100 d-flex align-items-center justify-content-between">
                         <UserPropertiesComponent
                             :user="point.properties.get('user')"
@@ -79,7 +79,6 @@
                     </div>
                     <OrderCarouselImagesComponent :images="point.properties.get('images')"></OrderCarouselImagesComponent>
                     <OrderPropertiesComponent
-                        :name="point.properties.get('name')"
                         :type="point.properties.get('orderType')"
                         :subtype="point.properties.get('subtype')"
                         :address="point.properties.get('address')"
@@ -195,7 +194,10 @@ export default {
             userId: Number,
             orders: [],
             selectedPoints: [],
-            respondOrder: null,
+            respondOrderId: 0,
+            respondOrderName: '',
+            respondOrderDate: '',
+            respondOrderAddress: '',
             openOrderId: 0,
             orderTypes: Array,
             orderFullDescription: '',
@@ -373,12 +375,16 @@ export default {
             $('#order-full-description-modal').modal('show');
         },
         orderRespond(point) {
-            this.respondOrder = point;
+            let self = this;
             axios.post(this.order_response_url, {
                 _token: window.tokenField,
                 id: point.properties.get('orderId')
             })
                 .then(function (response) {
+                    self.respondOrderId = point.properties.get('orderId');
+                    self.respondOrderName = point.properties.get('name');
+                    self.respondOrderDate = point.properties.get('date');
+                    self.respondOrderAddress = point.properties.get('address');
                     $('#order-respond-modal').modal('show');
                 })
                 .catch(function (error) {
@@ -419,8 +425,7 @@ export default {
         },
         removeOrder(res) {
             let self = this;
-            window.hideSelectedPointsDie(() => {
-                self.respondOrder = null;
+            window.hideSelectedPointsDie(null,() => {
                 let indexUnread = window.unreadOrders.indexOf(res.order.id);
                 if (indexUnread !== -1) window.unreadOrders.splice(indexUnread,1);
                 for (let i=0;i<window.placemarks.length;i++) {

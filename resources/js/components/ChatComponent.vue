@@ -82,7 +82,7 @@
                         v-model:value="message"
                         :error="errors['message']"
                         @icon-click="sendMessage"
-                        v-on:keyup.enter="sendMessage"
+                        @keydown.enter.prevent.exact="sendMessage"
                         @change="errors['message']=null"
                     ></TextAreaComponent>
                 </div>

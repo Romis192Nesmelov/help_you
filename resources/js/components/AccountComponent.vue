@@ -76,7 +76,7 @@
         ></ButtonComponent>
     </ModalComponent>
 
-    <div class="col-12 col-lg-8" v-on:keyup.enter="onSubmit">
+    <div class="col-12 col-lg-8">
         <div class="rounded-block tall">
             <div class="row">
                 <div id="account-block" class="col-12 col-lg-6">

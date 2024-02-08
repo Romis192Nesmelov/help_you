@@ -10,6 +10,8 @@
             :placeholder="placeholder"
             :minlength="min"
             :maxlength="max"
+            :min="min"
+            :max="max"
             @input="$emit('update:value', $event.target.value)"
         >
         <div class="error" v-if="error">{{ error }}</div>

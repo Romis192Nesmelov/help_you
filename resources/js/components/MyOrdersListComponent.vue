@@ -135,6 +135,13 @@ export default {
                 }
             }
         });
+
+        window.Echo.channel('order_event').listen('.order', res => {
+            if (res.notice === 'remove_order' && res.user.id !== this.userId) {
+                orderIndex = self.getOrderIndex('active', res.order.id);
+                if (orderIndex !== null) self.refreshOrders();
+            }
+        });
     },
     data() {
         return {
@@ -299,7 +306,7 @@ export default {
         getOrderIndex(tabKey, searchedId) {
             let index = null;
             for (let i=0;i<this.tabs[tabKey].orders.length;i++) {
-                if (self.tabs[tabKey].orders[i].id === searchedId) {
+                if (this.tabs[tabKey].orders[i].id === searchedId) {
                     index = i;
                     break;
                 }

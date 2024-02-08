@@ -68,40 +68,40 @@
         <div id="right-button-block" :class="'buttons-block d-none d-lg-flex align-items-center justify-content-'+(authCheck ? 'between' : 'end')+(onRoot ? ' on-root' : '')">
             <a
                 id="navbar-dropdown-messages"
-                :class="'nav-link'+(countMessages() ? ' dropdown-toggle' : '')"
+                :class="'nav-link'+(hasMessages ? ' dropdown-toggle' : '')"
                 role="button"
-                :data-bs-toggle="countMessages() ? 'dropdown' : ''"
+                :data-bs-toggle="hasMessages ? 'dropdown' : ''"
                 aria-expanded="false"
                 v-if="authCheck"
             >
                 <i class="fa fa-bell-o">
-                    <span class="dot" v-if="countMessages()"></span>
+                    <span class="dot" v-if="hasMessages"></span>
                 </i>
             </a>
-            <div class="dropdown-menu" aria-labelledby="navbar-dropdown-messages" v-show="authCheck && countMessages()">
+            <div class="dropdown-menu" aria-labelledby="navbar-dropdown-messages" v-show="authCheck && hasMessages">
                 <ul id="dropdown">
-                    <li v-for="(counter, id) in newsMessages" :key="id">
-                        Новых сообщений: <span class="counter">{{ counter }}</span><br>
-                        <a :href="chat_url+'?order_id='+(id.replace('order',''))">в чате по заявке №{{ id.replace('order','') }}</a>
+                    <li v-for="(message, id) in newsMessages" :key="id">
+                        Новых сообщений: <span class="counter">{{ message.count }}</span><br>
+                        <a :href="chat_url+'?id='+(id.replace('order',''))">в чате по заявке «{{ message.name }}»</a>
                         <hr>
                     </li>
                     <li v-for="(news, id) in newsSubscriptions" :key="id">
-                        <a :href="orders_url + '?id=' + news.id">Новая заяка №{{ news.id }} от:</a><br>
+                        <a :href="orders_url + '?id=' + news.id">Новая заяка «{{ news.order.name }}» от:</a><br>
                         {{ news.user.name+' '+news.user.family }}
                         <hr>
                     </li>
                     <li v-for="(news, id) in newsPerformers" :key="id">
-                        <a :href="my_orders_url">Новый исполнитель у заявки №:{{ news.order_id }}:</a><br>
+                        <a :href="my_orders_url">Новый исполнитель у заявки «{{ news.order.name }}»:</a><br>
                         {{ news.user.name+' '+news.user.family }}
                         <hr>
                     </li>
                     <li v-for="(news, id) in newsRemovedPerformers" :key="id">
                         <a :href="my_help_url">Вам было отказано в участии</a><br>
-                        в выполнении заяки №{{ news.order_id }}
+                        в выполнении заяки «{{ news.order.name }}»
                         <hr>
                     </li>
                     <li v-for="(news, id) in newsStatusOrders" :key="id">
-                        <a :href="my_orders_url">Новый статус у заявки №:{{ news.order_id }}</a>:<br>
+                        <a :href="my_orders_url">Новый статус у заявки «{{ news.order.name }}»</a>:<br>
                         «{{ ordersStatuses[news.status] }}»
                         <hr>
                     </li>
@@ -166,6 +166,7 @@ export default {
     data() {
         return {
             authCheck: false,
+            hasMessages: false,
             onRoot: Number,
             userId: 0,
             mainMenu: {},
@@ -178,15 +179,6 @@ export default {
         }
     },
     methods: {
-        countMessages() {
-            return (
-                !$.isEmptyObject(this.newsMessages) ||
-                !$.isEmptyObject(this.newsSubscriptions) ||
-                !$.isEmptyObject(this.newsPerformers) ||
-                !$.isEmptyObject(this.newsRemovedPerformers) ||
-                !$.isEmptyObject(this.newsStatusOrders)
-            );
-        },
         loggedIn(id) {
             this.userId = id;
             this.authCheck = true;
@@ -198,6 +190,7 @@ export default {
             let self = this;
             axios.get(this.get_unread_messages_url).then(function (response) {
                 self.newsMessages = response.data.unread;
+                self.hasMessages = !$.isEmptyObject(self.newsMessages);
                 window.emitter.emit('my-messages', !$.isEmptyObject(self.newsMessages));
             });
         },
@@ -209,7 +202,7 @@ export default {
             axios.get(this.get_orders_new_url).then(function (response) {
                 if (response.data.news_subscriptions.length) {
                     $.each(response.data.news_subscriptions, function (k,subscription) {
-                        self.newsSubscriptions['subscription'+subscription.order_id] = subscription.order;
+                        self.newsSubscriptions['subscription'+subscription.order_id] = subscription;
                     });
                     otherEventsFlag = true;
                     window.emitter.emit('my-subscriptions', !$.isEmptyObject(self.newsSubscriptions));
@@ -245,21 +238,24 @@ export default {
             window.Echo.private('notice_' + this.userId).listen('.notice', res => {
                 switch (res.notice) {
                     case 'new_message':
-                        let messageKey = 'order'+res.order.id;
+                        let messageKey = 'order' + res.order.id;
                         if (self.newsMessages[messageKey]) {
-                            let counter = self.newsMessages[messageKey];
+                            let counter = self.newsMessages[messageKey].count;
                             counter++;
-                            self.newsMessages[messageKey] = counter;
+                            self.newsMessages[messageKey].count = counter;
                         } else {
-                            self.newsMessages[messageKey] = 1;
+                            self.newsMessages = {};
+                            self.newsMessages[messageKey] = {name:res.order.name, count:1};
                         }
                         window.emitter.emit('my-messages', !$.isEmptyObject(self.newsMessages));
                         otherEventsFlag = true;
+                        this.hasMessages = true;
                         break;
                     case 'new_order_in_subscription':
                         self.newsSubscriptions['subscription'+res.order.id] = res.order;
                         window.emitter.emit('my-subscriptions', !$.isEmptyObject(self.newsSubscriptions));
                         otherEventsFlag = true;
+                        this.hasMessages = true;
                         break;
                     case 'new_performer':
                         self.newsPerformers['new_performer'+res.order.id] = res.order;
@@ -274,6 +270,7 @@ export default {
                         self.newsRemovedPerformers['removed_performer'+res.order.id] = res.order;
                         window.emitter.emit('my-help', !$.isEmptyObject(self.newsRemovedPerformers));
                         otherEventsFlag = true;
+                        this.hasMessages = true;
                         break;
                     case 'delete_order':
                         this.deleteOrderNotice(res.order.id);
@@ -282,6 +279,10 @@ export default {
                 }
                 self.eventOrderChange(ordersEventFlag);
                 self.bellAlert(otherEventsFlag, ordersEventFlag);
+            });
+
+            window.Echo.channel('order_event').listen('.order', res => {
+                if (res.notice === 'remove_order') self.deleteOrderNotice(res.order.id);
             });
 
             window.emitter.on('read-order', orderId => {
@@ -298,23 +299,29 @@ export default {
             }
         },
         deleteOrderNotice(orderId) {
-            let self = this;
-            $.each({
-                'order':self.newsMessages,
-                'subscription:':self.newsSubscriptions,
-                'performer':self.newsPerformers,
-                'status':self.newsStatusOrders
-            }, function (key,news) {
-                let newsKey = key + orderId;
-                if (news[newsKey]) delete news[newsKey];
-            });
+            if (this.newsMessages['order'+orderId]) {
+                delete this.newsMessages['order'+orderId];
+                window.emitter.emit('my-messages', !$.isEmptyObject(this.newsMessages));
+            }
+
+            if (this.newsSubscriptions['subscription'+orderId]) {
+                delete this.newsSubscriptions['order'+orderId];
+                window.emitter.emit('my-subscriptions', !$.isEmptyObject(this.newsSubscriptions));
+            }
+
+            if (this.newsRemovedPerformers['removed_performer'+orderId]) {
+                delete this.newsRemovedPerformers['order'+orderId];
+                window.emitter.emit('my-help', !$.isEmptyObject(this.newsRemovedPerformers));
+            }
+
+            this.hasMessages = !$.isEmptyObject(this.newsMessages) || !$.isEmptyObject(this.newsSubscriptions) || !$.isEmptyObject(this.newsRemovedPerformers);
         },
         bellAlert(otherEventsFlag, ordersEventFlag) {
             if (otherEventsFlag || ordersEventFlag) {
                 window.bellRinging($('#right-button-block .fa.fa-bell-o'));
-                const audio = new Audio(this.bell_sound);
-                audio.muted = false;
-                audio.play();
+                // const audio = new Audio(this.bell_sound);
+                // audio.muted = false;
+                // audio.play();
             }
         }
     },

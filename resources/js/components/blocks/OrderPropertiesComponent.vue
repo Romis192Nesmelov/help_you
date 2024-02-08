@@ -1,5 +1,5 @@
 <template>
-    <h2 class="order-name text-dark text-left mt-3 mb-4">{{ name }}</h2>
+    <h2 class="order-name text-dark text-left mt-3 mb-4" v-if="name">{{ name }}</h2>
     <h2 class="order-type text-dark text-left mt-3 h5">{{ type }}</h2>
     <ul class="subtypes" v-if="subtype">
         <li>{{ subtype }}</li>

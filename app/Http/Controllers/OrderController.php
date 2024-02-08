@@ -7,6 +7,7 @@ use App\Http\Requests\Order\EditOrderRequest;
 use App\Http\Requests\Order\RemovePerformerRequest;
 use App\Http\Requests\Order\SetRatingRequest;
 use App\Http\Resources\Orders\OrdersResource;
+use App\Models\Message;
 use App\Models\Rating;
 use App\Models\ReadPerformer;
 use App\Models\ReadRemovedPerformer;
@@ -83,6 +84,7 @@ class OrderController extends BaseController
             'news_performers' => ReadPerformer::query()
                 ->whereIn('order_id',Order::where('user_id',Auth::id())->pluck('id')->toArray())
                 ->where('read',null)
+                ->with('order')
                 ->with('user')
                 ->get(),
             'news_removed_performers' => ReadRemovedPerformer::query()
@@ -361,6 +363,8 @@ class OrderController extends BaseController
         $this->authorize('owner', $order);
         $order->status = 3;
         $order->save();
+
+        Message::where('order_id',$order->id)->delete();
 
         OrderUser::where('order_id',$request->id)->delete();
         $this->newOrderInSubscription($order);

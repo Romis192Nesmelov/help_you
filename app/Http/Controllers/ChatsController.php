@@ -31,7 +31,7 @@ class ChatsController extends BaseController
 
     public function chats(): View
     {
-        $this->data['active_left_menu'] = 'messages.chats';
+        $this->data['active_left_menu'] = 'account.my_chats';
         return $this->showView('chats');
     }
 
@@ -76,6 +76,7 @@ class ChatsController extends BaseController
             ->with('messages.user')
             ->where('id',$request->input('id'))
             ->first();
+        if ($this->data['order']->status != 1) abort (403);
         $this->setReadUnread(new ReadPerformer());
 		$this->setReadAllMessagesInChatForUser($this->data['order']->id);
         return $this->showView('chat');
@@ -120,8 +121,8 @@ class ChatsController extends BaseController
         if ($unreadMessages = MessageUser::where('user_id',Auth::id())->where('read',null)->orderBy('order_id')->get()) {
             foreach ($unreadMessages as $unreadMessage) {
                 if (!isset($unreadMessagesCounters['order'.$unreadMessage->order_id])) {
-                    $unreadMessagesCounters['order'.$unreadMessage->order_id] = 1;
-                } else $unreadMessagesCounters['order'.$unreadMessage->order_id]++;
+                    $unreadMessagesCounters['order'.$unreadMessage->order_id] = ['name' => $unreadMessage->order->name, 'count' => 1];
+                } else $unreadMessagesCounters['order'.$unreadMessage->order_id]['count']++;
             }
         }
         return response()->json(['unread' => $unreadMessagesCounters],200);

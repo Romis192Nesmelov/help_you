@@ -110,11 +110,13 @@
                         v-if="currentStep > 1"
                         class="btn btn-secondary link-cover"
                         text="Назад"
+                        :disabled="disabledButtons"
                         @click="prevStep"
                     ></ButtonComponent>
                     <ButtonComponent
                         class="btn btn-secondary link-cover"
                         text="Далее"
+                        :disabled="disabledButtons"
                         @click="nextStep"
                     ></ButtonComponent>
                 </div>
@@ -234,6 +236,7 @@ export default {
     },
     data() {
         return {
+            disabledButtons: false,
             sessionSteps: Array,
             currentStep: 1,
             wizardImages: Array,
@@ -287,9 +290,11 @@ export default {
     methods: {
         nextStep() {
             let self = this;
+
             if (this.currentStep === 3) {
                 if (!this.address) this.errors['address'] = 'Укажите адрес!';
                 else {
+                    this.disabledButtons = true;
                     this.address = this.address.indexOf('Москва') >= 0 ? this.address : 'Москва, ' + this.address;
 
                     axios.get('https://geocode-maps.yandex.ru/1.x/?apikey=' + self.yandex_api_key + '&geocode=' + self.address + '&format=json')
@@ -322,9 +327,11 @@ export default {
                                     .then(function (response) {
                                         setTimeout(() => {
                                             self.currentStep++;
+                                            self.disabledButtons = false;
                                         }, 1500);
                                     });
                             } else {
+                                self.disabledButtons = false;
                                 self.errors['address'] = 'Уточните адресс, он может быть не верным!';
                             }
                         });
@@ -332,6 +339,8 @@ export default {
             } else {
                 let self = this,
                     formData = new FormData();
+
+                this.disabledButtons = true;
 
                 formData.append('_token', window.tokenField);
                 formData.append('order_type_id', this.selectedOrderType);
@@ -350,6 +359,7 @@ export default {
                     .then(function (response) {
                         if (self.currentStep !== 4) {
                             self.currentStep++;
+                            self.disabledButtons = false;
                         } else {
                             setTimeout(function () {
                                 window.location.href = self.order_preview_url;
@@ -360,7 +370,7 @@ export default {
                         }
                     })
                     .catch(function (error) {
-                        console.log(error);
+                        self.disabledButtons = false;
                         $.each(error.response.data.errors, (name,error) => {
                             self.errors[name] = error[0];
                         });
@@ -369,9 +379,11 @@ export default {
         },
         prevStep() {
             let self = this;
+            this.disabledButtons = true;
             axios.get(this.prev_step_url + '?id=' + (this.orderId ? this.orderId : ''))
                 .then(function (response) {
                     self.currentStep--;
+                    self.disabledButtons = false;
                 })
                 .catch(function (error) {
                 console.log(error);
