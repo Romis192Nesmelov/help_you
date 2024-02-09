@@ -92,7 +92,6 @@ export default {
             allowChangeAvatar: false,
             avatarImage: Object,
             avatarSize: Number,
-            avatarHeight: Number,
             avatarPosX: Number,
             avatarPosY: Number,
             leftMenu: Array,
@@ -137,6 +136,7 @@ export default {
                 tuneAvatarModal = $('#tune-avatar-modal'),
                 avatarCirBig = $('.avatar.cir.big'),
                 avatarContainer = $('#avatar-container');
+            let avatarRatio = 0;
 
             $(".ui-slider-value").slider({
                 value: 0,
@@ -149,10 +149,13 @@ export default {
                         'align-items': 'start'
                     });
 
-                    if (!self.avatarHeight) self.avatarHeight = self.avatarImage.height();
+                    if (!avatarRatio) avatarRatio = self.avatarImage.width() / self.avatarImage.height();
+                    let avatarWidth = 200 + ui.value * 2,
+                        avatarHeight = avatarWidth / avatarRatio;
+
                     self.avatarImage.css({
-                        'width': 200 + ui.value * 2,
-                        'height': self.avatarHeight + (self.avatarHeight / 100 * ui.value)
+                        'width': avatarWidth,
+                        'height': avatarHeight
                     });
                     self.avatarImage.css({
                         'top': (200 - self.avatarImage.height()) / 2 + 150,
@@ -175,8 +178,6 @@ export default {
 
                 avatarContainer.html('');
                 avatarContainer.append(self.avatarImage);
-                // window.avatarImage.css('top',(200 - window.avatarImage.height()) / 2 + 150);
-                // window.avatarHeight = window.avatarImage.height();
                 self.avatarImage.draggable({
                     containment: "#avatar-container"
                 });
