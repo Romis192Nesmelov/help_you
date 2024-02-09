@@ -34,7 +34,7 @@ class AccountController extends BaseController
     public function mySubscriptions() :View
     {
         $this->setReadUnread(new ReadOrder());
-        $this->data['active_left_menu'] = 'account.my_subscriptions';
+        $this->data['active_left_menu'] = 'my_subscriptions';
         return $this->showView('my_subscriptions');
     }
 
@@ -63,7 +63,7 @@ class AccountController extends BaseController
     public function myOrders(): View
     {
         $this->setReadUnread(new ReadStatusOrder());
-        $this->data['active_left_menu'] = 'account.my_orders';
+        $this->data['active_left_menu'] = 'my_orders';
         return $this->showView('my_orders');
     }
 
@@ -102,7 +102,7 @@ class AccountController extends BaseController
     public function myHelp(): View
     {
         $this->setReadUnreadRemovedPerformers();
-        $this->data['active_left_menu'] = 'account.my_help';
+        $this->data['active_left_menu'] = 'my_help';
         return $this->showView('my_help');
     }
 

@@ -131,7 +131,13 @@ export default {
                 axios.post(this.read_message_url, {
                     _token: window.tokenField,
                     order_id: self.chatOrder.id
-                }).catch(function (error) {console.log(error);});
+                })
+                    .then(function (response) {
+                        window.emitter.emit('read-message', self.chatOrder.id);
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
             }
         });
 

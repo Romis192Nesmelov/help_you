@@ -1,15 +1,11 @@
 <template xmlns="http://www.w3.org/1999/html">
-    <ModalComponent id="order-respond-modal" head="Сообщение">
-        <h3 class="bg-gray">Спасибо, что откликнулись<br>на заяку «{{ respondOrderName }}» от {{ respondOrderDate }}</h3>
-        <hr>
-        <h2 class="order-type text-center mt-3"></h2>
-        <p class="small text-center"><b>Вас ждут вас по адресу:</b></p>
-        <h6 class="order-address text-center mt-0">{{ respondOrderAddress }}</h6>
-        <hr>
-        <p class="w-100 text-center"><a :href="chat_url + '?id=' + respondOrderId">Подробности вы можете обсудить в чате.</a></p>
-        <hr>
-        <h1 class="text-orange text-center">Спасибо!</h1>
-    </ModalComponent>
+    <OrderRespondModalComponent
+        :order_id="respondOrderId"
+        :order_name="respondOrderName"
+        :order_date="respondOrderDate"
+        :order_address="respondOrderAddress"
+        :chat_url="chat_url"
+    ></OrderRespondModalComponent>
 
     <ModalComponent id="order-full-description-modal" head="Описание заявки">
         <p class="p-3">{{ orderFullDescription }}</p>
@@ -108,6 +104,7 @@
 
 <script>
 import ModalComponent from "./blocks/ModalComponent.vue";
+import OrderRespondModalComponent from "./blocks/OrderRespondModalComponent.vue";
 import UserPropertiesComponent from "./blocks/UserPropertiesComponent.vue";
 import OrderCarouselImagesComponent from "./blocks/OrderCarouselImagesComponent.vue";
 import OrderPropertiesComponent from "./blocks/OrderPropertiesComponent.vue";
@@ -117,6 +114,7 @@ export default {
     name: "OrdersComponent",
     components: {
         ModalComponent,
+        OrderRespondModalComponent,
         UserPropertiesComponent,
         OrderCarouselImagesComponent,
         OrderPropertiesComponent,

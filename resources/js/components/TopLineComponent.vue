@@ -87,12 +87,12 @@
                     </li>
                     <li v-for="(news, id) in newsSubscriptions" :key="id">
                         <a :href="orders_url + '?id=' + news.id">Новая заяка «{{ news.order.name }}» от:</a><br>
-                        {{ news.user.name+' '+news.user.family }}
+                        {{ news.order.user.name + ' ' + news.order.user.family }}
                         <hr>
                     </li>
                     <li v-for="(news, id) in newsPerformers" :key="id">
                         <a :href="my_orders_url">Новый исполнитель у заявки «{{ news.order.name }}»:</a><br>
-                        {{ news.user.name+' '+news.user.family }}
+                        {{ news.order.user.name + ' ' + news.order.user.family }}
                         <hr>
                     </li>
                     <li v-for="(news, id) in newsRemovedPerformers" :key="id">
@@ -191,131 +191,150 @@ export default {
             axios.get(this.get_unread_messages_url).then(function (response) {
                 self.newsMessages = response.data.unread;
                 self.hasMessages = !$.isEmptyObject(self.newsMessages);
-                window.emitter.emit('my-messages', !$.isEmptyObject(self.newsMessages));
+                self.setEmitter('my-messages',!$.isEmptyObject(self.newsMessages));
             });
         },
         getNewsOrders() {
-            let self = this,
-                otherEventsFlag = false,
-                ordersEventFlag = false;
-
+            let self = this;
             axios.get(this.get_orders_new_url).then(function (response) {
                 if (response.data.news_subscriptions.length) {
-                    $.each(response.data.news_subscriptions, function (k,subscription) {
-                        self.newsSubscriptions['subscription'+subscription.order_id] = subscription;
+                    $.each(response.data.news_subscriptions, function (k,news) {
+                        self.newsSubscriptions['subscription' + news.order_id] = news;
                     });
-                    otherEventsFlag = true;
-                    window.emitter.emit('my-subscriptions', !$.isEmptyObject(self.newsSubscriptions));
+                    self.setEmitter('my-subscriptions',true);
+                    self.hasMessages = true;
                 }
                 if (response.data.news_performers.length) {
                     $.each(response.data.news_performers, function (k,news) {
-                        self.newsPerformers['new_performer'+news.order_id] = news;
+                        self.newsPerformers['new_performer' + news.order_id] = news;
                     });
-                    ordersEventFlag = true;
+                    self.setEmitter('my-orders',true);
+                    self.hasMessages = true;
                 }
                 if (response.data.news_removed_performers.length) {
                     $.each(response.data.news_performers, function (k,news) {
-                        self.newsRemovedPerformers['removed_performer'+news.order_id] = news;
+                        self.newsRemovedPerformers['removed_performer' + news.order_id] = news;
                     });
-                    window.emitter.emit('my-help', !$.isEmptyObject(self.newsRemovedPerformers));
-                    otherEventsFlag = true;
+                    self.setEmitter('my-help',true);
+                    self.hasMessages = true;
                 }
                 if (response.data.news_status_orders.length) {
                     $.each(response.data.news_status_orders, function (k,news) {
-                        self.newsStatusOrders['status'+news.order_id] = news;
+                        self.newsStatusOrders['status' + news.order_id] = news;
                     });
-                    ordersEventFlag = true;
+                    self.setEmitter('my-orders',true);
+                    self.hasMessages = true;
                 }
-                self.eventOrderChange(ordersEventFlag);
-                self.bellAlert(otherEventsFlag, ordersEventFlag);
+                self.bellAlert(self.hasMessages);
             });
         },
         listenEvents() {
             let self = this,
-                otherEventsFlag = false,
-                ordersEventFlag = false;
+                eventsFlag = false;
 
             window.Echo.private('notice_' + this.userId).listen('.notice', res => {
                 switch (res.notice) {
                     case 'new_message':
-                        let messageKey = 'order' + res.order.id;
-                        if (self.newsMessages[messageKey]) {
-                            let counter = self.newsMessages[messageKey].count;
+                        if (self.newsMessages['order' + res.order.id]) {
+                            let counter = self.newsMessages['order' + res.order.id].count;
                             counter++;
-                            self.newsMessages[messageKey].count = counter;
-                        } else {
-                            self.newsMessages = {};
-                            self.newsMessages[messageKey] = {name:res.order.name, count:1};
-                        }
-                        window.emitter.emit('my-messages', !$.isEmptyObject(self.newsMessages));
-                        otherEventsFlag = true;
-                        this.hasMessages = true;
+                            self.newsMessages['order' + res.order.id].count = counter;
+                        } else self.getNewsMessages();
+
+                        self.setEmitter('my-messages',true);
+                        eventsFlag = true;
+                        self.hasMessages = true;
                         break;
                     case 'new_order_in_subscription':
-                        self.newsSubscriptions['subscription'+res.order.id] = res.order;
-                        window.emitter.emit('my-subscriptions', !$.isEmptyObject(self.newsSubscriptions));
-                        otherEventsFlag = true;
-                        this.hasMessages = true;
+                        self.newsSubscriptions['subscription' + res.order.id] = res.order;
+                        self.setEmitter('my-subscriptions',true);
+                        eventsFlag = true;
+                        self.hasMessages = true;
                         break;
                     case 'new_performer':
-                        self.newsPerformers['new_performer'+res.order.id] = res.order;
-                        ordersEventFlag = true;
+                        self.newsPerformers['new_performer' + res.order.id] = res.order;
+                        self.setEmitter('my-orders',true);
+                        self.hasMessages = true;
                         break;
                     case 'new_order_status':
-                        self.newsStatusOrders['status'+res.order.d] = res.order;
-                        ordersEventFlag = true;
+                        self.newsStatusOrders['status' + res.order.d] = res.order;
+                        self.setEmitter('my-orders',true);
+                        self.hasMessages = true;
                         break;
                     case 'remove_performer':
-                        self.newsRemovedPerformers['removed_performer'+res.order.id] = res.order;
-                        window.emitter.emit('my-help', !$.isEmptyObject(self.newsRemovedPerformers));
-                        otherEventsFlag = true;
-                        this.hasMessages = true;
+                        self.newsRemovedPerformers['removed_performer' + res.order.id] = res.order;
+                        self.setEmitter('my-help',true);
+                        eventsFlag = true;
+                        self.hasMessages = true;
                         break;
                 }
-                self.eventOrderChange(ordersEventFlag);
-                self.bellAlert(otherEventsFlag, ordersEventFlag);
+                self.bellAlert(eventsFlag);
             });
 
             window.Echo.channel('order_event').listen('.order', res => {
                 if (res.notice === 'remove_order') {
-                    if (this.newsMessages['order' + res.order.id]) {
-                        delete this.newsMessages['order' + res.order.id];
-                        window.emitter.emit('my-messages', !$.isEmptyObject(this.newsMessages));
+                    if (self.newsMessages['order' + res.order.id]) {
+                        delete self.newsMessages['order' + res.order.id];
+                        self.setEmitter('my-messages',!$.isEmptyObject(self.newsMessages));
                     }
 
-                    if (this.newsSubscriptions['subscription' + res.order.id]) {
-                        delete this.newsSubscriptions['order' + res.order.id];
-                        window.emitter.emit('my-subscriptions', !$.isEmptyObject(this.newsSubscriptions));
+                    if (self.newsSubscriptions['subscription' + res.order.id]) {
+                        delete self.newsSubscriptions['subscription' + res.order.id];
+                        self.setEmitter('my-subscriptions',!$.isEmptyObject(self.newsSubscriptions));
                     }
 
-                    if (this.newsRemovedPerformers['removed_performer' + res.order.id]) {
-                        delete this.newsRemovedPerformers['order' + res.order.id];
-                        window.emitter.emit('my-help', !$.isEmptyObject(this.newsRemovedPerformers));
+                    if (self.newsPerformers['new_performer'+res.order.id]) {
+                        delete self.newsPerformers['new_performer'+res.order.id];
+                        self.setEmitter('my-order',!$.isEmptyObject(self.newsPerformers));
                     }
-                    this.hasMessages = !$.isEmptyObject(this.newsMessages) || !$.isEmptyObject(this.newsSubscriptions) || !$.isEmptyObject(this.newsRemovedPerformers);
+
+                    if (self.newsStatusOrders['status' + res.order.d]) {
+                        delete self.newsStatusOrders['status' + res.order.d];
+                        self.setEmitter('my-order',!$.isEmptyObject(self.newsStatusOrders));
+                    }
+
+                    if (self.newsRemovedPerformers['removed_performer' + res.order.id]) {
+                        delete self.newsRemovedPerformers['order' + res.order.id];
+                        self.setEmitter('my-help',!$.isEmptyObject(self.newsRemovedPerformers));
+                    }
+                    self.setHasMessages();
                 }
             });
 
             window.emitter.on('read-order', orderId => {
-                if (this.newsSubscriptions['subscription'+orderId])
+                if (this.newsSubscriptions['subscription' + orderId]) {
                     delete this.newsSubscriptions['subscription' + orderId];
+                    self.setEmitter('my-subscriptions',!$.isEmptyObject(self.newsSubscriptions));
+                    self.setHasMessages();
+                }
+            });
+
+            window.emitter.on('read-message', orderId => {
+                if (this.newsMessages['order' + orderId]) {
+                    delete this.newsMessages['order' + orderId];
+                    self.setEmitter('my-messages',!$.isEmptyObject(self.newsMessages));
+                    self.setHasMessages();
+                }
             });
         },
-        eventOrderChange(ordersEventFlag) {
-            if (ordersEventFlag) {
-                window.emitter.emit('my-orders',
-                    !$.isEmptyObject(this.newsPerformers) ||
-                    !$.isEmptyObject(this.newsStatusOrders)
-                );
-            }
-        },
-        bellAlert(otherEventsFlag, ordersEventFlag) {
-            if (otherEventsFlag || ordersEventFlag) {
+        bellAlert(eventsFlag) {
+            if (eventsFlag) {
                 window.bellRinging($('#right-button-block .fa.fa-bell-o'));
                 // const audio = new Audio(this.bell_sound);
                 // audio.muted = false;
                 // audio.play();
             }
+        },
+        setEmitter(event, flag) {
+            window.emitter.emit(event, flag);
+        },
+        setHasMessages() {
+            self.hasMessages =
+                !$.isEmptyObject(self.newsMessages) ||
+                !$.isEmptyObject(self.newsSubscriptions) ||
+                !$.isEmptyObject(self.newsPerformers) ||
+                !$.isEmptyObject(self.newsStatusOrders) ||
+                !$.isEmptyObject(self.newsRemovedPerformers);
         }
     },
     components: {

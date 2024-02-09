@@ -138,7 +138,8 @@ export default {
 
         window.Echo.channel('order_event').listen('.order', res => {
             if (res.notice === 'remove_order' && res.user.id !== this.userId) {
-                orderIndex = self.getOrderIndex('active', res.order.id);
+                let tabKey = this.tabs['active'] ? 'active' : 'open';
+                orderIndex = self.getOrderIndex(tabKey, res.order.id);
                 if (orderIndex !== null) self.refreshOrders();
             }
         });

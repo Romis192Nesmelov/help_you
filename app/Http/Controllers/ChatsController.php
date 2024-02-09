@@ -31,7 +31,7 @@ class ChatsController extends BaseController
 
     public function chats(): View
     {
-        $this->data['active_left_menu'] = 'account.my_chats';
+        $this->data['active_left_menu'] = 'my_chats';
         return $this->showView('chats');
     }
 
@@ -66,7 +66,7 @@ class ChatsController extends BaseController
 
     public function chat(ChatRequest $request): View
     {
-        $this->data['active_left_menu'] = 'messages.chats';
+        $this->data['active_left_menu'] = 'my_chats';
         $this->data['order'] = Order::query()
             ->with('user.ratings')
             ->with('performers.ratings')

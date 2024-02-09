@@ -23,17 +23,23 @@
                             <span class="text-secondary"><small>{{ order.performers.length }}</small></span>
                         </div>
 
-                        <ButtonComponent
-                            class="btn btn-primary w-50 m-auto mt-1"
-                            text="Отписаться"
-                            @click="$emit('unsubscribe',order.read_subscriptions)"
-                            v-if="subscription_mode"
-                        ></ButtonComponent>
+                        <div class="w-100 d-flex justify-content-center" v-if="subscription_mode">
+                            <ButtonComponent
+                                class="btn btn-primary w-50 m-auto me-1"
+                                text="Откликнуться"
+                                @click="$emit('respond',order)"
+                            ></ButtonComponent>
+                            <ButtonComponent
+                                class="btn btn-primary w-50 m-auto"
+                                text="Отписаться"
+                                @click="$emit('unsubscribe',order.read_subscriptions)"
+                            ></ButtonComponent>
+                        </div>
 
                         <div v-else-if="chat_mode">
                             <a :href="chat_url + '?id=' + order.id">
                                 <ButtonComponent
-                                    class="btn btn-primary w-50 m-auto mt-1"
+                                    class="btn btn-primary w-50 m-auto"
                                     text="Перейти в чат"
                                 ></ButtonComponent>
                             </a>
@@ -45,7 +51,7 @@
                             v-if="user_id === order.user_id && order.status === 1 && !chat_mode"
                         ></ButtonComponent>
                         <ButtonComponent
-                            class="btn btn-primary w-50 m-auto mt-1"
+                            class="btn btn-primary w-50 m-auto"
                             text="Возобновить"
                             @click="$emit('resumingOrder',order.id)"
                             v-else-if="user_id === order.user_id && order.status === 0"
@@ -99,7 +105,7 @@ export default {
         'subscription_mode': Boolean,
         'chat_mode': Boolean
     },
-    emits: ['closingOrder','resumingOrder','deletingOrder','performers','removingPerformer','changePage','unsubscribe'],
+    emits: ['closingOrder','resumingOrder','deletingOrder','performers','removingPerformer','changePage','respond','unsubscribe'],
     methods: {
         cropContent(string,max) {
             string = string.toString();

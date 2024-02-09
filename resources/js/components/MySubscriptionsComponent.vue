@@ -1,4 +1,12 @@
 <template>
+    <OrderRespondModalComponent
+        :order_id="respondOrderId"
+        :order_name="respondOrderName"
+        :order_date="respondOrderDate"
+        :order_address="respondOrderAddress"
+        :chat_url="chat_url"
+    ></OrderRespondModalComponent>
+
     <ModalComponent id="unsubscribe-confirm-modal" head="Закрытие подписки">
         <h4 class="text-center">Вы действительно хотите отписаться от этого пользователя?</h4>
         <ModalPairButtonsComponent @click-yes="unsubscribing"></ModalPairButtonsComponent>
@@ -18,6 +26,7 @@
                 :subscription_mode=true
                 :chat_mode=false
                 @change-page="changePage"
+                @respond="orderRespond"
                 @unsubscribe="unsubscribe"
             ></OrdersTabsComponent>
         </div>
@@ -26,6 +35,7 @@
 
 <script>
 import ModalComponent from "./blocks/ModalComponent.vue";
+import OrderRespondModalComponent from "./blocks/OrderRespondModalComponent.vue";
 import MyOrdersListComponent from "./MyOrdersListComponent.vue";
 import TabsComponent from "./blocks/TabsComponent.vue";
 import OrdersTabsComponent from "./blocks/OrdersTabsComponent.vue";
@@ -36,6 +46,7 @@ export default {
     name: "MySubscriptionsComponent",
     components: {
         ModalComponent,
+        OrderRespondModalComponent,
         TabsComponent,
         OrdersTabsComponent,
         NoDataComponent
@@ -54,6 +65,10 @@ export default {
     data() {
         return {
             userId: Number,
+            respondOrderId: 0,
+            respondOrderName: '',
+            respondOrderDate: '',
+            respondOrderAddress: '',
             tabs: {
                 open: {
                     name: 'Открыты',
@@ -67,6 +82,10 @@ export default {
     },
     props: {
         'unsubscribe_url': String,
+        'order_response_url': String,
+        'orders_urls': String,
+        'read_order_url': String,
+        'chat_url': String,
     },
     methods: {
         unsubscribe(readSubscriptions) {
@@ -86,6 +105,27 @@ export default {
                 id: self.subscription.id
             }).then(function (response) {
                 self.refreshOrders();
+            });
+        },
+        orderRespond(order) {
+            let self = this;
+            axios.post(this.order_response_url, {
+                _token: window.tokenField,
+                id: order.id
+            })
+                .then(function (response) {
+                    self.respondOrderId = order.id;
+                    self.respondOrderName = order.name;
+                    self.respondOrderDate = order.date;
+                    self.respondOrderAddress = order.address;
+                    $('#order-respond-modal').modal('show');
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+
+            axios.get(this.read_order_url + '?order_id=' + order.id).then(function (response) {
+                window.emitter.emit('read-order', order.id);
             });
         }
     },
