@@ -42,7 +42,6 @@ class OrderController extends BaseController
 
     public function orders(): View
     {
-        $this->setReadUnreadRemovedPerformers();
         $this->data['order_types'] = OrderType::where('active',1)->with('subtypesActive')->get();
         return $this->showView('orders');
     }
