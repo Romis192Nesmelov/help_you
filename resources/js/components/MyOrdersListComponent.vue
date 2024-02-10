@@ -141,8 +141,8 @@ export default {
         });
 
         window.Echo.channel('order_event').listen('.order', res => {
-            if (res.notice === 'remove_order' && res.user.id !== this.userId) {
-                let tabKey = this.tabs['active'] ? 'active' : 'open';
+            if (res.notice === 'remove_order' && res.user.id !== self.userId) {
+                let tabKey = self.tabs['active'] ? 'active' : 'open';
                 orderIndex = self.getOrderIndex(tabKey, res.order.id);
                 if (orderIndex !== null) self.refreshOrders();
             }

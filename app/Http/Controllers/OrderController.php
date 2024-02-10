@@ -172,6 +172,7 @@ class OrderController extends BaseController
                 'order_id' => $order->id,
                 'status' => 1,
             ]);
+            ReadOrder::where('order_id',$order->id)->delete();
 
             $order->status = 1;
             $order->save();
