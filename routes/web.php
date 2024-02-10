@@ -44,9 +44,12 @@ Route::prefix('account')->name('account.')->controller(AccountController::class)
 
     Route::get('/change', 'account')->name('change');
     Route::get('/messages', 'messages')->name('messages');
+
     Route::get('/my-subscriptions', 'mySubscriptions')->name('my_subscriptions');
     Route::get('/my-unread-subscriptions', 'getMyUnreadSubscriptions')->name('my_unread_subscriptions');
+
     Route::get('/my-orders', 'myOrders')->name('my_orders');
+    Route::get('/set-read-unread-by-my-orders', 'setReadUnreadByMyOrders')->name('set_read_unread_by_my_orders');
 
     Route::get('/my-orders-active', 'myOrdersActive')->name('my_orders_active');
     Route::get('/my-orders-open', 'myOrdersOpen')->name('my_orders_open');
@@ -54,6 +57,8 @@ Route::prefix('account')->name('account.')->controller(AccountController::class)
     Route::get('/my-orders-archive', 'myOrdersArchive')->name('my_orders_archive');
 
     Route::get('/my-help', 'myHelp')->name('my_help');
+    Route::get('/set-read-unread-by-performer', 'setReadUnreadByPerformer')->name('set_read_unread_by_performer');
+
     Route::get('/my-help-active', 'myHelpActive')->name('my_help_active');
     Route::get('/my-help-archive', 'myHelpArchive')->name('my_help_archive');
     Route::get('/incentives', 'account')->name('incentives');

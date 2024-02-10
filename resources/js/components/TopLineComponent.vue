@@ -316,6 +316,16 @@ export default {
                     self.setHasMessages();
                 }
             });
+
+            window.emitter.on('read-unread-by-my-orders', orderId => {
+                self.newsPerformers = {};
+                self.newsStatusOrders = {};
+            });
+
+            window.emitter.on('read-unread-by-my-help', orderId => {
+                self.newsPerformers = {};
+                self.newsRemovedPerformers = {};
+            });
         },
         bellAlert(eventsFlag) {
             if (eventsFlag) {

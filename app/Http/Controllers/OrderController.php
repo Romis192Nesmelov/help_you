@@ -378,6 +378,7 @@ class OrderController extends BaseController
                 'order_id' => $order->id,
             ]);
 
+            /*TODO: enable after approving */
 //            broadcast(new NotificationEvent('new_order_in_subscription', $order, $subscription->subscriber_id));
 //            $this->mailNotice($order, $subscription->subscriber, 'new_order_in_subscription');
         }

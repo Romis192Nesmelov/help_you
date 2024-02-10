@@ -128,11 +128,15 @@ export default {
         window.Echo.private('notice_' + this.userId).listen('.notice', res => {
             if (res.user.id !== this.userId) {
                 orderIndex = self.getOrderIndex('active', res.order.id);
-                if ((res.notice === 'new_performer' || res.notice === 'remove_performer') && orderIndex !== null) {
-                    self.tabs.active.orders[orderIndex].performers = res.performers;
-                } else if ((res.notice === 'new_performer' || res.notice === 'remove_performer' || res.notice === 'new_order_status') && orderIndex !== null) {
+                if (res.notice === 'new_order_status') {
                     self.refreshOrders();
+                } else if ( (res.notice === 'new_performer' || res.notice === 'remove_performer') && orderIndex !== null) {
+                    self.tabs.active.orders[orderIndex].performers = res.performers;
                 }
+
+                axios.get(self.read_unread_by_my_orders).then(function (response) {
+                    window.emitter.emit('read-unread-by-my-orders');
+                });
             }
         });
 
@@ -189,6 +193,7 @@ export default {
         'user_id': String,
         'head': String,
         'orders_urls': String,
+        'read_unread_by_my_orders': String,
         'close_order_url': String,
         'resume_order_url': String,
         'delete_order_url': String,

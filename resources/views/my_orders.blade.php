@@ -12,6 +12,7 @@
     <my-orders-list-component
         user_id="{{ auth()->id() }}"
         orders_urls="{{ json_encode(['active' => route('account.my_orders_active'), 'open' => route('account.my_orders_open'),'approving' => route('account.my_orders_approving'),'archive' => route('account.my_orders_archive')]) }}"
+        read_unread_by_my_orders="{{ route('account.set_read_unread_by_my_orders') }}"
         close_order_url="{{ route('order.close_order') }}"
         resume_order_url="{{ route('order.resume_order') }}"
         delete_order_url="{{ route('order.delete_order') }}"

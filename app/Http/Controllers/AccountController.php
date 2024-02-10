@@ -11,6 +11,8 @@ use App\Http\Requests\Account\SubscriptionRequest;
 use App\Models\Order;
 use App\Models\OrderUser;
 use App\Models\ReadOrder;
+use App\Models\ReadPerformer;
+use App\Models\ReadRemovedPerformer;
 use App\Models\ReadStatusOrder;
 use App\Models\Subscription;
 use Carbon\Carbon;
@@ -33,7 +35,6 @@ class AccountController extends BaseController
 
     public function mySubscriptions() :View
     {
-        $this->setReadUnread(new ReadOrder());
         $this->data['active_left_menu'] = 'my_subscriptions';
         return $this->showView('my_subscriptions');
     }
@@ -62,9 +63,16 @@ class AccountController extends BaseController
 
     public function myOrders(): View
     {
-        $this->setReadUnread(new ReadStatusOrder());
+        $this->setReadUnreadByMyOrders();
         $this->data['active_left_menu'] = 'my_orders';
         return $this->showView('my_orders');
+    }
+
+    public function setReadUnreadByMyOrders(): JsonResponse
+    {
+        $this->setReadUnread(new ReadStatusOrder());
+        $this->setReadUnread(new ReadPerformer());
+        return response()->json(200);
     }
 
     public function myOrdersArchive(): JsonResponse
@@ -101,9 +109,16 @@ class AccountController extends BaseController
 
     public function myHelp(): View
     {
-        $this->setReadUnreadRemovedPerformers();
+        $this->setReadUnreadByPerformer();
         $this->data['active_left_menu'] = 'my_help';
         return $this->showView('my_help');
+    }
+
+    public function setReadUnreadByPerformer(): JsonResponse
+    {
+        $this->setReadUnreadUser(new ReadPerformer());
+        $this->setReadUnreadUser(new ReadRemovedPerformer());
+        return response()->json(200);
     }
 
     public function myHelpActive(): JsonResponse

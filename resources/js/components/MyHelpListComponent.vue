@@ -34,6 +34,22 @@ export default {
         OrdersTabsComponent,
         NoDataComponent
     },
+    created() {
+        let self = this,
+            orderIndex;
+
+        window.Echo.private('notice_' + this.userId).listen('.notice', res => {
+            if (res.notice === 'new_performer' || res.notice === 'remove_performer') {
+                orderIndex = self.getOrderIndex('active', res.order.id);
+                if (orderIndex !== null) self.tabs.active.orders[orderIndex].performers = res.performers;
+                else self.refreshOrders();
+
+                axios.get(self.read_unread_by_performer).then(function (response) {
+                    window.emitter.emit('read-unread-by-my-help');
+                });
+            }
+        });
+    },
     data() {
         return {
             tabs: {
@@ -42,15 +58,12 @@ export default {
                     counter: 0,
                     orders: Array,
                     links: []
-                },
-                archive: {
-                    name: 'Архив',
-                    counter: 0,
-                    orders: Array,
-                    links: []
                 }
             },
         }
     },
+    props: {
+        'read_unread_by_performer': String
+    }
 }
 </script>
