@@ -790,7 +790,8 @@ button.btn > i {
     font-size: 15px;
 }
 
-.rounded-block a {
+.left-menu a,
+.top-submenu a {
     color: black;
     text-decoration: none;
 }

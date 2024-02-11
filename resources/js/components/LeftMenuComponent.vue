@@ -25,7 +25,7 @@
     </ModalComponent>
 
     <div class="col-12 col-lg-4">
-        <div class="rounded-block tall">
+        <div class="rounded-block tall left-menu">
             <div id="avatar-block">
                 <div class="w-100">
                     <div class="d-flex align-items-center justify-content-start">

@@ -17,7 +17,13 @@
                         <hr class="mt-1 mb-1">
                         <p class="text-secondary fs-6 mb-1"><small>{{ cropContent(order.address,40) }}</small></p>
 
-                        <div class="w-100 text-center mb-1" role="button" @click="$emit('performers',{'performers':order.performers,'orderId':order.id})">
+                        <div class="w-100 text-center mb-1" v-if="subscription_mode">
+                            <i class="icon-map orange me-1"></i>
+                            <span class="text-secondary">
+                                <small><a :href="orders_map_url + '?id=' + order.id" title="Перейти на карту">Посмотреть на карте</a></small>
+                            </span>
+                        </div>
+                        <div class="w-100 text-center mb-1" role="button" @click="$emit('performers',{'performers':order.performers,'orderId':order.id})" v-else>
                             <span class="text-secondary me-1"><small>Исполнителей:</small></span>
                             <i title="Участники" class="orange icon-users4 me-1"></i>
                             <span class="text-secondary"><small>{{ order.performers.length }}</small></span>
@@ -102,6 +108,7 @@ export default {
         'active_tab': String,
         'edit_order_url': String,
         'chat_url': String,
+        'orders_map_url': String,
         'subscription_mode': Boolean,
         'chat_mode': Boolean
     },

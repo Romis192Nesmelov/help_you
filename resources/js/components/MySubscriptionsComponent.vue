@@ -11,6 +11,7 @@
         <h4 class="text-center">Вы действительно хотите отписаться от этого пользователя?</h4>
         <ModalPairButtonsComponent @click-yes="unsubscribing"></ModalPairButtonsComponent>
     </ModalComponent>
+
     <div id="my-subscriptions" class="col-12 col-lg-8 right-block">
         <div class="rounded-block tall">
             <h2>Мои подписки</h2>
@@ -25,6 +26,7 @@
                 :active_tab="activeTab"
                 :subscription_mode=true
                 :chat_mode=false
+                :orders_map_url="orders_map_url"
                 @change-page="changePage"
                 @respond="orderRespond"
                 @unsubscribe="unsubscribe"
@@ -84,6 +86,7 @@ export default {
         'unsubscribe_url': String,
         'order_response_url': String,
         'orders_urls': String,
+        'orders_map_url': String,
         'read_order_url': String,
         'chat_url': String,
     },
