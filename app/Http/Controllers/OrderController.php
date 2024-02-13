@@ -54,6 +54,9 @@ class OrderController extends BaseController
         if ($request->has('id')) {
             $this->data['order'] = Order::with('images')->find($request->id);
             $this->authorize('owner', $this->data['order']);
+            $this->data['order']->update(['status' => 3]);
+            $this->data['order']->refresh();
+            broadcast(new OrderEvent('new_order_status', $this->data['order']));
         }
         $this->data['session_key'] = $this->getSessionKey($request);
         $this->data['order_types'] = OrderType::where('active',1)->with('subtypesActive')->get();
@@ -94,6 +97,7 @@ class OrderController extends BaseController
             'news_status_orders' => ReadStatusOrder::query()
                 ->whereIn('order_id',Order::where('user_id',Auth::id())->pluck('id')->toArray())
                 ->where('read',null)
+                ->with('order')
                 ->get()
         ]);
     }
@@ -185,7 +189,7 @@ class OrderController extends BaseController
             broadcast(new NotificationEvent('new_order_status', $order, $order->user_id));
             $this->mailNotice($order, $order->userCredentials, 'new_order_status_notice');
 
-            broadcast(new OrderEvent('remove_order', $order));
+            broadcast(new OrderEvent('new_order_status', $order));
 
 //            if ($order->performers->count() >= $order->need_performers) {
 //                $order->status = 1;
@@ -232,12 +236,9 @@ class OrderController extends BaseController
             if (!$orderType->subtypes->count()) unset($fields['subtype_id']);
             if ($request->has('id')) {
                 $order = Order::find($request->id);
-
                 $this->authorize('owner', $order);
                 if (!$order->status) return response()->json([],403);
-
                 $order->update($fields);
-
             } else {
                 $order = Order::create($fields);
                 $this->newOrderInSubscription($order);

@@ -82,17 +82,17 @@
                 <ul id="dropdown">
                     <li v-for="(message, id) in newsMessages" :key="id">
                         Новых сообщений: <span class="counter">{{ message.count }}</span><br>
-                        <a :href="chat_url+'?id='+(id.replace('order',''))">в чате по заявке «{{ message.name }}»</a>
+                        <a :href="chat_url+'?id=' + message.order.id">в чате по заявке «{{ message.order.name }}»</a>
                         <hr>
                     </li>
                     <li v-for="(news, id) in newsSubscriptions" :key="id">
-                        <a :href="orders_url + '?id=' + news.id">Новая заяка «{{ news.order.name }}» от:</a><br>
+                        <a :href="orders_url + '?id=' + news.order.id">Новая заяка «{{ news.order.name }}» от:</a><br>
                         {{ news.order.user.name + ' ' + news.order.user.family }}
                         <hr>
                     </li>
                     <li v-for="(news, id) in newsPerformers" :key="id">
                         <a :href="my_orders_url">Новый исполнитель у заявки «{{ news.order.name }}»:</a><br>
-                        {{ news.order.user.name + ' ' + news.order.user.family }}
+                        {{ news.user.name + ' ' + news.user.family }}
                         <hr>
                     </li>
                     <li v-for="(news, id) in newsRemovedPerformers" :key="id">
@@ -102,7 +102,7 @@
                     </li>
                     <li v-for="(news, id) in newsStatusOrders" :key="id">
                         <a :href="my_orders_url">Новый статус у заявки «{{ news.order.name }}»</a>:<br>
-                        «{{ ordersStatuses[news.status] }}»
+                        «{{ ordersStatuses[news.order.status] }}»
                         <hr>
                     </li>
                 </ul>
@@ -170,11 +170,11 @@ export default {
             onRoot: Number,
             userId: 0,
             mainMenu: {},
-            newsMessages: {},
-            newsSubscriptions: {},
-            newsPerformers: {},
-            newsRemovedPerformers: {},
-            newsStatusOrders: {},
+            newsMessages: [],
+            newsSubscriptions: [],
+            newsPerformers: [],
+            newsRemovedPerformers: [],
+            newsStatusOrders: [],
             ordersStatuses: []
         }
     },
@@ -189,39 +189,33 @@ export default {
         getNewsMessages() {
             let self = this;
             axios.get(this.get_unread_messages_url).then(function (response) {
-                self.newsMessages = response.data.unread;
-                self.hasMessages = !$.isEmptyObject(self.newsMessages);
-                self.setEmitter('my-messages',!$.isEmptyObject(self.newsMessages));
+                if (response.data.unread.length) {
+                    self.newsMessages = response.data.unread;
+                    self.hasMessages = true;
+                    self.setEmitter('my-messages',true);
+                }
             });
         },
         getNewsOrders() {
             let self = this;
             axios.get(this.get_orders_new_url).then(function (response) {
                 if (response.data.news_subscriptions.length) {
-                    $.each(response.data.news_subscriptions, function (k,news) {
-                        self.newsSubscriptions['subscription' + news.order_id] = news;
-                    });
+                    self.newsSubscriptions = response.data.news_subscriptions;
                     self.setEmitter('my-subscriptions',true);
                     self.hasMessages = true;
                 }
                 if (response.data.news_performers.length) {
-                    $.each(response.data.news_performers, function (k,news) {
-                        self.newsPerformers['new_performer' + news.order_id] = news;
-                    });
+                    self.newsPerformers = response.data.news_performers;
                     self.setEmitter('my-orders',true);
                     self.hasMessages = true;
                 }
                 if (response.data.news_removed_performers.length) {
-                    $.each(response.data.news_performers, function (k,news) {
-                        self.newsRemovedPerformers['removed_performer' + news.order_id] = news;
-                    });
+                    self.newsRemovedPerformers = response.data.news_removed_performers;
                     self.setEmitter('my-help',true);
                     self.hasMessages = true;
                 }
                 if (response.data.news_status_orders.length) {
-                    $.each(response.data.news_status_orders, function (k,news) {
-                        self.newsStatusOrders['status' + news.order_id] = news;
-                    });
+                    self.newsStatusOrders = response.data.news_status_orders;
                     self.setEmitter('my-orders',true);
                     self.hasMessages = true;
                 }
@@ -230,39 +224,45 @@ export default {
         },
         listenEvents() {
             let self = this,
-                eventsFlag = false;
+                eventsFlag = false,
+                key = false;
 
             window.Echo.private('notice_' + this.userId).listen('.notice', res => {
                 switch (res.notice) {
                     case 'new_message':
-                        if (self.newsMessages['order' + res.order.id]) {
-                            let counter = self.newsMessages['order' + res.order.id].count;
+                        key = this.findOrder(self.newsMessages, res.order.id);
+                        if (key !== false) {
+                            let counter = self.newsMessages[key].count;
                             counter++;
-                            self.newsMessages['order' + res.order.id].count = counter;
-                        } else self.getNewsMessages();
-
+                            self.newsMessages[key].count = counter;
+                        } else {
+                            self.newsMessages.push({
+                                'order':res.order,
+                                'count':1
+                            });
+                        }
                         self.setEmitter('my-messages',true);
                         eventsFlag = true;
                         self.hasMessages = true;
                         break;
                     case 'new_order_in_subscription':
-                        self.newsSubscriptions['subscription' + res.order.id] = res.order;
+                        self.newsSubscriptions.push(res);
                         self.setEmitter('my-subscriptions',true);
                         eventsFlag = true;
                         self.hasMessages = true;
                         break;
                     case 'new_performer':
-                        self.newsPerformers['new_performer' + res.order.id] = res.order;
+                        self.newsPerformers.push(res);
                         self.setEmitter('my-orders',true);
                         self.hasMessages = true;
                         break;
                     case 'new_order_status':
-                        self.newsStatusOrders['status' + res.order.d] = res.order;
+                        self.newsStatusOrders.push(res);
                         self.setEmitter('my-orders',true);
                         self.hasMessages = true;
                         break;
                     case 'remove_performer':
-                        self.newsRemovedPerformers['removed_performer' + res.order.id] = res.order;
+                        self.newsRemovedPerformers.push(res);
                         self.setEmitter('my-help',true);
                         eventsFlag = true;
                         self.hasMessages = true;
@@ -273,58 +273,67 @@ export default {
 
             window.Echo.channel('order_event').listen('.order', res => {
                 if (res.notice === 'remove_order') {
-                    if (self.newsMessages['order' + res.order.id]) {
-                        delete self.newsMessages['order' + res.order.id];
-                        self.setEmitter('my-messages',!$.isEmptyObject(self.newsMessages));
+                    key = self.findOrder(self.newsMessages, res.order.id);
+                    if (key !== false) {
+                        self.newsMessages.splice(key,1);
+                        self.setEmitter('my-messages',self.newsMessages.length);
                     }
 
-                    if (self.newsSubscriptions['subscription' + res.order.id]) {
-                        delete self.newsSubscriptions['subscription' + res.order.id];
-                        self.setEmitter('my-subscriptions',!$.isEmptyObject(self.newsSubscriptions));
+                    key = self.findOrder(self.newsSubscriptions, res.order.id);
+                    if (key !== false) {
+                        self.newsSubscriptions.splice(key,1);
+                        self.setEmitter('my-subscriptions',self.newsSubscriptions.length);
                     }
 
-                    if (self.newsPerformers['new_performer'+res.order.id]) {
-                        delete self.newsPerformers['new_performer'+res.order.id];
-                        self.setEmitter('my-order',!$.isEmptyObject(self.newsPerformers));
+                    key = self.findOrder(self.newsPerformers, res.order.id);
+                    if (key !== false) {
+                        self.newsPerformers.splice(key,1);
+                        self.setEmitter('my-orders',self.newsPerformers.length);
                     }
 
-                    if (self.newsStatusOrders['status' + res.order.d]) {
-                        delete self.newsStatusOrders['status' + res.order.d];
-                        self.setEmitter('my-order',!$.isEmptyObject(self.newsStatusOrders));
+                    key = self.findOrder(self.newsStatusOrders, res.order.id);
+                    if (key !== false) {
+                        self.newsStatusOrders.splice(key,1);
+                        self.setEmitter('my-orders',self.newsStatusOrders.length);
                     }
 
-                    if (self.newsRemovedPerformers['removed_performer' + res.order.id]) {
-                        delete self.newsRemovedPerformers['order' + res.order.id];
-                        self.setEmitter('my-help',!$.isEmptyObject(self.newsRemovedPerformers));
+                    key = self.findOrder(self.newsRemovedPerformers, res.order.id);
+                    if (key !== false) {
+                        self.newsRemovedPerformers.splice(key,1);
+                        self.setEmitter('my-help',self.newsRemovedPerformers.length);
                     }
                     self.setHasMessages();
                 }
             });
 
             window.emitter.on('read-order', orderId => {
-                if (this.newsSubscriptions['subscription' + orderId]) {
-                    delete this.newsSubscriptions['subscription' + orderId];
-                    self.setEmitter('my-subscriptions',!$.isEmptyObject(self.newsSubscriptions));
+                key = self.findOrder(self.newsSubscriptions, orderId);
+                if (key !== false) {
+                    self.newsSubscriptions.splice(key,1);
+                    self.setEmitter('my-subscriptions',self.newsSubscriptions.length);
                     self.setHasMessages();
                 }
             });
 
             window.emitter.on('read-message', orderId => {
-                if (this.newsMessages['order' + orderId]) {
-                    delete this.newsMessages['order' + orderId];
-                    self.setEmitter('my-messages',!$.isEmptyObject(self.newsMessages));
+                key = self.findOrder(self.newsMessages, orderId);
+                if (key !== false) {
+                    self.newsMessages.splice(key,1);
+                    self.setEmitter('my-messages',self.newsMessages.length);
                     self.setHasMessages();
                 }
             });
 
             window.emitter.on('read-unread-by-my-orders', orderId => {
-                self.newsPerformers = {};
-                self.newsStatusOrders = {};
+                self.newsPerformers = [];
+                self.newsStatusOrders = [];
+                self.setEmitter('my-orders',false);
             });
 
             window.emitter.on('read-unread-by-my-help', orderId => {
-                self.newsPerformers = {};
-                self.newsRemovedPerformers = {};
+                self.newsPerformers = [];
+                self.newsRemovedPerformers = [];
+                self.setEmitter('my-help',false);
             });
         },
         bellAlert(eventsFlag) {
@@ -339,13 +348,23 @@ export default {
             window.emitter.emit(event, flag);
         },
         setHasMessages() {
-            self.hasMessages =
-                !$.isEmptyObject(self.newsMessages) ||
-                !$.isEmptyObject(self.newsSubscriptions) ||
-                !$.isEmptyObject(self.newsPerformers) ||
-                !$.isEmptyObject(self.newsStatusOrders) ||
-                !$.isEmptyObject(self.newsRemovedPerformers);
-        }
+            this.hasMessages =
+                this.newsMessages.length ||
+                this.newsSubscriptions.length ||
+                this.newsPerformers.length ||
+                this.newsStatusOrders.length ||
+                this.newsRemovedPerformers.length;
+        },
+        findOrder(newsArr, orderId) {
+            let key = false;
+            $.each(newsArr, function (k,news) {
+                if (news.order.id === orderId) {
+                    key = k;
+                    return false;
+                }
+            });
+            return key;
+        },
     },
     components: {
         LogoComponent,

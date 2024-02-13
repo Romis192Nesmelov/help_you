@@ -111,18 +111,21 @@ class ChatsController extends BaseController
 
     public function readMessage(ChatRequest $request): JsonResponse
     {
-        $this->setReadAllMessagesInChatForUser($request->input('order_id'));
+        $this->setReadAllMessagesInChatForUser($request->input('id'));
         return response()->json([],200);
     }
 
     public function getUnreadMessages(): JsonResponse
     {
         $unreadMessagesCounters = [];
-        if ($unreadMessages = MessageUser::where('user_id',Auth::id())->where('read',null)->orderBy('order_id')->get()) {
+        if ($unreadMessages = MessageUser::where('user_id',Auth::id())->where('read',null)->get()) {
+            $orderIds = [];
             foreach ($unreadMessages as $unreadMessage) {
-                if (!isset($unreadMessagesCounters['order'.$unreadMessage->order_id])) {
-                    $unreadMessagesCounters['order'.$unreadMessage->order_id] = ['name' => $unreadMessage->order->name, 'count' => 1];
-                } else $unreadMessagesCounters['order'.$unreadMessage->order_id]['count']++;
+                $key = array_search($unreadMessage->order_id,$orderIds);
+                if ($key === false) {
+                    $orderIds[] = $unreadMessage->order_id;
+                    $unreadMessagesCounters[] = ['order' => $unreadMessage->order, 'count' => 1];
+                } else $unreadMessagesCounters[$key]['count']++;
             }
         }
         return response()->json(['unread' => $unreadMessagesCounters],200);

@@ -127,17 +127,7 @@ export default {
                 self.messages.push(res.message);
                 self.scrollBottom();
                 if (res.message.image) self.bindLastFancyBox();
-
-                axios.post(this.read_message_url, {
-                    _token: window.tokenField,
-                    order_id: self.chatOrder.id
-                })
-                    .then(function (response) {
-                        window.emitter.emit('read-message', self.chatOrder.id);
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
+                this.readMessage();
             }
         });
 
@@ -165,6 +155,7 @@ export default {
     },
     data() {
         return {
+            allowSend: true,
             userId: Number,
             chatOrder: Number,
             chatDate: String,
@@ -218,9 +209,11 @@ export default {
             $('input[name=image]').val('');
         },
         sendMessage() {
-            if (this.message || this.image) {
+            if ((this.message || this.image) && this.allowSend) {
                 let self = this,
                     formData = new FormData();
+
+                this.allowSend = false;
 
                 formData.append('_token', window.tokenField);
                 formData.append('order_id', this.chatOrder.id);
@@ -237,14 +230,28 @@ export default {
                         self.messages.push(response.data);
                         self.scrollBottom();
                         if (response.data.image) self.bindLastFancyBox();
+                        self.allowSend = true;
                     })
                     .catch(function (error) {
-                        console.log(error);
                         $.each(error.response.data.errors, (name,error) => {
                             self.errors[name] = error[0];
+                            self.allowSend = true;
                         });
                     });
             }
+        },
+        readMessage() {
+            let self = this;
+            axios.post(this.read_message_url, {
+                _token: window.tokenField,
+                id: self.chatOrder.id
+            })
+                .then(function (response) {
+                    window.emitter.emit('read-message', self.chatOrder.id);
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
         },
         scrollBottom() {
             setTimeout(() => {

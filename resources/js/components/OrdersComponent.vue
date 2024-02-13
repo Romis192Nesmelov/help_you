@@ -422,18 +422,16 @@ export default {
             }
         },
         removeOrder(res) {
-            let self = this;
-            window.hideSelectedPointsDie(null,() => {
-                let indexUnread = window.unreadOrders.indexOf(res.order.id);
-                if (indexUnread !== -1) window.unreadOrders.splice(indexUnread,1);
-                for (let i=0;i<window.placemarks.length;i++) {
-                    if (window.placemarks[i].properties.get('orderId') === res.order.id) {
-                        window.clusterer.remove(window.placemarks[i]);
-                        window.placemarks.splice(i,1);
-                        break;
-                    }
+            let indexUnread = window.unreadOrders.indexOf(res.order.id);
+            if (indexUnread !== -1) window.unreadOrders.splice(indexUnread,1);
+            for (let i=0;i<window.placemarks.length;i++) {
+                if (window.placemarks[i].properties.get('orderId') === res.order.id) {
+                    window.clusterer.remove(window.placemarks[i]);
+                    window.placemarks.splice(i,1);
+                    break;
                 }
-            });
+            }
+            window.hideSelectedPointsDie();
         }
     }
 }
