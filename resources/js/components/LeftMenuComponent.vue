@@ -80,7 +80,6 @@ export default {
 
         let self = this;
         $.each(this.leftMenu, function (k,menu) {
-            console.log(menu.id);
             window.emitter.on(menu.id, flag => {
                 self.newsFlags[menu.id] = flag;
             });

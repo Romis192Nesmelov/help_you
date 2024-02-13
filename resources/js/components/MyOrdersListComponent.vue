@@ -24,7 +24,7 @@
                 <td>
                     <UserPropertiesComponent
                         :user="performer"
-                        :small=false
+                        :small=true
                         :avatar_coof=0.2
                         :use_rating=true
                         :allow_change_rating=false
@@ -49,8 +49,16 @@
 
     <ModalComponent id="order-closed-modal" head="Заявка успешно закрыта!">
         <div class="text-center">
-            <img class="w-50" :src="closed_image" />
             <h2 class="text-center mt-3">Выставите рейтинг исполнителя</h2>
+
+            <UserPropertiesComponent
+                :user="closingOrderUser"
+                :avatar_coof=0.35
+                :use_rating=false
+                :allow_change_rating=false
+                v-if="closingOrderUser"
+            ></UserPropertiesComponent>
+
             <div class="w-100 d-flex justify-content-center">
                 <RatingLineComponent
                     :income_rating=0
@@ -149,6 +157,7 @@ export default {
     data() {
         return {
             userId: Number,
+            closingOrderUser: null,
             tabs: {
                 active: {
                     name: 'В работе',
@@ -199,7 +208,6 @@ export default {
         'set_rating_url': String,
         'edit_order_url': String,
         'resume_image': String,
-        'closed_image': String
     },
     methods: {
         getOrders(url,key) {
@@ -224,8 +232,9 @@ export default {
         changeTab(key) {
             this.activeTab = key;
         },
-        closeOrder(id) {
-            this.closingOrderId = id;
+        closeOrder(order) {
+            this.closingOrderId = order.id;
+            this.closingOrderUser = order.user;
             $('#order-closing-confirm-modal').modal('show');
         },
         closingOrder() {

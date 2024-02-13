@@ -20,7 +20,6 @@
         set_rating_url="{{ route('order.set_rating') }}"
         edit_order_url="{{ route('order.edit_order') }}"
         resume_image="{{ asset('images/resumed.png') }}"
-        closed_image="{{ asset('images/closed.png') }}"
     ></my-orders-list-component>
 </div>
 @endsection

@@ -53,7 +53,7 @@
                         <ButtonComponent
                             class="btn btn-primary w-50 m-auto"
                             text="Завершить"
-                            @click="$emit('closingOrder',order.id)"
+                            @click="$emit('closingOrder',order)"
                             v-if="user_id === order.user_id && order.status === 1 && !chat_mode"
                         ></ButtonComponent>
                         <ButtonComponent
