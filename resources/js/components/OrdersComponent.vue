@@ -223,7 +223,7 @@ export default {
                 fields.performers_to = this.filterPerformersTo;
             }
 
-                axios.post(url, fields)
+            axios.post(url, fields)
                 .then(function (response) {
                     window.placemarks = [];
                     window.subscriptions = [];
@@ -246,7 +246,7 @@ export default {
                                 ImPerformer = false;
                             if (point.performers.length) {
                                 for (let p=0;p<point.performers.length;p++) {
-                                    if (point.performers[p].id === userId) {
+                                    if (point.performers[p].id === self.userId) {
                                         ImPerformer = true;
                                         break;
                                     }
