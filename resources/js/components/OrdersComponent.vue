@@ -37,7 +37,7 @@
                 <ButtonComponent
                     class="btn btn-primary w-100 mt-lg-0 mt-3"
                     text="Применить"
-                    @click=""
+                    @click="getOrders"
                 ></ButtonComponent>
             </div>
             <div class="col-lg-4 col-12 mt-lg-0 mt-2 row d-flex align-items-end m-0 p-0">
@@ -352,7 +352,7 @@ export default {
                     } else {
                         bellIcon.removeClass('icon-bell-cross').addClass('icon-bell-check');
                         let index = window.subscriptions.indexOf(userId);
-                        if (index !== 1) window.subscriptions.splice(index,1);
+                        if (index !== 1) window.subscriptions.splice(index,app1);
                     }
                     window.bellRinging(bellIcon);
                     bellIcon.fadeIn('fast');

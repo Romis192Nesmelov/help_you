@@ -378,8 +378,12 @@ table {
     cursor: pointer;
 }
 
-.form-group input.has-icon {
+.form-group input.has-icon:not[list] {
     padding-right: 35px;
+}
+
+.form-select {
+    overflow: hidden;
 }
 
 .form-check-input:checked {

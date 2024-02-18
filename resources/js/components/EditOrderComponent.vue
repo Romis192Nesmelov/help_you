@@ -81,7 +81,11 @@
                     :error="errors['address']"
                     v-model:value="address"
                     @change="errors['address']=null"
+                    v-if="!addresses.length"
                 ></InputComponent>
+                <select id="addresses" class="form-select" v-model="featureMemberIndex" v-show="addresses.length">
+                    <option v-for="(address, k) in addresses" :key="'address-' + k" :value="k">{{ address }}</option>
+                </select>
             </div>
             <div class="inputs-step" v-show="currentStep === 4">
                 <TextAreaComponent
@@ -151,6 +155,8 @@ export default {
         ButtonComponent,
     },
     created() {
+        let self = this;
+
         if (this.step) this.currentStep = parseInt(this.step);
         this.wizardImages = JSON.parse(this.images);
         this.orderTypes = JSON.parse(this.order_types);
@@ -159,8 +165,7 @@ export default {
         this.selectedOrderSubType = 1;
 
         if (this.order) {
-            let order = JSON.parse(this.order),
-                self = this;
+            let order = JSON.parse(this.order);
 
             this.orderId = order.id;
             this.currentStep = 1;
@@ -221,6 +226,13 @@ export default {
                 });
             }
         });
+
+        setTimeout(() => {
+            $('#addresses').change(function () {
+                self.featureMemberIndex = $(this).val();
+                self.showPlaceMark();
+            });
+        }, 500);
     },
     props: {
         'next_step_url': String,
@@ -250,8 +262,10 @@ export default {
             photo1: null,
             photo2: null,
             photo3: null,
-            point: Array,
+            geoObjectCollection: null,
+            featureMemberIndex: 0,
             address: '',
+            addresses: [],
             addressError: null,
             latitude: Number,
             longitude: Number,
@@ -289,53 +303,9 @@ export default {
     },
     methods: {
         nextStep() {
-            let self = this;
-
             if (this.currentStep === 3) {
                 if (!this.address) this.errors['address'] = 'Укажите адрес!';
-                else {
-                    this.disabledButtons = true;
-                    this.address = this.address.indexOf('Москва') >= 0 ? this.address : 'Москва, ' + this.address;
-
-                    axios.get('https://geocode-maps.yandex.ru/1.x/?apikey=' + self.yandex_api_key + '&geocode=' + self.address + '&format=json')
-                        .then(function (response) {
-                            let geoObjectCollection = response.data.response.GeoObjectCollection;
-
-                            if (parseInt(geoObjectCollection.metaDataProperty.GeocoderResponseMetaData.found) === 1) {
-                                self.address = geoObjectCollection.featureMember[0].GeoObject.name;
-
-                                if (window.placemark) window.myMap.geoObjects.remove(window.placemark);
-                                let coordinates = geoObjectCollection.featureMember[0].GeoObject.Point.pos.split(' ');
-                                window.singlePoint = [parseFloat(coordinates[1]), parseFloat(coordinates[0])];
-                                let newPlaceMark = window.getPlaceMark(window.singlePoint, {});
-
-                                window.myMap.geoObjects.add(newPlaceMark)
-                                window.zoomAndCenterMap();
-
-                                let fields = {
-                                    '_token': window.tokenField,
-                                    'address': self.address,
-                                    'latitude': window.singlePoint[0],
-                                    'longitude': window.singlePoint[1]
-                                };
-
-                                if (self.orderId) {
-                                    fields['id'] = self.orderId;
-                                }
-
-                                axios.post(self.next_step_url, fields)
-                                    .then(function (response) {
-                                        setTimeout(() => {
-                                            self.currentStep++;
-                                            self.disabledButtons = false;
-                                        }, 1500);
-                                    });
-                            } else {
-                                self.disabledButtons = false;
-                                self.errors['address'] = 'Уточните адресс, он может быть не верным!';
-                            }
-                        });
-                }
+                else this.getApiPlaceMark();
             } else {
                 let self = this,
                     formData = new FormData();
@@ -388,6 +358,66 @@ export default {
                 .catch(function (error) {
                 console.log(error);
             });
+        },
+        getApiPlaceMark() {
+            let self = this;
+            this.disabledButtons = true;
+            this.address = this.address.indexOf('Москва') >= 0 ? this.address : 'Москва, ' + this.address;
+            if (!this.geoObjectCollection) {
+                // Getting placemark from api
+                axios.get('https://geocode-maps.yandex.ru/1.x/?apikey=' + this.yandex_api_key + '&geocode=' + this.address + '&format=json')
+                    .then(function (response) {
+                        self.geoObjectCollection = response.data.response.GeoObjectCollection;
+                        if (parseInt(self.geoObjectCollection.metaDataProperty.GeocoderResponseMetaData.found) === 1) {
+                            self.showPlaceMark();
+                            self.setPlaceMark();
+                        } else {
+                            self.addresses = [];
+                            $.each(self.geoObjectCollection.featureMember, function (k,featureMember) {
+                                self.addresses.push(featureMember.GeoObject.description + ' ' + featureMember.GeoObject.name);
+                            });
+                            let select = $('#addresses');
+                            select.show().focus().click();
+                            select[0].size = self.addresses.length;
+                            self.disabledButtons = false;
+                            self.showPlaceMark();
+                        }
+                    });
+            } else {
+                self.addresses = [];
+                self.showPlaceMark();
+                self.setPlaceMark();
+            }
+        },
+        setPlaceMark() {
+            let featureMember = this.geoObjectCollection.featureMember[this.featureMemberIndex];
+            this.address = featureMember.GeoObject.description + ' ' + featureMember.GeoObject.name;
+
+            let fields = {
+                '_token': window.tokenField,
+                'address': this.address,
+                'latitude': window.singlePoint[0],
+                'longitude': window.singlePoint[1]
+            };
+
+            if (this.orderId) fields['id'] = this.orderId;
+
+            axios.post(this.next_step_url, fields)
+                .then(() => {
+                    setTimeout(() => {
+                        this.currentStep++;
+                        this.disabledButtons = false;
+                    }, 1500);
+                });
+        },
+        showPlaceMark() {
+            if (window.placemark) window.myMap.geoObjects.remove(window.placemark);
+            let coordinates = this.geoObjectCollection.featureMember[this.featureMemberIndex].GeoObject.Point.pos.split(' ');
+            window.singlePoint = [parseFloat(coordinates[1]), parseFloat(coordinates[0])];
+            let newPlaceMark = window.getPlaceMark(window.singlePoint, {});
+
+            window.myMap.geoObjects.add(newPlaceMark)
+            window.zoomAndCenterMap();
         },
     }
 }

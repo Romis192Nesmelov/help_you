@@ -21,6 +21,16 @@
 <script>
 export default {
     name: "InputComponent",
-    props: ['label','icon','type','name','placeholder','value','min','max','error']
+    props: {
+        'label': String,
+        'icon': String,
+        'type': String,
+        'name': String,
+        'placeholder':String,
+        'value': String|Number,
+        'min': String|Number,
+        'max': String|Number,
+        'error': String
+    }
 }
 </script>

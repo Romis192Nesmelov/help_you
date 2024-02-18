@@ -7,12 +7,12 @@ export default defineConfig({
         vue(),
         laravel({
             input: [
-                'resources/js/app.js',
                 'resources/js/interactions.min.js',
                 'resources/js/touch.min.js',
                 'resources/js/widgets.min.js',
                 'resources/js/jquery.fancybox.min.js',
                 'resources/js/owl.carousel.min.js',
+                'resources/js/app.js',
                 'resources/css/icons/fontawesome/styles.min.css',
                 'resources/css/icons/icomoon/styles.css',
                 'resources/css/jquery.fancybox.min.css',
