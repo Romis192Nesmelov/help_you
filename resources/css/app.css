@@ -386,6 +386,10 @@ table {
     overflow: hidden;
 }
 
+.form-select option {
+    margin-bottom: 5px;
+}
+
 .form-check-input:checked {
     background-color: #e65639;
     border-color: #e65639;

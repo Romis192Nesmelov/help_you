@@ -202,15 +202,10 @@ export default {
             }
 
             if (this.sessionSteps.length > 2) {
-                window.singlePoint = [this.sessionSteps[1].latitude, this.sessionSteps[1].longitude];
-                this.address = this.sessionSteps[1].address;
-                this.latitude = this.sessionSteps[1].latitude;
-                this.longitude = this.sessionSteps[1].longitude;
-            }
-
-            if (this.sessionSteps.length > 3) {
-                this.descriptionShort = this.sessionSteps[2].description_short;
-                this.descriptionFull = this.sessionSteps[2].description_full;
+                window.singlePoint = [this.sessionSteps[2].latitude, this.sessionSteps[2].longitude];
+                this.address = this.sessionSteps[2].address;
+                this.latitude = this.sessionSteps[2].latitude;
+                this.longitude = this.sessionSteps[2].longitude;
             }
         }
 
@@ -305,7 +300,10 @@ export default {
         nextStep() {
             if (this.currentStep === 3) {
                 if (!this.address) this.errors['address'] = 'Укажите адрес!';
-                else this.getApiPlaceMark();
+                else {
+                    console.log(1111);
+                    this.getApiPlaceMark();
+                }
             } else {
                 let self = this,
                     formData = new FormData();
