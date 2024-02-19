@@ -2,19 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Account\ChangeAvatarRequest;
 use App\Http\Requests\Account\ChangePasswordRequest;
 use App\Http\Requests\Account\ChangePhoneRequest;
 use App\Http\Requests\Account\EditAccountRequest;
 use App\Http\Requests\Account\GetCodeRequest;
 use App\Http\Requests\Account\SubscriptionRequest;
 use App\Models\Order;
+use App\Models\OrderUser;
 use App\Models\ReadOrder;
 use App\Models\ReadPerformer;
+use App\Models\ReadRemovedPerformer;
 use App\Models\ReadStatusOrder;
 use App\Models\Subscription;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
@@ -31,33 +35,113 @@ class AccountController extends BaseController
 
     public function mySubscriptions() :View
     {
-        $this->setReadUnread(new ReadOrder());
-        $this->data['unread_orders'] = ReadOrder::whereIn('subscription_id',Subscription::query()->default()->pluck('id')->toArray())->where('read',null)->orderByDesc('created_at')->get();
-        $this->data['active_left_menu'] = 'account.my_subscriptions';
+        $this->data['active_left_menu'] = 'my_subscriptions';
         return $this->showView('my_subscriptions');
+    }
+
+    public function getMyUnreadSubscriptions(): JsonResponse
+    {
+        $unreadOrdersIds = ReadOrder::query()
+            ->whereIn('subscription_id',Subscription::query()->default()->pluck('id')->toArray())
+            ->where('read',null)
+            ->pluck('order_id')
+            ->toArray();
+
+        return response()->json([
+            'orders' => Order::query()
+                ->whereIn('id',$unreadOrdersIds)
+                ->where('status',2)
+                ->with('user.ratings')
+                ->with('performers.ratings')
+                ->with('readSubscriptions.subscription.orders')
+                ->with('orderType')
+                ->with('subType')
+                ->orderByDesc('created_at')
+                ->paginate(4)
+            ]);
     }
 
     public function myOrders(): View
     {
-        $this->setReadUnread(new ReadStatusOrder());
-        $this->data['orders'] = [
-            'active' => Auth::user()->ordersActiveAndApproving,
-            'approving' => Auth::user()->orderApproving,
-            'archive' => Auth::user()->ordersArchive
-        ];
-        $this->data['active_left_menu'] = 'account.my_orders';
+        $this->setReadUnreadByMyOrders();
+        $this->data['active_left_menu'] = 'my_orders';
         return $this->showView('my_orders');
+    }
+
+    public function setReadUnreadByMyOrders(): JsonResponse
+    {
+        $this->setReadUnread(new ReadStatusOrder());
+        $this->setReadUnread(new ReadPerformer());
+        return response()->json(200);
+    }
+
+    public function myOrdersArchive(): JsonResponse
+    {
+        return response()->json(['orders' => $this->getMyOrders(0)],200);
+    }
+
+    public function myOrdersActive(): JsonResponse
+    {
+        return response()->json(['orders' => $this->getMyOrders(1)],200);
+    }
+
+    public function myOrdersOpen(): JsonResponse
+    {
+        return response()->json(['orders' => $this->getMyOrders(2)],200);
+    }
+
+    public function myOrdersApproving(): JsonResponse
+    {
+        return response()->json(['orders' => $this->getMyOrders(3)],200);
+    }
+
+    private function getMyOrders(int $status): LengthAwarePaginator
+    {
+        return Order::query()
+            ->where('user_id',Auth::id())
+            ->where('status',$status)
+            ->with('user.ratings')
+            ->with('performers.ratings')
+            ->with('orderType')
+            ->orderByDesc('created_at')
+            ->paginate(4);
     }
 
     public function myHelp(): View
     {
-        $this->setReadUnreadRemovedPerformers();
-        $this->data['orders'] = [
-            'active' => Auth::user()->orderActivePerformer,
-            'archive' => Auth::user()->orderArchivePerformer
-        ];
-        $this->data['active_left_menu'] = 'account.my_help';
+        $this->setReadUnreadByPerformer();
+        $this->data['active_left_menu'] = 'my_help';
         return $this->showView('my_help');
+    }
+
+    public function setReadUnreadByPerformer(): JsonResponse
+    {
+        $this->setReadUnreadUser(new ReadPerformer());
+        $this->setReadUnreadUser(new ReadRemovedPerformer());
+        return response()->json(200);
+    }
+
+    public function myHelpActive(): JsonResponse
+    {
+        return response()->json(['orders' => $this->getMyHelp(1)],200);
+    }
+
+    public function myHelpArchive(): JsonResponse
+    {
+        return response()->json(['orders' => $this->getMyHelp(0)],200);
+    }
+
+    private function getMyHelp(int $status): LengthAwarePaginator
+    {
+        $orderIds = OrderUser::where('user_id', Auth::id())->pluck('order_id')->toArray();
+        return Order::query()
+            ->whereIn('id',$orderIds)
+            ->where('status',$status)
+            ->with('user.ratings')
+            ->with('performers.ratings')
+            ->with('orderType')
+            ->orderByDesc('created_at')
+            ->paginate(4);
     }
 
     public function getCode(GetCodeRequest $request): JsonResponse
@@ -88,14 +172,9 @@ class AccountController extends BaseController
         }
     }
 
-    public function editAccount(EditAccountRequest $request): JsonResponse
+    public function changeAvatar(ChangeAvatarRequest $request): JsonResponse
     {
         $fields = $request->validated();
-        $fields = $this->processingSpecialField($fields, 'mail_notice');
-        $birthday = Carbon::parse($fields['born']);
-        $currentDate = Carbon::now();
-        $age = $currentDate->diffInYears($birthday);
-        if ($age < 18 || $age > 100) return response()->json(['errors' => ['born' => [trans('validation.wrong_date')]]], 401);
         $fields['avatar_props'] = [];
         foreach (['size','position_x','position_y'] as $avatarProp) {
             $fieldProp = 'avatar_'.$avatarProp;
@@ -104,6 +183,18 @@ class AccountController extends BaseController
             unset($fields[$fieldProp]);
         }
         $fields = $this->processingImage($request, $fields,'avatar', 'images/avatars/', 'avatar'.Auth::id());
+        Auth::user()->update($fields);
+        return response()->json(['message' => trans('content.save_complete')],200);
+    }
+
+    public function editAccount(EditAccountRequest $request): JsonResponse
+    {
+        $fields = $request->validated();
+        $fields = $this->processingSpecialField($fields, 'mail_notice');
+        $birthday = Carbon::parse($fields['born']);
+        $currentDate = Carbon::now();
+        $age = $currentDate->diffInYears($birthday);
+        if ($age < 18 || $age > 100) return response()->json(['errors' => ['born' => [trans('validation.wrong_date')]]], 401);
         Auth::user()->update($fields);
         return response()->json(['message' => trans('content.save_complete')],200);
     }

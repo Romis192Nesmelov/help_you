@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 use App\Events\NotificationEvent;
 use App\Events\OrderEvent;
+use App\Http\Requests\Order\EditOrderRequest;
 use App\Http\Requests\Order\RemovePerformerRequest;
 use App\Http\Requests\Order\SetRatingRequest;
+use App\Http\Resources\Orders\OrdersResource;
+use App\Models\Message;
 use App\Models\Rating;
 use App\Models\ReadPerformer;
 use App\Models\ReadRemovedPerformer;
@@ -14,7 +17,6 @@ use App\Http\Requests\Order\NextStepRequest;
 use App\Http\Requests\Order\OrderRequest;
 use App\Http\Requests\Order\PrevStepRequest;
 use App\Http\Requests\Order\ReadOrderRequest;
-use App\Http\Requests\Order\UserAgeRequest;
 use App\Models\Order;
 use App\Models\OrderImage;
 use App\Models\OrderType;
@@ -33,27 +35,31 @@ class OrderController extends BaseController
 
     public function newOrder(): View
     {
-        $this->getItems('order_types', new OrderType());
+        $this->data['order_types'] = OrderType::where('active',1)->with('subtypesActive')->get();
         $this->data['session_key'] = 'steps';
         return $this->showView('edit_order');
     }
 
     public function orders(): View
     {
-        $this->setReadUnreadRemovedPerformers();
-        $this->getItems('order_types', new OrderType());
+        $this->data['order_types'] = OrderType::where('active',1)->with('subtypesActive')->get();
         return $this->showView('orders');
     }
 
     /**
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    public function editOrder(OrderRequest $request): View
+    public function editOrder(EditOrderRequest $request): View
     {
-        $this->data['order'] = Order::find($request->id);
-        $this->authorize('owner', $this->data['order']);
-        $this->getItems('order_types', new OrderType());
-        $this->data['session_key'] = 'edit'.$this->data['order']->id.'_steps';
+        if ($request->has('id')) {
+            $this->data['order'] = Order::with('images')->find($request->id);
+            $this->authorize('owner', $this->data['order']);
+            $this->data['order']->update(['status' => 3]);
+            $this->data['order']->refresh();
+            broadcast(new OrderEvent('new_order_status', $this->data['order']));
+        }
+        $this->data['session_key'] = $this->getSessionKey($request);
+        $this->data['order_types'] = OrderType::where('active',1)->with('subtypesActive')->get();
         return $this->showView('edit_order');
     }
 
@@ -69,32 +75,47 @@ class OrderController extends BaseController
         return response()->json([],200);
     }
 
-    public function getSubscriptionsNews(): JsonResponse
+    public function getOrdersNews(): JsonResponse
     {
         return response()->json([
-            'subscriptions' => Subscription::query()
-                ->with('unreadOrders.order.user')
-                ->default()
+            'news_subscriptions' => ReadOrder::query()
+                ->whereIn('subscription_id',Subscription::query()->default()->pluck('id')->toArray())
+                ->where('read',null)
+                ->with('order.user')
+                ->get(),
+            'news_performers' => ReadPerformer::query()
+                ->whereIn('order_id',Order::where('user_id',Auth::id())->pluck('id')->toArray())
+                ->where('read',null)
+                ->with('order')
+                ->with('user')
+                ->get(),
+            'news_removed_performers' => ReadRemovedPerformer::query()
+                ->where('user_id', Auth::id())
+                ->where('read', null)
+                ->with('order')
+                ->get(),
+            'news_status_orders' => ReadStatusOrder::query()
+                ->whereIn('order_id',Order::where('user_id',Auth::id())->pluck('id')->toArray())
+                ->where('read',null)
+                ->with('order')
                 ->get()
         ]);
     }
 
     public function getOrders(): JsonResponse
     {
-        return response()->json([
+        return response()->json(OrdersResource::make([
             'orders' => Order::query()
                 ->default()
-//                ->filtered()
-//                ->searched()
-                ->with(['orderType','subType','images','user','performers'])
+                ->filtered()
+                ->searched()
+                ->with(['orderType','subType','images','user.ratings','performers'])
                 ->get(),
             'subscriptions' => Subscription::query()
                 ->with('orders')
                 ->default()
                 ->get()
-        ],
-            200
-        );
+        ])->resolve(), 200);
     }
 
     public function getPreview(): JsonResponse
@@ -102,75 +123,14 @@ class OrderController extends BaseController
         return response()->json([
             'orders' => Order::query()
                 ->where('user_id',Auth::id())
-                ->where('status',2)
-                ->where('approved',0)
+                ->where('status',2) /*TODO: default: 3 (on moderation) */
                 ->filtered()
                 ->with(['orderType','subType','images','user','performers'])
                 ->orderByDesc('created_at')
                 ->limit(1)
                 ->get(),
             'subscriptions' => []
-        ],
-            200
-        );
-    }
-
-    public function getUnreadOrderPerformers(): JsonResponse
-    {
-        return response()->json([
-            'performers' => ReadPerformer::query()
-                ->whereIn('order_id',Order::where('user_id',Auth::id())->pluck('id')->toArray())
-                ->where('read',null)
-                ->with(['user'])
-                ->get()
-        ]);
-    }
-
-    public function getUnreadOrderRemovedPerformers(): JsonResponse
-    {
-        return response()->json([
-            'performers' => ReadRemovedPerformer::query()
-                ->where('user_id', Auth::id())
-                ->where('read', null)
-                ->with(['order'])
-                ->get()
-        ]);
-    }
-
-    public function getUnreadOrderStatus(): JsonResponse
-    {
-        return response()->json([
-            'orders' => ReadStatusOrder::query()
-                ->whereIn('order_id',Order::where('user_id',Auth::id())->pluck('id')->toArray())
-                ->where('read',null)
-                ->get()
-        ]);
-    }
-
-    public function getUserAge(UserAgeRequest $request): JsonResponse
-    {
-        return response()->json(['age' => getUserAge(User::find($request->id))]);
-    }
-
-    /**
-     * @throws \Illuminate\Auth\Access\AuthorizationException
-     */
-    public function getOrderPerformers(OrderRequest $request): JsonResponse
-    {
-        $order = Order::find($request->id);
-        $this->authorize('owner', $order);
-        $performers = [];
-        foreach ($order->performers as $performer) {
-            $performers[] = [
-                'id' => $performer->id,
-                'avatar' => $performer->avatar,
-                'avatar_props' => $performer->avatar_props,
-                'full_name' => $performer->name.' '.$performer->family,
-                'age' => getUserAge($performer),
-                'rating' => getUserRating($performer)
-            ];
-        }
-        return response()->json(['performers' => $performers],200);
+        ],200);
     }
 
     /**
@@ -216,6 +176,7 @@ class OrderController extends BaseController
                 'order_id' => $order->id,
                 'status' => 1,
             ]);
+            ReadOrder::where('order_id',$order->id)->delete();
 
             $order->status = 1;
             $order->save();
@@ -228,7 +189,7 @@ class OrderController extends BaseController
             broadcast(new NotificationEvent('new_order_status', $order, $order->user_id));
             $this->mailNotice($order, $order->userCredentials, 'new_order_status_notice');
 
-            broadcast(new OrderEvent('remove_order', $order));
+            broadcast(new OrderEvent('new_order_status', $order));
 
 //            if ($order->performers->count() >= $order->need_performers) {
 //                $order->status = 1;
@@ -264,10 +225,8 @@ class OrderController extends BaseController
             $fields = [
                 'city_id' => 1,
                 'user_id' => Auth::id(),
-                'status' => 2,
-                'approved' => 1
+                'status' => 2 /*TODO: default: 3 (on moderation) */
             ];
-            // Statuses: 2 – new; 1 – in progress; 0 – closed
 
             foreach ($steps as $step) {
                 $fields = array_merge($fields,$step);
@@ -277,12 +236,9 @@ class OrderController extends BaseController
             if (!$orderType->subtypes->count()) unset($fields['subtype_id']);
             if ($request->has('id')) {
                 $order = Order::find($request->id);
-
                 $this->authorize('owner', $order);
                 if (!$order->status) return response()->json([],403);
-
                 $order->update($fields);
-
             } else {
                 $order = Order::create($fields);
                 $this->newOrderInSubscription($order);
@@ -318,11 +274,8 @@ class OrderController extends BaseController
     {
         $sessionKey = $this->getSessionKey($request);
         $steps = Session::get($sessionKey);
-        if (count($steps) == 1) Session::forget($sessionKey);
-        else {
-            array_pop($steps);
-            Session::put($sessionKey,$steps);
-        }
+        array_pop($steps);
+        Session::put($sessionKey,$steps);
         return response()->json([],200);
     }
 
@@ -338,12 +291,8 @@ class OrderController extends BaseController
             foreach ($order->images as $image) {
                 $this->deleteFile($image->image);
             }
-            $unreadOrders = ReadOrder::where('order_id',$request->id)->where('read',null)->get();
-            foreach ($unreadOrders as $unreadOrder) {
-                broadcast(new NotificationEvent('delete_order', $request->id, $unreadOrder->subscription->subscriber_id));
-                $unreadOrder->delete();
-            }
 
+            $this->removeOrderUnreadMessages($request->id);
             broadcast(new OrderEvent('remove_order', $order));
 
             $order->delete();
@@ -374,8 +323,8 @@ class OrderController extends BaseController
         $this->authorize('owner', $order);
         $order->status = 0;
         $order->save();
-        ReadOrder::where('order_id')->delete();
 
+        $this->removeOrderUnreadMessages($request->id);
         broadcast(new OrderEvent('remove_order', $order));
 
         return response()->json([],200);
@@ -407,8 +356,7 @@ class OrderController extends BaseController
     {
         $order = Order::find($request->id);
         $this->authorize('owner', $order);
-        $order->status = 2;
-        $order->approved = 0;
+        $order->status = 3;
         $order->save();
 
         OrderUser::where('order_id',$request->id)->delete();
@@ -432,8 +380,19 @@ class OrderController extends BaseController
                 'order_id' => $order->id,
             ]);
 
+            /*TODO: enable after approving */
 //            broadcast(new NotificationEvent('new_order_in_subscription', $order, $subscription->subscriber_id));
 //            $this->mailNotice($order, $subscription->subscriber, 'new_order_in_subscription');
         }
+    }
+
+    private function removeOrderUnreadMessages($orderId): void
+    {
+        Message::where('order_id',$orderId)->delete();
+        OrderUser::where('order_id',$orderId)->delete();
+        ReadOrder::where('order_id',$orderId)->delete();
+        ReadPerformer::where('order_id',$orderId)->delete();
+        ReadRemovedPerformer::where('order_id',$orderId)->delete();
+        ReadRemovedPerformer::where('order_id',$orderId)->delete();
     }
 }

@@ -27,7 +27,7 @@ class OrderType extends Model
 
     public function ordersActive(): HasMany
     {
-        return $this->hasMany(Order::class)->where('active',1)->where('approved',1);
+        return $this->hasMany(Order::class)->where('active',1);
     }
 
 //    protected $casts = [

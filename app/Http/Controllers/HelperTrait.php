@@ -91,8 +91,8 @@ trait HelperTrait
             'user_id' => 1,
             'order_id' => $order->id
         ]);
-        $this->setNewMessages($message);
         broadcast(new ChatMessageEvent($message));
+        $this->setNewMessages($message);
     }
 
     public function setNewMessages(Message $message): void
@@ -149,12 +149,18 @@ trait HelperTrait
 
     public function setReadUnread(Model $model): void
     {
-        $model->query()->whereIn('order_id',Order::where('user_id',Auth::id())->pluck('id')->toArray())->update(['read' => true]);
+        $model->query()
+            ->whereIn('order_id',Order::where('user_id',Auth::id())->pluck('id')->toArray())
+            ->where('read',null)
+            ->update(['read' => true]);
     }
 
-    public function setReadUnreadRemovedPerformers(): void
+    public function setReadUnreadUser(Model $model): void
     {
-        ReadRemovedPerformer::where('user_id',Auth::id())->update(['read' => true]);
+        $model->query()
+            ->where('user_id',Auth::id())
+            ->where('read',null)
+            ->update(['read' => true]);
     }
 
     private function mailNotice(Order $order, User $user, string $template): void

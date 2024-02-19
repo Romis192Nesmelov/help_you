@@ -26,7 +26,6 @@ class Order extends Model
         'longitude',
         'description_short',
         'description_full',
-        'approved',
         'status'
     ];
 
@@ -89,7 +88,6 @@ class Order extends Model
     {
         $query
             ->where('status',2)
-            ->where('approved',1)
             ->where('user_id','!=',Auth::id());
     }
 

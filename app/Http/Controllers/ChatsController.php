@@ -31,18 +31,52 @@ class ChatsController extends BaseController
 
     public function chats(): View
     {
-        $this->data['active_left_menu'] = 'messages.chats';
-        $this->data['chats'] = [
-            'my_orders' => Order::where('approved',1)->where('status','>',0)->where('user_id',Auth::id())->whereIn('id',OrderUser::groupBy('order_id')->pluck('order_id')->toArray())->orderByDesc('created_at')->get(),
-            'im_performer' => Order::where('approved',1)->where('status','>',0)->whereIn('id',OrderUser::where('user_id',Auth::id())->pluck('order_id')->toArray())->orderByDesc('created_at')->get()
-        ];
+        $this->data['active_left_menu'] = 'my_chats';
         return $this->showView('chats');
+    }
+
+    public function chatsMyOrders(): JsonResponse
+    {
+        return response()->json([
+            'orders' => Order::query()
+                ->where('status',1)
+                ->where('user_id',Auth::id())
+                ->whereIn('id',OrderUser::groupBy('order_id')->pluck('order_id')->toArray())
+                ->with('user.ratings')
+                ->with('performers.ratings')
+                ->with('orderType')
+                ->orderByDesc('created_at')
+                ->paginate(4)
+        ],200);
+    }
+
+    public function chatsPerformer(): JsonResponse
+    {
+        return response()->json([
+            'orders' => Order::query()
+                ->where('status',1)
+                ->whereIn('id',OrderUser::where('user_id',Auth::id())->pluck('order_id')->toArray())
+                ->with('user.ratings')
+                ->with('performers.ratings')
+                ->with('orderType')
+                ->orderByDesc('created_at')
+                ->paginate(4)
+        ],200);
     }
 
     public function chat(ChatRequest $request): View
     {
-        $this->data['active_left_menu'] = 'messages.chats';
-        $this->data['order'] = Order::find($request->input('order_id'));
+        $this->data['active_left_menu'] = 'my_chats';
+        $this->data['order'] = Order::query()
+            ->with('user.ratings')
+            ->with('performers.ratings')
+            ->with('orderType')
+            ->with('subType')
+            ->with('images')
+            ->with('messages.user')
+            ->where('id',$request->input('id'))
+            ->first();
+        if ($this->data['order']->status != 1) abort (403);
         $this->setReadUnread(new ReadPerformer());
 		$this->setReadAllMessagesInChatForUser($this->data['order']->id);
         return $this->showView('chat');
@@ -77,18 +111,21 @@ class ChatsController extends BaseController
 
     public function readMessage(ChatRequest $request): JsonResponse
     {
-        $this->setReadAllMessagesInChatForUser($request->input('order_id'));
+        $this->setReadAllMessagesInChatForUser($request->input('id'));
         return response()->json([],200);
     }
 
     public function getUnreadMessages(): JsonResponse
     {
         $unreadMessagesCounters = [];
-        if ($unreadMessages = MessageUser::where('user_id',Auth::id())->where('read',null)->orderBy('order_id')->get()) {
+        if ($unreadMessages = MessageUser::where('user_id',Auth::id())->where('read',null)->get()) {
+            $orderIds = [];
             foreach ($unreadMessages as $unreadMessage) {
-                if (!isset($unreadMessagesCounters['order'.$unreadMessage->order_id])) {
-                    $unreadMessagesCounters['order'.$unreadMessage->order_id] = 1;
-                } else $unreadMessagesCounters['order'.$unreadMessage->order_id]++;
+                $key = array_search($unreadMessage->order_id,$orderIds);
+                if ($key === false) {
+                    $orderIds[] = $unreadMessage->order_id;
+                    $unreadMessagesCounters[] = ['order' => $unreadMessage->order, 'count' => 1];
+                } else $unreadMessagesCounters[$key]['count']++;
             }
         }
         return response()->json(['unread' => $unreadMessagesCounters],200);

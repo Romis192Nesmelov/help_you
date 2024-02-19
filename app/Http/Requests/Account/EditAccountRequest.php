@@ -25,10 +25,7 @@ class EditAccountRequest extends FormRequest
      */
     public function rules(): array
     {
-        $validationArr = [
-            'avatar_size' => 'nullable|integer',
-            'avatar_position_x' => 'nullable',
-            'avatar_position_y' => 'nullable',
+        return [
             'name' => $this->validationString,
             'family' => $this->validationString,
             'born' => $this->validationBorn,
@@ -36,8 +33,5 @@ class EditAccountRequest extends FormRequest
             'info_about' => $this->validationText,
             'mail_notice' => 'nullable'
         ];
-
-        if ($this->hasFile('avatar')) $validationArr['avatar'] = $this->validationJpgAndPng;
-        return $validationArr;
     }
 }

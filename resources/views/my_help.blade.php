@@ -1,32 +1,18 @@
 @extends('layouts.main')
 
 @section('content')
-
-@include('blocks.modal_delete_block',[
-    'action' => 'order.delete_response',
-    'head' => trans('content.do_you_really_want_to_withdraw_your_response')
-])
-
 <div class="row">
-    @include('blocks.left_menu_block',['hasChangeAvatar' => false])
-    <div id="my-help" class="col-12 col-lg-8 right-block">
-        <div class="rounded-block tall">
-            <h2>{{ trans('account.my_help') }}</h2>
-            @include('blocks.top_sub_menu_block',[
-                'menus' => ['active','archive'],
-                'prefix' => 'auth',
-                'postfix' => '_orders',
-                'items' => $orders
-            ])
-            @include('blocks.tab_orders_block', [
-                'menus' => ['active','archive'],
-                'useButton' => false,
-                'editRoute' => null
-            ])
-        </div>
-    </div>
+    <left-menu-component
+        user="{{ json_encode(auth()->user()) }}"
+        allow_change_avatar="0"
+        left_menu="{{ json_encode($leftMenu) }}"
+        logout_url="{{ route('auth.logout') }}"
+        active_left_menu="{{ $active_left_menu }}"
+    ></left-menu-component>
+    <my-help-list-component
+        user_id="{{ auth()->id() }}"
+        orders_urls="{{ json_encode(['active' => route('account.my_help_active'), 'archive' => route('account.my_help_archive')]) }}"
+        read_unread_by_performer="{{ route('account.set_read_unread_by_performer') }}"
+    ></my-help-list-component>
 </div>
-<script>
-    const closeOrderUrl = "{{ route('order.close_order') }}";
-</script>
 @endsection

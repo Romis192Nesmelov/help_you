@@ -38,14 +38,29 @@ Route::prefix('account')->name('account.')->controller(AccountController::class)
     Route::post('/get-code', 'getCode')->name('get_code');
     Route::post('/change-phone', 'changePhone')->name('change_phone');
     Route::post('/change-password', 'changePassword')->name('change_password');
+    Route::post('/change-avatar', 'changeAvatar')->name('change_avatar');
     Route::post('/edit-account', 'editAccount')->name('edit_account');
     Route::post('/delete-subscription', 'deleteSubscription')->name('delete_subscription');
 
     Route::get('/change', 'account')->name('change');
     Route::get('/messages', 'messages')->name('messages');
+
     Route::get('/my-subscriptions', 'mySubscriptions')->name('my_subscriptions');
+    Route::get('/my-unread-subscriptions', 'getMyUnreadSubscriptions')->name('my_unread_subscriptions');
+
     Route::get('/my-orders', 'myOrders')->name('my_orders');
+    Route::get('/set-read-unread-by-my-orders', 'setReadUnreadByMyOrders')->name('set_read_unread_by_my_orders');
+
+    Route::get('/my-orders-active', 'myOrdersActive')->name('my_orders_active');
+    Route::get('/my-orders-open', 'myOrdersOpen')->name('my_orders_open');
+    Route::get('/my-orders-approving', 'myOrdersApproving')->name('my_orders_approving');
+    Route::get('/my-orders-archive', 'myOrdersArchive')->name('my_orders_archive');
+
     Route::get('/my-help', 'myHelp')->name('my_help');
+    Route::get('/set-read-unread-by-performer', 'setReadUnreadByPerformer')->name('set_read_unread_by_performer');
+
+    Route::get('/my-help-active', 'myHelpActive')->name('my_help_active');
+    Route::get('/my-help-archive', 'myHelpArchive')->name('my_help_archive');
     Route::get('/incentives', 'account')->name('incentives');
     Route::get('/subscription', 'subscription')->name('subscription');
 });
@@ -55,17 +70,12 @@ Route::middleware(['auth','account.completed'])->name('order.')->controller(Orde
     Route::get('/orders', 'orders')->name('orders');
     Route::get('/edit-order', 'editOrder')->name('edit_order');
     Route::get('/read-order', 'readOrder')->name('read_order');
-    Route::get('/get-subscriptions-news', 'getSubscriptionsNews')->name('get_subscriptions_news');
+    Route::get('/get-orders-news', 'getOrdersNews')->name('get_orders_news');
 
-    Route::get('/get-user-age', 'getUserAge')->name('get_user_age');
-    Route::post('/get-order-performers', 'getOrderPerformers')->name('get_order_performers');
     Route::post('/remove-order-performer', 'removeOrderPerformer')->name('remove_order_performer');
 
     Route::post('/get-orders', 'getOrders')->name('get_orders');
     Route::post('/get-preview', 'getPreview')->name('get_preview');
-    Route::get('/get-unread-order-performers', 'getUnreadOrderPerformers')->name('get_unread_order_performers');
-    Route::get('/get-unread-order-removed-performers', 'getUnreadOrderRemovedPerformers')->name('get_unread_order_removed_performers');
-    Route::get('/get-unread-order-status', 'getUnreadOrderStatus')->name('get_unread_order_status');
     Route::post('/order-response', 'orderResponse')->name('order_response');
 
     Route::post('/next-step', 'nextStep')->name('next_step');
@@ -81,6 +91,8 @@ Route::middleware(['auth','account.completed'])->name('order.')->controller(Orde
 
 Route::middleware(['auth','account.completed'])->name('messages.')->controller(ChatsController::class)->group(function () {
     Route::get('/chats', 'chats')->name('chats');
+    Route::get('/chats-my-orders', 'chatsMyOrders')->name('chats_my_orders');
+    Route::get('/chats-performer', 'chatsPerformer')->name('chats_performer');
     Route::get('/chat', 'chat')->name('chat');
     Route::get('/get-unread-messages', 'getUnreadMessages')->name('get_unread_messages');
     Route::post('/read-message', 'readMessage')->name('read_message');

@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Casts\Json;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -57,6 +56,11 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
+    public function getAgeAttribute(): int
+    {
+        return Carbon::parse($this->born)->age;
+    }
+
     public function subscriptions(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'subscriptions', 'subscriber_id');
@@ -80,7 +84,11 @@ class User extends Authenticatable
     public function orderActivePerformer(): BelongsToMany
     {
         return $this->belongsToMany(Order::class)
-            ->where('status','>',0)
+            ->where('status',1)
+            ->with('user.ratings')
+            ->with('performers.ratings')
+            ->with('orderType')
+            ->with('subType')
             ->orderByDesc('created_at');
     }
 
@@ -88,43 +96,10 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Order::class)
             ->where('status',0)
-            ->orderByDesc('created_at');
-    }
-
-    public function ordersApproving(): HasMany
-    {
-        return $this->hasMany(Order::class)
-            ->where('approved',1)
-            ->orderByDesc('created_at');
-    }
-
-    public function ordersActive(): HasMany
-    {
-        return $this->hasMany(Order::class)
-            ->where('status','>',0)
-            ->orderByDesc('created_at');
-    }
-
-    public function orderApproving(): HasMany
-    {
-        return $this->hasMany(Order::class)
-            ->where('approved',0)
-            ->orderByDesc('created_at');
-    }
-
-    public function ordersActiveAndApproving(): HasMany
-    {
-        return $this->hasMany(Order::class)
-            ->where('status','>',0)
-            ->where('approved',1)
-            ->orderByDesc('created_at');
-    }
-
-    public function ordersArchive(): HasMany
-    {
-        return $this->hasMany(Order::class)
-            ->where('status',0)
-            ->where('approved',1)
+            ->with('user.ratings')
+            ->with('performers.ratings')
+            ->with('orderType')
+            ->with('subType')
             ->orderByDesc('created_at');
     }
 
@@ -136,11 +111,6 @@ class User extends Authenticatable
     public function unreadMessages(): HasMany
     {
         return $this->hasMany(MessageUser::class)->where('read',null);
-    }
-
-    public function years(): int
-    {
-        return Carbon::parse($this->born)->age;
     }
 
     public function ratings(): HasMany
