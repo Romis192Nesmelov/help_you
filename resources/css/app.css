@@ -235,8 +235,13 @@ table {
     color: grey;
 }
 
+.form-group input.has-icon,
 .form-group.text-area.has-icon textarea {
-    padding-right: 50px;
+    padding-right: 40px;
+}
+
+.form-group input.has-icon:not[list] {
+    padding-right: 35px;
 }
 
 .form-group.text-area i {
@@ -376,10 +381,6 @@ table {
 
 .form-group.password i {
     cursor: pointer;
-}
-
-.form-group input.has-icon:not[list] {
-    padding-right: 35px;
 }
 
 .form-select {

@@ -46,6 +46,22 @@ class OrderController extends BaseController
         return $this->showView('orders');
     }
 
+    public function getOrders(): JsonResponse
+    {
+        return response()->json(OrdersResource::make([
+            'orders' => Order::query()
+                ->default()
+                ->filtered()
+                ->searched()
+                ->with(['orderType','subType','images','user.ratings','performers'])
+                ->get(),
+            'subscriptions' => Subscription::query()
+                ->with('orders')
+                ->default()
+                ->get()
+        ])->resolve(), 200);
+    }
+
     /**
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
@@ -100,22 +116,6 @@ class OrderController extends BaseController
                 ->with('order')
                 ->get()
         ]);
-    }
-
-    public function getOrders(): JsonResponse
-    {
-        return response()->json(OrdersResource::make([
-            'orders' => Order::query()
-                ->default()
-                ->filtered()
-                ->searched()
-                ->with(['orderType','subType','images','user.ratings','performers'])
-                ->get(),
-            'subscriptions' => Subscription::query()
-                ->with('orders')
-                ->default()
-                ->get()
-        ])->resolve(), 200);
     }
 
     public function getPreview(): JsonResponse

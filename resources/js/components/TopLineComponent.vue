@@ -398,8 +398,7 @@ export default {
         'get_orders_new_url': String,
         'my_orders_url': String,
         'my_help_url': String,
-        'order_statuses': String,
-        'bell_sound': String
+        'order_statuses': String
     },
 }
 </script>

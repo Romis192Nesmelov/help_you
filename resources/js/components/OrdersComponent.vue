@@ -33,24 +33,27 @@
                     </select>
                 </div>
             </div>
+            <div class="col-lg-4 col-12 mt-lg-0 mt-2 row d-flex align-items-end m-0 p-0">
+                <label class="ms-3">Поиск</label>
+                <div class="form-group mt-2">
+                    <i class="icon-search4"
+                       @click="getSearched"
+                    ></i>
+                    <input
+                        type="text"
+                        name="search"
+                        class="form-control has-icon"
+                        v-model="searchingString"
+                        @keydown.enter.prevent.exact="getSearched"
+                    >
+                </div>
+            </div>
             <div class="col-lg-2 col-sm-12 col-12 d-flex align-items-end m-0">
                 <ButtonComponent
                     class="btn btn-primary w-100 mt-lg-0 mt-3"
                     text="Применить"
                     @click="getOrders"
                 ></ButtonComponent>
-            </div>
-            <div class="col-lg-4 col-12 mt-lg-0 mt-2 row d-flex align-items-end m-0 p-0">
-                <label class="ms-3">Поиск</label>
-                <div class="form-group mt-2">
-                    <i class="icon-search4"></i>
-                    <input
-                        type="text"
-                        name="search"
-                        class="form-control has-icon"
-                        v-model="searchingString"
-                    >
-                </div>
             </div>
         </div>
     </div>
@@ -124,6 +127,11 @@ export default {
         let self = this;
 
         this.userId = parseInt(this.user_id);
+
+        this.filterType = parseInt(this.order_type);
+        this.filterPerformersFrom = parseInt(this.performers_from);
+        this.filterPerformersTo = parseInt(this.performers_to);
+
         this.orderTypes = JSON.parse(this.order_types);
         window.previewFlag = parseInt(this.get_preview_flag);
         window.pointsContainer = $('#points-container');
@@ -177,6 +185,7 @@ export default {
     },
     props: {
         'user_id': String,
+        'orders_url': String,
         'get_orders_url': String,
         'order_response_url': String,
         'read_order_url': String,
@@ -185,6 +194,10 @@ export default {
         'chat_url': String,
         'get_preview_flag': String,
         'order_id': String,
+        'order_type': String,
+        'performers_from': String,
+        'performers_to': String,
+        'search': String,
         'order_types': String,
     },
     data() {
@@ -202,26 +215,48 @@ export default {
             filterType: 0,
             filterPerformersFrom: 1,
             filterPerformersTo: 20,
-            searchingString: '',
+            searchingString: null,
         }
     },
     methods: {
+        getSearched() {
+            this.filterType = 0;
+            this.filterPerformersFrom = 1;
+            this.filterPerformersTo = 20;
+            this.getOrders();
+        },
         getOrders() {
             window.myMap.geoObjects.removeAll();
             window.hideSelectedPointsDie();
 
-            let self = this, fields = {_token: window.tokenField}, url;
+            let self = this,
+                fields = {_token: window.tokenField},
+                url = this.get_orders_url,
+                selfUrl = this.orders_url,
+                urlConnector = '?';
 
             if (this.previewFlag) url = this.get_preview_url;
             else {
-                url = this.get_orders_url;
 
-                if (this.filterType) fields.order_type = this.filterType;
-                if (this.searchingString) fields.search = this.searchingString;
+                if (this.searchingString !== null) fields.search = this.searchingString;
+                else if (this.search) {
+                    fields.search = this.search;
+                    this.searchingString = this.search;
+                }
 
+                fields.order_type = this.filterType;
                 fields.performers_from = this.filterPerformersFrom;
                 fields.performers_to = this.filterPerformersTo;
             }
+
+            $.each(fields, function (field,value) {
+                if (field !== '_token' && value) {
+                    selfUrl += urlConnector + field + '=' + value;
+                    urlConnector = '&';
+                }
+            });
+
+            window.history.pushState(fields, 'Оказать помощь. Карта', selfUrl);
 
             axios.post(url, fields)
                 .then(function (response) {
@@ -436,3 +471,9 @@ export default {
     }
 }
 </script>
+
+<style scoped>
+    i.icon-search4 {
+        cursor: pointer;
+    }
+</style>
