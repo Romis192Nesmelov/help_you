@@ -25,7 +25,7 @@
                         :is_active=false
                         add_class="d-block d-lg-none"
                         :url="messages_url"
-                        name="messages"
+                        name="Сообщения"
                     ></top-menu-item-component>
 
                     <top-menu-item-component

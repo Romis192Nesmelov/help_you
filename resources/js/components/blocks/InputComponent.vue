@@ -6,7 +6,7 @@
             :type="type"
             :name="name"
             :value="value"
-            :class="'form-control has-icon' + (error ? ' error' : '' )"
+            :class="'form-control' + (icon ? ' has-icon': '') + (error ? ' error' : '' )"
             :placeholder="placeholder"
             :minlength="min"
             :maxlength="max"

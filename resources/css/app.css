@@ -280,12 +280,21 @@ table {
     overflow: hidden;
 }
 
+.form-group textarea[name=address] {
+    height: 65px;
+}
+
 .form-group textarea[name=description_short] {
     height: 90px;
 }
 
 .form-group textarea[name=description_full] {
     height: 230px;
+}
+
+select#addresses {
+    margin-top: 20px;
+    padding: 5px 0;
 }
 
 .item-in-list {
