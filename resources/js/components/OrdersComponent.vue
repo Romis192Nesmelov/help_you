@@ -140,6 +140,7 @@ export default {
 
         window.clickedToCluster = (target) => {
             this.selectedPoints = target.properties.get('geoObjects');
+            window.cickedTarget = target;
             $.each(this.selectedPoints, function(k,point) {
                 self.checkUnreadOrders(point.properties.get('orderId'));
             });
