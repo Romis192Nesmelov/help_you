@@ -19,15 +19,14 @@
             </button>
             <div class="collapse navbar-collapse" id="navbar-main-nav">
                 <ul class="navbar-nav">
-                    <top-menu-item-component
-                        v-if="authCheck"
-                        key="messages"
-                        :is_active=false
-                        add_class="d-block d-lg-none"
-                        :url="messages_url"
-                        name="Сообщения"
-                    ></top-menu-item-component>
-
+<!--                    <top-menu-item-component-->
+<!--                        v-if="authCheck"-->
+<!--                        key="messages"-->
+<!--                        :is_active=false-->
+<!--                        add_class="d-block d-lg-none"-->
+<!--                        :url="messages_url"-->
+<!--                        name="Сообщения"-->
+<!--                    ></top-menu-item-component>-->
                     <top-menu-item-component
                         v-for="menu in this.mainMenu"
                         :key="menu.key"
@@ -36,7 +35,6 @@
                         :url="menu.url"
                         :name="menu.name"
                     ></top-menu-item-component>
-
                     <top-menu-item-component
                         v-if="authCheck"
                         :is_active=false
@@ -44,6 +42,14 @@
                         add_class="d-block d-lg-none"
                         :url="new_order_url"
                         name="Создать заявку"
+                    ></top-menu-item-component>
+                    <top-menu-item-component
+                        v-if="authCheck"
+                        :is_active=false
+                        key="orders"
+                        add_class="d-block d-lg-none"
+                        :url="orders_url"
+                        name="Оказать помощь"
                     ></top-menu-item-component>
                 </ul>
             </div>
@@ -68,7 +74,7 @@
         <div id="right-button-block" :class="'buttons-block d-none d-lg-flex align-items-center justify-content-'+(authCheck ? 'between' : 'end')+(onRoot ? ' on-root' : '')">
             <a
                 id="navbar-dropdown-messages"
-                :class="'nav-link'+(hasMessages ? ' dropdown-toggle' : '')"
+                :class="'ms-2 me-2'+(hasMessages ? ' dropdown-toggle' : '')"
                 role="button"
                 :data-bs-toggle="hasMessages ? 'dropdown' : ''"
                 aria-expanded="false"
@@ -108,18 +114,23 @@
                 </ul>
             </div>
 
-            <a :href="new_order_url" v-if="authCheck && !onRoot">
-                <ButtonComponent
-                    class_name="btn btn-secondary"
-                    icon="icon-magazine"
-                    text="Создать заявку"
-                ></ButtonComponent>
+            <a class="ms-2 me-2" :href="new_order_url" v-if="authCheck && !onRoot">
+                <i class="icon-add-to-list"></i>
+<!--                <ButtonComponent-->
+<!--                    class_name="btn btn-secondary"-->
+<!--                    icon="icon-magazine"-->
+<!--                    text="Создать заявку"-->
+<!--                ></ButtonComponent>-->
+            </a>
+
+            <a class="ms-2 me-2" :href="orders_url" v-if="authCheck && !onRoot">
+                <i class="icon-map"></i>
             </a>
 
             <a :href="account_change_url" v-if="authCheck">
                 <ButtonComponent
                     id="account-button"
-                    class_name="btn btn-secondary"
+                    class_name="btn btn-secondary ms-3"
                     icon="icon-user-lock"
                     text="Личный кабинет"
                 ></ButtonComponent>

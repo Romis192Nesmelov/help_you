@@ -13,11 +13,20 @@ class BaseController extends Controller
     protected array $data = [];
     protected string $activeMainMenu = '';
     protected string $activeLeftMenu = '';
-    protected string $activeSubMenu = '';
+//    protected string $activeSubMenu = '';
 
     public function index() :View
     {
         return $this->showView('home');
+    }
+
+    public function howDoesItWork($slug=null) :View
+    {
+        $this->activeMainMenu = 'how_does_it_work';
+        if ($slug) {
+            if (!in_array($slug,['who-needs-help','who-wants-to-help'])) abort(404);
+            return $this->showView(str_replace('-','_',$slug));
+        } else return $this->showView('how_does_it_work');
     }
 
     public function partners(Request $request) :View

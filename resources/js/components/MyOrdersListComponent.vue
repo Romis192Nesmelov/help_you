@@ -9,7 +9,7 @@
         <ModalPairButtonsComponent @click-yes="resumingOrder"></ModalPairButtonsComponent>
     </ModalComponent>
 
-    <ModalComponent id="order-resumed-modal" head="Заявка возобновлена!">
+    <ModalComponent id="order-resumed-modal" head="Ваша заявка снова на модерации!">
         <img class="w-100" :src="resume_image" />
     </ModalComponent>
 
@@ -234,7 +234,7 @@ export default {
         },
         closeOrder(order) {
             this.closingOrderId = order.id;
-            this.closingOrderUser = order.user;
+            this.closingOrderUser = order.performers[0];
             $('#order-closing-confirm-modal').modal('show');
         },
         closingOrder() {
