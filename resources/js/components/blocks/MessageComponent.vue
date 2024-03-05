@@ -32,8 +32,11 @@ export default {
     },
     methods: {
         getMessageTime(createdAt) {
-            let date = new Date(createdAt);
-            return date.getHours() + ':' + date.getMinutes()
+            let date = new Date(createdAt),
+                minutes = date.getMinutes().toString();
+
+            minutes = minutes.length === 1 ? '0' + minutes : minutes;
+            return date.getHours() + ':' + minutes
         }
     }
 }
