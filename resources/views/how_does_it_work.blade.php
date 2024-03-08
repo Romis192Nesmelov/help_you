@@ -7,7 +7,6 @@
                 'addClass' => 'tall black how-does-it-work',
                 'image' => 'images/edit_order/step1.png',
                 'head' => trans('content.how_does_it_work_head1'),
-                'content' => trans('content.home_text_block4'),
                 'link' => route('how_does_it_work',['slug' => 'who-needs-help'])
             ])
         </div>
@@ -16,7 +15,6 @@
                 'addClass' => 'tall black how-does-it-work',
                 'image' => 'images/edit_order/step2.png',
                 'head' => trans('content.how_does_it_work_head2'),
-                'content' => trans('content.home_text_block3'),
                 'link' => route('how_does_it_work',['slug' => 'who-wants-to-help'])
             ])
         </div>

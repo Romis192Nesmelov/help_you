@@ -122,4 +122,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(ReadStatusOrder::class);
     }
+
+    public function incentives(): BelongsToMany
+    {
+        return $this->belongsToMany(Action::class);
+    }
+
+    public function incentivesActive(): BelongsToMany
+    {
+        return $this->belongsToMany(Action::class)->wherePivot('active',1);
+    }
 }

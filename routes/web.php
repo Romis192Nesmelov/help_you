@@ -35,6 +35,8 @@ Route::prefix('auth')->name('auth.')->controller(AuthController::class)->group(f
 });
 
 Route::prefix('account')->name('account.')->controller(AccountController::class)->middleware(['auth'])->group(function () {
+    Route::get('/get-news', 'getNews')->name('get_news');
+
     Route::post('/get-code', 'getCode')->name('get_code');
     Route::post('/change-phone', 'changePhone')->name('change_phone');
     Route::post('/change-password', 'changePassword')->name('change_password');
@@ -61,7 +63,11 @@ Route::prefix('account')->name('account.')->controller(AccountController::class)
 
     Route::get('/my-help-active', 'myHelpActive')->name('my_help_active');
     Route::get('/my-help-archive', 'myHelpArchive')->name('my_help_archive');
-    Route::get('/incentives', 'account')->name('incentives');
+
+    Route::get('/incentives', 'incentives')->name('incentives');
+    Route::get('/get-my-incentive', 'getMyIncentives')->name('get_my_incentive');
+    Route::post('/delete-incentive', 'deleteIncentive')->name('delete_incentive');
+
     Route::get('/subscription', 'subscription')->name('subscription');
 });
 
@@ -70,7 +76,6 @@ Route::middleware(['auth','account.completed'])->name('order.')->controller(Orde
     Route::get('/orders', 'orders')->name('orders');
     Route::get('/edit-order', 'editOrder')->name('edit_order');
     Route::get('/read-order', 'readOrder')->name('read_order');
-    Route::get('/get-orders-news', 'getOrdersNews')->name('get_orders_news');
 
     Route::post('/remove-order-performer', 'removeOrderPerformer')->name('remove_order_performer');
 

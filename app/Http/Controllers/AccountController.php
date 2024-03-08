@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\IncentivesEvent;
 use App\Http\Requests\Account\ChangeAvatarRequest;
 use App\Http\Requests\Account\ChangePasswordRequest;
 use App\Http\Requests\Account\ChangePhoneRequest;
 use App\Http\Requests\Account\EditAccountRequest;
 use App\Http\Requests\Account\GetCodeRequest;
+use App\Http\Requests\Account\IncentivesRequest;
 use App\Http\Requests\Account\SubscriptionRequest;
+use App\Models\Action;
+use App\Models\ActionUser;
 use App\Models\Order;
 use App\Models\OrderUser;
 use App\Models\ReadOrder;
@@ -31,6 +35,39 @@ class AccountController extends BaseController
     {
         $this->data['active_left_menu'] = null;
         return $this->showView('account');
+    }
+
+    public function getNews(): JsonResponse
+    {
+        return response()->json([
+            'news_subscriptions' => ReadOrder::query()
+                ->whereIn('subscription_id',Subscription::query()->default()->pluck('id')->toArray())
+                ->where('read',null)
+                ->with('order.user')
+                ->get(),
+            'news_performers' => ReadPerformer::query()
+                ->whereIn('order_id',Order::where('user_id',Auth::id())->pluck('id')->toArray())
+                ->where('read',null)
+                ->with('order')
+                ->with('user')
+                ->get(),
+            'news_removed_performers' => ReadRemovedPerformer::query()
+                ->where('user_id', Auth::id())
+                ->where('read', null)
+                ->with('order')
+                ->get(),
+            'news_status_orders' => ReadStatusOrder::query()
+                ->whereIn('order_id',Order::where('user_id',Auth::id())->pluck('id')->toArray())
+                ->where('read',null)
+                ->with('order')
+                ->get(),
+            'news_incentive' => ActionUser::query()
+                ->where('user_id', Auth::id())
+                ->where('read', null)
+                ->where('active', 1)
+                ->with('action')
+                ->get(),
+        ]);
     }
 
     public function mySubscriptions() :View
@@ -112,6 +149,42 @@ class AccountController extends BaseController
         $this->setReadUnreadByPerformer();
         $this->data['active_left_menu'] = 'my_help';
         return $this->showView('my_help');
+    }
+
+    public function incentives(Request $request): View
+    {
+        $this->data['active_left_menu'] = 'incentives';
+        if ($request->has('id')) {
+            $this->data['action'] = Action::findOrFail($request->id);
+            $incentive = ActionUser::where('action_id',$this->data['action']->id)->where('user_id',Auth::id())->first();
+            if (!$incentive) abort(403);
+            $incentive->read = 1;
+            $incentive->save();
+            broadcast(new IncentivesEvent('remove_incentive', $incentive, Auth::id()));
+            return $this->showView('action');
+        } else return $this->showView('incentives');
+    }
+
+    public function getMyIncentives(): LengthAwarePaginator
+    {
+        return ActionUser::query()
+            ->where('user_id',Auth::id())
+            ->where('active', 1)
+            ->with('action')
+            ->paginate(6);
+    }
+
+    /**
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
+    public function deleteIncentive(IncentivesRequest $request): JsonResponse
+    {
+        $incentive = ActionUser::find($request->id);
+        $this->authorize('owner', $incentive);
+        broadcast(new IncentivesEvent('remove_incentive', $incentive, Auth::id()));
+        $incentive->active = 0;
+        $incentive->save();
+        return response()->json([],200);
     }
 
     public function setReadUnreadByPerformer(): JsonResponse

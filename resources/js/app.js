@@ -8,6 +8,7 @@ import AccountComponent from "./components/AccountComponent.vue";
 import MyOrdersListComponent from "./components/MyOrdersListComponent.vue";
 import MyHelpListComponent from "./components/MyHelpListComponent.vue";
 import MySubscriptionsComponent from "./components/MySubscriptionsComponent.vue";
+import IncentivesComponent from "./components/IncentivesComponent.vue";
 import MyChatsComponent from "./components/MyChatsComponent.vue";
 import EditOrderComponent from "./components/EditOrderComponent.vue";
 import OrdersComponent from "./components/OrdersComponent.vue";
@@ -21,6 +22,7 @@ const app = createApp({
         AccountComponent,
         MyOrdersListComponent,
         MyHelpListComponent,
+        IncentivesComponent,
         MySubscriptionsComponent,
         MyChatsComponent,
         EditOrderComponent,

@@ -86,6 +86,11 @@
             </a>
             <div class="dropdown-menu" aria-labelledby="navbar-dropdown-messages" v-show="authCheck && hasMessages">
                 <ul id="dropdown">
+                    <li v-for="(news, id) in newsIncentives" :key="id">
+                        <a :href="incentives_url + '?id=' + news.action.id">У вас новая награда:</a><br>
+                        Акция «{{ news.action.name }}»
+                        <hr>
+                    </li>
                     <li v-for="(message, id) in newsMessages" :key="id">
                         Новых сообщений: <span class="counter">{{ message.count }}</span><br>
                         <a :href="chat_url+'?id=' + message.order.id">в чате по заявке «{{ message.order.name }}»</a>
@@ -169,7 +174,7 @@ export default {
 
         if (this.authCheck) {
             this.getNewsMessages();
-            this.getNewsOrders();
+            this.getNews();
             this.listenEvents();
         }
         this.onRoot = parseInt(this.on_root);
@@ -181,6 +186,7 @@ export default {
             onRoot: Number,
             userId: 0,
             mainMenu: {},
+            newsIncentives: [],
             newsMessages: [],
             newsSubscriptions: [],
             newsPerformers: [],
@@ -194,7 +200,7 @@ export default {
             this.userId = id;
             this.authCheck = true;
             this.getNewsMessages();
-            this.getNewsOrders();
+            this.getNews();
             this.listenEvents();
         },
         getNewsMessages() {
@@ -207,9 +213,14 @@ export default {
                 }
             });
         },
-        getNewsOrders() {
+        getNews() {
             let self = this;
-            axios.get(this.get_orders_new_url).then(function (response) {
+            axios.get(this.get_news_url).then(function (response) {
+                if (response.data.news_incentive.length) {
+                    self.newsIncentives = response.data.news_incentive;
+                    self.setEmitter('incentives',true);
+                    self.hasMessages = true;
+                }
                 if (response.data.news_subscriptions.length) {
                     self.newsSubscriptions = response.data.news_subscriptions;
                     self.setEmitter('my-subscriptions',true);
@@ -237,6 +248,22 @@ export default {
             let self = this,
                 eventsFlag = false,
                 key = false;
+
+            window.Echo.private('incentive_' + this.userId).listen('.incentive', res => {
+                if (res.notice === 'remove_incentive') {
+                    key = self.findIncentive(res.incentive.id);
+                    if (key !== false) {
+                        self.newsIncentives.splice(key,1);
+                        self.setEmitter('incentives',self.newsIncentives.length);
+                        self.setHasMessages();
+                    }
+                } else if (res.notice === 'new_incentive') {
+                    self.newsIncentives.push(res);
+                    self.setEmitter('incentives',true);
+                    self.hasMessages = true;
+                    self.bellAlert(true);
+                }
+            });
 
             window.Echo.private('notice_' + this.userId).listen('.notice', res => {
                 switch (res.notice) {
@@ -364,12 +391,23 @@ export default {
                 this.newsSubscriptions.length ||
                 this.newsPerformers.length ||
                 this.newsStatusOrders.length ||
-                this.newsRemovedPerformers.length;
+                this.newsRemovedPerformers.length ||
+                this.newsIncentives.length;
         },
         findOrder(newsArr, orderId) {
             let key = false;
             $.each(newsArr, function (k,news) {
                 if (news.order.id === orderId) {
+                    key = k;
+                    return false;
+                }
+            });
+            return key;
+        },
+        findIncentive(incentiveId) {
+            let key = false;
+            $.each(this.newsIncentives, function (k,news) {
+                if (news.id === incentiveId) {
                     key = k;
                     return false;
                 }
@@ -406,9 +444,10 @@ export default {
         'active_main_menu': String,
         'get_unread_messages_url': String,
         'chat_url': String,
-        'get_orders_new_url': String,
+        'get_news_url': String,
         'my_orders_url': String,
         'my_help_url': String,
+        'incentives_url': String,
         'order_statuses': String
     },
 }

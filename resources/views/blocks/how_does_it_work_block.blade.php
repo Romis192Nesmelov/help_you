@@ -1,5 +1,4 @@
-<div class="rounded-block half how-does-it-work">
-    <h3 class="text-center">{{ $head }}</h3>
+<div class="rounded-block half p-2 how-does-it-work">
     <div class="w-100 text-center d-none d-md-block d-sm-none">
         <a class="fancybox" href="{{ asset($imageDesc) }}">
             <img src="{{ asset($imageDesc) }}" />
@@ -10,5 +9,6 @@
             <img src="{{ asset($imageMob) }}" />
         </a>
     </div>
-    <p class="text-center">{{ $description }}</p>
+    <h3 class="text-center">{{ $head }}</h3>
+    <p class="text-center m-0">{{ $description }}</p>
 </div>

@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Action;
 use App\Models\Order;
 use Illuminate\Database\Seeder;
 use App\Models\Partner;
@@ -23,5 +24,7 @@ class DatabaseSeeder extends Seeder
         $this->call(OrderImagesSeeder::class);
         $this->call(SubscriptionTypesSeeder::class);
         $this->call(MessageKeywordsSeeder::class);
+        Action::factory(20)->create();
+        $this->call(ActionsUsersSeeder::class);
     }
 }

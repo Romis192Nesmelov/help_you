@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 use App\Events\ChatMessageEvent;
+use App\Events\IncentivesEvent;
 use App\Events\NotificationEvent;
 use App\Jobs\SendMessage;
+use App\Models\Action;
+use App\Models\ActionUser;
 use App\Models\InformingOrder;
 use App\Models\Message;
 use App\Models\MessageUser;
@@ -84,6 +87,18 @@ trait HelperTrait
         }
     }
 
+    public function checkRegistrationAward(): void
+    {
+        $usersIds = User::query()
+            ->where('active',1)
+            ->where('created_at','<=', Carbon::now()->subDay())
+            ->pluck('id');
+
+        foreach ($usersIds as $userId) {
+            $this->setIncentive(2, $userId);
+        }
+    }
+
     public function chatMessage(Order $order, string $message): void
     {
         $message = Message::create([
@@ -117,6 +132,33 @@ trait HelperTrait
                 broadcast(new NotificationEvent('new_message', $message->order, $performer->id));
                 $this->mailNotice($message->order, $performer, 'new_message_notice');
             }
+        }
+    }
+
+    public function setIncentive(int $actionRating, int $userId): void {
+        $actionId = Action::query()
+            ->where('rating',$actionRating)
+            ->where('start','<=',Carbon::now())
+            ->where('end','>=',Carbon::now()->addDays(7))
+            ->pluck('id')
+            ->first();
+
+        $alreadyAwarded = false;
+        $user = User::find($userId);
+
+        foreach ($user->incentives as $incentive) {
+            if ($incentive->rating == $actionRating) {
+                $alreadyAwarded = true;
+                break;
+            }
+        }
+
+        if ($actionId && !$alreadyAwarded) {
+            $incentive = ActionUser::create([
+                'action_id' => $actionId,
+                'user_id' => Auth::id()
+            ]);
+            broadcast(new IncentivesEvent('new_incentive', $incentive, $userId));
         }
     }
 

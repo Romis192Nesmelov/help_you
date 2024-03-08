@@ -91,33 +91,6 @@ class OrderController extends BaseController
         return response()->json([],200);
     }
 
-    public function getOrdersNews(): JsonResponse
-    {
-        return response()->json([
-            'news_subscriptions' => ReadOrder::query()
-                ->whereIn('subscription_id',Subscription::query()->default()->pluck('id')->toArray())
-                ->where('read',null)
-                ->with('order.user')
-                ->get(),
-            'news_performers' => ReadPerformer::query()
-                ->whereIn('order_id',Order::where('user_id',Auth::id())->pluck('id')->toArray())
-                ->where('read',null)
-                ->with('order')
-                ->with('user')
-                ->get(),
-            'news_removed_performers' => ReadRemovedPerformer::query()
-                ->where('user_id', Auth::id())
-                ->where('read', null)
-                ->with('order')
-                ->get(),
-            'news_status_orders' => ReadStatusOrder::query()
-                ->whereIn('order_id',Order::where('user_id',Auth::id())->pluck('id')->toArray())
-                ->where('read',null)
-                ->with('order')
-                ->get()
-        ]);
-    }
-
     public function getPreview(): JsonResponse
     {
         return response()->json([
@@ -345,6 +318,9 @@ class OrderController extends BaseController
                     'user_id' => $performer->id
                 ]);
             }
+
+            //Check and set incentive
+            if ($request->rating >= 3) $this->setIncentive(1, $performer->id);
         }
         return response()->json([],200);
     }

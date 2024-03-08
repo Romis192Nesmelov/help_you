@@ -380,6 +380,10 @@ select#addresses {
     cursor: pointer;
 }
 
+.action {
+    height: 200px;
+}
+
 .form-group input[type=number] {
     text-align: center;
     font-weight: bold;
@@ -655,6 +659,10 @@ button.btn > i {
     height: 630px !important;
 }
 
+.rounded-block.tall .h-100.without-tabs {
+    height: 700px !important;
+}
+
 #map-container {
     padding: 0;
     min-height: 725px;
@@ -748,7 +756,7 @@ button.btn > i {
 .rounded-block.half.how-does-it-work img {
     margin-top: 10px;
     margin-bottom: 10px;
-    height: 210px;
+    height: 270px;
 }
 
 .rounded-block.half.how-does-it-work p {
