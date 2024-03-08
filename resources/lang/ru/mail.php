@@ -10,4 +10,5 @@ return [
     'new_order_in_subscription' => 'Новая заяка в подписке от пользователя: :user_name',
     'removed_performer' => ':user_name отказался от Вашего участия в завке «:name»',
     'new_order_status' => 'Новый статус у заявки «:name» – «:status»',
+    'new_award' => 'У вас новая награда: «:name»'
 ];

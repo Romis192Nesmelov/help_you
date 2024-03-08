@@ -128,7 +128,7 @@ class OrderController extends BaseController
         ]);
 
         broadcast(new NotificationEvent('remove_performer', $order, $request->user_id));
-        $this->mailNotice($order, $performer, 'remove_performer_notice');
+        $this->mailOrderNotice($order, $performer, 'remove_performer_notice');
 
         return response()->json(['message' => trans('content.the_performer_is_removed'), 'performers_count' => $order->performers->count()],200);
     }
@@ -156,11 +156,11 @@ class OrderController extends BaseController
             $order->refresh();
 
             broadcast(new NotificationEvent('new_performer', $order, $order->user_id));
-            $this->mailNotice($order, $order->userCredentials, 'new_performer_notice');
+            $this->mailOrderNotice($order, $order->userCredentials, 'new_performer_notice');
             if (!$order->messages->count()) $this->chatMessage($order, trans('content.new_chat_message'));
 
             broadcast(new NotificationEvent('new_order_status', $order, $order->user_id));
-            $this->mailNotice($order, $order->userCredentials, 'new_order_status_notice');
+            $this->mailOrderNotice($order, $order->userCredentials, 'new_order_status_notice');
 
             broadcast(new OrderEvent('new_order_status', $order));
 
@@ -358,7 +358,7 @@ class OrderController extends BaseController
 
             /*TODO: enable after approving */
 //            broadcast(new NotificationEvent('new_order_in_subscription', $order, $subscription->subscriber_id));
-//            $this->mailNotice($order, $subscription->subscriber, 'new_order_in_subscription');
+//            $this->mailOrderNotice($order, $subscription->subscriber, 'new_order_in_subscription');
         }
     }
 

@@ -119,7 +119,7 @@ trait HelperTrait
                 'order_id' => $message->order_id,
             ]);
             broadcast(new NotificationEvent('new_message', $message->order, $message->order->user_id));
-            $this->mailNotice($message->order, $message->order->userCredentials, 'new_message_notice');
+            $this->mailOrderNotice($message->order, $message->order->userCredentials, 'new_message_notice');
         }
 
         foreach ($message->order->performers as $performer) {
@@ -130,7 +130,7 @@ trait HelperTrait
                     'order_id' => $message->order_id,
                 ]);
                 broadcast(new NotificationEvent('new_message', $message->order, $performer->id));
-                $this->mailNotice($message->order, $performer, 'new_message_notice');
+                $this->mailOrderNotice($message->order, $performer, 'new_message_notice');
             }
         }
     }
@@ -159,6 +159,9 @@ trait HelperTrait
                 'user_id' => Auth::id()
             ]);
             broadcast(new IncentivesEvent('new_incentive', $incentive, $userId));
+            if ($user->email && $user->mail_notice) {
+                $this->sendMessage('new_award_notice', $user->email, null, ['action' => $incentive->action]);
+            }
         }
     }
 
@@ -205,7 +208,7 @@ trait HelperTrait
             ->update(['read' => true]);
     }
 
-    private function mailNotice(Order $order, User $user, string $template): void
+    public function mailOrderNotice(Order $order, User $user, string $template): void
     {
         if ($user->email && $user->mail_notice) {
             $this->sendMessage($template, $user->email, null, ['order' => $order]);
