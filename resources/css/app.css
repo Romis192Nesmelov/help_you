@@ -1295,6 +1295,11 @@ button.btn > i {
         margin-bottom: 25px;
     }
 
+    .rounded-block.tall .h-100,
+    .rounded-block.tall .h-100.without-tabs {
+        height: auto !important;
+    }
+
     .rounded-block.half,
     .rounded-block.one-quarter {
         height: auto;
