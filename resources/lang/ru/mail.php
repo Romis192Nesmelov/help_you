@@ -10,5 +10,9 @@ return [
     'new_order_in_subscription' => 'Новая заяка в подписке от пользователя: :user_name',
     'removed_performer' => ':user_name отказался от Вашего участия в завке «:name»',
     'new_order_status' => 'Новый статус у заявки «:name» – «:status»',
-    'new_award' => 'У вас новая награда: «:name»'
+    'new_award' => 'У вас новая награда: «:name»',
+    'sent_from_feedback_form' => 'Отправлено с помощью формы обратной связи',
+    'from_user_with_name' => 'От пользователя с именем: ',
+    'message' => 'Сообщение:',
+    'thanks_for_your_feedback' => 'Спасибо за Ваш отзыв!',
 ];

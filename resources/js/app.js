@@ -1,6 +1,7 @@
 import './bootstrap';
 import {createApp} from "vue/dist/vue.esm-bundler";
 import mitt from 'mitt';
+import FeedbackComponent from "./components/FeedbackComponent.vue";
 import MessageComponent from "./components/MessageComponent.vue";
 import TopLineComponent from "./components/TopLineComponent.vue";
 import LeftMenuComponent from "./components/LeftMenuComponent.vue";
@@ -16,6 +17,7 @@ import ChatComponent from "./components/ChatComponent.vue";
 
 const app = createApp({
     components: {
+        FeedbackComponent,
         MessageComponent,
         TopLineComponent,
         LeftMenuComponent,

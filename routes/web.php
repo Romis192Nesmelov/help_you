@@ -20,7 +20,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::controller(BaseController::class)->group(function () {
     Route::get('/', 'index')->name('home');
-    Route::get('/about', 'index')->name('about');
+    Route::get('/about', 'aboutUs')->name('about');
+
+    Route::post('/feedback', 'feedback')->name('feedback');
+
     Route::get('/how_does_it_work/{slug?}', 'howDoesItWork')->name('how_does_it_work');
     Route::get('/partners', 'partners')->name('partners');
     Route::get('/prev-url', 'prevUrl')->name('prev_url');

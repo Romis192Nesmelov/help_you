@@ -284,6 +284,11 @@ table {
     height: 65px;
 }
 
+.form-group textarea[name=message] {
+    height: 230px;
+    overflow: auto;
+}
+
 .form-group textarea[name=description_short] {
     height: 90px;
 }

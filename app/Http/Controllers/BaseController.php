@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Http\Requests\Feedback\FeedbackRequest;
 use App\Models\Partner;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -10,6 +11,8 @@ use Illuminate\Support\Facades\Session;
 
 class BaseController extends Controller
 {
+    use HelperTrait;
+
     protected array $data = [];
     protected string $activeMainMenu = '';
     protected string $activeLeftMenu = '';
@@ -18,6 +21,18 @@ class BaseController extends Controller
     public function index() :View
     {
         return $this->showView('home');
+    }
+
+    public function aboutUs(): View
+    {
+        $this->activeMainMenu = 'about';
+        return $this->showView('about_us');
+    }
+
+    public function feedback(FeedbackRequest $request): JsonResponse
+    {
+        $this->sendMessage('feedback', env('MAIL_TO'), null, $request->validated());
+        return response()->json(['message' => trans('mail.thanks_for_your_feedback')],200);
     }
 
     public function howDoesItWork($slug=null) :View
