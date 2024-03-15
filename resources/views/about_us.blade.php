@@ -7,7 +7,7 @@
                 <h1 class="mb-5">О нас</h1>
                 <p>Cras quis congue purus, quis fringilla lorem. Suspendisse lacinia mattis ante, nec mollis magna tincidunt et. Fusce blandit dui metus, vel lacinia enim faucibus id. Ut eget eleifend massa. Nulla efficitur ornare nibh vitae auctor. Morbi ligula diam, elementum ut lorem non, sollicitudin ornare est. Praesent at erat placerat tellus ultrices condimentum. Vivamus mollis feugiat lorem, gravida gravida sem luctus rhoncus.</p>
             </div>
-            <div class="rounded-block half">
+            <div class="rounded-block half d-none d-lg-block">
                 <div class="w-100 image">
                     <img src="{{ asset('images/help.png') }}" />
                 </div>
