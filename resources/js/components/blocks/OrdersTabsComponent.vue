@@ -45,35 +45,40 @@
                         <div v-else-if="chat_mode">
                             <a :href="chat_url + '?id=' + order.id">
                                 <ButtonComponent
-                                    class="btn btn-primary w-50 m-auto"
+                                    class="btn btn-primary w-100 m-auto"
                                     text="Перейти в чат"
                                 ></ButtonComponent>
                             </a>
                         </div>
+
                         <ButtonComponent
-                            class="btn btn-primary w-50 m-auto"
+                            class="btn btn-primary w-100 m-auto"
                             text="Завершить"
                             @click="$emit('closingOrder',order)"
                             v-if="user_id === order.user_id && order.status === 1 && !chat_mode"
                         ></ButtonComponent>
+
                         <ButtonComponent
-                            class="btn btn-primary w-50 m-auto"
+                            class="btn btn-primary w-100 m-auto"
                             text="Возобновить"
                             @click="$emit('resumingOrder',order.id)"
                             v-else-if="user_id === order.user_id && order.status === 0"
                         ></ButtonComponent>
+
                         <div class="w-100 d-flex justify-content-center mt-1" v-else-if="user_id === order.user_id && (order.status === 2 || order.status === 3)">
                             <ButtonComponent
-                                class="btn btn-primary me-1"
+                                class="btn btn-primary w-50 m-auto me-1"
                                 text="Удалить"
                                 @click="$emit('deletingOrder',{'key':tabKey,'id':order.id})"
                             ></ButtonComponent>
-                            <a :href="edit_order_url + '?id=' + order.id">
-                                <ButtonComponent
-                                    class="btn btn-primary"
-                                    text="Редактировать"
-                                ></ButtonComponent>
-                            </a>
+                            <div class="w-50 m-auto">
+                                <a :href="edit_order_url + '?id=' + order.id">
+                                    <ButtonComponent
+                                        class="btn btn-primary w-100"
+                                        text="Редактировать"
+                                    ></ButtonComponent>
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>

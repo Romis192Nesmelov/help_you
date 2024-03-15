@@ -8,7 +8,7 @@
             :allow_change_avatar=0
         ></AvatarComponent>
         <div class="w-100 fs-lg-6 fs-sm-7 ms-3 d-flex flex-column align-items-start">
-            <small v-if="small">
+            <small class="text-start" v-if="small">
                 <UserNameComponent :user="user"></UserNameComponent>
             </small>
             <UserNameComponent :user="user" v-else></UserNameComponent>

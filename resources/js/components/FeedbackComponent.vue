@@ -19,7 +19,7 @@
         @change="checkDisableSubmit"
     ></InputComponent>
     <TextAreaComponent
-        class="mt-4"
+        class="mt-2"
         label="Ваше сообщение"
         name="message"
         placeholder="Введите ваше сообщение"

@@ -50,7 +50,6 @@
     <ModalComponent id="order-closed-modal" head="Заявка успешно закрыта!">
         <div class="text-center">
             <h2 class="text-center mt-3">Выставите рейтинг исполнителя</h2>
-
             <UserPropertiesComponent
                 :user="closingOrderUser"
                 :avatar_coof=0.35
@@ -58,7 +57,6 @@
                 :allow_change_rating=false
                 v-if="closingOrderUser"
             ></UserPropertiesComponent>
-
             <div class="w-100 d-flex justify-content-center">
                 <RatingLineComponent
                     :income_rating=0

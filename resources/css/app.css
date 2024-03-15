@@ -285,7 +285,7 @@ table {
 }
 
 .form-group textarea[name=message] {
-    height: 230px;
+    height: 200px;
     overflow: auto;
 }
 
@@ -420,7 +420,7 @@ select#addresses {
 }
 
 .form-check.small .form-check-input:checked[type=radio] {
-    background-size: 9px;
+    background-size: 8px;
 }
 
 .error {
@@ -465,9 +465,9 @@ textarea {
 button.btn {
     width: 180px;
     height: 40px;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: bold;
-    padding-top: 9px;
+    padding: 3px;
     border: 2px solid #e65639;
     border-radius: 20px;
 }
@@ -1237,7 +1237,6 @@ button.btn > i {
 }
 
 .sub-types-block .form-check {
-    height: 25px;
     margin-bottom: 0;
 }
 
