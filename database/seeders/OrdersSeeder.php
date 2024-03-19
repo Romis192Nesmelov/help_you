@@ -30,7 +30,7 @@ class OrdersSeeder extends Seeder
             'latitude' => 55.529496,
             'longitude' => 37.517940,
             'description_short' => 'Нужно прибраться в квартире и вынести мусор.',
-            'status' => 2
+            'status' => 1
         ]);
 
         OrderUser::create([
