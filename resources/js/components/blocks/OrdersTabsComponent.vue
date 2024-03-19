@@ -23,7 +23,7 @@
                                 <small><a :href="orders_map_url + '?id=' + order.id" title="Перейти на карту">Посмотреть на карте</a></small>
                             </span>
                         </div>
-                        <div class="w-100 text-center mb-1" role="button" @click="$emit('performers',{'performers':order.performers,'orderId':order.id})" v-else>
+                        <div class="w-100 text-center mb-1" role="button" @click="$emit('performers',{'order':order})" v-else>
                             <span class="text-secondary me-1"><small>Исполнителей:</small></span>
                             <i title="Участники" class="orange icon-users4 me-1"></i>
                             <span class="text-secondary"><small>{{ order.performers.length }}</small></span>

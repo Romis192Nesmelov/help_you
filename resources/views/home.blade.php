@@ -8,7 +8,7 @@
                 'addClass' => 'tall black',
                 'head' => trans('content.home_head1'),
                 'content' => [trans('content.home_text_block1'), trans('content.home_text_block2')],
-                'addLink' => '#',
+                'addLink' => route('partners'),
                 'addLinkText' => trans('content.more_about_gifts'),
                 'link' => route('how_does_it_work')
             ])

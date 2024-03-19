@@ -405,6 +405,10 @@ select#addresses {
     overflow: hidden;
 }
 
+select.form-select {
+    overflow-y: auto;
+}
+
 .form-select option {
     margin-bottom: 5px;
 }

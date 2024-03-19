@@ -370,7 +370,7 @@ export default {
                             $.each(self.geoObjectCollection.featureMember, function (k,featureMember) {
                                 self.addresses.push(featureMember.GeoObject.description + ' ' + featureMember.GeoObject.name);
                             });
-                            $('#addresses')[0].size = self.addresses.length + 0.2;
+                            $('#addresses')[0].size = self.addresses.length + 0.9;
                             self.disabledButtons = false;
                             self.changeAddressInSelect();
                         }

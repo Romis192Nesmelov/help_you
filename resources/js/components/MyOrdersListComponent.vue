@@ -32,6 +32,7 @@
                 </td>
                 <td class="order-cell-delete icon align-middle">
                     <ButtonComponent
+                        v-show="showRefuseButton"
                         class="btn btn-primary"
                         text="Отказать"
                         @click="removePerformer(performer.id)"
@@ -189,6 +190,7 @@ export default {
             deletingOrderTab: '',
             removingPerformerId: 0,
             removingPerformerOrderId: 0,
+            showRefuseButton: true,
             performers: [],
             rating: 0,
             activeTab: String,
@@ -267,8 +269,10 @@ export default {
             });
         },
         getPerformers(params) {
-            this.performers = params.performers;
-            this.removingPerformerOrderId = params.orderId;
+            console.log(params);
+            this.performers = params.order.performers;
+            this.removingPerformerOrderId = params.order.id;
+            this.showRefuseButton = params.order.status === 1;
             $('#order-performers-modal').modal('show');
         },
         removePerformer(id) {

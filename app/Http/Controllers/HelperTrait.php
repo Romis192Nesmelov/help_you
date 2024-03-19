@@ -156,7 +156,8 @@ trait HelperTrait
         if ($actionId && !$alreadyAwarded) {
             $incentive = ActionUser::create([
                 'action_id' => $actionId,
-                'user_id' => Auth::id()
+                'user_id' => $userId,
+                'active' => 1
             ]);
             broadcast(new IncentivesEvent('new_incentive', $incentive, $userId));
             if ($user->email && $user->mail_notice) {

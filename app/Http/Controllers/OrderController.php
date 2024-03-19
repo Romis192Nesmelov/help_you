@@ -303,9 +303,13 @@ class OrderController extends BaseController
         return response()->json([],200);
     }
 
+    /**
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
     public function setRating(SetRatingRequest $request): JsonResponse
     {
         $order = Order::find($request->order_id);
+        $this->authorize('owner', $order);
         foreach ($order->performers as $performer) {
             $rating = Rating::where('order_id',$order->id)->where('user_id',$performer->id)->first();
             if ($rating) {
@@ -332,6 +336,7 @@ class OrderController extends BaseController
     {
         $order = Order::find($request->id);
         $this->authorize('owner', $order);
+        OrderUser::where('order_id',$order->id)->delete();
         $order->status = 3;
         $order->save();
 
@@ -365,7 +370,6 @@ class OrderController extends BaseController
     private function removeOrderUnreadMessages($orderId): void
     {
         Message::where('order_id',$orderId)->delete();
-        OrderUser::where('order_id',$orderId)->delete();
         ReadOrder::where('order_id',$orderId)->delete();
         ReadPerformer::where('order_id',$orderId)->delete();
         ReadRemovedPerformer::where('order_id',$orderId)->delete();
