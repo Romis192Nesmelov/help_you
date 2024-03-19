@@ -15,9 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('logo',50);
             $table->string('name');
-            $table->text('about');
-            $table->longText('info');
-            $table->boolean('active');
+            $table->text('about')->nullable();
+            $table->longText('info')->nullable();
             $table->timestamps();
         });
     }

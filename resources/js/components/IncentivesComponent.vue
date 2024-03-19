@@ -11,13 +11,11 @@
                 <div class="row">
                     <div class="col-lg-6 col-sm-12 mb-2" v-for="incentive in incentives" :key="incentive.id">
                         <div class="item-in-list action text-center p-3">
-                            <div>
-                                <div class="fw-bold fs-6">Акция</div>
-                                <div class="lh-sm fs-5">{{ incentive.action.name }}</div>
-                            </div>
-                            <div class="fs-6 fw-bold">{{ getDate(incentive.action.start) + ' - ' + getDate(incentive.action.end) }}</div>
+                            <div class="lh-sm fs-5">{{ incentive.action_full.name }}</div>
+                            <div class="fs-6">Подарок от компании<br><span class="fw-bold text-uppercase">«{{ incentive.action_full.partner.name }}»</span></div>
+                            <div class="fs-6 fw-bold">Дата: {{ getDate(incentive.action_full.start) + ' - ' + getDate(incentive.action_full.end) }}</div>
                             <div class="w-100 d-flex justify-content-center">
-                                <a class="w-50 me-1" :href="incentive_url + '?id=' + incentive.action.id">
+                                <a class="w-50 me-1" :href="incentive_url + '?id=' + incentive.action_full.id">
                                     <ButtonComponent
                                         class="btn btn-primary w-100 m-auto"
                                         text="Подробнее"
@@ -111,6 +109,8 @@ export default {
             axios.get(url).then(function (response) {
                 self.incentives = response.data.data;
                 self.links = response.data.links;
+
+                console.log(self.incentives);
 
                 if (!self.incentives.length) {
                     window.emitter.emit('incentives', false);

@@ -24,13 +24,13 @@ class OrdersSeeder extends Seeder
             'order_type_id' => 1,
             'city_id' => 1,
             'subtype_id' => rand(1,4),
-            'name' => 'Тестовая заяка',
-            'need_performers' => 10,
-            'address' => 'Криворожская улица, 17, подъезд 2, этаж 3, кв. 32',
-            'latitude' => 55.667594,
-            'longitude' => 37.612245,
-            'description_short' => 'Чета с кем-то где-то что-то и когда-то надо срочно сделать, а то край!',
-            'status' => 1
+            'name' => 'Помощь на дому',
+            'need_performers' => 1,
+            'address' => 'Чечёрский проезд д.102 кв.97',
+            'latitude' => 55.529496,
+            'longitude' => 37.517940,
+            'description_short' => 'Нужно прибраться в квартире и вынести мусор.',
+            'status' => 2
         ]);
 
         OrderUser::create([

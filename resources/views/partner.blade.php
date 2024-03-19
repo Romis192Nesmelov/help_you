@@ -12,7 +12,7 @@
             </div>
         </div>
     </div>
-{{--    <div class="mt-4">--}}
-{{--        {!! $partner->info !!}--}}
-{{--    </div>--}}
+    <div class="mt-4">
+        {!! $partner->info !!}
+    </div>
 @endsection

@@ -22,6 +22,11 @@ class ActionUser extends Model
         return $this->belongsTo(Action::class)->select(['id','name']);
     }
 
+    public function actionFull(): BelongsTo
+    {
+        return $this->belongsTo(Action::class,'action_id');
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

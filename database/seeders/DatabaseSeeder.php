@@ -17,14 +17,14 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(UsersSeeder::class);
         $this->call(CitySeeder::class);
-        Partner::factory(13)->create();
         $this->call(OrderTypesSeeder::class);
 //        Order::factory(50)->create();
         $this->call(OrdersSeeder::class);
         $this->call(OrderImagesSeeder::class);
         $this->call(SubscriptionTypesSeeder::class);
         $this->call(MessageKeywordsSeeder::class);
-        Action::factory(20)->create();
+        $this->call(PartnersSeeder::class);
+        $this->call(ActionsSeeder::class);
         $this->call(ActionsUsersSeeder::class);
     }
 }

@@ -1,22 +1,19 @@
 <?php
 
 namespace App\Models;
-
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Action extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
         'name',
         'html',
         'start',
         'end',
-        'rating'
+        'rating',
+        'partner_id'
     ];
 
     public function users(): BelongsToMany
@@ -27,5 +24,10 @@ class Action extends Model
     public function usersAwardedActive(): BelongsToMany
     {
         return $this->belongsToMany(User::class)->wherePivot('active',1);
+    }
+
+    public function partner(): BelongsTo
+    {
+        return $this->belongsTo(Partner::class);
     }
 }
