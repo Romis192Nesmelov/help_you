@@ -48,10 +48,10 @@ class BaseController extends Controller
     {
         $this->activeMainMenu = 'partners';
         if ($request->has('id')) {
-            $this->getItem('partner', new Partner(), $request->id);
+            $this->data['partner'] = Partner::findOrFail($request->id);
             return $this->showView('partner');
         } else {
-            $this->data['partners'] = Partner::where('active',1)->get();
+            $this->data['partners'] = Partner::all();
             return $this->showView('partners');
         }
     }
@@ -82,12 +82,6 @@ class BaseController extends Controller
                 'activeLeftMenu' => $this->activeLeftMenu,
             ]
         ));
-    }
-
-    protected function getItem(string $itemName, Model $model, $id): void
-    {
-        $this->data[$itemName] = $model->findOrFail($id);
-        if (!$this->data[$itemName]->active) abort(404);
     }
 
     protected function processingImage(Request $request, array $fields, string $imageField, string $pathToSave, string $imageName): array
