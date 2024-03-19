@@ -47,13 +47,13 @@ class BaseController extends Controller
     public function partners(Request $request) :View
     {
         $this->activeMainMenu = 'partners';
-//        if ($request->has('id')) {
-//            $this->getItem('partner', new Partner(), $request->id);
-//            return $this->showView('partner');
-//        } else {
+        if ($request->has('id')) {
+            $this->getItem('partner', new Partner(), $request->id);
+            return $this->showView('partner');
+        } else {
             $this->data['partners'] = Partner::where('active',1)->get();
             return $this->showView('partners');
-//        }
+        }
     }
 
     public function prevUrl(): JsonResponse
