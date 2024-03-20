@@ -69,6 +69,19 @@ class UsersSeeder extends Seeder
         foreach ($data as $item) {
             User::create($item);
         }
-        User::factory(10)->create();
+
+        for ($i=1;$i<=15;$i++) {
+            User::create([
+                'name' => 'User'.($i),
+                'family' => 'Test'.($i),
+                'phone' => '+7(926)111-11-'.($i < 10 ? '0'.$i : $i),
+                'born' => '01-01-1970',
+                'email' => 'user'.($i).'@mail.ru',
+                'password' => bcrypt('123456'),
+                'code' => '99-99-99',
+                'active' => 1
+            ]);
+        }
+//        User::factory(10)->create();
     }
 }
