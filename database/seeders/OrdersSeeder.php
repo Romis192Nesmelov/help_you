@@ -16,11 +16,11 @@ class OrdersSeeder extends Seeder
      */
     public function run(): void
     {
-        $im = User::where('phone','+7(926)247-77-25')->select('id')->first();
+        $me = User::where('phone','+7(926)247-77-25')->select('id')->first();
         $anotherUser = User::where('phone','+7(958)815-85-65')->select('id')->first();
 
         $order = Order::create([
-            'user_id' => $im->id,
+            'user_id' => $me->id,
             'order_type_id' => 1,
             'city_id' => 1,
             'subtype_id' => rand(1,4),

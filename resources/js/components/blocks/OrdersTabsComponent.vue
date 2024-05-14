@@ -1,5 +1,5 @@
 <template>
-    <div v-for="(tab, tabKey) in tabs" :key="tabKey" v-show="tabKey === active_tab">
+    <div :id="'tab-' + tabKey" v-for="(tab, tabKey) in tabs" :key="tabKey" v-show="tabKey === active_tab">
         <div class="h-100 d-flex flex-column justify-content-between" v-if="tab.orders.length">
             <div class="row">
                 <div class="col-lg-6 col-sm-12 mb-1" v-for="order in tab.orders" :key="order.id">

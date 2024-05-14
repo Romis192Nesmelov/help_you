@@ -61,7 +61,7 @@ export default {
     },
     created() {
         this.userId = parseInt(this.user_id);
-        this.getIncentives(this.get_incentives_url);
+        this.getIncentives(this.get_incentives_url, false);
 
         window.Echo.private('incentive_' + this.userId).listen('.incentive', res => {
             if (res.notice === 'remove_incentive') {
@@ -72,8 +72,8 @@ export default {
                         return false;
                     }
                 });
-                if (index !== null) this.getIncentives(this.get_incentives_url);
-            } else if (res.notice === 'new_incentive') this.getIncentives(this.get_incentives_url);
+                if (index !== null) this.getIncentives(this.get_incentives_url, false);
+            } else if (res.notice === 'new_incentive') this.getIncentives(this.get_incentives_url, false);
         });
     },
     data() {
@@ -101,24 +101,23 @@ export default {
                 _token: window.tokenField,
                 id: self.deletingActionId
             }).then(function (response) {
-                // self.getIncentives(self.incentives_url);
+                // self.getIncentives(self.incentives_url, false);
             });
         },
-        getIncentives(url) {
+        getIncentives(url, callBack) {
             let self = this;
             axios.get(url).then(function (response) {
                 self.incentives = response.data.data;
                 self.links = response.data.links;
-
-                console.log(self.incentives);
-
-                if (!self.incentives.length) {
-                    window.emitter.emit('incentives', false);
-                }
+                if (!self.incentives.length) window.emitter.emit('incentives', false);
+                if (callBack) callBack();
             });
         },
         changePage(params) {
-            this.getIncentives(params.url);
+            let contentBlock = $('.without-tabs');
+            contentBlock.fadeOut(() => {
+                this.getIncentives(params.url, () => {activeTab.fadeIn();});
+            });
         },
         getDate(date) {
             return new Date(date).toLocaleDateString('ru-RU');

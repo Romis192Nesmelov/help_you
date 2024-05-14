@@ -210,20 +210,27 @@ export default {
         'resume_image': String,
     },
     methods: {
-        getOrders(url, key, emitFlag) {
+        getOrders(url, key, emitFlag, callBack) {
             let self = this;
             axios.get(url).then(function (response) {
                 self.tabs[key].counter = response.data.orders.total;
                 self.tabs[key].orders = response.data.orders.data;
                 self.tabs[key].links = response.data.orders.links;
                 if (emitFlag) window.emitter.emit('refresh-complete');
+                if (callBack) callBack();
             });
         },
         changePage(params) {
-            this.getOrders(params.url, params.key, false);
+            let activeTab = $('#tab-' + this.activeTab);
+            activeTab.fadeOut(() => {
+                this.getOrders(params.url, params.key, false, () => {activeTab.fadeIn();});
+            });
         },
         changeTab(key) {
-            this.activeTab = key;
+            $('#tab-' + this.activeTab).fadeOut(() => {
+                this.activeTab = key;
+                $('#tab-' + this.activeTab).fadeIn();
+            });
         },
         closeOrder(order) {
             this.closingOrderId = order.id;
@@ -308,7 +315,7 @@ export default {
         refreshOrders() {
             let self = this;
             $.each(self.tabs, function (key) {
-                self.getOrders(self.ordersUrls[key], key,true);
+                self.getOrders(self.ordersUrls[key], key,true, false);
             });
         },
         getOrderIndex(tabKey, searchedId) {
