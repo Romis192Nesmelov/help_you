@@ -75,15 +75,21 @@
                 </div>
             </div>
             <div class="inputs-step" v-show="currentStep === 3">
-                <InputComponent
-                    type="text"
+                <TextAreaComponent
                     name="address"
-                    :error="errors['address']"
+                    max="255"
+                    :value="address"
                     v-model:value="address"
-                    @change="errors['address']=null"
-                    v-if="!addresses.length"
-                ></InputComponent>
-                <select id="addresses" class="form-select" v-model="featureMemberIndex" v-show="addresses.length">
+                    :error="errors['address']"
+                    @keyup="changeAddressInInput"
+                ></TextAreaComponent>
+                <select
+                    id="addresses"
+                    class="form-select"
+                    v-model="featureMemberIndex"
+                    v-show="addresses.length"
+                    @change="changeAddressInSelect"
+                >
                     <option v-for="(address, k) in addresses" :key="'address-' + k" :value="k">{{ address }}</option>
                 </select>
             </div>
@@ -221,13 +227,6 @@ export default {
                 });
             }
         });
-
-        setTimeout(() => {
-            $('#addresses').change(function () {
-                self.featureMemberIndex = $(this).val();
-                self.showPlaceMark();
-            });
-        }, 500);
     },
     props: {
         'next_step_url': String,
@@ -300,10 +299,7 @@ export default {
         nextStep() {
             if (this.currentStep === 3) {
                 if (!this.address) this.errors['address'] = 'Укажите адрес!';
-                else {
-                    console.log(1111);
-                    this.getApiPlaceMark();
-                }
+                else this.getApiPlaceMark();
             } else {
                 let self = this,
                     formData = new FormData();
@@ -374,23 +370,17 @@ export default {
                             $.each(self.geoObjectCollection.featureMember, function (k,featureMember) {
                                 self.addresses.push(featureMember.GeoObject.description + ' ' + featureMember.GeoObject.name);
                             });
-                            let select = $('#addresses');
-                            select.show().focus().click();
-                            select[0].size = self.addresses.length;
+                            $('#addresses')[0].size = self.addresses.length + 0.9;
                             self.disabledButtons = false;
-                            self.showPlaceMark();
+                            self.changeAddressInSelect();
                         }
                     });
             } else {
-                self.addresses = [];
                 self.showPlaceMark();
                 self.setPlaceMark();
             }
         },
         setPlaceMark() {
-            let featureMember = this.geoObjectCollection.featureMember[this.featureMemberIndex];
-            this.address = featureMember.GeoObject.description + ' ' + featureMember.GeoObject.name;
-
             let fields = {
                 '_token': window.tokenField,
                 'address': this.address,
@@ -407,6 +397,17 @@ export default {
                         this.disabledButtons = false;
                     }, 1500);
                 });
+        },
+        changeAddressInInput() {
+            this.errors['address'] = null;
+            this.geoObjectCollection = null;
+            this.addresses = [];
+        },
+        changeAddressInSelect() {
+            this.errors['address'] = null;
+            let featureMember = this.geoObjectCollection.featureMember[this.featureMemberIndex];
+            this.address = featureMember.GeoObject.description + ' ' + featureMember.GeoObject.name;
+            this.showPlaceMark();
         },
         showPlaceMark() {
             if (window.placemark) window.myMap.geoObjects.remove(window.placemark);

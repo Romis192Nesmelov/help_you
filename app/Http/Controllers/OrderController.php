@@ -46,6 +46,22 @@ class OrderController extends BaseController
         return $this->showView('orders');
     }
 
+    public function getOrders(): JsonResponse
+    {
+        return response()->json(OrdersResource::make([
+            'orders' => Order::query()
+                ->default()
+                ->filtered()
+                ->searched()
+                ->with(['orderType','subType','images','user.ratings','performers'])
+                ->get(),
+            'subscriptions' => Subscription::query()
+                ->with('orders')
+                ->default()
+                ->get()
+        ])->resolve(), 200);
+    }
+
     /**
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
@@ -73,49 +89,6 @@ class OrderController extends BaseController
         $readOrder->read = true;
         $readOrder->save();
         return response()->json([],200);
-    }
-
-    public function getOrdersNews(): JsonResponse
-    {
-        return response()->json([
-            'news_subscriptions' => ReadOrder::query()
-                ->whereIn('subscription_id',Subscription::query()->default()->pluck('id')->toArray())
-                ->where('read',null)
-                ->with('order.user')
-                ->get(),
-            'news_performers' => ReadPerformer::query()
-                ->whereIn('order_id',Order::where('user_id',Auth::id())->pluck('id')->toArray())
-                ->where('read',null)
-                ->with('order')
-                ->with('user')
-                ->get(),
-            'news_removed_performers' => ReadRemovedPerformer::query()
-                ->where('user_id', Auth::id())
-                ->where('read', null)
-                ->with('order')
-                ->get(),
-            'news_status_orders' => ReadStatusOrder::query()
-                ->whereIn('order_id',Order::where('user_id',Auth::id())->pluck('id')->toArray())
-                ->where('read',null)
-                ->with('order')
-                ->get()
-        ]);
-    }
-
-    public function getOrders(): JsonResponse
-    {
-        return response()->json(OrdersResource::make([
-            'orders' => Order::query()
-                ->default()
-                ->filtered()
-                ->searched()
-                ->with(['orderType','subType','images','user.ratings','performers'])
-                ->get(),
-            'subscriptions' => Subscription::query()
-                ->with('orders')
-                ->default()
-                ->get()
-        ])->resolve(), 200);
     }
 
     public function getPreview(): JsonResponse
@@ -155,7 +128,7 @@ class OrderController extends BaseController
         ]);
 
         broadcast(new NotificationEvent('remove_performer', $order, $request->user_id));
-        $this->mailNotice($order, $performer, 'remove_performer_notice');
+        $this->mailOrderNotice($order, $performer, 'remove_performer_notice');
 
         return response()->json(['message' => trans('content.the_performer_is_removed'), 'performers_count' => $order->performers->count()],200);
     }
@@ -183,11 +156,11 @@ class OrderController extends BaseController
             $order->refresh();
 
             broadcast(new NotificationEvent('new_performer', $order, $order->user_id));
-            $this->mailNotice($order, $order->userCredentials, 'new_performer_notice');
+            $this->mailOrderNotice($order, $order->userCredentials, 'new_performer_notice');
             if (!$order->messages->count()) $this->chatMessage($order, trans('content.new_chat_message'));
 
             broadcast(new NotificationEvent('new_order_status', $order, $order->user_id));
-            $this->mailNotice($order, $order->userCredentials, 'new_order_status_notice');
+            $this->mailOrderNotice($order, $order->userCredentials, 'new_order_status_notice');
 
             broadcast(new OrderEvent('new_order_status', $order));
 
@@ -330,9 +303,13 @@ class OrderController extends BaseController
         return response()->json([],200);
     }
 
+    /**
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
     public function setRating(SetRatingRequest $request): JsonResponse
     {
         $order = Order::find($request->order_id);
+        $this->authorize('owner', $order);
         foreach ($order->performers as $performer) {
             $rating = Rating::where('order_id',$order->id)->where('user_id',$performer->id)->first();
             if ($rating) {
@@ -345,6 +322,9 @@ class OrderController extends BaseController
                     'user_id' => $performer->id
                 ]);
             }
+
+            //Check and set incentive
+            if ($request->rating >= 3) $this->setIncentive(1, $performer->id);
         }
         return response()->json([],200);
     }
@@ -356,6 +336,7 @@ class OrderController extends BaseController
     {
         $order = Order::find($request->id);
         $this->authorize('owner', $order);
+        OrderUser::where('order_id',$order->id)->delete();
         $order->status = 3;
         $order->save();
 
@@ -382,14 +363,13 @@ class OrderController extends BaseController
 
             /*TODO: enable after approving */
 //            broadcast(new NotificationEvent('new_order_in_subscription', $order, $subscription->subscriber_id));
-//            $this->mailNotice($order, $subscription->subscriber, 'new_order_in_subscription');
+//            $this->mailOrderNotice($order, $subscription->subscriber, 'new_order_in_subscription');
         }
     }
 
     private function removeOrderUnreadMessages($orderId): void
     {
         Message::where('order_id',$orderId)->delete();
-        OrderUser::where('order_id',$orderId)->delete();
         ReadOrder::where('order_id',$orderId)->delete();
         ReadPerformer::where('order_id',$orderId)->delete();
         ReadRemovedPerformer::where('order_id',$orderId)->delete();

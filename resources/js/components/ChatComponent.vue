@@ -25,7 +25,7 @@
             <OrderPropertiesComponent
                 :name="chatOrder.name"
                 :type="chatOrder.order_type.name"
-                :subtype="chatOrder.sub_type.name"
+                :subtype="chatOrder.sub_type ? chatOrder.sub_type.name : null"
                 :address="chatOrder.address"
                 :description_short="chatOrder.description_short"
             ></OrderPropertiesComponent>

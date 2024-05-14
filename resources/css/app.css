@@ -235,8 +235,13 @@ table {
     color: grey;
 }
 
+.form-group input.has-icon,
 .form-group.text-area.has-icon textarea {
-    padding-right: 50px;
+    padding-right: 40px;
+}
+
+.form-group input.has-icon:not[list] {
+    padding-right: 35px;
 }
 
 .form-group.text-area i {
@@ -275,12 +280,26 @@ table {
     overflow: hidden;
 }
 
+.form-group textarea[name=address] {
+    height: 65px;
+}
+
+.form-group textarea[name=message] {
+    height: 200px;
+    overflow: auto;
+}
+
 .form-group textarea[name=description_short] {
     height: 90px;
 }
 
 .form-group textarea[name=description_full] {
     height: 230px;
+}
+
+select#addresses {
+    margin-top: 20px;
+    padding: 5px 0;
 }
 
 .item-in-list {
@@ -366,6 +385,10 @@ table {
     cursor: pointer;
 }
 
+.action {
+    height: 200px;
+}
+
 .form-group input[type=number] {
     text-align: center;
     font-weight: bold;
@@ -378,12 +401,12 @@ table {
     cursor: pointer;
 }
 
-.form-group input.has-icon:not[list] {
-    padding-right: 35px;
-}
-
 .form-select {
     overflow: hidden;
+}
+
+select.form-select {
+    overflow-y: auto;
 }
 
 .form-select option {
@@ -401,7 +424,7 @@ table {
 }
 
 .form-check.small .form-check-input:checked[type=radio] {
-    background-size: 9px;
+    background-size: 8px;
 }
 
 .error {
@@ -446,9 +469,9 @@ textarea {
 button.btn {
     width: 180px;
     height: 40px;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: bold;
-    padding-top: 9px;
+    padding: 3px;
     border: 2px solid #e65639;
     border-radius: 20px;
 }
@@ -544,9 +567,9 @@ button.btn > i {
     margin-left: 25px;
 }
 
-#top-line .buttons-block {
-    width: 440px;
-}
+/*#top-line .buttons-block {*/
+/*    width: 440px;*/
+/*}*/
 
 #top-line .buttons-block.on-root {
     width: 250px;
@@ -561,10 +584,6 @@ button.btn > i {
     margin-top: -5px;
     margin-left: -5px;
     position: absolute;
-}
-
-#right-button-block {
-    width: 250px;
 }
 
 .main-nav {
@@ -647,6 +666,10 @@ button.btn > i {
 
 .rounded-block.tall .h-100 {
     height: 630px !important;
+}
+
+.rounded-block.tall .h-100.without-tabs {
+    height: 700px !important;
 }
 
 #map-container {
@@ -739,6 +762,16 @@ button.btn > i {
     height: 400px;
 }
 
+.rounded-block.half.how-does-it-work img {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    height: 270px;
+}
+
+.rounded-block.half.how-does-it-work p {
+    line-height: 1.3em;
+}
+
 .rounded-block.one-quarter {
     height: 200px;
     background-color: #f2ece4;
@@ -759,7 +792,7 @@ button.btn > i {
     background-color: #e9d6be;
 }
 
-.rounded-block h1 > div {
+.rounded-block:not(.how-does-it-work) h1 > div {
     width: 50%;
 }
 
@@ -778,7 +811,7 @@ button.btn > i {
     margin-right: 0 !important;
 }
 
-.rounded-block.black h1 {
+.rounded-block.black:not(.how-does-it-work) h1 {
     color: white;
     border-color: white;
 }
@@ -1208,7 +1241,6 @@ button.btn > i {
 }
 
 .sub-types-block .form-check {
-    height: 25px;
     margin-bottom: 0;
 }
 
@@ -1269,6 +1301,11 @@ button.btn > i {
         min-height: auto;
         height: auto;
         margin-bottom: 25px;
+    }
+
+    .rounded-block.tall .h-100,
+    .rounded-block.tall .h-100.without-tabs {
+        height: auto !important;
     }
 
     .rounded-block.half,

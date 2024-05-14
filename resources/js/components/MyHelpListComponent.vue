@@ -44,9 +44,13 @@ export default {
                 if (orderIndex !== null) self.tabs.active.orders[orderIndex].performers = res.performers;
                 else self.refreshOrders();
 
-                axios.get(self.read_unread_by_performer).then(function (response) {
+                if (res.notice !== 'remove_performer') {
+                    axios.get(self.read_unread_by_performer).then(function (response) {
+                        window.emitter.emit('read-unread-by-my-help');
+                    });
+                } else {
                     window.emitter.emit('read-unread-by-my-help');
-                });
+                }
             }
         });
     },

@@ -8,7 +8,7 @@
         <div class="col-12 col-md-6 col-lg-10">
             <div class="rounded-block partner">
                 <h2>{{ trans('content.info_about_company') }}</h2>
-                <p>{{ $partner->about }}</p>
+                <h1>{{ $partner->name }}</h1>
             </div>
         </div>
     </div>

@@ -21,3 +21,7 @@ Broadcast::channel('chat_{id}', function ($user, $id) {
 Broadcast::channel('notice_{id}', function ($user, $id) {
     return (int) $user->id === (int) $id;
 });
+
+Broadcast::channel('incentive_{id}', function ($user, $id) {
+    return (int) $user->id === (int) $id;
+});

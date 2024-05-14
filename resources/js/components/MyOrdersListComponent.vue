@@ -9,7 +9,7 @@
         <ModalPairButtonsComponent @click-yes="resumingOrder"></ModalPairButtonsComponent>
     </ModalComponent>
 
-    <ModalComponent id="order-resumed-modal" head="Заявка возобновлена!">
+    <ModalComponent id="order-resumed-modal" head="Ваша заявка снова на модерации!">
         <img class="w-100" :src="resume_image" />
     </ModalComponent>
 
@@ -32,6 +32,7 @@
                 </td>
                 <td class="order-cell-delete icon align-middle">
                     <ButtonComponent
+                        v-show="showRefuseButton"
                         class="btn btn-primary"
                         text="Отказать"
                         @click="removePerformer(performer.id)"
@@ -50,7 +51,6 @@
     <ModalComponent id="order-closed-modal" head="Заявка успешно закрыта!">
         <div class="text-center">
             <h2 class="text-center mt-3">Выставите рейтинг исполнителя</h2>
-
             <UserPropertiesComponent
                 :user="closingOrderUser"
                 :avatar_coof=0.35
@@ -58,7 +58,6 @@
                 :allow_change_rating=false
                 v-if="closingOrderUser"
             ></UserPropertiesComponent>
-
             <div class="w-100 d-flex justify-content-center">
                 <RatingLineComponent
                     :income_rating=0
@@ -191,6 +190,7 @@ export default {
             deletingOrderTab: '',
             removingPerformerId: 0,
             removingPerformerOrderId: 0,
+            showRefuseButton: true,
             performers: [],
             rating: 0,
             activeTab: String,
@@ -210,31 +210,24 @@ export default {
         'resume_image': String,
     },
     methods: {
-        getOrders(url,key) {
+        getOrders(url, key, emitFlag) {
             let self = this;
             axios.get(url).then(function (response) {
                 self.tabs[key].counter = response.data.orders.total;
                 self.tabs[key].orders = response.data.orders.data;
                 self.tabs[key].links = response.data.orders.links;
-                window.emitter.emit('refresh-complete');
+                if (emitFlag) window.emitter.emit('refresh-complete');
             });
         },
         changePage(params) {
-            let self = this;
-            if (params.url) {
-                axios.get(params.url).then(function (response) {
-                    self.tabs[params.key].counter = response.data.orders.total;
-                    self.tabs[params.key].orders = response.data.orders.data;
-                    self.tabs[params.key].links = response.data.orders.links;
-                });
-            }
+            this.getOrders(params.url, params.key, false);
         },
         changeTab(key) {
             this.activeTab = key;
         },
         closeOrder(order) {
             this.closingOrderId = order.id;
-            this.closingOrderUser = order.user;
+            this.closingOrderUser = order.performers[0];
             $('#order-closing-confirm-modal').modal('show');
         },
         closingOrder() {
@@ -276,8 +269,10 @@ export default {
             });
         },
         getPerformers(params) {
-            this.performers = params.performers;
-            this.removingPerformerOrderId = params.orderId;
+            console.log(params);
+            this.performers = params.order.performers;
+            this.removingPerformerOrderId = params.order.id;
+            this.showRefuseButton = params.order.status === 1;
             $('#order-performers-modal').modal('show');
         },
         removePerformer(id) {
@@ -313,7 +308,7 @@ export default {
         refreshOrders() {
             let self = this;
             $.each(self.tabs, function (key) {
-                self.getOrders(self.ordersUrls[key],key);
+                self.getOrders(self.ordersUrls[key], key,true);
             });
         },
         getOrderIndex(tabKey, searchedId) {

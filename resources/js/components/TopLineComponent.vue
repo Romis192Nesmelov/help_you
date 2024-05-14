@@ -19,15 +19,14 @@
             </button>
             <div class="collapse navbar-collapse" id="navbar-main-nav">
                 <ul class="navbar-nav">
-                    <top-menu-item-component
-                        v-if="authCheck"
-                        key="messages"
-                        :is_active=false
-                        add_class="d-block d-lg-none"
-                        :url="messages_url"
-                        name="messages"
-                    ></top-menu-item-component>
-
+<!--                    <top-menu-item-component-->
+<!--                        v-if="authCheck"-->
+<!--                        key="messages"-->
+<!--                        :is_active=false-->
+<!--                        add_class="d-block d-lg-none"-->
+<!--                        :url="messages_url"-->
+<!--                        name="Сообщения"-->
+<!--                    ></top-menu-item-component>-->
                     <top-menu-item-component
                         v-for="menu in this.mainMenu"
                         :key="menu.key"
@@ -36,7 +35,6 @@
                         :url="menu.url"
                         :name="menu.name"
                     ></top-menu-item-component>
-
                     <top-menu-item-component
                         v-if="authCheck"
                         :is_active=false
@@ -44,6 +42,14 @@
                         add_class="d-block d-lg-none"
                         :url="new_order_url"
                         name="Создать заявку"
+                    ></top-menu-item-component>
+                    <top-menu-item-component
+                        v-if="authCheck"
+                        :is_active=false
+                        key="orders"
+                        add_class="d-block d-lg-none"
+                        :url="orders_url"
+                        name="Оказать помощь"
                     ></top-menu-item-component>
                 </ul>
             </div>
@@ -68,7 +74,7 @@
         <div id="right-button-block" :class="'buttons-block d-none d-lg-flex align-items-center justify-content-'+(authCheck ? 'between' : 'end')+(onRoot ? ' on-root' : '')">
             <a
                 id="navbar-dropdown-messages"
-                :class="'nav-link'+(hasMessages ? ' dropdown-toggle' : '')"
+                :class="'ms-2 me-2'+(hasMessages ? ' dropdown-toggle' : '')"
                 role="button"
                 :data-bs-toggle="hasMessages ? 'dropdown' : ''"
                 aria-expanded="false"
@@ -80,6 +86,11 @@
             </a>
             <div class="dropdown-menu" aria-labelledby="navbar-dropdown-messages" v-show="authCheck && hasMessages">
                 <ul id="dropdown">
+                    <li v-for="(news, id) in newsIncentives" :key="id">
+                        <a :href="incentives_url + '?id=' + news.action.id">У вас новая награда:</a><br>
+                        Акция «{{ news.action.name }}»
+                        <hr>
+                    </li>
                     <li v-for="(message, id) in newsMessages" :key="id">
                         Новых сообщений: <span class="counter">{{ message.count }}</span><br>
                         <a :href="chat_url+'?id=' + message.order.id">в чате по заявке «{{ message.order.name }}»</a>
@@ -108,18 +119,23 @@
                 </ul>
             </div>
 
-            <a :href="new_order_url" v-if="authCheck && !onRoot">
-                <ButtonComponent
-                    class_name="btn btn-secondary"
-                    icon="icon-magazine"
-                    text="Создать заявку"
-                ></ButtonComponent>
+            <a class="ms-2 me-2" :href="new_order_url" v-if="authCheck && !onRoot">
+                <i class="icon-add-to-list"></i>
+<!--                <ButtonComponent-->
+<!--                    class_name="btn btn-secondary"-->
+<!--                    icon="icon-magazine"-->
+<!--                    text="Создать заявку"-->
+<!--                ></ButtonComponent>-->
+            </a>
+
+            <a class="ms-2 me-2" :href="orders_url" v-if="authCheck && !onRoot">
+                <i class="icon-map"></i>
             </a>
 
             <a :href="account_change_url" v-if="authCheck">
                 <ButtonComponent
                     id="account-button"
-                    class_name="btn btn-secondary"
+                    class_name="btn btn-secondary ms-3"
                     icon="icon-user-lock"
                     text="Личный кабинет"
                 ></ButtonComponent>
@@ -158,7 +174,7 @@ export default {
 
         if (this.authCheck) {
             this.getNewsMessages();
-            this.getNewsOrders();
+            this.getNews();
             this.listenEvents();
         }
         this.onRoot = parseInt(this.on_root);
@@ -170,6 +186,7 @@ export default {
             onRoot: Number,
             userId: 0,
             mainMenu: {},
+            newsIncentives: [],
             newsMessages: [],
             newsSubscriptions: [],
             newsPerformers: [],
@@ -183,7 +200,7 @@ export default {
             this.userId = id;
             this.authCheck = true;
             this.getNewsMessages();
-            this.getNewsOrders();
+            this.getNews();
             this.listenEvents();
         },
         getNewsMessages() {
@@ -196,9 +213,14 @@ export default {
                 }
             });
         },
-        getNewsOrders() {
+        getNews() {
             let self = this;
-            axios.get(this.get_orders_new_url).then(function (response) {
+            axios.get(this.get_news_url).then(function (response) {
+                if (response.data.news_incentive.length) {
+                    self.newsIncentives = response.data.news_incentive;
+                    self.setEmitter('incentives',true);
+                    self.hasMessages = true;
+                }
                 if (response.data.news_subscriptions.length) {
                     self.newsSubscriptions = response.data.news_subscriptions;
                     self.setEmitter('my-subscriptions',true);
@@ -226,6 +248,22 @@ export default {
             let self = this,
                 eventsFlag = false,
                 key = false;
+
+            window.Echo.private('incentive_' + this.userId).listen('.incentive', res => {
+                if (res.notice === 'remove_incentive') {
+                    key = self.findIncentive(res.incentive.id);
+                    if (key !== false) {
+                        self.newsIncentives.splice(key,1);
+                        self.setEmitter('incentives',self.newsIncentives.length);
+                        self.setHasMessages();
+                    }
+                } else if (res.notice === 'new_incentive') {
+                    self.newsIncentives.push(res);
+                    self.setEmitter('incentives',true);
+                    self.hasMessages = true;
+                    self.bellAlert(true);
+                }
+            });
 
             window.Echo.private('notice_' + this.userId).listen('.notice', res => {
                 switch (res.notice) {
@@ -353,12 +391,23 @@ export default {
                 this.newsSubscriptions.length ||
                 this.newsPerformers.length ||
                 this.newsStatusOrders.length ||
-                this.newsRemovedPerformers.length;
+                this.newsRemovedPerformers.length ||
+                this.newsIncentives.length;
         },
         findOrder(newsArr, orderId) {
             let key = false;
             $.each(newsArr, function (k,news) {
                 if (news.order.id === orderId) {
+                    key = k;
+                    return false;
+                }
+            });
+            return key;
+        },
+        findIncentive(incentiveId) {
+            let key = false;
+            $.each(this.newsIncentives, function (k,news) {
+                if (news.id === incentiveId) {
                     key = k;
                     return false;
                 }
@@ -395,11 +444,11 @@ export default {
         'active_main_menu': String,
         'get_unread_messages_url': String,
         'chat_url': String,
-        'get_orders_new_url': String,
+        'get_news_url': String,
         'my_orders_url': String,
         'my_help_url': String,
-        'order_statuses': String,
-        'bell_sound': String
+        'incentives_url': String,
+        'order_statuses': String
     },
 }
 </script>

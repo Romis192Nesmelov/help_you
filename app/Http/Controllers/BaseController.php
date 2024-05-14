@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Http\Requests\Feedback\FeedbackRequest;
 use App\Models\Partner;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -10,24 +11,47 @@ use Illuminate\Support\Facades\Session;
 
 class BaseController extends Controller
 {
+    use HelperTrait;
+
     protected array $data = [];
     protected string $activeMainMenu = '';
     protected string $activeLeftMenu = '';
-    protected string $activeSubMenu = '';
+//    protected string $activeSubMenu = '';
 
     public function index() :View
     {
         return $this->showView('home');
     }
 
+    public function aboutUs(): View
+    {
+        $this->activeMainMenu = 'about';
+        return $this->showView('about_us');
+    }
+
+    public function feedback(FeedbackRequest $request): JsonResponse
+    {
+        $this->sendMessage('feedback', env('MAIL_TO'), null, $request->validated());
+        return response()->json(['message' => trans('mail.thanks_for_your_feedback')],200);
+    }
+
+    public function howDoesItWork($slug=null) :View
+    {
+        $this->activeMainMenu = 'how_does_it_work';
+        if ($slug) {
+            if (!in_array($slug,['who-needs-help','who-wants-to-help'])) abort(404);
+            return $this->showView(str_replace('-','_',$slug));
+        } else return $this->showView('how_does_it_work');
+    }
+
     public function partners(Request $request) :View
     {
         $this->activeMainMenu = 'partners';
         if ($request->has('id')) {
-            $this->getItem('partner', new Partner(), $request->id);
+            $this->data['partner'] = Partner::findOrFail($request->id);
             return $this->showView('partner');
         } else {
-            $this->data['partners'] = Partner::where('active',1)->get();
+            $this->data['partners'] = Partner::all();
             return $this->showView('partners');
         }
     }
@@ -58,12 +82,6 @@ class BaseController extends Controller
                 'activeLeftMenu' => $this->activeLeftMenu,
             ]
         ));
-    }
-
-    protected function getItem(string $itemName, Model $model, $id): void
-    {
-        $this->data[$itemName] = $model->findOrFail($id);
-        if (!$this->data[$itemName]->active) abort(404);
     }
 
     protected function processingImage(Request $request, array $fields, string $imageField, string $pathToSave, string $imageName): array

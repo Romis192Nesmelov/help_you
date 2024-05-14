@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\ApiController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -17,5 +16,3 @@ use Illuminate\Support\Facades\Route;
 //Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //    return $request->user();
 //});
-
-Route::post('/get-points', [ApiController::class, 'getPoints'])->name('get_points');

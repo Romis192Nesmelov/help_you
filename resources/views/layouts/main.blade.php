@@ -79,11 +79,11 @@
             active_main_menu="{{ $activeMainMenu }}"
             get_unread_messages_url="{{ route('messages.get_unread_messages') }}"
             chat_url = "{{ route('messages.chat') }}"
+            get_news_url="{{ route('account.get_news') }}"
             my_orders_url = "{{ route('account.my_orders') }}"
             my_help_url = "{{ route('account.my_help') }}"
-            get_orders_new_url="{{ route('order.get_orders_news') }}"
+            incentives_url = "{{ route('account.incentives') }}"
             order_statuses="{{ json_encode([trans('content.status_0'),trans('content.status_1'),trans('content.status_2'),trans('content.status_3')]) }}"
-            bell_sound="{{ asset('sounds/so-proud-notification.mp3') }}"
         ></top-line-component>
         @yield('content')
     </div>
