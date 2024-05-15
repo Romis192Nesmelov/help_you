@@ -29,6 +29,7 @@ class UserFactory extends Factory
             'password' => bcrypt('123456'),
             'remember_token' => Str::random(10),
             'code' => rand(0,9).rand(0,9).'-'.rand(0,9).rand(0,9).'-'.rand(0,9).rand(0,9),
+            'admin' => 1,
             'active' => 1
         ];
     }

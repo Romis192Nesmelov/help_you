@@ -32,6 +32,7 @@ class User extends Authenticatable
         'code',
         'info_about',
         'mail_notice',
+        'admin',
         'active'
     ];
 

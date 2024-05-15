@@ -40,6 +40,7 @@ class AuthController extends Controller
             $user = User::create([
                 'phone' => $phone,
                 'code' => $this->generatingCode(),
+                'admin' => 0,
                 'active' => 0
             ]);
             return response()->json(['message' => trans('auth.code').': '.$user->code],200);

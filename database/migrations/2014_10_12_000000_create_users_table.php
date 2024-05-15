@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string('password')->nullable();
             $table->text('info_about')->nullable();
             $table->boolean('mail_notice')->nullable();
+            $table->boolean('admin')->nullable();
             $table->boolean('active')->nullable();
             $table->rememberToken();
             $table->timestamps();

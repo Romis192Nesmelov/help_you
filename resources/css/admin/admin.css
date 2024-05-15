@@ -1,0 +1,248 @@
+/*.cke_contents {*/
+/*    height: 700px !important;*/
+/*}*/
+
+:root {
+    --main-color: #166dba;
+    --second-color: #738aa3;
+}
+
+.text-warning-700,
+.text-danger-800 {
+    font-weight: bolder;
+}
+
+.page-title i {
+    margin: 0 5px;
+}
+
+.page-title i:first-child {
+    margin-left: 0;
+}
+
+.id {
+    width: 20px;
+    text-align: center;
+}
+
+button i {
+    margin-right: 5px;
+}
+
+.avatar.cir {
+    width: 40px;
+    min-width: 40px;
+    height: 40px;
+    margin: auto;
+    overflow: hidden;
+    position: relative;
+    border-radius: 50%;
+    border: 1px solid #595A5C;
+    background-position: center center;
+    background-size: 100%;
+    background-repeat: no-repeat;
+}
+
+th.arrange {
+    padding: 0 !important;
+    background-color: #f3f3f3;
+}
+
+th.arrange i {
+    cursor: pointer;
+}
+
+td.image-cell {
+    width: 10%;
+    padding: 5px;
+}
+
+th.tools,
+td.tools {
+    width: 70px;
+    padding: 0 10px;
+    text-align: center;
+}
+
+td.tools i {
+    margin-left: 10px;
+}
+
+td.tools i:first-child {
+    margin-left: 0;
+}
+
+.form-group {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+.form-group.name input,
+.form-group.name select {
+    height: 37px;
+    font-size: 17px;
+}
+
+.form-group input.has-icon {
+    padding-left: 35px;
+}
+
+.form-group i:not(.icon-file-plus) {
+    position: absolute;
+    font-size: 13px;
+    top: 16px;
+    left: 7px;
+    transform: translateY(-50%);
+    color: grey;
+}
+
+.form-group.number i {
+    font-size: 20px;
+    top: 24px;
+}
+
+.form-group.number.has-label i {
+    top: 50px;
+}
+
+.form-group.has-label i {
+    top: 45px;
+}
+
+div.error {
+    color: red;
+}
+
+div.error.image {
+    border: none;
+}
+
+.form-group.error .uploader {
+    border: 1px solid red;
+}
+
+input.error,
+textarea.error,
+select.error {
+    color: red !important;
+    border: 1px solid red !important;
+}
+
+label {
+    font-weight: bold;
+    color: grey;
+}
+
+label sup,
+p sup {
+    color: red;
+    font-weight: bolder;
+    font-size: 1rem;
+}
+
+input[type=number] {
+    height: 50px;
+    font-size: 30px;
+    font-weight: bold;
+    text-align: center;
+    color: var(--second-color);
+}
+
+textarea {
+    width: 100% !important;
+    min-height: 100px;
+    resize: vertical;
+}
+
+.modal-body {
+    background-color: #f1f1f1;
+    border: 1px solid #eaeaea;
+    margin-bottom: 20px;
+}
+
+.icon-object {
+    width: 85px;
+    height: 85px;
+    padding: 23px 10px;
+    text-align: center;
+    color: var(--second-color);
+}
+
+/*.pagination > .active > a,*/
+/*.pagination > .active > span,*/
+/*.pagination > .active > a:hover,*/
+/*.pagination > .active > span:hover,*/
+/*.pagination > .active > a:focus,*/
+/*.pagination > .active > span:focus {*/
+/*    background-color: var(--second-color);*/
+/*    border-color: #2c3341;*/
+/*}*/
+
+.btn-primary,
+.navigation > li.active > a,
+.navigation > li.active > a:hover,
+.navigation > li.active > a:focus {
+    background-color: var(--second-color);
+    border-color: #2c3341;
+}
+
+.btn-primary:focus,
+.btn-primary.focus,
+.btn-primary:hover {
+    background-color: #2c3341;
+}
+
+.btn-close {
+    box-sizing: content-box;
+    width: 1em;
+    height: 1em;
+    padding: 0.5rem 0.5rem;
+    float: right;
+    margin: -3.2rem -0.5rem -0.5rem auto;
+    position: relative;
+    color: #000;
+    background: transparent url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3e%3cpath d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/%3e%3c/svg%3e") center/1em auto no-repeat;
+    border: 0;
+    border-radius: 0.25rem;
+    opacity: .5;
+}
+
+.dataTables_length > label > span:first-child {
+    margin: 0 15px;
+}
+
+iframe {
+    width: 100%;
+    height: 300px;
+}
+
+.site-map-root-tag,
+.site-map-url-tag,
+.site-map-tag {
+    margin-left: 20px;
+    color: #990000;
+}
+
+.site-map-root-tag,
+.site-map-tag span.bkt {
+    margin-left: 0;
+}
+
+.site-map-root-tag span.bkt,
+.site-map-url-tag span.bkt,
+.site-map-tag span.bkt {
+    color: #003bff;
+}
+
+.site-map-root-tag span.red {
+    color: red;
+}
+
+.site-map-tag span.value {
+    color: black;
+    font-weight: bold;
+}
+
+.site-map-tag {
+    margin-left: 40px;
+}

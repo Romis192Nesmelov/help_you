@@ -253,8 +253,6 @@ $(document).ready(function () {
         alwaysShowScrollbar: 1,
         scrollTo: 'bottom'
     });
-
-
 });
 
 const mapInit = (container) => {

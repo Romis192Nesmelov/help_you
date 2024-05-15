@@ -22,6 +22,7 @@ class UsersSeeder extends Seeder
                 'email' => 'info@need-help.online',
                 'password' => bcrypt('apg192'),
                 'code' => '99-99-99',
+                'admin' => 1,
                 'active' => 1
             ],
             [
@@ -32,6 +33,7 @@ class UsersSeeder extends Seeder
                 'email' => 'romis@nesmelov.com',
                 'password' => bcrypt('apg192'),
                 'code' => '99-99-99',
+                'admin' => 1,
                 'active' => 1
             ],
             [
@@ -42,6 +44,7 @@ class UsersSeeder extends Seeder
                 'email' => 'romis.nesmelov@gmail.com',
                 'password' => bcrypt('apg192'),
                 'code' => '99-99-99',
+                'admin' => 1,
                 'active' => 1
             ],
             [
@@ -52,6 +55,7 @@ class UsersSeeder extends Seeder
                 'email' => 'unknown@mail.ru',
                 'password' => bcrypt('123456'),
                 'code' => '99-99-99',
+                'admin' => 1,
                 'active' => 1
             ],
             [
@@ -62,6 +66,7 @@ class UsersSeeder extends Seeder
                 'email' => 'anonymous@mail.ru',
                 'password' => bcrypt('123456'),
                 'code' => '99-99-99',
+                'admin' => 1,
                 'active' => 1
             ]
         ];
@@ -79,6 +84,7 @@ class UsersSeeder extends Seeder
                 'email' => 'user'.($i).'@mail.ru',
                 'password' => bcrypt('123456'),
                 'code' => '99-99-99',
+                'admin' => 1,
                 'active' => 1
             ]);
         }

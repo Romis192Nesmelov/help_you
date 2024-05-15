@@ -1,6 +1,9 @@
 <?php
 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\Admin\AdminBaseController;
+use App\Http\Controllers\Admin\AdminLoginController;
+use App\Http\Controllers\Admin\AdminUsersController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BaseController;
 use App\Http\Controllers\OrderController;
@@ -105,4 +108,22 @@ Route::middleware(['auth','account.completed'])->name('messages.')->controller(C
     Route::get('/get-unread-messages', 'getUnreadMessages')->name('get_unread_messages');
     Route::post('/read-message', 'readMessage')->name('read_message');
     Route::post('/new-message', 'newMessage')->name('new_message');
+});
+
+Route::controller(AdminLoginController::class)->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/login', 'showLogin')->name('show_login');
+    Route::post('/login', 'login')->name('login');
+});
+
+Route::prefix('admin')->middleware(['admin'])->name('admin.')->group(function () {
+    Route::controller(AdminBaseController::class)->group(function () {
+        Route::get('/', 'home')->name('home');
+    });
+
+    Route::controller(AdminUsersController::class)->group(function () {
+        Route::get('/users/{slug?}', 'users')->name('users');
+        Route::get('/get-users', 'getUsers')->name('get_users');
+        Route::post('/edit-user', 'editUser')->name('edit_user');
+//        Route::post('/delete-user', 'deleteUser')->name('delete_user');
+    });
 });
