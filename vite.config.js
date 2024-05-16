@@ -28,7 +28,6 @@ export default defineConfig({
                 'resources/js/admin/styling/bootstrap-switch.js',
                 'resources/js/admin/styling/bootstrap-toggle.min.js',
                 'resources/js/admin/app.js',
-                'resources/js/admin/jquery.maskedinput.js',
                 'resources/js/admin/login.js',
                 'resources/js/admin/admin.js',
 
