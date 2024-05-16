@@ -68,6 +68,7 @@ class AdminUsersController extends AdminBaseController
         } else {
             $validationArr['password'] = $this->validationPassword;
             $fields = $this->validate($request, $validationArr);
+            $fields = $this->getSpecialFields($this->user, $validationArr, $fields);
             $fields['password'] = bcrypt($fields['password']);
             $user = User::create($fields);
             $this->processingFiles($request, $user, 'avatar', $avatarPath, 'avatar'.$user->id);

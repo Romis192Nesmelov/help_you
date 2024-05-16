@@ -182,7 +182,7 @@ class AdminBaseController extends Controller
     protected function getSpecialFields(Model $model, array $validationArr, array $fields): array
     {
         foreach (['mail_notice','active','admin'] as $field) {
-            if (in_array($field, $model->getFillable())) $fields['active'] = request($field) ? 1 : 0;
+            if (in_array($field, $model->getFillable())) $fields[$field] = request($field) ? 1 : 0;
         }
         if (in_array('date',$model->getFillable()) && array_key_exists('date',$validationArr)) $fields['date'] = $this->convertTimestamp(request('date'));
         return $fields;
