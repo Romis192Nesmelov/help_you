@@ -10,12 +10,12 @@
 
     <!-- Global stylesheets -->
     <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,100,500,700,900" rel="stylesheet" type="text/css">
+    <script src="https://code.jquery.com/jquery-2.2.4.js" integrity="sha256-iT6Q9iMJYuQiMWNd9lDyBUStIq/8PuOW33aOqmvFpqI=" crossorigin="anonymous"></script>
     @vite([
         'resources/css/admin/bootstrap.css',
         'resources/css/admin/core.css',
         'resources/css/admin/components.css',
         'resources/css/admin/admin.css',
-        'resources/js/admin/jquery.min.js',
         'resources/js/admin/bootstrap.min.js',
         'resources/js/admin/styling/uniform.min.js',
         'resources/js/admin/app.js',

@@ -21,7 +21,6 @@ export default defineConfig({
                 'resources/css/loader.css',
                 'resources/css/app.css',
 
-                'resources/js/admin/jquery.min.js',
                 'resources/js/admin/bootstrap.min.js',
                 'resources/js/admin/styling/uniform.min.js',
                 'resources/js/admin/styling/switchery.min.js',
