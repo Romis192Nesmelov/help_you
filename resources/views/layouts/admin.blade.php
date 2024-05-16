@@ -8,8 +8,8 @@
     @include('blocks.favicon_block')
     <!-- Global stylesheets -->
     <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,100,500,700,900" rel="stylesheet" type="text/css">
-    <script src="https://code.jquery.com/jquery-3.6.3.js" integrity="sha256-nQLuAZGRRcILA+6dMBOvcRh5Pe310sBpanc6+QBmyVM=" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jquery.maskedinput@1.4.1/src/jquery.maskedinput.min.js" type="text/javascript"></script>
+{{--    <script src="https://code.jquery.com/jquery-3.6.3.js" integrity="sha256-nQLuAZGRRcILA+6dMBOvcRh5Pe310sBpanc6+QBmyVM=" crossorigin="anonymous"></script>--}}
+{{--    <script src="https://cdn.jsdelivr.net/npm/jquery.maskedinput@1.4.1/src/jquery.maskedinput.min.js" type="text/javascript"></script>--}}
     @vite([
         'resources/css/icons/fontawesome/styles.min.css',
         'resources/css/icons/icomoon/styles.css',
@@ -23,11 +23,13 @@
         'resources/css/admin/admin.css',
         'resources/js/admin/jquery.min.js',
         'resources/js/admin/bootstrap.min.js',
+        'resources/js/admin/select2.min.js',
         'resources/js/admin/styling/uniform.min.js',
         'resources/js/admin/styling/switchery.min.js',
         'resources/js/admin/styling/bootstrap-switch.js',
         'resources/js/admin/styling/bootstrap-toggle.min.js',
         'resources/js/jquery.fancybox.min.js',
+        'resources/js/admin/jquery.maskedinput.js',
         'resources/js/admin/app.js',
         'resources/js/admin/admin.js',
     ])
@@ -162,6 +164,10 @@
 
 </div>
 <!-- /page container -->
-@include('admin.blocks.message_modal_block')
+@if (session()->has('message'))
+    <x-modal id="message-modal" head="{{ trans('content.message') }}">
+        <h4 class="text-center p-4">{{ session()->has('message') ? session()->get('message') : '' }}</h4>
+    </x-modal>
+@endif
 </body>
 </html>

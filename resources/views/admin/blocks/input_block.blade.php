@@ -2,7 +2,6 @@
     name="{{ $name }}"
     error="{{ count($errors) && $errors->has($name) ? $errors->first($name) : '' }}"
     label="{{ isset($label) && $label ? $label : ''  }}"
-    ajax="{{ $ajax ?? false }}"
 >
     <input
         type="{{ isset($type) && $type ? $type : 'text' }}"

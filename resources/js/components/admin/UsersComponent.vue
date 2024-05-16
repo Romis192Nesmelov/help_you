@@ -4,8 +4,9 @@
         delete_phrase="Вы действительно хотите удалить этого пользователя?"
         :get_data_url="get_users_url"
         :edit_url=edit_url
-        :delete_url=delete_url
         :arrange="arrange"
+        broadcast_on="user_event"
+        broadcast_as="user"
     ></data-table-component>
 </template>
 
@@ -17,16 +18,11 @@ export default {
     components: {
         DataTableComponent
     },
-    created() {
-
-        // window.emitter.on('dt-arrange', arrange => {
-        //     this.getUsers(self.get_users_url + '?field=' + arrange.field + '&direction=' + arrange.direction);
-        // });
-    },
     props: {
+        'users_url': String,
         'get_users_url': String,
         'edit_url': String,
-        'delete_url': String,
+        // 'delete_url': String,
         'arrange': String
     },
     data() {

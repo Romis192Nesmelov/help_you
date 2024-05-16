@@ -10,10 +10,8 @@ const app = createApp({
 });
 
 window.tokenField = $('input[name=_token]').val();
-window.phoneMask = "+n(999)999-99-99";
-window.bornMask = "99-99-9999";
-
 window.emitter = mitt();
+window.showMessageModal = false;
 app.config.globalProperties.emitter = window.emitter;
 app.mount('#app');
 
@@ -21,14 +19,20 @@ app.mount('#app');
 // window.statisticsData = [];
 $(document).ready(function () {
     $(".radio-input").bootstrapSwitch();
-    // $('input[name=phone]').mask("+n(999)999-99-99");
     $('.styled').uniform();
+
+    $.mask.definitions['c'] = "[1-2]";
+    $('input[name=phone]').mask("+7(999)999-99-99");
+    $('input[name=born]').mask("99-99-9999");
 
     // File input
     $(".file-styled").uniform({
         wrapperClass: 'bg-blue',
         fileButtonHtml: '<i class="icon-file-plus"></i>'
     });
+
+    // Message modal
+    $('#message-modal').modal('show');
 
     // Single picker
     // $('.daterange-single').daterangepicker({
@@ -42,9 +46,6 @@ $(document).ready(function () {
     //         })
     //     }
     // });
-
-    // Message modal
-    window.messageModal = $('#message-modal');
 
     // Preview upload image
     $('input[type=file]').change(function () {

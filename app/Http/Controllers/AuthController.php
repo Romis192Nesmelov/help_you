@@ -6,6 +6,7 @@ use App\Http\Requests\Auth\GenerateCodeRequest;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Requests\Auth\ResetPasswordRequest;
+use Illuminate\Auth\Events\Registered;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -43,6 +44,7 @@ class AuthController extends Controller
                 'admin' => 0,
                 'active' => 0
             ]);
+            event(new Registered($user));
             return response()->json(['message' => trans('auth.code').': '.$user->code],200);
         } elseif ($user->active) {
             return response()->json(['errors' => ['phone' => [trans('auth.user_with_this_phone_is_already_registered')]]], 400);

@@ -12,15 +12,31 @@
         </div>
     </ModalComponent>
 
+    <div class="dt-top-line">
+        <InputComponent
+            type="text"
+            name="filter"
+            placeholder="Фильровать"
+            v-model:value="filter"
+            @keyup="filtered"
+            @change="filtered"
+        ></InputComponent>
+        <div>
+            <span class="hidden-sm">Показывать по:</span>
+            <select class="select-show-by" v-model="showBy">
+                <option v-for="showCase in showCases" :key="'show-by-' + showCase" :value="showCase">{{ showCase }}</option>
+            </select>
+        </div>
+    </div>
     <div class="table-responsive">
         <table class="table table-bordered table-striped">
             <thead>
                 <tr>
-                    <th class="text-center" v-for="(descr, field) in fields">{{ descr }}</th>
+                    <th class="text-center" v-for="(descr, field) in fields" :key="'dt-head-' + field">{{ descr }}</th>
                     <th class="tools" v-if="edit_url || delete_url">Инструменты</th>
                 </tr>
                 <tr>
-                    <th class="text-center arrange" v-for="(descr, field) in fields">
+                    <th class="text-center arrange" v-for="(descr, field) in fields" :key="'dt-arrange-by-' + field">
                         <i
                             v-if="field !== 'avatar'"
                             :class="(arrangeCol.field === field ? 'text-info ' : '') + (arrangeCol.field === field && arrangeCol.direction === 'desc' ? 'icon-arrow-up12' : 'icon-arrow-down12')"
@@ -31,8 +47,8 @@
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="item in data.data">
-                    <td class="text-center" v-for="(desc, field) in fields">
+                <tr v-for="item in data.data" :key="'dt-row-' + item.id">
+                    <td class="text-center" v-for="(desc, field) in fields" :key="'dt-cell-' + field">
                         <AvatarComponent
                             v-if="field === 'avatar'"
                             :avatar_image="item.avatar"
@@ -65,6 +81,7 @@
 
 <script>
 import ModalComponent from "../../blocks/ModalComponent.vue";
+import InputComponent from "../../blocks/InputComponent.vue";
 import ButtonComponent from "../../blocks/ButtonComponent.vue";
 import AvatarComponent from "../../blocks/AvatarComponent.vue";
 
@@ -72,6 +89,7 @@ export default {
     name: "DataTableComponent",
     components: {
         ModalComponent,
+        InputComponent,
         ButtonComponent,
         AvatarComponent,
     },
@@ -81,7 +99,9 @@ export default {
         'delete_phrase': String|null,
         'get_data_url': String,
         'edit_url': String|null,
-        'delete_url': String|null
+        'delete_url': String|null,
+        'broadcast_on': String|null,
+        'broadcast_as': String|null,
     },
     emits: ['paginate','arrange'],
     created() {
@@ -89,11 +109,30 @@ export default {
         this.arrangeCol = JSON.parse(self.arrange);
         this.getDataUrl = this.get_data_url;
         this.getData(this.get_data_url);
+
+        $(document).ready(function () {
+            $('.select-show-by').select2({
+                minimumResultsForSearch: Infinity,
+                width: 80
+            }).change(function () {
+                self.showBy = $(this).val();
+                self.getData(self.getUrl(self.get_data_url));
+            });
+        });
+
+        if (this.broadcast_on) {
+            window.Echo.channel(this.broadcast_on).listen('.' + this.broadcast_as, res => {
+                self.getData(self.getUrl());
+            });
+        }
     },
     data() {
         return {
             getDataUrl: String,
             data: Object,
+            showCases: [5,10,20,30,50],
+            showBy: 10,
+            filter: '',
             deleteId: Number,
             arrangeCol: Object,
             deleteModal: Object|null,
@@ -135,10 +174,19 @@ export default {
             this.arrangeCol.direction = newDirection;
             this.getData(this.getUrl());
         },
+        filtered() {
+            let self = this;
+            // console.log(self.getUrl(self.get_data_url));
+            self.getData(self.getUrl(self.get_data_url));
+        },
         getUrl(url) {
             if (url) this.getDataUrl = url;
             let firstDelimiter = this.getDataUrl.indexOf('page') !== -1 ? '&' : '?';
-            return this.getDataUrl + firstDelimiter + 'field=' + this.arrangeCol.field + '&direction=' + this.arrangeCol.direction
+            return this.getDataUrl
+                + firstDelimiter + 'field=' + this.arrangeCol.field
+                + '&direction=' + this.arrangeCol.direction
+                + '&show_by=' + this.showBy
+                + (this.filter ? '&filter=' + this.filter : '')
         }
     }
 }

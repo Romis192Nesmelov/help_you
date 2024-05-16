@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Casts\Json;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -60,6 +61,17 @@ class User extends Authenticatable
     public function getAgeAttribute(): int
     {
         return Carbon::parse($this->born)->age;
+    }
+
+    public function scopeFiltered(Builder $query): void
+    {
+        $query->when(request('filter'), function (Builder $q) {
+            $filter = request('filter');
+            foreach (['id','name','family','phone','email'] as $k => $field) {
+                if (!$k) $q->where($field, 'LIKE', "%{$filter}%");
+                else $q->orWhere($field, 'LIKE', "%{$filter}%");
+            }
+        });
     }
 
     public function subscriptions(): BelongsToMany

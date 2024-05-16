@@ -5,9 +5,11 @@
         </div>
     @endif
     <div class="panel-body edit-image-preview">
-        <a class="fancybox" href="{{ asset(isset($image) && $image ? $image : 'images/placeholder.jpg') }}">
-            <img class="w-100" src="{{ asset(isset($image) && $image ? $image : 'images/placeholder.jpg') }}?{{ md5(rand(1,100000)*time()) }}" />
-        </a>
+        <div {{ isset($addClass) ? 'class='.$addClass : '' }}>
+            <a class="fancybox" href="{{ asset(isset($image) && $image ? $image : 'images/placeholder.jpg') }}">
+                <img class="image" src="{{ asset(isset($image) && $image ? $image : 'images/placeholder.jpg') }}?{{ md5(rand(1,100000)*time()) }}" />
+            </a>
+        </div>
         @include('admin.blocks.input_file_block', ['label' => '', 'name' =>  isset($name) && $name ? $name : 'image'])
     </div>
 </div>

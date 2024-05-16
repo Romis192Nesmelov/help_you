@@ -6,7 +6,8 @@
     'yes_button_id' => null,
     'del_function' => null,
     'yes_button_class' => 'delete-yes',
-    'yes_button_text' => trans('content.yes')
+    'yes_button_text' => trans('content.yes'),
+    'show' => false
 ])
 
 <div {{ $attributes->class('modal fade') }} tabindex="-1" aria-labelledby="{{ $attributes->get('id') }}Label" aria-hidden="true" {{ $del_function ? 'del_function='.$del_function : ''}}>

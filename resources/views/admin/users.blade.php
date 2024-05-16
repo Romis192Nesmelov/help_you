@@ -6,8 +6,7 @@
         <div class="panel-body">
             <users-component
                 get_users_url="{{ route('admin.get_users') }}"
-                edit_url="{{ route('admin.edit_user') }}"
-
+                edit_url="{{ route('admin.users') }}"
                 arrange="{{ json_encode(['field' => 'id', 'direction' => 'desc']) }}"
             ></users-component>
         </div>

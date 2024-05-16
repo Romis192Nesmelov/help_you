@@ -1,4 +1,4 @@
-@include('blocks.button_block', [
+@include('admin.blocks.button_block', [
     'primary' => true,
     'buttonType' => 'submit',
     'icon' => ' icon-floppy-disk',

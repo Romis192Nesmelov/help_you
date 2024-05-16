@@ -106,11 +106,10 @@ class Order extends Model
     {
         $query->when(request('search'), function (Builder $q) {
             $searched = request('search');
-            $q
-                ->where('name', 'LIKE', "%{$searched}%")
-                ->orWhere('address', 'LIKE', "%{$searched}%")
-                ->orWhere('description_short', 'LIKE', "%{$searched}%")
-                ->orWhere('description_full', 'LIKE', "%{$searched}%");
+            foreach (['name','address','description_short','description_full'] as $k => $field) {
+                if (!$k) $q->where($field, 'LIKE', "%{$searched}%");
+                else $q->orWhere($field, 'LIKE', "%{$searched}%");
+            }
         });
     }
 

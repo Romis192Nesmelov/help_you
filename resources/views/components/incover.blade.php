@@ -2,8 +2,7 @@
     'labelClass' => '',
     'name' => '',
     'error' => null,
-    'label' => null,
-    'ajax' => true
+    'label' => null
 ])
 
 <div class="mb-3">
@@ -12,6 +11,6 @@
     @endif
     <div class="form-group {{ $error ? "error" : '' }}">
         {!! $slot !!}
-        @include('admin.blocks.wrap_error_block', ['ajax' => $ajax])
+        @include('admin.blocks.wrap_error_block')
     </div>
 </div>

@@ -31,7 +31,12 @@ class AdminUsersController extends AdminBaseController
 
     public function getUsers(): JsonResponse
     {
-        return response()->json($this->user::orderBy(request('field') ?? 'id',request('direction') ?? 'desc')->paginate(10));
+        return response()->json(
+            $this->user::query()
+                ->filtered()
+                ->orderBy(request('field') ?? 'id',request('direction') ?? 'desc')
+                ->paginate(request('show_by') ?? 10)
+        );
     }
 
     /**
@@ -42,11 +47,11 @@ class AdminUsersController extends AdminBaseController
         $validationArr = [
             'name' => 'nullable|max:255',
             'family' => 'nullable|max:255',
+            'born' => $this->validationBorn,
             'phone' => $this->validationPhone,
             'email' => 'nullable|email|unique:users,email',
             'info_about' => $this->validationText
         ];
-        if ($request->has('born')) $validationArr['born'] = $this->validationDate;
         $avatarPath = 'images/avatars/';
         if ($request->has('id')) {
             $validationArr['id'] = 'required|integer|exists:users,id';
