@@ -23,7 +23,6 @@ export default defineConfig({
 
                 'resources/js/admin/jquery.min.js',
                 'resources/js/admin/bootstrap.min.js',
-                'resources/js/admin/select2.min.js',
                 'resources/js/admin/styling/uniform.min.js',
                 'resources/js/admin/styling/switchery.min.js',
                 'resources/js/admin/styling/bootstrap-switch.js',

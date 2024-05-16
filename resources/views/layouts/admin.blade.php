@@ -8,6 +8,9 @@
     @include('blocks.favicon_block')
     <!-- Global stylesheets -->
     <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,100,500,700,900" rel="stylesheet" type="text/css">
+    <script src="https://code.jquery.com/jquery-2.2.4.js" integrity="sha256-iT6Q9iMJYuQiMWNd9lDyBUStIq/8PuOW33aOqmvFpqI=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery.maskedinput@1.4.1/src/jquery.maskedinput.min.js" type="text/javascript"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     @vite([
         'resources/css/icons/fontawesome/styles.min.css',
         'resources/css/icons/icomoon/styles.css',
@@ -21,13 +24,11 @@
         'resources/css/admin/admin.css',
         'resources/js/admin/jquery.min.js',
         'resources/js/admin/bootstrap.min.js',
-        'resources/js/admin/select2.min.js',
         'resources/js/admin/styling/uniform.min.js',
         'resources/js/admin/styling/switchery.min.js',
         'resources/js/admin/styling/bootstrap-switch.js',
         'resources/js/admin/styling/bootstrap-toggle.min.js',
         'resources/js/jquery.fancybox.min.js',
-        'resources/js/admin/jquery.maskedinput.js',
         'resources/js/admin/app.js',
         'resources/js/admin/admin.js',
     ])
