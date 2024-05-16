@@ -47,7 +47,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="item in data.data" :key="'dt-row-' + item.id">
+                <tr v-for="item in items.data" :key="'dt-row-' + item.id">
                     <td class="text-center" v-for="(desc, field) in fields" :key="'dt-cell-' + field">
                         <AvatarComponent
                             v-if="field === 'avatar'"
@@ -69,8 +69,8 @@
                 </tr>
             </tbody>
         </table>
-        <ul class="pagination" v-if="data.links && data.links.length > 3">
-            <li :class="link.active ? 'active' : ''" v-for="(link, key) in data.links" :key="'paginate-'+key" @click="paginate(link.url)">
+        <ul class="pagination" v-if="items.links && items.links.length > 3">
+            <li :class="link.active ? 'active' : ''" v-for="(link, key) in items.links" :key="'paginate-'+key" @click="paginate(link.url)">
                 <span v-if="link.label.indexOf('Пред') === 8">‹</span>
                 <span v-else-if="link.label.indexOf('След') === 0">›</span>
                 <span v-else>{{ link.label }}</span>
@@ -122,14 +122,23 @@ export default {
 
         if (this.broadcast_on) {
             window.Echo.channel(this.broadcast_on).listen('.' + this.broadcast_as, res => {
-                self.getData(self.getUrl());
+                if (res.notice === 'new_item' || res.notice === 'del_item') {
+                    self.getData(self.getUrl());
+                } else if (res.notice === 'change_item') {
+                    for (let i=0;i<self.items.data.length;i++) {
+                        if (items.data[i].id === res.model.id) {
+                            items.data[i] = res.model;
+                            break;
+                        }
+                    }
+                }
             });
         }
     },
     data() {
         return {
             getDataUrl: String,
-            data: Object,
+            items: Object,
             showCases: [5,10,20,30,50],
             showBy: 10,
             filter: '',
@@ -143,7 +152,7 @@ export default {
         getData(url) {
             let self = this;
             axios.get(url).then(function (response) {
-                self.data = response.data;
+                self.items = response.data;
             });
         },
         paginate(url) {

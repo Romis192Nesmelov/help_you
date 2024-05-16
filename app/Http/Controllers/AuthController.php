@@ -8,6 +8,7 @@ use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Requests\Auth\ResetPasswordRequest;
 use Illuminate\Auth\Events\Registered;
 use App\Models\User;
+use Illuminate\Auth\Events\Verified;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -64,6 +65,7 @@ class AuthController extends Controller
                 'password' => bcrypt($credentials['password']),
                 'active' => 1
             ]);
+            event(new Verified($user));
             return response()->json(['message' => trans('auth.register_complete')],200);
         } else {
             return response()->json(['errors' => ['code' => [trans('auth.wrong_code')]]], 401);

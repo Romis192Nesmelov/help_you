@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Models\User;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Foundation\Events\Dispatchable;
@@ -14,9 +15,13 @@ class UserEvent
     /**
      * Create a new event instance.
      */
-    public function __construct()
+    private string $noticeType;
+    private User $user;
+
+    public function __construct(string $noticeType, User $user)
     {
-        //
+        $this->noticeType = $noticeType;
+        $this->user = $user;
     }
 
     /**
@@ -37,5 +42,18 @@ class UserEvent
     public function broadcastAs(): string
     {
         return 'user';
+    }
+
+    /**
+     *  Get the data to broadcast.
+     *
+     * @return array<string, mixed>
+     */
+    public function broadcastWith(): array
+    {
+        return [
+            'notice' => $this->noticeType,
+            'model' => $this->user,
+        ];
     }
 }

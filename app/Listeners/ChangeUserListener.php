@@ -6,7 +6,7 @@ use App\Events\UserEvent;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
-class NewUserListener
+class ChangeUserListener
 {
     /**
      * Create the event listener.
@@ -21,6 +21,6 @@ class NewUserListener
      */
     public function handle(object $event): void
     {
-        broadcast(new UserEvent('new_item',$event->user));
+        broadcast(new UserEvent('change_item',$event->user));
     }
 }

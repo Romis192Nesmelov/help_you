@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Admin;
+use App\Events\UserEvent;
 use App\Http\Controllers\HelperTrait;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -63,12 +64,14 @@ class AdminUsersController extends AdminBaseController
             if ($request->input('password')) $fields['password'] = bcrypt($fields['password']);
             $user->update($fields);
             $this->processingFiles($request, $user, 'avatar', $avatarPath, 'avatar'.$user->id);
+            broadcast(new UserEvent('new_item',$user));
         } else {
             $validationArr['password'] = $this->validationPassword;
             $fields = $this->validate($request, $validationArr);
             $fields['password'] = bcrypt($fields['password']);
             $user = User::create($fields);
             $this->processingFiles($request, $user, 'avatar', $avatarPath, 'avatar'.$user->id);
+            broadcast(new UserEvent('change_item',$user));
         }
         $this->saveCompleteMessage();
         return redirect(route('admin.users'));
