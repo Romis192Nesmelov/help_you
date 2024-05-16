@@ -32,8 +32,8 @@ export default defineConfig({
 
                 'resources/css/admin/bootstrap.css',
                 'resources/css/admin/bootstrap-switch.css',
-                'resources/css/bootstrap-toggle.min.css',
-                'resources/css/colors.css',
+                'resources/css/admin/bootstrap-toggle.min.css',
+                'resources/css/admin/colors.css',
                 'resources/css/admin/core.css',
                 'resources/css/admin/components.css',
                 'resources/css/admin/admin.css',
