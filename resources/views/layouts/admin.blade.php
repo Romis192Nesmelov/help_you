@@ -22,7 +22,6 @@
         'resources/css/admin/colors.css',
         'resources/css/jquery.fancybox.min.css',
         'resources/css/admin/admin.css',
-        'resources/js/admin/jquery.min.js',
         'resources/js/admin/bootstrap.min.js',
         'resources/js/admin/styling/uniform.min.js',
         'resources/js/admin/styling/switchery.min.js',
