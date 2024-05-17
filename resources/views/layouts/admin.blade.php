@@ -8,6 +8,7 @@
     @include('blocks.favicon_block')
     <!-- Global stylesheets -->
     <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,100,500,700,900" rel="stylesheet" type="text/css">
+
     <script src="https://code.jquery.com/jquery-2.2.4.js" integrity="sha256-iT6Q9iMJYuQiMWNd9lDyBUStIq/8PuOW33aOqmvFpqI=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery.maskedinput@1.4.1/src/jquery.maskedinput.min.js" type="text/javascript"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
@@ -21,13 +22,19 @@
         'resources/css/admin/components.css',
         'resources/css/admin/colors.css',
         'resources/css/jquery.fancybox.min.css',
+        'resources/css/avatar.css',
+        'resources/css/loader.css',
         'resources/css/admin/admin.css',
+        'resources/js/interactions.min.js',
+        'resources/js/touch.min.js',
+        'resources/js/widgets.min.js',
         'resources/js/admin/bootstrap.min.js',
         'resources/js/admin/styling/uniform.min.js',
         'resources/js/admin/styling/switchery.min.js',
         'resources/js/admin/styling/bootstrap-switch.js',
         'resources/js/admin/styling/bootstrap-toggle.min.js',
         'resources/js/jquery.fancybox.min.js',
+        'resources/js/helper.js',
         'resources/js/admin/app.js',
         'resources/js/admin/admin.js',
     ])
@@ -162,10 +169,8 @@
 
 </div>
 <!-- /page container -->
-@if (session()->has('message'))
-    <x-modal id="message-modal" head="{{ trans('content.message') }}">
-        <h4 class="text-center p-4">{{ session()->has('message') ? session()->get('message') : '' }}</h4>
-    </x-modal>
-@endif
+<x-modal id="message-modal" head="{{ trans('content.message') }}">
+    <h4 class="text-center p-4">{{ session()->has('message') ? session()->get('message') : '' }}</h4>
+</x-modal>
 </body>
 </html>

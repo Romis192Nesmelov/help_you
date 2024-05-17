@@ -123,6 +123,7 @@ Route::prefix('admin')->middleware(['admin'])->name('admin.')->group(function ()
     Route::controller(AdminUsersController::class)->group(function () {
         Route::get('/users/{slug?}', 'users')->name('users');
         Route::get('/get-users', 'getUsers')->name('get_users');
+        Route::post('/change-avatar', 'changeAvatar')->name('change_avatar');
         Route::post('/edit-user', 'editUser')->name('edit_user');
 //        Route::post('/delete-user', 'deleteUser')->name('delete_user');
     });

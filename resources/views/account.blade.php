@@ -4,7 +4,6 @@
     <div class="row">
         <left-menu-component
             user="{{ json_encode(auth()->user()) }}"
-            allow_change_avatar="1"
             input_image_hover="{{ asset('images/input_image_hover.svg') }}"
             left_menu="{{ json_encode($leftMenu) }}"
             logout_url="{{ route('auth.logout') }}"

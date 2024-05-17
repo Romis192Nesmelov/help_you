@@ -38,12 +38,14 @@
         'resources/js/widgets.min.js',
         'resources/js/jquery.fancybox.min.js',
         'resources/js/owl.carousel.min.js',
+        'resources/js/helper.js',
         'resources/js/app.js',
         'resources/css/icons/fontawesome/styles.min.css',
         'resources/css/icons/icomoon/styles.css',
         'resources/css/jquery.fancybox.min.css',
         'resources/css/owl.carousel.min.css',
         'resources/css/loader.css',
+        'resources/css/avatar.css',
         'resources/css/app.css',
     ])
 </head>

@@ -7,7 +7,7 @@
         :data-bs-target="target"
         :disabled=disabled
         :data-bs-dismiss="dismiss ? 'modal' : ''"
-        :data-dismiss="dismiss"
+        :data-dismiss="dismiss ? 'modal' : ''"
     >
         <i v-if="icon" :class="icon"></i>
         <span>{{ text }}</span>

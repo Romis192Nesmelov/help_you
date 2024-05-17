@@ -9,14 +9,20 @@
                 @if (isset($user))
                     @include('admin.blocks.hidden_id_block',['id' => $user->id])
                 @endif
-                <div class="col-lg-2 col-md-3 col-sm-12 col-xs-12">
-                    @include('admin.blocks.input_image_block',[
-                        'addClass' => 'avatar',
-                        'name' => 'avatar',
-                        'image' => isset($user) && $user->avatar ? $user->avatar : 'images/def_avatar.svg'
-                    ])
+                <div class="col-lg-2 col-md-3 col-sm-4 col-xs-12">
+                    <div class="panel panel-flat">
+                        <div class="panel-body">
+                            <avatar-component
+                                user_id="{{ $user->id }}"
+                                avatar_image="{{ $user->avatar }}"
+                                avatar_props="{{ json_encode($user->avatar_props) }}"
+                                change_avatar_url="{{ route('admin.change_avatar') }}"
+                            >
+                            </avatar-component>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
+                <div class="col-lg-10 col-md-9 col-sm-8 col-xs-12">
                     <div class="panel panel-flat">
                         <div class="panel-body">
                             @include('admin.blocks.input_block', [
@@ -59,22 +65,6 @@
                                 'placeholder' => 'E-mail',
                                 'value' => isset($user) ? $user->email : ''
                             ])
-                            @include('admin.blocks.checkbox_block', [
-                                'name' => 'admin',
-                                'label' => 'Пользователь является админом',
-                                'checked' => isset($user) ? $user->admin : false
-                            ])
-                            @include('admin.blocks.checkbox_block', [
-                                'name' => 'active',
-                                'label' => 'Пользователь активен',
-                                'checked' => isset($user) ? $user->active : true
-                            ])
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
-                    <div class="panel panel-flat">
-                        <div class="panel-body">
                             <div class="panel panel-flat">
                                 @if (isset($user))
                                     <div class="panel-heading">
@@ -105,6 +95,16 @@
                                 'name' => 'text',
                                 'max' => 5000,
                                 'value' => isset($user) ? $user->info_about : '',
+                            ])
+                            @include('admin.blocks.checkbox_block', [
+                                'name' => 'admin',
+                                'label' => 'Пользователь является админом',
+                                'checked' => isset($user) ? $user->admin : false
+                            ])
+                            @include('admin.blocks.checkbox_block', [
+                                'name' => 'active',
+                                'label' => 'Пользователь активен',
+                                'checked' => isset($user) ? $user->active : true
                             ])
                             @include('admin.blocks.save_button_block')
                         </div>

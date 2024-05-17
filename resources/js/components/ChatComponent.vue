@@ -2,7 +2,6 @@
     <ModalComponent id="user-data-modal" head="Данные пользователя">
         <UserPropertiesComponent
             :user="myCompanion"
-            :avatar_coof=0.35
             :use_rating=true
             :allow_change_rating=false
         ></UserPropertiesComponent>
@@ -15,7 +14,6 @@
         <div id="selected-points">
             <UserPropertiesComponent
                 :user="chatOrder.user"
-                :avatar_coof=0.35
                 :use_rating=true
                 :allow_change_rating=false
             ></UserPropertiesComponent>

@@ -7,7 +7,7 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rules\Password;
+//use Illuminate\Validation\Rules\Password;
 use Illuminate\View\View;
 
 class AdminUsersController extends AdminBaseController
@@ -55,7 +55,7 @@ class AdminUsersController extends AdminBaseController
         ];
         $avatarPath = 'images/avatars/';
         if ($request->has('id')) {
-            $validationArr['id'] = 'required|integer|exists:users,id';
+            $validationArr['id'] = $this->validationUserId;
             $validationArr['email'] .= ','.$request->input('id');
             if ($request->input('password')) $validationArr['password'] = $this->validationPassword;
             $fields = $this->validate($request, $validationArr);
@@ -76,6 +76,11 @@ class AdminUsersController extends AdminBaseController
         }
         $this->saveCompleteMessage();
         return redirect(route('admin.users'));
+    }
+
+    public function changeAvatar(Request $request): JsonResponse
+    {
+        return $this->changeSomeAvatar($request);
     }
 
     /**

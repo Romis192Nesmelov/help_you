@@ -4,8 +4,6 @@
             :small=small
             :avatar_image="user.avatar"
             :avatar_props="user.avatar_props"
-            :avatar_coof=avatar_coof
-            :allow_change_avatar=0
         ></AvatarComponent>
         <div class="w-100 fs-lg-6 fs-sm-7 ms-3 d-flex flex-column align-items-start">
             <small class="text-start" v-if="small">
@@ -40,7 +38,6 @@ export default {
     props: {
         'user': Object,
         'small': Boolean,
-        'avatar_coof': Number,
         'use_rating': Boolean,
         'allow_change_rating': Boolean
     },

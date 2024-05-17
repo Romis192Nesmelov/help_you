@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Events\ChatMessageEvent;
 use App\Events\IncentivesEvent;
 use App\Events\NotificationEvent;
+use App\Events\UserEvent;
 use App\Jobs\SendMessage;
 use App\Models\Action;
 use App\Models\ActionUser;
@@ -16,6 +17,8 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 trait HelperTrait
@@ -55,6 +58,42 @@ trait HelperTrait
         'meta_googlebot' => ['name' => 'googlebot', 'property' => false],
         'meta_google_site_verification' => ['name' => 'google-site-verification', 'property' => false],
     ];
+
+    public function changeSomeAvatar(Request $request): JsonResponse
+    {
+        $validationArr = [
+            'avatar' => 'required|'.$this->validationJpgAndPng,
+            'avatar_size' => 'nullable|integer',
+            'avatar_position_x' => 'nullable',
+            'avatar_position_y' => 'nullable',
+        ];
+        if ($request->has('id')) $validationArr['id'] = $this->validationUserId;
+
+        $fields = $this->validate($request, $validationArr);
+
+        $user = $request->has('id') ? User::find($request->id) : Auth::user();
+        $fields['avatar_props'] = [];
+        foreach (['size','position_x','position_y'] as $avatarProp) {
+            $fieldProp = 'avatar_'.$avatarProp;
+            $prop = $fields[$fieldProp];
+            if ($prop) $fields['avatar_props']['background-'.str_replace('_','-',$avatarProp)] = $avatarProp == 'size' ? ((int)$prop).'%' : ((float)$prop);
+            unset($fields[$fieldProp]);
+        }
+        $fields = $this->processingImage($request, $fields,'avatar', 'images/avatars/', 'avatar'.$user->id);
+        $user->update($fields);
+        broadcast(new UserEvent('change_item',$user));
+        return response()->json(['message' => trans('content.save_complete')],200);
+    }
+
+    public function processingImage(Request $request, array $fields, string $imageField, string $pathToSave, string $imageName): array
+    {
+        if ($request->hasFile($imageField)) {
+            $imageName .= '.'.$request->file($imageField)->getClientOriginalExtension();
+            $fields[$imageField] = $pathToSave.$imageName;
+            $request->file($imageField)->move(base_path('public/'.$pathToSave), $imageName);
+        }
+        return $fields;
+    }
 
     public function saveCompleteMessage(): void
     {

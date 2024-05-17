@@ -51,10 +51,11 @@
                     <td class="text-center" v-for="(desc, field) in fields" :key="'dt-cell-' + field">
                         <AvatarComponent
                             v-if="field === 'avatar'"
+                            :user_id="item.id"
+                            :small=true
                             :avatar_image="item.avatar"
                             :avatar_props="item.avatar_props"
-                            :avatar_coof=0.35
-                            :allow_change_avatar=0
+                            :change_avatar_url="change_avatar_url"
                         ></AvatarComponent>
                         <span v-else-if="field === 'active'" :class="'label label-' + (item['active'] ? 'success' : 'warning')">{{ (item['active'] ? 'активен' : 'не активен') }}</span>
                         <span v-else-if="field === 'admin'" :class="'label label-' + (item['admin'] ? 'info' : 'primary')">{{ (item['admin'] ? 'админ' : 'пользователь') }}</span>
@@ -100,6 +101,7 @@ export default {
         'get_data_url': String,
         'edit_url': String|null,
         'delete_url': String|null,
+        'change_avatar_url': String|NaN,
         'broadcast_on': String|null,
         'broadcast_as': String|null,
     },

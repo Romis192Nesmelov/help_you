@@ -1,11 +1,15 @@
 import '../bootstrap';
+import {imagePreview} from "../helper.js";
+import {initAvatar} from "../helper.js";
 import {createApp} from "vue/dist/vue.esm-bundler";
 import mitt from 'mitt';
 import UsersComponent from "../components/admin/UsersComponent.vue";
+import AvatarComponent from "../components/blocks/AvatarComponent.vue";
 
 const app = createApp({
     components: {
         UsersComponent,
+        AvatarComponent
     }
 });
 
@@ -32,7 +36,11 @@ $(document).ready(function () {
     });
 
     // Message modal
-    $('#message-modal').modal('show');
+    const messageModal = $('#message-modal');
+    if (messageModal.find('h4').html()) messageModal.modal('show');
+
+    // Init avatar
+    setTimeout(() => {initAvatar();}, 500);
 
     // Single picker
     // $('.daterange-single').daterangepicker({
@@ -48,25 +56,25 @@ $(document).ready(function () {
     // });
 
     // Preview upload image
-    $('input[type=file]').change(function () {
-        let input = $(this)[0],
-            parent = $(this).parents('.edit-image-preview'),
-            imagePreview = parent.find('img');
-
-        if (input.files[0].type.match('image.*')) {
-            let reader = new FileReader();
-            reader.onload = function (e) {
-                imagePreview.attr('src', e.target.result);
-                if (!imagePreview.is(':visible')) imagePreview.fadeIn();
-            };
-            reader.readAsDataURL(input.files[0]);
-        } else if (parent.hasClass('file-advanced')) {
-            imagePreview.attr('src', '');
-            imagePreview.fadeOut();
-        } else {
-            imagePreview.attr('src', '/images/placeholder.jpg');
-        }
-    });
+    // $('input[type=file]').change(function () {
+    //     let input = $(this)[0],
+    //         parent = $(this).parents('.edit-image-preview'),
+    //         imagePreview = parent.find('img');
+    //
+    //     if (input.files[0].type.match('image.*')) {
+    //         let reader = new FileReader();
+    //         reader.onload = function (e) {
+    //             imagePreview.attr('src', e.target.result);
+    //             if (!imagePreview.is(':visible')) imagePreview.fadeIn();
+    //         };
+    //         reader.readAsDataURL(input.files[0]);
+    //     } else if (parent.hasClass('file-advanced')) {
+    //         imagePreview.attr('src', '');
+    //         imagePreview.fadeOut();
+    //     } else {
+    //         imagePreview.attr('src', '/images/placeholder.jpg');
+    //     }
+    // });
 
     $('.fancybox').fancybox({
         'autoScale': true,

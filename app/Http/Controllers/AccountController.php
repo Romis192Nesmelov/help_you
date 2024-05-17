@@ -247,20 +247,9 @@ class AccountController extends BaseController
         }
     }
 
-    public function changeAvatar(ChangeAvatarRequest $request): JsonResponse
+    public function changeAvatar(Request $request): JsonResponse
     {
-        $fields = $request->validated();
-        $fields['avatar_props'] = [];
-        foreach (['size','position_x','position_y'] as $avatarProp) {
-            $fieldProp = 'avatar_'.$avatarProp;
-            $prop = $fields[$fieldProp];
-            if ($prop) $fields['avatar_props']['background-'.str_replace('_','-',$avatarProp)] = $avatarProp == 'size' ? ((int)$prop).'%' : ((float)$prop);
-            unset($fields[$fieldProp]);
-        }
-        $fields = $this->processingImage($request, $fields,'avatar', 'images/avatars/', 'avatar'.Auth::id());
-        Auth::user()->update($fields);
-        broadcast(new UserEvent('change_item',Auth::user()));
-        return response()->json(['message' => trans('content.save_complete')],200);
+        return $this->changeSomeAvatar($request);
     }
 
     public function editAccount(EditAccountRequest $request): JsonResponse

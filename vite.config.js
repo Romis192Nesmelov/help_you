@@ -19,6 +19,7 @@ export default defineConfig({
                 'resources/css/jquery.fancybox.min.css',
                 'resources/css/owl.carousel.min.css',
                 'resources/css/loader.css',
+                'resources/css/avatar.css',
                 'resources/css/app.css',
 
                 'resources/js/admin/bootstrap.min.js',
@@ -26,6 +27,7 @@ export default defineConfig({
                 'resources/js/admin/styling/switchery.min.js',
                 'resources/js/admin/styling/bootstrap-switch.js',
                 'resources/js/admin/styling/bootstrap-toggle.min.js',
+                'resources/js/helper.js',
                 'resources/js/admin/app.js',
                 'resources/js/admin/login.js',
                 'resources/js/admin/admin.js',

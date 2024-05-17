@@ -7,7 +7,6 @@
                         <UserPropertiesComponent
                             :user="order.user"
                             :small=true
-                            :avatar_coof=0.2
                             :use_rating=true
                             :allow_change_rating=false
                         ></UserPropertiesComponent>

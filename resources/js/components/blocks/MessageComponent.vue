@@ -4,8 +4,6 @@
             :small=true
             :avatar_image="message.user.avatar"
             :avatar_props="message.user.avatar_props"
-            :avatar_coof=0.2
-            :allow_change_avatar=0
         ></AvatarComponent>
         <div class="message">
             <div class="author">

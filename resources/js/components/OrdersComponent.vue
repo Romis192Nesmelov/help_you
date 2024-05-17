@@ -70,7 +70,6 @@
                         <UserPropertiesComponent
                             :user="point.properties.get('user')"
                             :small=false
-                            :avatar_coof=0.35
                             :use_rating=true
                             :allow_change_rating=false
                         ></UserPropertiesComponent>

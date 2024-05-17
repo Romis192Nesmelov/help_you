@@ -6210,7 +6210,7 @@ h6.panel-title,
   margin-top: 0!important;
 }
 .modal-footer {
-  padding-top: 0;
+  padding-top: 10px;
   padding-bottom: 0;
 }
 .modal-footer.text-center {
