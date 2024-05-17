@@ -9,19 +9,26 @@
                 @if (isset($user))
                     @include('admin.blocks.hidden_id_block',['id' => $user->id])
                 @endif
-                <div class="col-lg-2 col-md-3 col-sm-4 col-xs-12">
-                    <div class="panel panel-flat">
-                        <div class="panel-body">
-                            <avatar-component
-                                user_id="{{ $user->id }}"
-                                avatar_image="{{ $user->avatar }}"
-                                avatar_props="{{ json_encode($user->avatar_props) }}"
-                                change_avatar_url="{{ route('admin.change_avatar') }}"
-                            >
-                            </avatar-component>
+                    <div class="col-lg-2 col-md-3 col-sm-4 col-xs-12">
+                        <div class="panel panel-flat">
+                            <div class="panel-body">
+                                @if (isset($user))
+                                    <avatar-component
+                                        user_id="{{ $user->id }}"
+                                        avatar_image="{{ $user->avatar }}"
+                                        avatar_props="{{ json_encode($user->avatar_props) }}"
+                                        change_avatar_url="{{ route('admin.change_avatar') }}"
+                                    >
+                                    </avatar-component>
+                                @else
+                                    <div class="avatar cir" style="background-image: url({{ asset('images/def_avatar.svg') }})">
+                                        <img src="{{ asset('images/input_image_hover.svg') }}" />
+                                        <input type="file" name="avatar">
+                                    </div>
+                                @endif
+                            </div>
                         </div>
                     </div>
-                </div>
                 <div class="col-lg-10 col-md-9 col-sm-8 col-xs-12">
                     <div class="panel panel-flat">
                         <div class="panel-body">
