@@ -1,7 +1,7 @@
 <li class="dropdown dropdown-user">
     <a class="dropdown-toggle" data-toggle="dropdown">
         <span>
-            {{ $menuName }}
+            {{ $menuName ?? null }}
             @if (isset($icon))
                 <i class="{{ $icon }}"></i>
             @endif

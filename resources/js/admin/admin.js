@@ -1,21 +1,23 @@
 import '../bootstrap';
-import {imagePreview} from "../helper.js";
-import {initAvatar} from "../helper.js";
 import {createApp} from "vue/dist/vue.esm-bundler";
 import mitt from 'mitt';
-import UsersComponent from "../components/admin/UsersComponent.vue";
 import AvatarComponent from "../components/blocks/AvatarComponent.vue";
+import OrdersComponent from "../components/admin/OrdersComponent.vue";
+import UserRatingComponent from "../components/admin/blocks/UserRatingComponent.vue";
+import UsersComponent from "../components/admin/UsersComponent.vue";
+import EditOrderMapComponent from "../components/admin/blocks/EditOrderMapComponent.vue";
 
 const app = createApp({
     components: {
         UsersComponent,
-        AvatarComponent
+        OrdersComponent,
+        AvatarComponent,
+        UserRatingComponent,
+        EditOrderMapComponent
     }
 });
 
-window.tokenField = $('input[name=_token]').val();
 window.emitter = mitt();
-window.showMessageModal = false;
 app.config.globalProperties.emitter = window.emitter;
 app.mount('#app');
 
@@ -40,7 +42,45 @@ $(document).ready(function () {
     if (messageModal.find('h4').html()) messageModal.modal('show');
 
     // Init avatar
-    setTimeout(() => {initAvatar();}, 500);
+    setTimeout(() => {
+        window.initImages();
+        window.bindFancybox();
+        window.mapStepsInit();
+    }, 500);
+
+    // Enable-disable subtypes radio-buttons in edit order page
+    $('input[name=order_type_id]').change(function () {
+        let currentSubtypesBlock = $(this).parents('.form-group').find('.subtypes'),
+            allSubtypesContainer = $('.subtypes');
+
+        allSubtypesContainer.addClass('hidden');
+        allSubtypesContainer.find('input[type=radio]').prop('checked', false);
+
+        if (currentSubtypesBlock.length) {
+            currentSubtypesBlock.removeClass('hidden');
+            let subtypesRadioButtons = currentSubtypesBlock.find('input[type=radio]');
+            $(subtypesRadioButtons[0]).prop('checked', true);
+        }
+
+    });
+
+    // Remove order image in edit order page
+    $('.order-photo i.icon-close2').click(function () {
+        let inputId = $('input[name=id]'),
+            photoContainer = $(this).parents('.order-photo'),
+            photoExist = photoContainer.attr('photo_exist'),
+            pos = parseInt($(this).attr('id').replace('remove-',''));
+        if (inputId.length && photoExist !== undefined) {
+            axios.post('/admin/delete-order-image', {
+                '_token': window.tokenField,
+                'id': inputId.val(),
+                'pos': pos
+            }).then(function () {
+                photoContainer.removeAttr('photo_exist');
+                photoContainer.find('.icon-file-plus2').removeClass('hidden')
+            });
+        }
+    });
 
     // Single picker
     // $('.daterange-single').daterangepicker({
@@ -75,15 +115,4 @@ $(document).ready(function () {
     //         imagePreview.attr('src', '/images/placeholder.jpg');
     //     }
     // });
-
-    $('.fancybox').fancybox({
-        'autoScale': true,
-        'touch': false,
-        'transitionIn': 'elastic',
-        'transitionOut': 'elastic',
-        'speedIn': 500,
-        'speedOut': 300,
-        'autoDimensions': true,
-        'centerOnScroll': true
-    });
 });

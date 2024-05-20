@@ -1,5 +1,5 @@
 <template>
-    <ModalComponent id="complete-modal" head="Ваша заявка успешно зарегистрирована! Сейчас Вы будете перенаправлены на страницу предпросмотра заяки">
+    <ModalComponent id="complete-modal" head="Ваша заявка успешно зарегистрирована! Сейчас Вы будете перенаправлены на страницу предпросмотра заяки.">
         <img class="w-100" :src="wizardImages[4]" />
     </ModalComponent>
 
@@ -75,23 +75,14 @@
                 </div>
             </div>
             <div class="inputs-step" v-show="currentStep === 3">
-                <TextAreaComponent
-                    name="address"
-                    max="255"
-                    :value="address"
-                    v-model:value="address"
-                    :error="errors['address']"
-                    @keyup="changeAddressInInput"
-                ></TextAreaComponent>
-                <select
-                    id="addresses"
-                    class="form-select"
-                    v-model="featureMemberIndex"
-                    v-show="addresses.length"
-                    @change="changeAddressInSelect"
-                >
-                    <option v-for="(address, k) in addresses" :key="'address-' + k" :value="k">{{ address }}</option>
-                </select>
+                <OrderMapComponent
+                    :incoming_address="address"
+                    :yandex_api_key="yandex_api_key"
+                    :get_place_mark="false"
+                    @disabled-buttons="disableButtons"
+                    @set-place-mark="setPlaceMark"
+                    ref="OrderMapComponent"
+                ></OrderMapComponent>
             </div>
             <div class="inputs-step" v-show="currentStep === 4">
                 <TextAreaComponent
@@ -113,7 +104,6 @@
                     @change="errors['description_full']=null"
                 ></TextAreaComponent>
             </div>
-
             <div class="bottom-block">
                 <div class="d-flex align-items-center justify-content-center justify-content-md-end">
                     <ButtonComponent
@@ -145,6 +135,7 @@
 </template>
 
 <script>
+import OrderMapComponent from "./blocks/OrderMapComponent.vue";
 import ModalComponent from "./blocks/ModalComponent.vue";
 import InputComponent from "./blocks/InputComponent.vue";
 import TextAreaComponent from "./blocks/TextAreaComponent.vue";
@@ -154,6 +145,7 @@ import ButtonComponent from "./blocks/ButtonComponent.vue";
 export default {
     name: "EditOrderComponent",
     components: {
+        OrderMapComponent,
         ModalComponent,
         InputComponent,
         TextAreaComponent,
@@ -191,8 +183,6 @@ export default {
 
             window.singlePoint = [order.latitude, order.longitude];
             this.address = order.address;
-            this.latitude = order.latitude;
-            this.longitude = order.longitude;
             this.descriptionShort = order.description_short;
             this.descriptionFull = order.description_full;
         }
@@ -210,14 +200,12 @@ export default {
             if (this.sessionSteps.length > 2) {
                 window.singlePoint = [this.sessionSteps[2].latitude, this.sessionSteps[2].longitude];
                 this.address = this.sessionSteps[2].address;
-                this.latitude = this.sessionSteps[2].latitude;
-                this.longitude = this.sessionSteps[2].longitude;
             }
         }
 
         window.emitter.on('remove-order-photo', pos => {
             let self = this;
-            if (this.orderId) {
+            if (this.orderId && this['photo' + pos]) {
                 axios.post(this.delete_order_image_url, {
                     '_token': window.tokenField,
                     'id': self.orderId,
@@ -256,13 +244,10 @@ export default {
             photo1: null,
             photo2: null,
             photo3: null,
-            geoObjectCollection: null,
-            featureMemberIndex: 0,
+            // geoObjectCollection: null,
+            // featureMemberIndex: 0,
             address: '',
-            addresses: [],
-            addressError: null,
-            latitude: Number,
-            longitude: Number,
+            // addresses: [],
             descriptionShort: '',
             descriptionFull: '',
             stepsHeadsH1: [
@@ -298,8 +283,8 @@ export default {
     methods: {
         nextStep() {
             if (this.currentStep === 3) {
-                if (!this.address) this.errors['address'] = 'Укажите адрес!';
-                else this.getApiPlaceMark();
+                if (!this.$refs.OrderMapComponent.address) this.$refs.OrderMapComponent.addressError = 'Укажите адрес!';
+                else this.$refs.OrderMapComponent.getApiPlaceMark();
             } else {
                 let self = this,
                     formData = new FormData();
@@ -353,34 +338,11 @@ export default {
                 console.log(error);
             });
         },
-        getApiPlaceMark() {
-            let self = this;
-            this.disabledButtons = true;
-            this.address = this.address.indexOf('Москва') >= 0 ? this.address : 'Москва, ' + this.address;
-            if (!this.geoObjectCollection) {
-                // Getting placemark from api
-                axios.get('https://geocode-maps.yandex.ru/1.x/?apikey=' + this.yandex_api_key + '&geocode=' + this.address + '&format=json')
-                    .then(function (response) {
-                        self.geoObjectCollection = response.data.response.GeoObjectCollection;
-                        if (parseInt(self.geoObjectCollection.metaDataProperty.GeocoderResponseMetaData.found) === 1) {
-                            self.showPlaceMark();
-                            self.setPlaceMark();
-                        } else {
-                            self.addresses = [];
-                            $.each(self.geoObjectCollection.featureMember, function (k,featureMember) {
-                                self.addresses.push(featureMember.GeoObject.description + ' ' + featureMember.GeoObject.name);
-                            });
-                            $('#addresses')[0].size = self.addresses.length + 0.9;
-                            self.disabledButtons = false;
-                            self.changeAddressInSelect();
-                        }
-                    });
-            } else {
-                self.showPlaceMark();
-                self.setPlaceMark();
-            }
+        disableButtons(flag) {
+            this.disabledButtons = flag;
         },
-        setPlaceMark() {
+        setPlaceMark(address) {
+            this.address = address;
             let fields = {
                 '_token': window.tokenField,
                 'address': this.address,
@@ -397,26 +359,6 @@ export default {
                         this.disabledButtons = false;
                     }, 1500);
                 });
-        },
-        changeAddressInInput() {
-            this.errors['address'] = null;
-            this.geoObjectCollection = null;
-            this.addresses = [];
-        },
-        changeAddressInSelect() {
-            this.errors['address'] = null;
-            let featureMember = this.geoObjectCollection.featureMember[this.featureMemberIndex];
-            this.address = featureMember.GeoObject.description + ' ' + featureMember.GeoObject.name;
-            this.showPlaceMark();
-        },
-        showPlaceMark() {
-            if (window.placemark) window.myMap.geoObjects.remove(window.placemark);
-            let coordinates = this.geoObjectCollection.featureMember[this.featureMemberIndex].GeoObject.Point.pos.split(' ');
-            window.singlePoint = [parseFloat(coordinates[1]), parseFloat(coordinates[0])];
-            let newPlaceMark = window.getPlaceMark(window.singlePoint, {});
-
-            window.myMap.geoObjects.add(newPlaceMark)
-            window.zoomAndCenterMap();
         },
     }
 }

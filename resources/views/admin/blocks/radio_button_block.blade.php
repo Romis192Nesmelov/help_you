@@ -11,4 +11,4 @@
         </div>
     </div>
 @endforeach
-@include('blocks.error_block')
+@include('admin.blocks.error_block')

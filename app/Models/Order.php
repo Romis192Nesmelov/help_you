@@ -97,6 +97,24 @@ class Order extends Model
             $q->where('order_type_id',request('order_type'));
         });
 
+        $query->when(request('order_types_ids'), function (Builder $q) {
+            if (!request('order_type')) $q->whereIn('order_type_id',request('order_types_ids'));
+            else $q->orWhereIn('order_type_id',request('order_types_ids'));
+        });
+
+        $query->when(request('users_ids'), function (Builder $q) {
+            if (!request('order_type') && !request('order_types_ids')) $q->whereIn('user_id',request('users_ids'));
+            else $q->orWhereIn('user_id',request('users_ids'));
+        });
+
+        $query->when(request('filter'), function (Builder $q) {
+            $filter = request('filter');
+            foreach (['id','name','address'] as $k => $field) {
+                if (!$k && !request('order_type')  && !request('order_types_ids') && !request('users_ids')) $q->where($field, 'LIKE', "%{$filter}%");
+                else $q->orWhere($field, 'LIKE', "%{$filter}%");
+            }
+        });
+
         $query->when(request('performers_from') && request('performers_to'), function (Builder $q) {
             $q->whereBetween('need_performers',[request('performers_from'),request('performers_to')]);
         });

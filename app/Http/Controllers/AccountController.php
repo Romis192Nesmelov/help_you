@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\Admin\AdminUserEvent;
 use App\Events\IncentivesEvent;
-use App\Events\UserEvent;
 use App\Http\Requests\Account\ChangeAvatarRequest;
 use App\Http\Requests\Account\ChangePasswordRequest;
 use App\Http\Requests\Account\ChangePhoneRequest;
@@ -21,8 +21,8 @@ use App\Models\ReadRemovedPerformer;
 use App\Models\ReadStatusOrder;
 use App\Models\Subscription;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -231,7 +231,7 @@ class AccountController extends BaseController
         else {
             Auth::user()->phone = $request->phone;
             Auth::user()->save();
-            broadcast(new UserEvent('change_item',Auth::user()));
+            broadcast(new AdminUserEvent('change_item',Auth::user()));
             return response()->json(['message' => trans('auth.phone_has_been_changed'), 'number' => $request->phone],200);
         }
     }
@@ -261,7 +261,7 @@ class AccountController extends BaseController
         $age = $currentDate->diffInYears($birthday);
         if ($age < 18 || $age > 100) return response()->json(['errors' => ['born' => [trans('validation.wrong_date')]]], 401);
         Auth::user()->update($fields);
-        broadcast(new UserEvent('change_item',Auth::user()));
+        broadcast(new AdminUserEvent('change_item',Auth::user()));
         return response()->json(['message' => trans('content.save_complete')],200);
     }
 

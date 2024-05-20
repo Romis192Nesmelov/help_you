@@ -1,10 +1,9 @@
 <?php
 
-namespace App\Listeners;
+namespace App\Listeners\Admin;
 
-use App\Events\UserEvent;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
+use App\Events\Admin\AdminUserEvent;
+use function broadcast;
 
 class NewUserListener
 {
@@ -21,6 +20,6 @@ class NewUserListener
      */
     public function handle(object $event): void
     {
-        broadcast(new UserEvent('new_item',$event->user));
+        broadcast(new AdminUserEvent('new_item',$event->user));
     }
 }

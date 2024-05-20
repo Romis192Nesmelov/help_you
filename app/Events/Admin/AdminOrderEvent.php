@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Events;
+namespace App\Events\Admin;
 
-use App\Models\User;
+use App\Models\Order;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class UserEvent
+class AdminOrderEvent
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -16,12 +16,12 @@ class UserEvent
      * Create a new event instance.
      */
     private string $noticeType;
-    private User $user;
+    private Order $order;
 
-    public function __construct(string $noticeType, User $user)
+    public function __construct(string $noticeType, Order $order)
     {
         $this->noticeType = $noticeType;
-        $this->user = $user;
+        $this->order = $order;
     }
 
     /**
@@ -32,7 +32,7 @@ class UserEvent
     public function broadcastOn(): array
     {
         return [
-            new Channel('user_event'),
+            new Channel('admin_order_event'),
         ];
     }
 
@@ -41,7 +41,7 @@ class UserEvent
      */
     public function broadcastAs(): string
     {
-        return 'user';
+        return 'admin_order';
     }
 
     /**
@@ -53,7 +53,7 @@ class UserEvent
     {
         return [
             'notice' => $this->noticeType,
-            'model' => $this->user,
+            'model' => $this->order,
         ];
     }
 }

@@ -7,13 +7,20 @@
     --second-color: #738aa3;
 }
 
+.display-flex {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.panel-body.display-flex .rating-line {
+    margin-top: 15px;
+}
+
 .text-warning-700,
 .text-danger-800 {
     font-weight: bolder;
-}
-
-textarea {
-    height: 200px !important;
 }
 
 .page-title i {
@@ -63,6 +70,21 @@ th.arrange i {
     cursor: pointer;
 }
 
+td.id {
+    width: 20px;
+}
+
+td.user {
+    width: 180px;
+}
+
+td.avatar,
+td.active,
+td.status,
+td.admin {
+    width: 70px;
+}
+
 td.image-cell {
     width: 10%;
     padding: 5px;
@@ -70,13 +92,13 @@ td.image-cell {
 
 th.tools,
 td.tools {
-    width: 70px;
+    width: 80px;
     padding: 0 10px;
     text-align: center;
 }
 
 td.tools i {
-    margin-left: 10px;
+    margin-left: 5px;
 }
 
 td.tools i:first-child {
@@ -111,6 +133,10 @@ td.tools i:first-child {
     top: 50px;
 }
 
+.form-group textarea[name=address] {
+    height: 65px;
+}
+
 .form-group.has-label i {
     top: 45px;
 }
@@ -121,6 +147,11 @@ div.error {
 
 div.error.image {
     border: none;
+}
+
+.form-horizontal .form-group {
+    margin-left: 0;
+    margin-right: 0;
 }
 
 .form-group.error .uploader {
@@ -147,8 +178,7 @@ p sup {
 }
 
 input[type=number] {
-    height: 50px;
-    font-size: 30px;
+    font-size: 25px;
     font-weight: bold;
     text-align: center;
     color: var(--second-color);
@@ -156,7 +186,7 @@ input[type=number] {
 
 textarea {
     width: 100% !important;
-    min-height: 100px;
+    height: 200px !important;
     resize: vertical;
 }
 
@@ -215,6 +245,25 @@ textarea {
 
 .dataTables_length > label > span:first-child {
     margin: 0 15px;
+}
+
+.order-photo {
+    height: 200px;
+}
+
+.form-group textarea[name=address] {
+    height: 50px !important;
+    resize: none;
+}
+
+select#addresses {
+    width: 100%;
+    height: 100px;
+}
+
+#map-steps {
+    width: 100%;
+    height: 400px;
 }
 
 .site-map-root-tag,

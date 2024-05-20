@@ -3,6 +3,7 @@
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\Admin\AdminBaseController;
 use App\Http\Controllers\Admin\AdminLoginController;
+use App\Http\Controllers\Admin\AdminOrdersController;
 use App\Http\Controllers\Admin\AdminUsersController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BaseController;
@@ -126,5 +127,13 @@ Route::prefix('admin')->middleware(['admin'])->name('admin.')->group(function ()
         Route::post('/change-avatar', 'changeAvatar')->name('change_avatar');
         Route::post('/edit-user', 'editUser')->name('edit_user');
 //        Route::post('/delete-user', 'deleteUser')->name('delete_user');
+    });
+
+    Route::controller(AdminOrdersController::class)->group(function () {
+        Route::get('/orders/{slug?}', 'orders')->name('orders');
+        Route::get('/get-orders', 'getOrders')->name('get_orders');
+        Route::post('/edit-order', 'editOrder')->name('edit_order');
+        Route::post('/delete-order-image', 'deleteOrderImage')->name('delete_order_image');
+        Route::post('/delete-order', 'deleteOrder')->name('delete_order');
     });
 });

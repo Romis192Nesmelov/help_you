@@ -1,6 +1,5 @@
 <x-incover
     name="{{ $name }}"
-    required="{{ isset($required) && $required }}"
     error="{{ count($errors) && $errors->has($name) ? $errors->first($name) : '' }}"
     label="{{ isset($label) && $label ? $label : ''  }}"
 >
@@ -11,7 +10,9 @@
             @endforeach
         @else
             @foreach ($values as $value)
-                <option value="{{ $value->id }}" {{ (!count($errors) ? $value->id == $selected : $value->id == old($name)) ? 'selected' : '' }}>{{ $value[$option] }}</option>
+                <option value="{{ $value->id }}" {{ (!count($errors) ? $value->id == $selected : $value->id == old($name)) ? 'selected' : '' }}>
+                    {{ $value[$option].(isset($addOption) ? ' '.$value[$addOption] : '') }}
+                </option>
             @endforeach
         @endif
     </select>

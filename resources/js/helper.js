@@ -1,10 +1,18 @@
-export const initAvatar = () => {
-    window.avatarBlock = $('.avatar.cir');
-    window.defAvatar = '/images/def_avatar.svg';
-    imagePreview(window.avatarBlock, window.defAvatar);
+window.tokenField = $('input[name=_token]').val();
+window.bornMask = "99-99-9999";
+window.fancyBoxSettings = {
+    'autoScale': true,
+    'touch': false,
+    'transitionIn': 'elastic',
+    'transitionOut': 'elastic',
+    'speedIn': 500,
+    'speedOut': 300,
+    'autoDimensions': true,
+    'centerOnScroll': true
 }
+window.singlePoint = null;
 
-export const imagePreview = (container, defImage) => {
+const imagePreview = (container, defImage) => {
     container.each(function () {
         let currentContainer = $(this),
             hoverImg = currentContainer.find('img'),
@@ -24,7 +32,7 @@ export const imagePreview = (container, defImage) => {
                 };
                 reader.readAsDataURL(input);
                 addFileIcon.hide();
-                clearInputIcon.removeClass('d-none');
+                clearInputIcon.removeClass('d-none').removeClass('hidden');
                 clearInputIcon.show();
 
             } else if (defImage) {
@@ -40,7 +48,7 @@ export const imagePreview = (container, defImage) => {
             inputFile.val('');
             if (defImage) currentContainer.css('background-image', 'url('+defImage+')');
             else currentContainer.css('background-image', '');
-            addFileIcon.removeClass('d-none');
+            addFileIcon.removeClass('d-none').removeClass('hidden');
             addFileIcon.show();
             clearInputIcon.removeClass('d-block');
             clearInputIcon.hide();
@@ -52,6 +60,41 @@ export const imagePreview = (container, defImage) => {
             }
         });
     });
+}
+
+window.userRating = (ratings) => {
+    if (ratings.length) {
+        let ratingVal = 0;
+        $.each(ratings, function (k,rating) {
+            ratingVal += rating.value;
+        });
+        return Math.round(ratingVal/ratings.length);
+    } else return 0;
+}
+
+window.getUserAge = (born) => {
+    let now = new Date(),
+        bornArr = born.split('-');
+    let age = now.getFullYear() - parseInt(bornArr[2]);
+    if (now.getMonth() + 1 <= parseInt(bornArr[1]) && now.getDay() < parseInt(bornArr[1])) {
+        age--;
+    }
+    let lastDigit = age.toString().substr(-1,1),
+        word;
+
+    if (lastDigit === 0) word = 'лет';
+    else if (lastDigit === 1) word = 'год';
+    else if (lastDigit > 1 && lastDigit < 5) word = 'года';
+    else word = 'лет';
+
+    return age + ' ' + word;
+}
+
+window.initImages = () => {
+    window.avatarBlock = $('.avatar.cir');
+    window.defAvatar = '/images/def_avatar.svg';
+    imagePreview(window.avatarBlock, window.defAvatar);
+    imagePreview($('.order-photo'));
 }
 
 window.addLoader = () => {
@@ -72,4 +115,41 @@ window.showMessage = (message) => {
     const messageModal = $('#message-modal');
     messageModal.find('h4').html(message);
     messageModal.modal('show');
+}
+
+window.bindFancybox = () => {
+    setTimeout(() => {
+        $('.fancybox').fancybox(window.fancyBoxSettings);
+    }, 200);
+}
+
+window.getPlaceMark = (point, data) => {
+    return new ymaps.Placemark(point, data, {
+        preset: 'islands#darkOrangeCircleDotIcon'
+    });
+}
+
+window.zoomAndCenterMap = () => {
+    window.myMap.setCenter(window.singlePoint, 17);
+}
+
+window.mapInit = (container) => {
+    window.myMap = new ymaps.Map(container, {
+        center: [55.76, 37.64],
+        zoom: 10,
+        controls: []
+    });
+}
+
+window.mapStepsInit = () => {
+    if ($('#map-steps').length) {
+        ymaps.ready(() => {
+            window.mapInit('map-steps');
+            if (window.singlePoint) {
+                window.placemark = window.getPlaceMark(window.singlePoint,{});
+                window.myMap.geoObjects.add(window.placemark);
+                window.zoomAndCenterMap();
+            }
+        });
+    }
 }

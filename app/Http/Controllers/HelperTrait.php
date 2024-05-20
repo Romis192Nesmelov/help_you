@@ -1,10 +1,11 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Events\Admin\AdminOrderEvent;
+use App\Events\Admin\AdminUserEvent;
 use App\Events\ChatMessageEvent;
 use App\Events\IncentivesEvent;
 use App\Events\NotificationEvent;
-use App\Events\UserEvent;
 use App\Jobs\SendMessage;
 use App\Models\Action;
 use App\Models\ActionUser;
@@ -12,7 +13,7 @@ use App\Models\InformingOrder;
 use App\Models\Message;
 use App\Models\MessageUser;
 use App\Models\Order;
-use App\Models\ReadRemovedPerformer;
+use App\Models\OrderImage;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
@@ -62,7 +63,7 @@ trait HelperTrait
     public function changeSomeAvatar(Request $request): JsonResponse
     {
         $validationArr = [
-            'avatar' => 'required|'.$this->validationJpgAndPng,
+            'avatar' => 'required|'.$this->validationJpgAndPngSmall,
             'avatar_size' => 'nullable|integer',
             'avatar_position_x' => 'nullable',
             'avatar_position_y' => 'nullable',
@@ -81,8 +82,38 @@ trait HelperTrait
         }
         $fields = $this->processingImage($request, $fields,'avatar', 'images/avatars/', 'avatar'.$user->id);
         $user->update($fields);
-        broadcast(new UserEvent('change_item',$user));
+        broadcast(new AdminUserEvent('change_item',$user));
         return response()->json(['message' => trans('content.save_complete')],200);
+    }
+
+    public function processingOrderImages(Request $request, Model $order)
+    {
+        for ($i=1;$i<=3;$i++) {
+            $fieldName = 'photo'.$i;
+            $imageFields = $this->processingImage($request, [], $fieldName, 'images/orders_images/', 'order'.$order->id.'_'.$i);
+            if (count($imageFields)) {
+                $orderImage = OrderImage::where('position',$i)->where('order_id',$order->id)->first();
+                if ($orderImage) {
+                    $orderImage->image = $imageFields[$fieldName];
+                    $orderImage->save();
+                } else {
+                    OrderImage::create([
+                        'position' => $i,
+                        'image' => $imageFields[$fieldName],
+                        'order_id' => $order->id
+                    ]);
+                }
+            }
+        }
+    }
+
+    public function removeOrderImage(Order $order, int $pos): JsonResponse
+    {
+        $fileName = 'images/orders_images/order'.$order->id.'_'.$pos.'.jpg';
+        OrderImage::where('image',$fileName)->delete();
+        $this->deleteFile($fileName);
+        broadcast(new AdminOrderEvent('change_item', $order));
+        return response()->json([],200);
     }
 
     public function processingImage(Request $request, array $fields, string $imageField, string $pathToSave, string $imageName): array

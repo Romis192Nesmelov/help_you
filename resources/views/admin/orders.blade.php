@@ -4,11 +4,12 @@
     <div class="panel panel-flat">
         @include('admin.blocks.title_block')
         <div class="panel-body">
-            <users-component
-                get_users_url="{{ route('admin.get_users') }}"
-                edit_user_url="{{ route('admin.users') }}"
+            <orders-component
+                get_orders_url="{{ route('admin.get_orders') }}"
+                edit_order_url="{{ route('admin.orders') }}"
+                delete_order_url="{{ route('admin.delete_order') }}"
                 arrange="{{ json_encode(['field' => 'id', 'direction' => 'desc']) }}"
-            ></users-component>
+            ></orders-component>
         </div>
         @include('admin.blocks.add_button_block')
     </div>

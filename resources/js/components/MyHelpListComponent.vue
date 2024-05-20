@@ -21,19 +21,10 @@
 </template>
 
 <script>
-import TabsComponent from "./blocks/TabsComponent.vue";
-import OrdersTabsComponent from "./blocks/OrdersTabsComponent.vue";
-import NoDataComponent from "./blocks/NoDataComponent.vue";
 import MyOrdersListComponent from "./MyOrdersListComponent.vue";
-
 export default {
     extends: MyOrdersListComponent,
     name: "MyHelpListComponent",
-    components: {
-        TabsComponent,
-        OrdersTabsComponent,
-        NoDataComponent
-    },
     created() {
         let self = this,
             orderIndex;

@@ -1,6 +1,4 @@
 import './bootstrap';
-import {imagePreview} from "./helper.js";
-import {initAvatar} from "./helper.js";
 import {createApp} from "vue/dist/vue.esm-bundler";
 import mitt from 'mitt';
 import FeedbackComponent from "./components/FeedbackComponent.vue";
@@ -35,27 +33,18 @@ const app = createApp({
     }
 });
 
+window.emitter = mitt();
+app.config.globalProperties.emitter = window.emitter;
+app.mount('#app');
+
 window.tokenField = $('input[name=_token]').val();
 window.phoneMask = "+n(999)999-99-99";
 window.codeMask = "99-99-99";
-window.bornMask = "99-99-9999";
 window.phoneRegExp = /^((\+)?(\d)(\s)?(\()?[0-9]{3}(\))?(\s)?([0-9]{3})(\-)?([0-9]{2})(\-)?([0-9]{2}))$/gi;
 window.bornRegExp = /^([0-3][0-9])-([0-1][0-9])-((19([0-9][0-9]))|(20[0-9][0-9]))$/gi;
 window.emailRegExp = /^[a-zA-Z0-9][\-_\.\+\!\#\$\%\&\'\*\/\=\?\^\`\{\|]{0,1}([a-zA-Z0-9][\-_\.\+\!\#\$\%\&\'\*\/\=\?\^\`\{\|]{0,1})*[a-zA-Z0-9]@[a-zA-Z0-9][-\.]{0,1}([a-zA-Z][-\.]{0,1})*[a-zA-Z0-9]\.[a-zA-Z0-9]{1,}([\.\-]{0,1}[a-zA-Z]){0,}[a-zA-Z0-9]{0,}$/gi;
 window.codeRegExp = /^((\d){2}(\-)(\d){2}(\-)(\d){2})$/gi;
-window.singlePoint = null;
-
 window.toCamelize = str => str.replace(/-|_./g, x=>x[1].toUpperCase());
-
-window.userRating = (ratings) => {
-    if (ratings.length) {
-        let ratingVal = 0;
-        $.each(ratings, function (k,rating) {
-            ratingVal += rating.value;
-        });
-        return Math.round(ratingVal/ratings.length);
-    } else return 0;
-}
 
 window.bellRinging = (bellIcon) => {
     let counter = 0,
@@ -76,51 +65,6 @@ window.bellRinging = (bellIcon) => {
             '-ms-transform' : 'rotate('+ degrees +'deg)',
             'transform' : 'rotate('+ degrees +'deg)'});
     }
-}
-
-window.getUserAge = (born) => {
-    let now = new Date(),
-        bornArr = born.split('-');
-    let age = now.getFullYear() - parseInt(bornArr[2]);
-    if (now.getMonth() + 1 <= parseInt(bornArr[1]) && now.getDay() < parseInt(bornArr[1])) {
-        age--;
-    }
-    let lastDigit = age.toString().substr(-1,1),
-        word;
-
-    if (lastDigit === 0) word = 'лет';
-    else if (lastDigit === 1) word = 'год';
-    else if (lastDigit > 1 && lastDigit < 5) word = 'года';
-    else word = 'лет';
-
-    return age + ' ' + word;
-}
-
-window.getPlaceMark = (point, data) => {
-    return new ymaps.Placemark(point, data, {
-        preset: 'islands#darkOrangeCircleDotIcon'
-    });
-}
-
-window.zoomAndCenterMap = () => {
-    window.myMap.setCenter(window.singlePoint, 17);
-}
-
-window.fancyBoxSettings = {
-    'autoScale': true,
-    'touch': false,
-    'transitionIn': 'elastic',
-    'transitionOut': 'elastic',
-    'speedIn': 500,
-    'speedOut': 300,
-    'autoDimensions': true,
-    'centerOnScroll': true
-}
-
-window.bindFancybox = () => {
-    setTimeout(() => {
-        $('.fancybox').fancybox(window.fancyBoxSettings);
-    }, 200);
 }
 
 window.enablePointImagesCarousel = () => {
@@ -146,10 +90,6 @@ window.scrollBottomMessages = () => {
     $('#messages').mCustomScrollbar('scrollTo','bottom');
 }
 
-window.emitter = mitt();
-app.config.globalProperties.emitter = window.emitter;
-app.mount('#app');
-
 $(document).ready(function () {
     // MAIN BLOCK BEGIN
     $('.form-group.has-label i.icon-eye').click(function () {
@@ -172,10 +112,9 @@ $(document).ready(function () {
 
     setTimeout(function () {
         removeLoader();
+        window.initImages();
+        window.bindFancybox();
     }, 500);
-
-    // Fancybox init
-    window.bindFancybox();
 
     $('#main-nav .navbar-toggler').click(function () {
         if (!$(this).hasClass('collapsed')) {
@@ -194,23 +133,8 @@ $(document).ready(function () {
     });
     // MAIN BLOCK END
 
-    // ACCOUNT BLOCK BEGIN
-    initAvatar();
-    // ACCOUNT BLOCK END
-
     // EDIT ORDER BLOCK BEGIN
-    imagePreview($('.order-photo'));
-
-    if ($('#map-steps').length) {
-        ymaps.ready(() => {
-            mapInit('map-steps');
-            if (window.singlePoint) {
-                window.placemark = window.getPlaceMark(window.singlePoint,{});
-                window.myMap.geoObjects.add(window.placemark);
-                window.zoomAndCenterMap();
-            }
-        });
-    }
+    window.window.mapStepsInit();
     // EDIT ORDER BLOCK END
 
     // ORDERS BLOCK BEGIN
@@ -222,23 +146,18 @@ $(document).ready(function () {
             alwaysShowScrollbar: 0
         });
         ymaps.ready(() => {
-            mapInit('map');
+            window.mapInit('map');
             window.emitter.emit('map-is-ready');
         });
     }
     // ORDERS BLOCK END
+
+    // MESSAGES BLOCK BEGIN
     $('#messages').mCustomScrollbar({
         axis: 'y',
         theme: 'light-3',
         alwaysShowScrollbar: 1,
         scrollTo: 'bottom'
     });
+    // MESSAGES BLOCK END
 });
-
-const mapInit = (container) => {
-    window.myMap = new ymaps.Map(container, {
-        center: [55.76, 37.64],
-        zoom: 10,
-        controls: []
-    });
-}

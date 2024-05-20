@@ -36,22 +36,14 @@
 </template>
 
 <script>
-import ModalComponent from "./blocks/ModalComponent.vue";
 import OrderRespondModalComponent from "./blocks/OrderRespondModalComponent.vue";
 import MyOrdersListComponent from "./MyOrdersListComponent.vue";
-import TabsComponent from "./blocks/TabsComponent.vue";
-import OrdersTabsComponent from "./blocks/OrdersTabsComponent.vue";
-import NoDataComponent from "./blocks/NoDataComponent.vue";
 
 export default {
     extends: MyOrdersListComponent,
     name: "MySubscriptionsComponent",
     components: {
-        ModalComponent,
         OrderRespondModalComponent,
-        TabsComponent,
-        OrdersTabsComponent,
-        NoDataComponent
     },
     created() {
         window.emitter.on('refresh-complete', () => {

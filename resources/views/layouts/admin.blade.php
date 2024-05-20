@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,100,500,700,900" rel="stylesheet" type="text/css">
 
     <script src="https://code.jquery.com/jquery-2.2.4.js" integrity="sha256-iT6Q9iMJYuQiMWNd9lDyBUStIq/8PuOW33aOqmvFpqI=" crossorigin="anonymous"></script>
+    <script src="https://api-maps.yandex.ru/2.1/?apikey={{ env('YANDEX_API_KEY') }}&lang=ru_RU" type="text/javascript"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery.maskedinput@1.4.1/src/jquery.maskedinput.min.js" type="text/javascript"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     @vite([
@@ -22,7 +23,7 @@
         'resources/css/admin/components.css',
         'resources/css/admin/colors.css',
         'resources/css/jquery.fancybox.min.css',
-        'resources/css/avatar.css',
+        'resources/css/images.css',
         'resources/css/loader.css',
         'resources/css/admin/admin.css',
         'resources/js/interactions.min.js',
@@ -55,7 +56,6 @@
         <ul class="nav navbar-nav">
             <li><a class="sidebar-control sidebar-main-toggle hidden-xs"><i class="icon-paragraph-justify3"></i></a></li>
         </ul>
-
         <ul class="nav navbar-nav navbar-right">
             @include('admin.blocks.dropdown_menu_item_block',[
                 'menuName' => auth()->user()->email,

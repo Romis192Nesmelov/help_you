@@ -1,16 +1,9 @@
 <template>
-    <ModalComponent id="confirm-delete-modal" head="Подтверждение удаления" v-if="delete_url">
-        <h2 class="w-100 text-center">{{ delete_phrase }}</h2>
-        <div class="modal-footer">
-            <button @click="delRow" type="button" class="btn btn-primary" data-bs-dismiss="modal" data-dismiss="modal">
-                <i class="icon-checkmark4"></i><span>Да</span>
-            </button>
-
-            <button type="button" class="btn btn-primary" data-bs-dismiss="modal" data-dismiss="modal">
-                <i class="icon-cancel-circle2"></i><span>Нет</span>
-            </button>
-        </div>
-    </ModalComponent>
+    <delete-item-modal-component
+        v-if="delete_url"
+        :delete_phrase="delete_phrase"
+        @click-yes="delRow"
+    ></delete-item-modal-component>
 
     <div class="dt-top-line">
         <InputComponent
@@ -21,24 +14,21 @@
             @keyup="filtered"
             @change="filtered"
         ></InputComponent>
-        <div>
-            <span class="hidden-sm">Показывать по:</span>
-            <select class="select-show-by" v-model="showBy">
-                <option v-for="showCase in showCases" :key="'show-by-' + showCase" :value="showCase">{{ showCase }}</option>
-            </select>
-        </div>
+        <ShowCaseComponent
+            @change-show-case="changeShowCase"
+        ></ShowCaseComponent>
     </div>
     <div class="table-responsive">
         <table class="table table-bordered table-striped">
             <thead>
                 <tr>
                     <th class="text-center" v-for="(descr, field) in fields" :key="'dt-head-' + field">{{ descr }}</th>
-                    <th class="tools" v-if="edit_url || delete_url">Инструменты</th>
+                    <th class="tools" v-if="edit_url || delete_url"></th>
                 </tr>
                 <tr>
                     <th class="text-center arrange" v-for="(descr, field) in fields" :key="'dt-arrange-by-' + field">
                         <i
-                            v-if="field !== 'avatar'"
+                            v-if="field !== 'avatar' && field !== 'rating'"
                             :class="(arrangeCol.field === field ? 'text-info ' : '') + (arrangeCol.field === field && arrangeCol.direction === 'desc' ? 'icon-arrow-up12' : 'icon-arrow-down12')"
                             @click="setArrange(field,arrangeCol.field === field ? arrangeCol.direction : 'asc')"
                         ></i>
@@ -48,7 +38,7 @@
             </thead>
             <tbody>
                 <tr v-for="item in items.data" :key="'dt-row-' + item.id">
-                    <td class="text-center" v-for="(desc, field) in fields" :key="'dt-cell-' + field">
+                    <td :class="'text-center' + (field === 'id' || field === 'avatar' || field === 'user' || field === 'status' || field === 'active' || field === 'admin' ? ' ' + field : '')" v-for="(desc, field) in fields" :key="'dt-cell-' + field">
                         <AvatarComponent
                             v-if="field === 'avatar'"
                             :user_id="item.id"
@@ -57,6 +47,11 @@
                             :avatar_props="item.avatar_props"
                             :change_avatar_url="change_avatar_url"
                         ></AvatarComponent>
+                        <RatingLineComponent
+                            :income_rating="getUserRating(item.ratings)"
+                            :allow_change_rating="false"
+                            v-if="field === 'rating'"
+                        ></RatingLineComponent>
                         <span v-else-if="field === 'active'" :class="'label label-' + (item['active'] ? 'success' : 'warning')">{{ (item['active'] ? 'активен' : 'не активен') }}</span>
                         <span v-else-if="field === 'admin'" :class="'label label-' + (item['admin'] ? 'info' : 'primary')">{{ (item['admin'] ? 'админ' : 'пользователь') }}</span>
                         <span v-else>{{ item[field] }}</span>
@@ -70,29 +65,33 @@
                 </tr>
             </tbody>
         </table>
-        <ul class="pagination" v-if="items.links && items.links.length > 3">
-            <li :class="link.active ? 'active' : ''" v-for="(link, key) in items.links" :key="'paginate-'+key" @click="paginate(link.url)">
-                <span v-if="link.label.indexOf('Пред') === 8">‹</span>
-                <span v-else-if="link.label.indexOf('След') === 0">›</span>
-                <span v-else>{{ link.label }}</span>
-            </li>
-        </ul>
+        <paginator-component
+            v-if="items.links"
+            :links="items.links"
+            @paginate="paginate"
+        ></paginator-component>
     </div>
 </template>
 
 <script>
-import ModalComponent from "../../blocks/ModalComponent.vue";
 import InputComponent from "../../blocks/InputComponent.vue";
 import ButtonComponent from "../../blocks/ButtonComponent.vue";
+import DeleteItemModalComponent from "./DeleteItemModalComponent.vue";
+import ShowCaseComponent from "./ShowCaseComponent.vue";
+import PaginatorComponent from "./PaginatorComponent.vue";
 import AvatarComponent from "../../blocks/AvatarComponent.vue";
+import RatingLineComponent from "../../blocks/RatingLineComponent.vue";
 
 export default {
     name: "DataTableComponent",
     components: {
-        ModalComponent,
         InputComponent,
         ButtonComponent,
+        DeleteItemModalComponent,
+        ShowCaseComponent,
+        PaginatorComponent,
         AvatarComponent,
+        RatingLineComponent
     },
     props: {
         'fields': Object,
@@ -105,22 +104,11 @@ export default {
         'broadcast_on': String|null,
         'broadcast_as': String|null,
     },
-    emits: ['paginate','arrange'],
     created() {
         let self = this;
         this.arrangeCol = JSON.parse(self.arrange);
         this.getDataUrl = this.get_data_url;
         this.getData(this.get_data_url);
-
-        $(document).ready(function () {
-            $('.select-show-by').select2({
-                minimumResultsForSearch: Infinity,
-                width: 80
-            }).change(function () {
-                self.showBy = $(this).val();
-                self.getData(self.getUrl(self.get_data_url));
-            });
-        });
 
         if (this.broadcast_on) {
             window.Echo.channel(this.broadcast_on).listen('.' + this.broadcast_as, res => {
@@ -141,7 +129,6 @@ export default {
         return {
             getDataUrl: String,
             items: Object,
-            showCases: [5,10,20,30,50],
             showBy: 10,
             filter: '',
             deleteId: Number,
@@ -159,6 +146,10 @@ export default {
         },
         paginate(url) {
             this.getData(this.getUrl(url));
+        },
+        changeShowCase(showBy) {
+            this.showBy = showBy;
+            this.getData(this.getUrl(this.get_data_url));
         },
         confirmDel(id) {
             this.deleteId = id;
@@ -187,7 +178,6 @@ export default {
         },
         filtered() {
             let self = this;
-            // console.log(self.getUrl(self.get_data_url));
             self.getData(self.getUrl(self.get_data_url));
         },
         getUrl(url) {
@@ -198,6 +188,13 @@ export default {
                 + '&direction=' + this.arrangeCol.direction
                 + '&show_by=' + this.showBy
                 + (this.filter ? '&filter=' + this.filter : '')
+                + this.getAdditionalFilters()
+        },
+        getAdditionalFilters() {
+            return '';
+        },
+        getUserRating(ratings) {
+            return window.userRating(ratings);
         }
     }
 }

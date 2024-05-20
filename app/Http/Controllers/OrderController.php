@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use App\Events\NotificationEvent;
 use App\Events\OrderEvent;
+use App\Events\Admin\AdminOrderEvent;
 use App\Http\Requests\Order\EditOrderRequest;
 use App\Http\Requests\Order\RemovePerformerRequest;
 use App\Http\Requests\Order\SetRatingRequest;
@@ -72,7 +73,9 @@ class OrderController extends BaseController
             $this->authorize('owner', $this->data['order']);
             $this->data['order']->update(['status' => 3]);
             $this->data['order']->refresh();
+
             broadcast(new OrderEvent('new_order_status', $this->data['order']));
+            broadcast(new AdminOrderEvent('change_item', $this->data['order']));
         }
         $this->data['session_key'] = $this->getSessionKey($request);
         $this->data['order_types'] = OrderType::where('active',1)->with('subtypesActive')->get();
@@ -163,6 +166,7 @@ class OrderController extends BaseController
             $this->mailOrderNotice($order, $order->userCredentials, 'new_order_status_notice');
 
             broadcast(new OrderEvent('new_order_status', $order));
+            broadcast(new AdminOrderEvent('change_item', $order));
 
 //            if ($order->performers->count() >= $order->need_performers) {
 //                $order->status = 1;
@@ -198,7 +202,7 @@ class OrderController extends BaseController
             $fields = [
                 'city_id' => 1,
                 'user_id' => Auth::id(),
-                'status' => 2 /*TODO: default: 3 (on moderation) */
+                'status' => 3 /*TODO: default: 3 (on moderation) */
             ];
 
             foreach ($steps as $step) {
@@ -215,25 +219,13 @@ class OrderController extends BaseController
             } else {
                 $order = Order::create($fields);
                 $this->newOrderInSubscription($order);
+
+                broadcast(new OrderEvent('new_order', $order));
+                broadcast(new AdminOrderEvent('new_item', $order));
             }
 
-            for ($i=1;$i<=3;$i++) {
-                $fieldName = 'photo'.$i;
-                $imageFields = $this->processingImage($request, [], $fieldName, 'images/orders_images/', 'order'.$order->id.'_'.$i);
-                if (count($imageFields)) {
-                    $orderImage = OrderImage::where('position',$i)->where('order_id',$order->id)->first();
-                    if ($orderImage) {
-                        $orderImage->image = $imageFields[$fieldName];
-                        $orderImage->save();
-                    } else {
-                        OrderImage::create([
-                            'position' => $i,
-                            'image' => $imageFields[$fieldName],
-                            'order_id' => $order->id
-                        ]);
-                    }
-                }
-            }
+            $this->processingOrderImages($request, $order);
+
             return response()->json([
                 'order' => $order,
                 'image_fields' => $imageFields ?? 'none'
@@ -266,7 +258,9 @@ class OrderController extends BaseController
             }
 
             $this->removeOrderUnreadMessages($request->id);
+
             broadcast(new OrderEvent('remove_order', $order));
+            broadcast(new AdminOrderEvent('del_item', $order));
 
             $order->delete();
             return response()->json([],200);
@@ -280,11 +274,7 @@ class OrderController extends BaseController
     {
         $order = Order::find($request->id);
         $this->authorize('owner', $order);
-        $fileName = 'images/orders_images/order'.$order->id.'_'.$request->pos.'.jpg';
-        $orderImage = OrderImage::where('image',$fileName)->first();
-        $orderImage->delete();
-        $this->deleteFile($fileName);
-        return response()->json([],200);
+        return $this->removeOrderImage($order, $request->pos);
     }
 
     /**
@@ -298,7 +288,9 @@ class OrderController extends BaseController
         $order->save();
 
         $this->removeOrderUnreadMessages($request->id);
+
         broadcast(new OrderEvent('remove_order', $order));
+        broadcast(new AdminOrderEvent('change_item', $order));
 
         return response()->json([],200);
     }
@@ -342,6 +334,10 @@ class OrderController extends BaseController
 
         OrderUser::where('order_id',$request->id)->delete();
         $this->newOrderInSubscription($order);
+
+        broadcast(new OrderEvent('new_order', $order));
+        broadcast(new AdminOrderEvent('change_item', $order));
+
         return response()->json([],200);
     }
 
@@ -362,8 +358,8 @@ class OrderController extends BaseController
             ]);
 
             /*TODO: enable after approving */
-//            broadcast(new NotificationEvent('new_order_in_subscription', $order, $subscription->subscriber_id));
-//            $this->mailOrderNotice($order, $subscription->subscriber, 'new_order_in_subscription');
+            broadcast(new NotificationEvent('new_order_in_subscription', $order, $subscription->subscriber_id));
+            $this->mailOrderNotice($order, $subscription->subscriber, 'new_order_in_subscription');
         }
     }
 

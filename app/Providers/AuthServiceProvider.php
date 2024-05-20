@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+ use App\Models\User;
+ use Illuminate\Database\Eloquent\Model;
  use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
@@ -23,11 +25,11 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        Gate::define('owner', function ($user, $model) {
+        Gate::define('owner', function (User $user, Model $model) {
             return $user->id == $model->user_id;
         });
 
-        Gate::define('subscriber', function ($user, $model) {
+        Gate::define('subscriber', function (User $user, Model $model) {
             return $user->id == $model->subscriber_id;
         });
     }

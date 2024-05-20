@@ -23,18 +23,10 @@
 
 <script>
 import MyOrdersListComponent from "./MyOrdersListComponent.vue";
-import TabsComponent from "./blocks/TabsComponent.vue";
-import OrdersTabsComponent from "./blocks/OrdersTabsComponent.vue";
-import NoDataComponent from "./blocks/NoDataComponent.vue";
 
 export default {
     extends: MyOrdersListComponent,
     name: "MyChatsComponent",
-    components: {
-        TabsComponent,
-        OrdersTabsComponent,
-        NoDataComponent
-    },
     props: {
         'chat_url': String
     },

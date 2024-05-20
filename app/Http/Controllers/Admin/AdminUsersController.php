@@ -1,14 +1,15 @@
 <?php
 
 namespace App\Http\Controllers\Admin;
-use App\Events\UserEvent;
+use App\Events\Admin\AdminUserEvent;
 use App\Http\Controllers\HelperTrait;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-//use Illuminate\Validation\Rules\Password;
 use Illuminate\View\View;
+
+//use Illuminate\Validation\Rules\Password;
 
 class AdminUsersController extends AdminBaseController
 {
@@ -35,6 +36,7 @@ class AdminUsersController extends AdminBaseController
         return response()->json(
             $this->user::query()
                 ->filtered()
+                ->with('ratings')
                 ->orderBy(request('field') ?? 'id',request('direction') ?? 'desc')
                 ->paginate(request('show_by') ?? 10)
         );
@@ -60,11 +62,11 @@ class AdminUsersController extends AdminBaseController
             if ($request->input('password')) $validationArr['password'] = $this->validationPassword;
             $fields = $this->validate($request, $validationArr);
             $fields = $this->getSpecialFields($this->user, $validationArr, $fields);
-            $user = User::find($request->input('id'));
+            $user = User::where('id',$request->input('id'))->with('ratings')->first();
             if ($request->input('password')) $fields['password'] = bcrypt($fields['password']);
             $user->update($fields);
             $this->processingFiles($request, $user, 'avatar', $avatarPath, 'avatar'.$user->id);
-            broadcast(new UserEvent('new_item',$user));
+            broadcast(new AdminUserEvent('new_item',$user));
         } else {
             $validationArr['password'] = $this->validationPassword;
             $fields = $this->validate($request, $validationArr);
@@ -72,7 +74,7 @@ class AdminUsersController extends AdminBaseController
             $fields['password'] = bcrypt($fields['password']);
             $user = User::create($fields);
             $this->processingFiles($request, $user, 'avatar', $avatarPath, 'avatar'.$user->id);
-            broadcast(new UserEvent('change_item',$user));
+            broadcast(new AdminUserEvent('change_item',$user));
         }
         $this->saveCompleteMessage();
         return redirect(route('admin.users'));

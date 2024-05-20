@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Admin;
+use App\Events\Admin\AdminOrderEvent;
 use App\Http\Controllers\HelperTrait;
 use App\Http\Controllers\Controller;
 //use App\Models\Seo;
@@ -28,6 +29,11 @@ class AdminBaseController extends Controller
             'users' => [
                 'key' => 'users',
                 'icon' => 'icon-users',
+                'hidden' => false,
+            ],
+            'orders' => [
+                'key' => 'orders',
+                'icon' => 'icon-map',
                 'hidden' => false,
             ],
         ];
@@ -176,6 +182,7 @@ class AdminBaseController extends Controller
             }
         }
         $table->delete();
+        broadcast(new AdminOrderEvent('del_item', $table));
         return response()->json(['message' => trans('admin.delete_complete')],200);
     }
 
