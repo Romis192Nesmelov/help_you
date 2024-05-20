@@ -71,13 +71,13 @@ class AdminOrdersController extends AdminBaseController
             ],
         );
 
-//        if (!$order->orderType->subtypesActive->count()) {
-//            $order->subtype_id = null;
-//            $order->save();
-//        }
-
         $this->processingOrderImages($request, $order);
         broadcast(new AdminOrderEvent('change_item', $order));
+
+        if ($request->status != 3) {
+            $order->adminNotice->read = 1;
+            $order->adminNotice->save();
+        }
 
         $this->saveCompleteMessage();
         return redirect(route('admin.orders'));

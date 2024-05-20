@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\Auth;
 
 class Order extends Model
@@ -144,5 +145,10 @@ class Order extends Model
     public function lastInformingOrder(): HasMany
     {
         return $this->hasMany(InformingOrder::class, 'order_id')->select('created_at')->orderBy('created_at','desc');
+    }
+
+    public function adminNotice(): HasOne
+    {
+        return $this->hasOne(AdminNotice::class);
     }
 }

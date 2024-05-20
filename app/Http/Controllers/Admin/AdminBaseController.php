@@ -5,6 +5,7 @@ use App\Events\Admin\AdminOrderEvent;
 use App\Http\Controllers\HelperTrait;
 use App\Http\Controllers\Controller;
 //use App\Models\Seo;
+use App\Models\AdminNotice;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Model;
@@ -238,7 +239,13 @@ class AdminBaseController extends Controller
             $this->data,
             [
                 'breadcrumbs' => $this->breadcrumbs,
-                'menu' => $this->menu
+                'menu' => $this->menu,
+                'notices' => AdminNotice::query()
+                    ->where('read',null)
+                    ->with('order.user')
+                    ->select(['order_id'])
+                    ->orderByDesc('created_at')
+                    ->get()
             ]
         ));
     }

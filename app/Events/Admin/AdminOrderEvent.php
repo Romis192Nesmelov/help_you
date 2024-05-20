@@ -53,7 +53,7 @@ class AdminOrderEvent
     {
         return [
             'notice' => $this->noticeType,
-            'model' => $this->order,
+            'model' => $this->order->with(['user']),
         ];
     }
 }

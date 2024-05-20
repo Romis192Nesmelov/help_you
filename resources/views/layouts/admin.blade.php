@@ -41,7 +41,7 @@
     ])
 </head>
 
-<body>
+<body id="app">
 @csrf
 <!-- Main navbar -->
 <div class="navbar navbar-inverse">
@@ -56,12 +56,18 @@
         <ul class="nav navbar-nav">
             <li><a class="sidebar-control sidebar-main-toggle hidden-xs"><i class="icon-paragraph-justify3"></i></a></li>
         </ul>
-        <ul class="nav navbar-nav navbar-right">
-            @include('admin.blocks.dropdown_menu_item_block',[
-                'menuName' => auth()->user()->email,
-                'menu' => [['href' => route('auth.logout'), 'icon' => 'icon-switch2', 'text' => trans('admin.exit')]]
-            ])
-        </ul>
+        <div class="navbar-right">
+            <notice-component
+                incoming_notices="{{ json_encode($notices) }}"
+                incoming_user="{{ json_encode(auth()->user()) }}"
+                orders_url="{{ route('admin.orders') }}"
+                logout_url="{{ route('auth.logout') }}"
+            ></notice-component>
+        </div>
+{{--            @include('admin.blocks.dropdown_menu_item_block',[--}}
+{{--                'menuName' => auth()->user()->email,--}}
+{{--                'menu' => [['href' => route('auth.logout'), 'icon' => 'icon-switch2', 'text' => trans('admin.exit')]]--}}
+{{--            ])--}}
 
     </div>
 </div>
@@ -83,7 +89,7 @@
                     <div class="media-body">
                         <div class="text-size-mini text-muted">
                             <i class="glyphicon glyphicon-user text-size-small"></i>
-                            {{ trans('admin.welcome') }}<br>{{ auth()->user()->email }}
+                            {{ trans('admin.welcome') }}<br>{{ auth()->user()->family.' '.auth()->user()->name }}
                         </div>
                     </div>
                 </div>
@@ -158,7 +164,7 @@
     <!-- /page header -->
 
     <!-- Content area -->
-    <div id="app" class="content">@yield('content')</div>
+    <div class="content">@yield('content')</div>
     <!-- /content area -->
 
 </div>

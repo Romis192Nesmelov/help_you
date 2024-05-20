@@ -204,15 +204,20 @@ textarea {
     color: var(--second-color);
 }
 
-/*.pagination > .active > a,*/
-/*.pagination > .active > span,*/
-/*.pagination > .active > a:hover,*/
-/*.pagination > .active > span:hover,*/
-/*.pagination > .active > a:focus,*/
-/*.pagination > .active > span:focus {*/
-/*    background-color: var(--second-color);*/
-/*    border-color: #2c3341;*/
-/*}*/
+.nav.navbar-nav {
+    display: flex;
+    align-items: center;
+}
+
+.dropdown-user .dropdown-toggle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.dropdown-user .avatar.cir.small {
+    background-color: white;
+}
 
 .btn-primary,
 .navigation > li.active > a,

@@ -8,6 +8,7 @@ use App\Http\Requests\Order\EditOrderRequest;
 use App\Http\Requests\Order\RemovePerformerRequest;
 use App\Http\Requests\Order\SetRatingRequest;
 use App\Http\Resources\Orders\OrdersResource;
+use App\Models\AdminNotice;
 use App\Models\Message;
 use App\Models\Rating;
 use App\Models\ReadPerformer;
@@ -19,7 +20,6 @@ use App\Http\Requests\Order\OrderRequest;
 use App\Http\Requests\Order\PrevStepRequest;
 use App\Http\Requests\Order\ReadOrderRequest;
 use App\Models\Order;
-use App\Models\OrderImage;
 use App\Models\OrderType;
 use App\Models\OrderUser;
 use App\Models\ReadOrder;
@@ -99,7 +99,7 @@ class OrderController extends BaseController
         return response()->json([
             'orders' => Order::query()
                 ->where('user_id',Auth::id())
-                ->where('status',2) /*TODO: default: 3 (on moderation) */
+                ->where('status',3)
                 ->filtered()
                 ->with(['orderType','subType','images','user','performers'])
                 ->orderByDesc('created_at')
@@ -202,7 +202,7 @@ class OrderController extends BaseController
             $fields = [
                 'city_id' => 1,
                 'user_id' => Auth::id(),
-                'status' => 3 /*TODO: default: 3 (on moderation) */
+                'status' => 3
             ];
 
             foreach ($steps as $step) {
@@ -218,6 +218,7 @@ class OrderController extends BaseController
                 $order->update($fields);
             } else {
                 $order = Order::create($fields);
+                AdminNotice::create(['order_id' => $order->id]);
                 $this->newOrderInSubscription($order);
 
                 broadcast(new OrderEvent('new_order', $order));
@@ -332,6 +333,8 @@ class OrderController extends BaseController
         $order->status = 3;
         $order->save();
 
+        AdminNotice::where(['order_id' => $order->id])->update(['read',null]);
+
         OrderUser::where('order_id',$request->id)->delete();
         $this->newOrderInSubscription($order);
 
@@ -356,8 +359,6 @@ class OrderController extends BaseController
                 'subscription_id' => $subscription->id,
                 'order_id' => $order->id,
             ]);
-
-            /*TODO: enable after approving */
             broadcast(new NotificationEvent('new_order_in_subscription', $order, $subscription->subscriber_id));
             $this->mailOrderNotice($order, $subscription->subscriber, 'new_order_in_subscription');
         }

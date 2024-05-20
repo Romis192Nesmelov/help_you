@@ -6,8 +6,8 @@
         :delete_url="delete_order_url"
         delete_phrase="Вы действительно хотите удалить эту заявку?"
         :arrange="arrange"
-        broadcast_on="admin_user_event"
-        broadcast_as="admin_user"
+        broadcast_on="admin_order_event"
+        broadcast_as="admin_order"
     ></orders-data-table-component>
 </template>
 

@@ -6,6 +6,7 @@ import OrdersComponent from "../components/admin/OrdersComponent.vue";
 import UserRatingComponent from "../components/admin/blocks/UserRatingComponent.vue";
 import UsersComponent from "../components/admin/UsersComponent.vue";
 import EditOrderMapComponent from "../components/admin/blocks/EditOrderMapComponent.vue";
+import NoticeComponent from "../components/admin/blocks/NoticeComponent.vue";
 
 const app = createApp({
     components: {
@@ -13,7 +14,8 @@ const app = createApp({
         OrdersComponent,
         AvatarComponent,
         UserRatingComponent,
-        EditOrderMapComponent
+        EditOrderMapComponent,
+        NoticeComponent
     }
 });
 
