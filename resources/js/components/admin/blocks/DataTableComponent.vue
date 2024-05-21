@@ -50,7 +50,7 @@
                         <RatingLineComponent
                             :income_rating="getUserRating(item.ratings)"
                             :allow_change_rating="false"
-                            v-if="field === 'rating'"
+                            v-else-if="field === 'rating'"
                         ></RatingLineComponent>
                         <span v-else-if="field === 'active'" :class="'label label-' + (item['active'] ? 'success' : 'warning')">{{ (item['active'] ? 'активен' : 'не активен') }}</span>
                         <span v-else-if="field === 'admin'" :class="'label label-' + (item['admin'] ? 'info' : 'primary')">{{ (item['admin'] ? 'админ' : 'пользователь') }}</span>

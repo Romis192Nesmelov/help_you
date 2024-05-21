@@ -126,7 +126,7 @@ Route::prefix('admin')->middleware(['admin'])->name('admin.')->group(function ()
         Route::get('/get-users', 'getUsers')->name('get_users');
         Route::post('/change-avatar', 'changeAvatar')->name('change_avatar');
         Route::post('/edit-user', 'editUser')->name('edit_user');
-//        Route::post('/delete-user', 'deleteUser')->name('delete_user');
+        Route::post('/delete-user', 'deleteUser')->name('delete_user');
     });
 
     Route::controller(AdminOrdersController::class)->group(function () {

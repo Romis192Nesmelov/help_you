@@ -1,43 +1,50 @@
 <?php
 
 namespace App\Http\Controllers\Admin;
+use App\Actions\DeleteFile;
+use App\Actions\DeleteOrder;
+use App\Actions\NewOrderStatusEvents;
+use App\Actions\OrderResponse;
+use App\Actions\OrderResponseEvents;
+use App\Actions\ProcessingImage;
+use App\Actions\ProcessingOrderImages;
+use App\Actions\RemoveOrderEvents;
+use App\Actions\RemoveOrderImage;
+use App\Actions\RemoveOrderUnreadMessages;
 use App\Events\Admin\AdminOrderEvent;
-use App\Http\Controllers\HelperTrait;
+use App\Events\NotificationEvent;
+use App\Http\Controllers\MessagesHelperTrait;
+use App\Http\Requests\Admin\AdminEditOrderRequest;
 use App\Http\Requests\Order\DelOrderImageRequest;
+use App\Http\Requests\Order\OrderRequest;
 use App\Models\Order;
 use App\Models\OrderType;
+use App\Models\OrderUser;
+use App\Models\ReadOrder;
+use App\Models\Subscription;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class AdminOrdersController extends AdminBaseController
 {
-    use HelperTrait;
-
-    public Order $order;
-
-    public function __construct(Order $order)
-    {
-        parent::__construct();
-        $this->order = $order;
-    }
+    use MessagesHelperTrait;
 
     /**
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function orders($slug=null): View
+    public function orders(Order $order, $slug=null): View
     {
         $this->data['users'] = User::select(['id','name','family'])->get();
         $this->data['types'] = OrderType::with(['subtypes'])->get();
-        return $this->getSomething($this->order, $slug);
+        return $this->getSomething($order, $slug);
     }
 
     public function getOrders(): JsonResponse
     {
         return response()->json([
-            'orders' => $this->order::query()
+            'orders' => Order::query()
                 ->filtered()
                 ->with(['user.ratings'])
                 ->with(['orderType'])
@@ -51,49 +58,91 @@ class AdminOrdersController extends AdminBaseController
     /**
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function editOrder(Request $request): RedirectResponse
+    public function editOrder(
+        AdminEditOrderRequest $request,
+        ProcessingImage $processingImage,
+        ProcessingOrderImages $actionOrderImages,
+        RemoveOrderUnreadMessages $removeOrderUnreadMessages,
+        RemoveOrderEvents $removeOrderEvents,
+        OrderResponse $orderResponse,
+        OrderResponseEvents $orderResponseEvents,
+        NewOrderStatusEvents $newOrderStatusEvents
+    ): RedirectResponse
     {
-        $order = $this->editSomething (
-            $request,
-            $this->order,
-            [
-                'user_id' => $this->validationUserId,
-                'order_type_id' => 'required|exists:order_types,id',
-                'subtype_id' => 'nullable|exists:subtypes,id',
-                'name' => 'required|min:3|max:50',
-                'need_performers' => 'required|min:1|max:20',
-                'address' => $this->validationString,
-                'latitude' => 'required|numeric',
-                'longitude' => 'required|numeric',
-                'description_short' => 'nullable|string|min:5|max:200',
-                'description_full' => 'nullable|string|min:5|max:1000',
-                'status' => 'nullable|max:3'
-            ],
-        );
+        $fields = $request->validated();
+        $lastStatus = 0;
+        if ($request->has('id')) {
+            $order = Order::query()
+                ->where('id',$request->id)
+                ->with(['adminNotice','userCredentials'])
+                ->first();
 
-        $this->processingOrderImages($request, $order);
-        broadcast(new AdminOrderEvent('change_item', $order));
+            $lastStatus = $order->status;
 
-        if ($request->status != 3) {
-            $order->adminNotice->read = 1;
-            $order->adminNotice->save();
+            $order->update($fields);
+            if ($order->adminNotice && $order->adminNotice->read != 1) {
+                $order->adminNotice->read = 1;
+                $order->adminNotice->save();
+            }
+        } else {
+            $order = Order::query()->create($fields);
+            broadcast(new AdminOrderEvent('new_item', $order));
+        }
+        $actionOrderImages->handle($request, $processingImage, $order->id);
+
+        if ($order->status != $lastStatus) {
+            $this->mailOrderNotice($order, $order->userCredentials, 'new_order_status_notice');
+            $newOrderStatusEvents->handle($order);
+
+            if (!$order->status) {
+                $removeOrderUnreadMessages->handle($order->id);
+                $removeOrderEvents->handle($order);
+            } elseif ($order->status == 1) {
+                OrderUser::query()->create(['order_id' => $order->id, 'user_id' => $request->performer_id]);
+
+                $removeOrderUnreadMessages->handle($order->id);
+                $orderResponse->handle($order);
+                $orderResponseEvents->handle($order);
+
+                $this->mailOrderNotice($order, $order->userCredentials, 'new_performer_notice');
+                if (!$order->messages->count()) $this->chatMessage($order, trans('content.new_chat_message'));
+            } elseif ($order->status == 2) {
+                $subscriptions = Subscription::query()->where('user_id',$order->user_id)->with('unreadOrders')->get();
+                foreach ($subscriptions as $subscription) {
+                    ReadOrder::create([
+                        'subscription_id' => $subscription->id,
+                        'order_id' => $order->id,
+                    ]);
+                    broadcast(new NotificationEvent('new_order_in_subscription', $order, $subscription->subscriber_id));
+                    $this->mailOrderNotice($order, $subscription->subscriber, 'new_order_in_subscription');
+                }
+                OrderUser::query()->where('order_id',$order->id)->delete();
+            } elseif ($order->status == 3) {
+                $removeOrderUnreadMessages->handle($order->id);
+                OrderUser::query()->where('order_id',$order->id)->delete();
+            }
         }
 
         $this->saveCompleteMessage();
         return redirect(route('admin.orders'));
     }
 
-    public function deleteOrderImage(DelOrderImageRequest $request): JsonResponse
+    public function deleteOrderImage(DelOrderImageRequest $request, RemoveOrderImage $removeOrderImage, DeleteFile $deleteFile): JsonResponse
     {
         $order = Order::find($request->id);
-        return $this->removeOrderImage($order, $request->pos);
+        return $removeOrderImage->handle($order, $deleteFile, $request->pos);
     }
 
     /**
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function deleteOrder(Request $request): JsonResponse
+    public function deleteOrder(
+        OrderRequest $request,
+        DeleteOrder $deleteOrder,
+        DeleteFile $deleteFile,
+    ): JsonResponse
     {
-        return $this->deleteSomething($request, $this->order);
+        $order = Order::find($request->id);
+        return $deleteOrder->handle($order, $deleteFile);
     }
 }

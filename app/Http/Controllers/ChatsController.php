@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\SetReadUnread;
 use App\Events\ChatMessageEvent;
 use App\Http\Requests\Chats\ChatRequest;
 use App\Http\Resources\Message\MessageResource;
-use App\Models\InformingOrder;
 use App\Models\Message;
 use App\Http\Requests\Chats\MessageRequest;
 use App\Models\MessageKeyword;
@@ -20,7 +20,7 @@ use Illuminate\View\View;
 
 class ChatsController extends BaseController
 {
-    use HelperTrait;
+    use MessagesHelperTrait;
 
     private array $keywords;
 
@@ -64,7 +64,7 @@ class ChatsController extends BaseController
         ],200);
     }
 
-    public function chat(ChatRequest $request): View
+    public function chat(ChatRequest $request, SetReadUnread $actionSetReadUnread): View
     {
         $this->data['active_left_menu'] = 'my_chats';
         $this->data['order'] = Order::query()
@@ -77,7 +77,7 @@ class ChatsController extends BaseController
             ->where('id',$request->input('id'))
             ->first();
         if ($this->data['order']->status != 1) abort (403);
-        $this->setReadUnread(new ReadPerformer());
+        $actionSetReadUnread->handle(new ReadPerformer());
 		$this->setReadAllMessagesInChatForUser($this->data['order']->id);
         return $this->showView('chat');
     }

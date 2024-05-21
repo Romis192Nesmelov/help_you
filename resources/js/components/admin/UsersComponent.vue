@@ -3,6 +3,8 @@
         :fields=fields
         :get_data_url="get_users_url"
         :edit_url=edit_user_url
+        :delete_url="delete_user_url"
+        delete_phrase="Вы действительно хотите удалить этого пользователя?"
         :arrange="arrange"
         broadcast_on="admin_user_event"
         broadcast_as="admin_user"
@@ -21,6 +23,7 @@ export default {
         'users_url': String,
         'get_users_url': String,
         'edit_user_url': String,
+        'delete_user_url': String,
         'arrange': String
     },
     data() {
@@ -28,6 +31,8 @@ export default {
             fields: {
                 id:'id',
                 avatar:'Аватар',
+                rating: 'Рейтинг',
+                born: 'Дата рождения',
                 name:'Имя',
                 family:'Фамилия',
                 phone:'Телефон',

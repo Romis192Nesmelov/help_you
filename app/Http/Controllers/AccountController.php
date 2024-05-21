@@ -2,6 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\AuthGeneratingCode;
+use App\Actions\ChangeAvatar;
+use App\Actions\DeleteFile;
+use App\Actions\DeleteSomething;
+use App\Actions\ProcessingImage;
+use App\Actions\ProcessingSpecialFields;
+use App\Actions\SetReadUnread;
+use App\Actions\SetReadUnreadUser;
 use App\Events\Admin\AdminUserEvent;
 use App\Events\IncentivesEvent;
 use App\Http\Requests\Account\ChangeAvatarRequest;
@@ -106,10 +114,10 @@ class AccountController extends BaseController
         return $this->showView('my_orders');
     }
 
-    public function setReadUnreadByMyOrders(): JsonResponse
+    public function setReadUnreadByMyOrders(SetReadUnread $actionSetReadUnread): JsonResponse
     {
-        $this->setReadUnread(new ReadStatusOrder());
-        $this->setReadUnread(new ReadPerformer());
+        $actionSetReadUnread->handle(new ReadStatusOrder());
+        $actionSetReadUnread->handle(new ReadPerformer());
         return response()->json(200);
     }
 
@@ -188,10 +196,10 @@ class AccountController extends BaseController
         return response()->json([],200);
     }
 
-    public function setReadUnreadByPerformer(): JsonResponse
+    public function setReadUnreadByPerformer(SetReadUnreadUser $setReadUnreadUser): JsonResponse
     {
-        $this->setReadUnreadUser(new ReadPerformer());
-        $this->setReadUnreadUser(new ReadRemovedPerformer());
+        $setReadUnreadUser->handle(new ReadPerformer());
+        $setReadUnreadUser->handle(new ReadRemovedPerformer());
         return response()->json(200);
     }
 
@@ -218,9 +226,9 @@ class AccountController extends BaseController
             ->paginate(4);
     }
 
-    public function getCode(GetCodeRequest $request): JsonResponse
+    public function getCode(GetCodeRequest $request, AuthGeneratingCode $authGeneratingCode): JsonResponse
     {
-        Auth::user()->code = $this->generatingCode();
+        Auth::user()->code = $authGeneratingCode->handle();
         Auth::user()->save();
         return response()->json(['message' => trans('auth.code').': '.Auth::user()->code],200);
     }
@@ -247,15 +255,15 @@ class AccountController extends BaseController
         }
     }
 
-    public function changeAvatar(Request $request): JsonResponse
+    public function changeAvatar(ChangeAvatarRequest $request, ProcessingImage $processingImage, ChangeAvatar $changeAvatar): JsonResponse
     {
-        return $this->changeSomeAvatar($request);
+        return $changeAvatar->handle($request, $processingImage);
     }
 
-    public function editAccount(EditAccountRequest $request): JsonResponse
+    public function editAccount(EditAccountRequest $request, ProcessingSpecialFields $processingSpecialFields): JsonResponse
     {
         $fields = $request->validated();
-        $fields = $this->processingSpecialField($fields, 'mail_notice');
+        $fields = $processingSpecialFields->handle($fields, 'mail_notice');
         $birthday = Carbon::parse($fields['born']);
         $currentDate = Carbon::now();
         $age = $currentDate->diffInYears($birthday);
@@ -286,8 +294,8 @@ class AccountController extends BaseController
      * @throws \Illuminate\Auth\Access\AuthorizationException
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function deleteSubscription(Request $request): JsonResponse
+    public function deleteSubscription(Request $request, DeleteFile $deleteFile, DeleteSomething $deleteSomething, Subscription $subscription): JsonResponse
     {
-        return $this->deleteSomething($request, new Subscription(), 'subscriber');
+        return $deleteSomething->handle($request, $deleteFile, $subscription);
     }
 }

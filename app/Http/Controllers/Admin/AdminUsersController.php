@@ -1,13 +1,21 @@
 <?php
 
 namespace App\Http\Controllers\Admin;
+use App\Actions\ChangeAvatar;
+use App\Actions\DeleteFile;
+use App\Actions\DeleteOrder;
+use App\Actions\ProcessingImage;
+use App\Actions\ProcessingSpecialFields;
 use App\Events\Admin\AdminUserEvent;
 use App\Http\Controllers\HelperTrait;
+use App\Http\Requests\Account\ChangeAvatarRequest;
+use App\Models\Subscription;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use JetBrains\PhpStorm\Pure;
 
 //use Illuminate\Validation\Rules\Password;
 
@@ -45,7 +53,11 @@ class AdminUsersController extends AdminBaseController
     /**
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function editUser(Request $request): RedirectResponse
+    public function editUser(
+        Request $request,
+        ProcessingSpecialFields $processingSpecialFields,
+        ProcessingImage $processingImage
+    ): RedirectResponse
     {
         $validationArr = [
             'name' => 'nullable|max:255',
@@ -61,35 +73,63 @@ class AdminUsersController extends AdminBaseController
             $validationArr['email'] .= ','.$request->input('id');
             if ($request->input('password')) $validationArr['password'] = $this->validationPassword;
             $fields = $this->validate($request, $validationArr);
-            $fields = $this->getSpecialFields($this->user, $validationArr, $fields);
-            $user = User::where('id',$request->input('id'))->with('ratings')->first();
+            $fields = $this->getUserSpecialFields($processingSpecialFields, $fields);
+            $user = User::query()->where('id',$request->input('id'))->with('ratings')->first();
             if ($request->input('password')) $fields['password'] = bcrypt($fields['password']);
+            $processingImage->handle($request, $fields, 'avatar', $avatarPath, 'avatar'.$user->id);
             $user->update($fields);
-            $this->processingFiles($request, $user, 'avatar', $avatarPath, 'avatar'.$user->id);
             broadcast(new AdminUserEvent('new_item',$user));
         } else {
             $validationArr['password'] = $this->validationPassword;
             $fields = $this->validate($request, $validationArr);
-            $fields = $this->getSpecialFields($this->user, $validationArr, $fields);
+            $fields = $this->getUserSpecialFields($processingSpecialFields, $fields);
             $fields['password'] = bcrypt($fields['password']);
-            $user = User::create($fields);
-            $this->processingFiles($request, $user, 'avatar', $avatarPath, 'avatar'.$user->id);
+            $user = User::query()->create($fields);
+            $processingImage->handle($request, [], 'avatar', $avatarPath, 'avatar'.$user->id);
+            $user->update($fields);
             broadcast(new AdminUserEvent('change_item',$user));
         }
         $this->saveCompleteMessage();
         return redirect(route('admin.users'));
     }
 
-    public function changeAvatar(Request $request): JsonResponse
+    public function changeAvatar(
+        ChangeAvatarRequest $request,
+        ProcessingImage $processingImage,
+        ChangeAvatar $changeAvatar
+    ): JsonResponse
     {
-        return $this->changeSomeAvatar($request);
+        return $changeAvatar->handle($request, $processingImage);
     }
 
     /**
      * @throws \Illuminate\Validation\ValidationException
      */
-//    public function deleteUser(Request $request): JsonResponse
-//    {
-//        return $this->deleteSomething($request, $this->user);
-//    }
+    public function deleteUser(
+        Request $request,
+        DeleteOrder $deleteOrder,
+        DeleteFile $deleteFile,
+    ): JsonResponse
+    {
+        $this->validate($request, ['id' => $this->validationUserId]);
+        $user = User::where('id',$request->id)->select('id')->with('orders')->first();
+        if ($user->orders->count()) {
+            foreach ($user->orders as $order) {
+                $deleteOrder->handle($order, $deleteFile);
+            }
+        }
+        if ($user->avatar) $deleteFile->handle($user->avatar);
+        Subscription::query()->where('user_id',$user->id)->delete();
+        Subscription::query()->where('subscriber_id',$user->id)->delete();
+        $user->delete();
+        return response()->json([],200);
+    }
+
+    #[Pure] private function getUserSpecialFields(ProcessingSpecialFields $processingSpecialFields, array $fields): array
+    {
+        foreach (['mail_notice','active','admin'] as $field) {
+            $fields = $processingSpecialFields->handle($fields, $field);
+        }
+        return $fields;
+    }
 }

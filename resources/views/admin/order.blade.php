@@ -45,7 +45,6 @@
                             @endforeach
                         </div>
                     </div>
-
                     <div class="panel panel-flat">
                         <x-atitle val="5">Статус заявки</x-atitle>
                         <div class="panel-body">
@@ -58,6 +57,19 @@
                                     ['val' => 3, 'descript' => 'Новая'],
                                 ],
                                 'activeValue' => isset($order) ? $order->status : 2
+                            ])
+                        </div>
+                    </div>
+                    <div class="panel panel-flat">
+                        <x-atitle val="5">Исполнители</x-atitle>
+                        <div class="panel-body">
+                            @include('admin.blocks.select_block',[
+                                'firstNull' => true,
+                                'name' => 'performer_id',
+                                'values' => $users,
+                                'selected' => isset($order) && count($order->performers) ? $order->performers[0]->id : 0,
+                                'option' => 'family',
+                                'addOption' => 'name'
                             ])
                         </div>
                     </div>

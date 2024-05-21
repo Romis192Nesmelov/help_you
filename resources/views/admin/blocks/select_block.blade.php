@@ -4,6 +4,9 @@
     label="{{ isset($label) && $label ? $label : ''  }}"
 >
     <select name="{{ $name }}" class="select form-control @error($name) error @enderror">
+        @if (isset($firstNull))
+            <option value="0" {{ (!count($errors) ? 0 == $selected : 0 == old($name)) ? 'selected' : '' }}>Нет</option>
+        @endif
         @if (is_array($values))
             @foreach ($values as $value => $options)
                 <option value="{{ $value }}" {{ (!count($errors) ? $value == $selected : $value == old($name)) ? 'selected' : '' }}>{{ $options }}</option>

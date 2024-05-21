@@ -1,6 +1,17 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Actions\DeleteFile;
+use App\Actions\DeleteOrder;
+use App\Actions\NewOrderStatusEvents;
+use App\Actions\OrderResponse;
+use App\Actions\OrderResponseEvents;
+use App\Actions\ProcessingImage;
+use App\Actions\ProcessingOrderImages;
+use App\Actions\RemoveOrderEvents;
+use App\Actions\RemoveOrderImage;
+use App\Actions\RemoveOrderUnreadMessages;
+use App\Actions\RemovePerformer;
 use App\Events\NotificationEvent;
 use App\Events\OrderEvent;
 use App\Events\Admin\AdminOrderEvent;
@@ -9,11 +20,7 @@ use App\Http\Requests\Order\RemovePerformerRequest;
 use App\Http\Requests\Order\SetRatingRequest;
 use App\Http\Resources\Orders\OrdersResource;
 use App\Models\AdminNotice;
-use App\Models\Message;
 use App\Models\Rating;
-use App\Models\ReadPerformer;
-use App\Models\ReadRemovedPerformer;
-use App\Models\ReadStatusOrder;
 use App\Http\Requests\Order\DelOrderImageRequest;
 use App\Http\Requests\Order\NextStepRequest;
 use App\Http\Requests\Order\OrderRequest;
@@ -33,6 +40,7 @@ use Illuminate\View\View;
 class OrderController extends BaseController
 {
     use HelperTrait;
+    use MessagesHelperTrait;
 
     public function newOrder(): View
     {
@@ -112,61 +120,49 @@ class OrderController extends BaseController
     /**
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    public function removeOrderPerformer(RemovePerformerRequest $request): JsonResponse
+    public function removeOrderPerformer(
+        RemovePerformerRequest $request,
+        RemovePerformer $removePerformer
+    ): JsonResponse
     {
         $order = Order::find($request->order_id);
         $performer = User::find($request->user_id);
         $this->authorize('owner', $order);
         if (!$order->status) return response()->json([],403);
 
-        OrderUser::where('order_id',$request->order_id)->where('user_id',$request->user_id)->delete();
         if (!$order->performers->count()) {
             $order->status = 2;
             $order->save();
         }
 
-        ReadRemovedPerformer::create([
-            'order_id' => $request->order_id,
-            'user_id' => $request->user_id,
-        ]);
-
+        $removePerformer->handle($order, $request->user_id);
         broadcast(new NotificationEvent('remove_performer', $order, $request->user_id));
         $this->mailOrderNotice($order, $performer, 'remove_performer_notice');
 
         return response()->json(['message' => trans('content.the_performer_is_removed'), 'performers_count' => $order->performers->count()],200);
     }
 
-    public function orderResponse(OrderRequest $request): JsonResponse
+    public function orderResponse(
+        OrderRequest $request,
+        OrderResponse $orderResponse,
+        OrderResponseEvents $orderResponseEvents,
+        NewOrderStatusEvents $newOrderStatusEvents
+    ): JsonResponse
     {
-        $fields['order_id'] = $request->id;
-        $fields['user_id'] = Auth::id();
         $order = Order::find($request->id);
         if ($order->user_id == Auth::id()) return response()->json([],403);
         else {
-            OrderUser::create($fields);
-            ReadPerformer::create([
-                'order_id' => $order->id,
-                'user_id' => Auth::id(),
-            ]);
-            ReadStatusOrder::create([
-                'order_id' => $order->id,
-                'status' => 1,
-            ]);
-            ReadOrder::where('order_id',$order->id)->delete();
-
             $order->status = 1;
             $order->save();
             $order->refresh();
 
-            broadcast(new NotificationEvent('new_performer', $order, $order->user_id));
+            $orderResponse->handle($order);
+            $orderResponseEvents->handle($order);
+            $newOrderStatusEvents->handle($order);
+
             $this->mailOrderNotice($order, $order->userCredentials, 'new_performer_notice');
-            if (!$order->messages->count()) $this->chatMessage($order, trans('content.new_chat_message'));
-
-            broadcast(new NotificationEvent('new_order_status', $order, $order->user_id));
             $this->mailOrderNotice($order, $order->userCredentials, 'new_order_status_notice');
-
-            broadcast(new OrderEvent('new_order_status', $order));
-            broadcast(new AdminOrderEvent('change_item', $order));
+            if (!$order->messages->count()) $this->chatMessage($order, trans('content.new_chat_message'));
 
 //            if ($order->performers->count() >= $order->need_performers) {
 //                $order->status = 1;
@@ -179,7 +175,11 @@ class OrderController extends BaseController
     /**
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    public function nextStep(NextStepRequest $request): JsonResponse
+    public function nextStep(
+        NextStepRequest $request,
+        ProcessingImage $processingImage,
+        ProcessingOrderImages $action
+    ): JsonResponse
     {
         $sessionKey = $this->getSessionKey($request);
         $fields = $request->validated();
@@ -219,13 +219,11 @@ class OrderController extends BaseController
             } else {
                 $order = Order::create($fields);
                 AdminNotice::create(['order_id' => $order->id]);
-                $this->newOrderInSubscription($order);
 
-                broadcast(new OrderEvent('new_order', $order));
                 broadcast(new AdminOrderEvent('new_item', $order));
             }
 
-            $this->processingOrderImages($request, $order);
+            $action->handle($request, $processingImage, $order->id);
 
             return response()->json([
                 'order' => $order,
@@ -248,50 +246,50 @@ class OrderController extends BaseController
     /**
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    public function deleteOrder(OrderRequest $request): JsonResponse
+    public function deleteOrder(
+        OrderRequest $request,
+        DeleteOrder $deleteOrder,
+        DeleteFile $deleteFile,
+        RemoveOrderUnreadMessages $removeOrderUnreadMessages
+    ): JsonResponse
     {
         $order = Order::find($request->id);
         $this->authorize('owner', $order);
+
         if ($order->status <= 1) return response()->json([],403);
-        else {
-            foreach ($order->images as $image) {
-                $this->deleteFile($image->image);
-            }
-
-            $this->removeOrderUnreadMessages($request->id);
-
-            broadcast(new OrderEvent('remove_order', $order));
-            broadcast(new AdminOrderEvent('del_item', $order));
-
-            $order->delete();
-            return response()->json([],200);
-        }
+        else return $deleteOrder->handle($order, $deleteFile, $removeOrderUnreadMessages);
     }
 
     /**
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    public function deleteOrderImage(DelOrderImageRequest $request): JsonResponse
+    public function deleteOrderImage(
+        DelOrderImageRequest $request,
+        RemoveOrderImage $removeOrderImage,
+        DeleteFile $deleteFile
+    ): JsonResponse
     {
         $order = Order::find($request->id);
         $this->authorize('owner', $order);
-        return $this->removeOrderImage($order, $request->pos);
+        return $removeOrderImage->handle($order, $deleteFile, $request->pos);
     }
 
     /**
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    public function closeOrder(OrderRequest $request): JsonResponse
+    public function closeOrder(
+        OrderRequest $request,
+        RemoveOrderUnreadMessages $removeOrderUnreadMessages,
+        RemoveOrderEvents $removeOrderEvents
+    ): JsonResponse
     {
         $order = Order::find($request->id);
         $this->authorize('owner', $order);
         $order->status = 0;
         $order->save();
 
-        $this->removeOrderUnreadMessages($request->id);
-
-        broadcast(new OrderEvent('remove_order', $order));
-        broadcast(new AdminOrderEvent('change_item', $order));
+        $removeOrderUnreadMessages->handle($request->id);
+        $removeOrderEvents->handle($order);
 
         return response()->json([],200);
     }
@@ -304,12 +302,12 @@ class OrderController extends BaseController
         $order = Order::find($request->order_id);
         $this->authorize('owner', $order);
         foreach ($order->performers as $performer) {
-            $rating = Rating::where('order_id',$order->id)->where('user_id',$performer->id)->first();
+            $rating = Rating::query()->where('order_id',$order->id)->where('user_id',$performer->id)->first();
             if ($rating) {
                 $rating->value = $request->rating;
                 $rating->save();
             } else {
-                Rating::create([
+                Rating::query()->create([
                     'value' => $request->rating,
                     'order_id' => $order->id,
                     'user_id' => $performer->id
@@ -329,16 +327,12 @@ class OrderController extends BaseController
     {
         $order = Order::find($request->id);
         $this->authorize('owner', $order);
-        OrderUser::where('order_id',$order->id)->delete();
+        OrderUser::query()->where('order_id',$order->id)->delete();
         $order->status = 3;
         $order->save();
 
-        AdminNotice::where(['order_id' => $order->id])->update(['read',null]);
-
-        OrderUser::where('order_id',$request->id)->delete();
-        $this->newOrderInSubscription($order);
-
-        broadcast(new OrderEvent('new_order', $order));
+        AdminNotice::query()->where(['order_id' => $order->id])->update(['read',null]);
+        OrderUser::query()->where('order_id',$request->id)->delete();
         broadcast(new AdminOrderEvent('change_item', $order));
 
         return response()->json([],200);
@@ -346,30 +340,8 @@ class OrderController extends BaseController
 
     public function deleteResponse(OrderRequest $request): JsonResponse
     {
-        $orderUser = OrderUser::where('order_id',$request->id)->where('user_id',Auth::id())->first();
+        $orderUser = OrderUser::query()->where('order_id',$request->id)->where('user_id',Auth::id())->first();
         $orderUser->delete();
         return response()->json([],200);
-    }
-
-    private function newOrderInSubscription(Order $order): void
-    {
-        $subscriptions = Subscription::where('user_id',Auth::id())->get();
-        foreach ($subscriptions as $subscription) {
-            ReadOrder::create([
-                'subscription_id' => $subscription->id,
-                'order_id' => $order->id,
-            ]);
-            broadcast(new NotificationEvent('new_order_in_subscription', $order, $subscription->subscriber_id));
-            $this->mailOrderNotice($order, $subscription->subscriber, 'new_order_in_subscription');
-        }
-    }
-
-    private function removeOrderUnreadMessages($orderId): void
-    {
-        Message::where('order_id',$orderId)->delete();
-        ReadOrder::where('order_id',$orderId)->delete();
-        ReadPerformer::where('order_id',$orderId)->delete();
-        ReadRemovedPerformer::where('order_id',$orderId)->delete();
-        ReadRemovedPerformer::where('order_id',$orderId)->delete();
     }
 }

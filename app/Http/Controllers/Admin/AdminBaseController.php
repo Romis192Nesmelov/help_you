@@ -129,72 +129,10 @@ class AdminBaseController extends Controller
     /**
      * @throws \Illuminate\Validation\ValidationException
      */
-    protected function editSomething (
-        Request $request,
-        Model $model,
-        array $validationArr,
-        string $pathToImages = null,
-        string $imageName = null
-    ): Model
-    {
-        if ($request->has('id')) {
-            $validationArr['id'] = 'required|integer|exists:'.$model->getTable().',id';
-            if ($imageName) $validationArr['image'] = 'nullable|'.$validationArr['image'];
-            $fields = $this->validate($request, $validationArr);
-//            $seoFields = $this->getSeo($request, $model);
-            $fields = $this->getSpecialFields($model, $validationArr, $fields);
-            $model = $model->find($request->input('id'));
-            $model->update($fields);
-        } else {
-            if ($imageName) $validationArr['image'] = 'required|'.$validationArr['image'];
-            $fields = $this->validate($request, $validationArr);
-//            $seoFields = $this->getSeo($request, $model);
-            $fields = $this->getSpecialFields($model, $validationArr, $fields);
-            $model = $model->create($fields);
-        }
+//    protected function deleteSomething(Request $request, Model $model): JsonResponse
+//    {
 
-//        if (count($seoFields)) {
-//            if (!isset($model->seo)) {
-//                $seo = Seo::create($seoFields);
-//                $model->update(['seo_id' => $seo->id]);
-//            } else {
-//                $model->seo->update($seoFields);
-//            }
-//        }
-
-        $this->processingFiles($request, $model, 'image', $pathToImages, $imageName.$model->id);
-        $this->saveCompleteMessage();
-        return $model;
-    }
-
-    /**
-     * @throws \Illuminate\Validation\ValidationException
-     */
-    protected function deleteSomething(Request $request, Model $model): JsonResponse
-    {
-        $this->validate($request, ['id' => 'required|integer|exists:'.$model->getTable().',id']);
-        $table = $model->find($request->input('id'));
-
-        if (isset($table->avatar)) {
-            $this->deleteFile($table->avatar);
-        } elseif (isset($table->images)) {
-            foreach ($table->images as $image) {
-                $this->deleteFile($image->image);
-            }
-        }
-        $table->delete();
-        broadcast(new AdminOrderEvent('del_item', $table));
-        return response()->json(['message' => trans('admin.delete_complete')],200);
-    }
-
-    protected function getSpecialFields(Model $model, array $validationArr, array $fields): array
-    {
-        foreach (['mail_notice','active','admin'] as $field) {
-            if (in_array($field, $model->getFillable())) $fields[$field] = request($field) ? 1 : 0;
-        }
-        if (in_array('date',$model->getFillable()) && array_key_exists('date',$validationArr)) $fields['date'] = $this->convertTimestamp(request('date'));
-        return $fields;
-    }
+//    }
 
 //    /**
 //     * @throws \Illuminate\Validation\ValidationException
@@ -216,22 +154,11 @@ class AdminBaseController extends Controller
 //        return $seoFields;
 //    }
 
-    protected function convertTimestamp($time): int
-    {
-        $time = explode('/', $time);
-        return strtotime($time[1].'/'.$time[0].'/'.$time[2]);
-    }
-
-    protected function processingFiles(Request $request, Model $model, string $fileField, string|null $pathToFile=null, string|null $fileName=null): void
-    {
-        if ($pathToFile && $request->hasFile($fileField)) {
-            if ($model[$fileField]) $this->deleteFile($model[$fileField]);
-            $fileName .= $model->id.'.'.$request->file($fileField)->getClientOriginalExtension();
-            $model[$fileField] = $pathToFile.$fileName;
-            $model->save();
-            $request->file($fileField)->move(base_path('public/'.$pathToFile), $fileName);
-        }
-    }
+//    protected function convertTimestamp($time): int
+//    {
+//        $time = explode('/', $time);
+//        return strtotime($time[1].'/'.$time[0].'/'.$time[2]);
+//    }
 
     protected function showView($view): View
     {
@@ -248,10 +175,5 @@ class AdminBaseController extends Controller
                     ->get()
             ]
         ));
-    }
-
-    protected function deleteFile($path): void
-    {
-        if ($path && file_exists(base_path('public/'.$path))) unlink(base_path('public/'.$path));
     }
 }

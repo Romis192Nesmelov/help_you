@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\AuthGeneratingCode;
+use App\Actions\UnifyPhone;
 use App\Http\Requests\Auth\GenerateCodeRequest;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
@@ -19,11 +21,11 @@ class AuthController extends Controller
 {
     use HelperTrait;
 
-    public function login(LoginRequest $request): JsonResponse
+    public function login(LoginRequest $request, UnifyPhone $actionUnifyPhone): JsonResponse
     {
         $credentials = $request->validated();
         $credentials['active'] = 1;
-        $credentials['phone'] = $this->unifyPhone($credentials['phone']);
+        $credentials['phone'] = $actionUnifyPhone->handle($credentials['phone']);
 
         if (Auth::attempt($credentials, $request->remember)) {
             $request->session()->regenerate();
@@ -34,14 +36,14 @@ class AuthController extends Controller
         } else return response()->json(['errors' => ['phone' => [trans('auth.failed')], 'password' => [trans('auth.failed')]]], 401);
     }
 
-    public function generateCode(GenerateCodeRequest $request): JsonResponse
+    public function generateCode(GenerateCodeRequest $request, AuthGeneratingCode $actionGeneratingCode, UnifyPhone $actionUnifyPhone): JsonResponse
     {
-        $phone = $this->unifyPhone($request->phone);
+        $phone = $actionUnifyPhone->handle($request->phone);
         $user = User::where('phone',$phone)->first();
         if (!$user) {
             $user = User::create([
                 'phone' => $phone,
-                'code' => $this->generatingCode(),
+                'code' => $actionGeneratingCode->handle(),
                 'admin' => 0,
                 'active' => 0
             ]);
@@ -50,16 +52,16 @@ class AuthController extends Controller
         } elseif ($user->active) {
             return response()->json(['errors' => ['phone' => [trans('auth.user_with_this_phone_is_already_registered')]]], 400);
         } else {
-            $user->code = $this->generatingCode();
+            $user->code = $actionGeneratingCode->handle();
             $user->save();
             return response()->json(['message' => trans('auth.code').': '.$user->code],200);
         }
     }
 
-    public function register(RegisterRequest $request): JsonResponse
+    public function register(RegisterRequest $request, UnifyPhone $actionUnifyPhone): JsonResponse
     {
         $credentials = $request->validated();
-        $user = User::where('phone',$this->unifyPhone($request->phone))->first();
+        $user = User::where('phone',$actionUnifyPhone->handle($request->phone))->first();
         if ($user->code == $request->code) {
             $user->update([
                 'password' => bcrypt($credentials['password']),
@@ -72,9 +74,9 @@ class AuthController extends Controller
         }
     }
 
-    public function resetPassword(ResetPasswordRequest $request): JsonResponse
+    public function resetPassword(ResetPasswordRequest $request, UnifyPhone $actionUnifyPhone): JsonResponse
     {
-        $user = User::where('phone',$this->unifyPhone($request->phone))->where('active',1)->first();
+        $user = User::where('phone',$actionUnifyPhone->handle($request->phone))->where('active',1)->first();
         if (!$user) return response()->json(['errors' => ['phone' => [trans('auth.wrong_phone')]]], 401);
         else {
             $password = Str::random(5);

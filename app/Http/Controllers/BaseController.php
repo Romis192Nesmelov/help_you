@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Session;
 
 class BaseController extends Controller
 {
-    use HelperTrait;
+    use MessagesHelperTrait;
 
     protected array $data = [];
     protected string $activeMainMenu = '';
@@ -88,24 +88,19 @@ class BaseController extends Controller
      * @throws \Illuminate\Auth\Access\AuthorizationException
      * @throws \Illuminate\Validation\ValidationException
      */
-    protected function deleteSomething(Request $request, Model $model, $gate=false, $fileField=null): JsonResponse
-    {
-        $fields = $this->validate($request, ['id' => 'required|integer|exists:'.$model->getTable().',id']);
-        $itemModel = $model->find($fields['id']);
-        $this->authorize($gate, $itemModel);
-        if ($fileField) {
-            if (is_array($fileField)) {
-                foreach ($fileField as $field) {
-                    $this->deleteFile($itemModel[$field]);
-                }
-            } else $this->deleteFile($itemModel[$fileField]);
-        }
-        $itemModel->delete();
-        return response()->json([],200);
-    }
-
-    protected function deleteFile($path): void
-    {
-        if (file_exists(base_path('public/'.$path))) unlink(base_path('public/'.$path));
-    }
+//    protected function deleteSomething(Request $request, Model $model, $gate=false, $fileField=null): JsonResponse
+//    {
+//        $fields = $this->validate($request, ['id' => 'required|integer|exists:'.$model->getTable().',id']);
+//        $itemModel = $model->find($fields['id']);
+//        $this->authorize($gate, $itemModel);
+//        if ($fileField) {
+//            if (is_array($fileField)) {
+//                foreach ($fileField as $field) {
+//                    $this->deleteFile($itemModel[$field]);
+//                }
+//            } else $this->deleteFile($itemModel[$fileField]);
+//        }
+//        $itemModel->delete();
+//        return response()->json([],200);
+//    }
 }

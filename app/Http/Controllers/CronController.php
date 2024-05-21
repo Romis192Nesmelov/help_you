@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 class CronController extends Controller
 {
-    use HelperTrait;
+    use MessagesHelperTrait;
 
     public function daily()
     {
