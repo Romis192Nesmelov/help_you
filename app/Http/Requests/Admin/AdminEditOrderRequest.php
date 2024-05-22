@@ -49,7 +49,6 @@ class AdminEditOrderRequest extends FormRequest
                 $rules[$fileName] = 'required|'.$this->validationJpgAndPng;
             }
         }
-
         return $rules;
     }
 }

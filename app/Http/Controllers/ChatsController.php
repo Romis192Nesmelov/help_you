@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\ProcessingImage;
 use App\Actions\SetReadUnread;
 use App\Events\ChatMessageEvent;
 use App\Http\Requests\Chats\ChatRequest;
@@ -82,7 +83,10 @@ class ChatsController extends BaseController
         return $this->showView('chat');
     }
 
-    public function newMessage(MessageRequest $request): JsonResponse
+    public function newMessage(
+        MessageRequest $request,
+        ProcessingImage $processingImage
+    ): JsonResponse
     {
         $data = $request->validated();
         $data['user_id'] = Auth::id();
@@ -92,7 +96,7 @@ class ChatsController extends BaseController
             do {
                 $imageName = Str::random(32);
             } while (file_exists(base_path('public/'.$pathToImage.$imageName.'.'.$request->file('image')->getClientOriginalExtension())));
-            $data = $this->processingImage($request, $data,'image', $pathToImage, $imageName);
+            $data = $processingImage->handle($request, $data,'image', $pathToImage, $imageName);
         }
 
         $message = Message::create($data);

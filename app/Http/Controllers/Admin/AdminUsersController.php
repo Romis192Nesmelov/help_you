@@ -9,6 +9,7 @@ use App\Actions\ProcessingSpecialFields;
 use App\Events\Admin\AdminUserEvent;
 use App\Http\Controllers\HelperTrait;
 use App\Http\Requests\Account\ChangeAvatarRequest;
+use App\Http\Requests\Admin\AdminEditUserRequest;
 use App\Models\Subscription;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -54,39 +55,29 @@ class AdminUsersController extends AdminBaseController
      * @throws \Illuminate\Validation\ValidationException
      */
     public function editUser(
-        Request $request,
+        AdminEditUserRequest $request,
         ProcessingSpecialFields $processingSpecialFields,
         ProcessingImage $processingImage
     ): RedirectResponse
     {
-        $validationArr = [
-            'name' => 'nullable|max:255',
-            'family' => 'nullable|max:255',
-            'born' => $this->validationBorn,
-            'phone' => $this->validationPhone,
-            'email' => 'nullable|email|unique:users,email',
-            'info_about' => $this->validationText
-        ];
+        $fields = $request->validated();
         $avatarPath = 'images/avatars/';
+
         if ($request->has('id')) {
-            $validationArr['id'] = $this->validationUserId;
-            $validationArr['email'] .= ','.$request->input('id');
-            if ($request->input('password')) $validationArr['password'] = $this->validationPassword;
-            $fields = $this->validate($request, $validationArr);
             $fields = $this->getUserSpecialFields($processingSpecialFields, $fields);
             $user = User::query()->where('id',$request->input('id'))->with('ratings')->first();
             if ($request->input('password')) $fields['password'] = bcrypt($fields['password']);
             $processingImage->handle($request, $fields, 'avatar', $avatarPath, 'avatar'.$user->id);
             $user->update($fields);
+            /** @var USER $user */
             broadcast(new AdminUserEvent('new_item',$user));
         } else {
-            $validationArr['password'] = $this->validationPassword;
-            $fields = $this->validate($request, $validationArr);
             $fields = $this->getUserSpecialFields($processingSpecialFields, $fields);
             $fields['password'] = bcrypt($fields['password']);
             $user = User::query()->create($fields);
             $processingImage->handle($request, [], 'avatar', $avatarPath, 'avatar'.$user->id);
             $user->update($fields);
+            /** @var USER $user */
             broadcast(new AdminUserEvent('change_item',$user));
         }
         $this->saveCompleteMessage();

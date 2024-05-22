@@ -116,7 +116,6 @@ export default {
         this.messages = this.chatOrder.messages;
         this.myCompanion = JSON.parse(this.companion);
         this.chatDate = this.getDate(this.chatOrder.created_at);
-        window.enablePointImagesCarousel();
         window.bindFancybox();
         this.scrollBottom();
 
@@ -231,6 +230,7 @@ export default {
                         self.allowSend = true;
                     })
                     .catch(function (error) {
+                        console.log(error);
                         $.each(error.response.data.errors, (name,error) => {
                             self.errors[name] = error[0];
                             self.allowSend = true;

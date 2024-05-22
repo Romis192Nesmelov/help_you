@@ -18,6 +18,10 @@ class DeleteOrder
             $deleteFile->handle($image->image);
         }
 
+        foreach ($order->messages as $message) {
+            if ($message->image) $deleteFile->handle($message->image);
+        }
+
         broadcast(new OrderEvent('remove_order', $order));
         broadcast(new AdminOrderEvent('del_item', $order));
 

@@ -142,7 +142,6 @@ class AdminOrdersController extends AdminBaseController
         DeleteFile $deleteFile,
     ): JsonResponse
     {
-        $order = Order::find($request->id);
-        return $deleteOrder->handle($order, $deleteFile);
+        return $deleteOrder->handle(Order::where('id',$request->id)->with(['images','messages'])->first(), $deleteFile);
     }
 }
