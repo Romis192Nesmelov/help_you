@@ -13,6 +13,10 @@
     <script src="https://api-maps.yandex.ru/2.1/?apikey={{ env('YANDEX_API_KEY') }}&lang=ru_RU" type="text/javascript"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery.maskedinput@1.4.1/src/jquery.maskedinput.min.js" type="text/javascript"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="{{ asset('ckeditor/ckeditor.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('js/admin/moment.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('js/admin/daterangepicker.js') }}" type="text/javascript"></script>
+
     @vite([
         'resources/css/icons/fontawesome/styles.min.css',
         'resources/css/icons/icomoon/styles.css',

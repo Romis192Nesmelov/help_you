@@ -20,7 +20,6 @@ export default {
         DataTableComponent
     },
     props: {
-        'users_url': String,
         'get_users_url': String,
         'edit_user_url': String,
         'delete_user_url': String,

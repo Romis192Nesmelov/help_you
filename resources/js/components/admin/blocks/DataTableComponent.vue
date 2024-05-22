@@ -28,7 +28,7 @@
                 <tr>
                     <th class="text-center arrange" v-for="(descr, field) in fields" :key="'dt-arrange-by-' + field">
                         <i
-                            v-if="field !== 'avatar' && field !== 'rating'"
+                            v-if="field !== 'avatar' && field !== 'logo' && field !== 'image' && field !== 'rating'"
                             :class="(arrangeCol.field === field ? 'text-info ' : '') + (arrangeCol.field === field && arrangeCol.direction === 'desc' ? 'icon-arrow-up12' : 'icon-arrow-down12')"
                             @click="setArrange(field,arrangeCol.field === field ? arrangeCol.direction : 'asc')"
                         ></i>
@@ -38,7 +38,16 @@
             </thead>
             <tbody>
                 <tr v-for="item in items.data" :key="'dt-row-' + item.id">
-                    <td :class="'text-center' + (field === 'id' || field === 'avatar' || field === 'user' || field === 'status' || field === 'active' || field === 'admin' ? ' ' + field : '')" v-for="(desc, field) in fields" :key="'dt-cell-' + field">
+                    <td :class="'text-center' + (
+                        field === 'id'      ||
+                        field === 'avatar'  ||
+                        field === 'logo'    ||
+                        field === 'image'   ||
+                        field === 'user'    ||
+                        field === 'status'  ||
+                        field === 'active'  ||
+                        field === 'admin'
+                        ? ' ' + field : '')" v-for="(desc, field) in fields" :key="'dt-cell-' + field">
                         <AvatarComponent
                             v-if="field === 'avatar'"
                             :user_id="item.id"
@@ -52,6 +61,7 @@
                             :allow_change_rating="false"
                             v-else-if="field === 'rating'"
                         ></RatingLineComponent>
+                        <a v-else-if="field === 'logo' || field === 'image'" class="fancybox" :href="'/' + item[field]"><img :src="'/' + item[field]" /></a>
                         <span v-else-if="field === 'active'" :class="'label label-' + (item['active'] ? 'success' : 'warning')">{{ (item['active'] ? 'активен' : 'не активен') }}</span>
                         <span v-else-if="field === 'admin'" :class="'label label-' + (item['admin'] ? 'info' : 'primary')">{{ (item['admin'] ? 'админ' : 'пользователь') }}</span>
                         <span v-else>{{ item[field] }}</span>

@@ -24,26 +24,18 @@ class AdminUsersController extends AdminBaseController
 {
     use HelperTrait;
 
-    public User $user;
-
-    public function __construct(User $user)
-    {
-        parent::__construct();
-        $this->user = $user;
-    }
-
     /**
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function users($slug=null): View
+    public function users(User $users, $slug=null): View
     {
-        return $this->getSomething($this->user, $slug);
+        return $this->getSomething($users, $slug);
     }
 
-    public function getUsers(): JsonResponse
+    public function getUsers(User $users): JsonResponse
     {
         return response()->json(
-            $this->user::query()
+            $users::query()
                 ->filtered()
                 ->with('ratings')
                 ->orderBy(request('field') ?? 'id',request('direction') ?? 'desc')
@@ -61,13 +53,11 @@ class AdminUsersController extends AdminBaseController
     ): RedirectResponse
     {
         $fields = $request->validated();
-        $avatarPath = 'images/avatars/';
 
         if ($request->has('id')) {
             $fields = $this->getUserSpecialFields($processingSpecialFields, $fields);
             $user = User::query()->where('id',$request->input('id'))->with('ratings')->first();
             if ($request->input('password')) $fields['password'] = bcrypt($fields['password']);
-            $processingImage->handle($request, $fields, 'avatar', $avatarPath, 'avatar'.$user->id);
             $user->update($fields);
             /** @var USER $user */
             broadcast(new AdminUserEvent('new_item',$user));
@@ -75,7 +65,7 @@ class AdminUsersController extends AdminBaseController
             $fields = $this->getUserSpecialFields($processingSpecialFields, $fields);
             $fields['password'] = bcrypt($fields['password']);
             $user = User::query()->create($fields);
-            $processingImage->handle($request, [], 'avatar', $avatarPath, 'avatar'.$user->id);
+            $fields = $processingImage->handle($request, [], 'avatar', 'images/avatars/', 'avatar'.$user->id);
             $user->update($fields);
             /** @var USER $user */
             broadcast(new AdminUserEvent('change_item',$user));

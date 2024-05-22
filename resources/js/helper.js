@@ -120,7 +120,7 @@ window.showMessage = (message) => {
 window.bindFancybox = () => {
     setTimeout(() => {
         $('.fancybox').fancybox(window.fancyBoxSettings);
-    }, 200);
+    }, 500);
 }
 
 window.getPlaceMark = (point, data) => {

@@ -37,6 +37,11 @@ class AdminBaseController extends Controller
                 'icon' => 'icon-map',
                 'hidden' => false,
             ],
+            'partners' => [
+                'key' => 'partners',
+                'icon' => 'icon-users4',
+                'hidden' => false,
+            ],
         ];
         $this->breadcrumbs[] = $this->menu['home'];
     }
@@ -50,6 +55,9 @@ class AdminBaseController extends Controller
         return $this->showView('home');
     }
 
+    /**
+     * @throws \Illuminate\Validation\ValidationException
+     */
     protected function getSomething(
         Model $model,
         string|null $slug=null,
@@ -58,6 +66,9 @@ class AdminBaseController extends Controller
     ): View
     {
         $key = $model->getTable();
+        $this->data['menu_key'] = $key;
+        $this->data['singular_key'] = substr($key, 0, -1);
+
         if (request('parent_id')) {
             $parentItem = $parentModel->findOrFail(request('parent_id'));
             $this->data['parent'] = $parentModel->find(request('parent_id'));
@@ -96,11 +107,6 @@ class AdminBaseController extends Controller
             $this->breadcrumbs[] = $this->menu[$key];
         }
 
-        $this->data['singular_key'] = substr($key, 0, -1);
-
-        $breadcrumbsParams = [];
-        if ($parentModel) $breadcrumbsParams['parent_id'] = $parentItem->id;
-
         if (request('id')) {
 //            $this->data['metas'] = $this->metas;
             $this->data[$this->data['singular_key']] = $model->findOrFail(request('id'));
@@ -108,7 +114,7 @@ class AdminBaseController extends Controller
             $this->breadcrumbs[] = [
                 'key' => $this->menu[$key]['key'],
                 'params' => $breadcrumbsParams,
-                'name' => trans('admin.edit_'.$this->data['singular_key']),
+                'name' => trans('admin.edit_'.$this->data['singular_key']).' id#'.$this->data[$this->data['singular_key']]->id,
             ];
             return $this->showView($this->data['singular_key']);
         } else if ($slug && $slug == 'add') {

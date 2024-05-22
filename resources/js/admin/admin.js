@@ -7,6 +7,7 @@ import UserRatingComponent from "../components/admin/blocks/UserRatingComponent.
 import UsersComponent from "../components/admin/UsersComponent.vue";
 import EditOrderMapComponent from "../components/admin/blocks/EditOrderMapComponent.vue";
 import NoticeComponent from "../components/admin/blocks/NoticeComponent.vue";
+import PartnerComponent from "../components/admin/PartnerComponent.vue";
 
 const app = createApp({
     components: {
@@ -15,7 +16,8 @@ const app = createApp({
         AvatarComponent,
         UserRatingComponent,
         EditOrderMapComponent,
-        NoticeComponent
+        NoticeComponent,
+        PartnerComponent
     }
 });
 
@@ -42,6 +44,12 @@ $(document).ready(function () {
     // Message modal
     const messageModal = $('#message-modal');
     if (messageModal.find('h4').html()) messageModal.modal('show');
+
+    if ($('textarea[name=info]').length) {
+        CKEDITOR.replace('info',{
+            height: '300px'
+        });
+    }
 
     // Init avatar
     setTimeout(() => {

@@ -4,6 +4,7 @@ use App\Http\Controllers\AccountController;
 use App\Http\Controllers\Admin\AdminBaseController;
 use App\Http\Controllers\Admin\AdminLoginController;
 use App\Http\Controllers\Admin\AdminOrdersController;
+use App\Http\Controllers\Admin\AdminPartnersController;
 use App\Http\Controllers\Admin\AdminUsersController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BaseController;
@@ -135,5 +136,12 @@ Route::prefix('admin')->middleware(['admin'])->name('admin.')->group(function ()
         Route::post('/edit-order', 'editOrder')->name('edit_order');
         Route::post('/delete-order-image', 'deleteOrderImage')->name('delete_order_image');
         Route::post('/delete-order', 'deleteOrder')->name('delete_order');
+    });
+
+    Route::controller(AdminPartnersController::class)->group(function () {
+        Route::get('/partners/{slug?}', 'partners')->name('partners');
+        Route::get('/get-partner', 'getPartners')->name('get_partners');
+        Route::post('/edit-partner', 'editPartner')->name('edit_partner');
+        Route::post('/delete-partner', 'deletePartner')->name('delete_partner');
     });
 });

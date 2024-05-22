@@ -4,7 +4,7 @@
     <div class="panel panel-flat">
         @include('admin.blocks.title_block')
         <div class="panel-body">
-            <form class="form-horizontal" action="{{ route('admin.edit_user') }}" method="post">
+            <form class="form-horizontal" action="{{ route('admin.edit_user') }}" enctype="multipart/form-data" method="post">
                 @csrf
                 @if (isset($user))
                     @include('admin.blocks.hidden_id_block',['id' => $user->id])

@@ -79,6 +79,8 @@ td.user {
 }
 
 td.avatar,
+td.logo,
+td.image,
 td.active,
 td.status,
 td.admin {

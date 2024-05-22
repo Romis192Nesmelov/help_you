@@ -239,6 +239,7 @@ class AccountController extends BaseController
         else {
             Auth::user()->phone = $request->phone;
             Auth::user()->save();
+
             broadcast(new AdminUserEvent('change_item',Auth::user()));
             return response()->json(['message' => trans('auth.phone_has_been_changed'), 'number' => $request->phone],200);
         }

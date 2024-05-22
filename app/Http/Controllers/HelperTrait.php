@@ -14,7 +14,7 @@ trait HelperTrait
     public string $validationNumeric = 'required|numeric';
     public string $validationString = 'required|min:3|max:255';
     public string $validationText = 'nullable|min:1|max:3000';
-    public string $validationLongText = 'required|min:5|max:50000';
+    public string $validationLongText = 'nullable|min:5|max:50000';
     public string $validationColor = 'regex:/^(hsv\((\d+)\,\s(\d+)\%\,\s(\d+)\%\))$/';
     public string $validationSvg = 'required|mimes:svg|max:10';
     public string $validationJpgAndPng = 'mimes:jpg,png|max:2000';

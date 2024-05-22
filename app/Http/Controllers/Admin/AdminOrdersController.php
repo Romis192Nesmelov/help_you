@@ -86,6 +86,7 @@ class AdminOrdersController extends AdminBaseController
             }
         } else {
             $order = Order::query()->create($fields);
+            /** @var ORDER $order */
             broadcast(new AdminOrderEvent('new_item', $order));
         }
         $actionOrderImages->handle($request, $processingImage, $order->id);
