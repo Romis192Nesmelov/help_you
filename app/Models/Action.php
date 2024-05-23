@@ -5,6 +5,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Action extends Model
 {
@@ -25,6 +26,11 @@ class Action extends Model
     public function usersAwardedActive(): BelongsToMany
     {
         return $this->belongsToMany(User::class)->wherePivot('active',1);
+    }
+
+    public function actionUsers(): HasMany
+    {
+        return $this->hasMany(ActionUser::class,'action_id');
     }
 
     public function partner(): BelongsTo

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\Admin\AdminActionsController;
 use App\Http\Controllers\Admin\AdminBaseController;
 use App\Http\Controllers\Admin\AdminLoginController;
 use App\Http\Controllers\Admin\AdminOrdersController;
@@ -143,5 +144,12 @@ Route::prefix('admin')->middleware(['admin'])->name('admin.')->group(function ()
         Route::get('/get-partner', 'getPartners')->name('get_partners');
         Route::post('/edit-partner', 'editPartner')->name('edit_partner');
         Route::post('/delete-partner', 'deletePartner')->name('delete_partner');
+    });
+
+    Route::controller(AdminActionsController::class)->group(function () {
+        Route::get('/actions/{slug?}', 'actions')->name('actions');
+        Route::get('/get-actions', 'getActions')->name('get_actions');
+        Route::post('/edit-action', 'editAction')->name('edit_action');
+        Route::post('/delete-action', 'deleteAction')->name('delete_action');
     });
 });

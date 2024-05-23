@@ -5,7 +5,7 @@ namespace App\Http\Requests\Admin;
 use App\Http\Controllers\HelperTrait;
 use Illuminate\Foundation\Http\FormRequest;
 
-class AdminEditPartnerRequest extends FormRequest
+class AdminEditActionRequest extends FormRequest
 {
     use HelperTrait;
 
@@ -25,13 +25,19 @@ class AdminEditPartnerRequest extends FormRequest
     public function rules(): array
     {
         $rules = [
-            'logo' => 'nullable|mimes:jpg,png|max:300',
             'name' => $this->validationName,
-            'about' => $this->validationText,
-            'info' => $this->validationLongText
+            'html' => $this->validationLongText,
+            'start' => $this->validationDate,
+            'end' => $this->validationDate,
+            'rating' => 'required|min:1|max:2',
+            'partner_id' => 'required|integer|exists:partners,id'
         ];
 
-        if (request()->has('id')) $rules['id'] = 'required|exists:orders,id';
+        if (request()->has('id')) $rules['id'] = 'required|exists:actions,id';
+        if (request()->has('user_ids')) {
+            $rules['user_ids'] = 'required|array';
+            $rules['user_ids.*'] = 'exists:users,id';
+        }
 
         return $rules;
     }

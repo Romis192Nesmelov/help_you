@@ -71,7 +71,7 @@ class AdminUsersController extends AdminBaseController
             broadcast(new AdminUserEvent('change_item',$user));
         }
         $this->saveCompleteMessage();
-        return redirect(route('admin.users'));
+        return redirect()->back();
     }
 
     public function changeAvatar(
@@ -102,6 +102,9 @@ class AdminUsersController extends AdminBaseController
         if ($user->avatar) $deleteFile->handle($user->avatar);
         Subscription::query()->where('user_id',$user->id)->delete();
         Subscription::query()->where('subscriber_id',$user->id)->delete();
+
+        broadcast(new AdminUserEvent('del_item', $user));
+
         $user->delete();
         return response()->json([],200);
     }

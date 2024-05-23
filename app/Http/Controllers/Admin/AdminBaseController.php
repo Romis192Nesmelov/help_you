@@ -6,6 +6,7 @@ use App\Http\Controllers\HelperTrait;
 use App\Http\Controllers\Controller;
 //use App\Models\Seo;
 use App\Models\AdminNotice;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Model;
@@ -42,6 +43,11 @@ class AdminBaseController extends Controller
                 'icon' => 'icon-users4',
                 'hidden' => false,
             ],
+            'actions' => [
+                'key' => 'actions',
+                'icon' => 'icon-trophy3',
+                'hidden' => false,
+            ],
         ];
         $this->breadcrumbs[] = $this->menu['home'];
     }
@@ -70,42 +76,26 @@ class AdminBaseController extends Controller
         $this->data['singular_key'] = substr($key, 0, -1);
 
         if (request('parent_id')) {
-            $parentItem = $parentModel->findOrFail(request('parent_id'));
-            $this->data['parent'] = $parentModel->find(request('parent_id'));
-
-            if ($parentRelation) {
-                $this->data['menu_key'] = $this->data['parent_key'];
-                $this->data['current_sub_item'] = $parentItem[$parentRelation]->id;
-                $this->breadcrumbs[] = [
-                    'key' => $this->menu[$this->data['parent_key']]['key'],
-                    'name' => trans('admin_menu.'.$this->data['parent_key']),
-                ];
-                $this->breadcrumbs[] = [
-                    'key' => $this->menu[$this->data['parent_key']]['key'],
-                    'params' => ['id' => $parentItem[$parentRelation]->id],
-                    'name' => $parentItem[$parentRelation]->name ?? $parentItem[$parentRelation]->head,
-                ];
-                $this->breadcrumbs[] = [
-                    'key' => $this->menu[$this->data['near_parent_key']]['key'],
-                    'params' => ['id' => $parentItem->id, 'parent_id' => $parentItem[$parentRelation]->id],
-                    'name' => $parentItem->name ?? $parentItem->head,
-                ];
-            } else {
-                $this->data['menu_key'] = $this->data['parent_key'];
-                $this->breadcrumbs[] = [
-                    'key' => $this->menu[$this->data['parent_key']]['key'],
-                    'name' => trans('admin_menu.'.$this->data['parent_key']),
-                ];
-                $this->breadcrumbs[] = [
-                    'key' => $this->menu[$this->data['parent_key']]['key'],
-                    'params' => ['id' => $parentItem->id],
-                    'name' => $parentItem->name ?? $parentItem->head,
-                ];
-            }
+            $isParentModelUser = $parentModel instanceof User;
+            $selectFields = $isParentModelUser ? ['name','family','phone','email'] : ['name'];
+            $this->data['parent'] = $parentModel->query()->where('id',request('parent_id'))->select($selectFields)->first();
+            $this->data['menu_key'] = $this->data['parent_key'];
+            $this->breadcrumbs[] = [
+                'key' => $this->menu[$this->data['parent_key']]['key'],
+                'name' => trans('admin_menu.'.$this->data['parent_key']),
+            ];
+            $this->breadcrumbs[] = [
+                'key' => $this->menu[$this->data['parent_key']]['key'],
+                'params' => ['id' => request('parent_id')],
+                'name' => $isParentModelUser ? getItemName($this->data['parent']) : $this->data['parent']->name,
+            ];
         } else if (!$this->menu[$key]['hidden']) {
             $this->data['menu_key'] = $key;
             $this->breadcrumbs[] = $this->menu[$key];
         }
+
+        $breadcrumbsParams = [];
+        if ($parentModel) $breadcrumbsParams['parent_id'] = request('parent_id');
 
         if (request('id')) {
 //            $this->data['metas'] = $this->metas;
@@ -132,14 +122,6 @@ class AdminBaseController extends Controller
         }
     }
 
-    /**
-     * @throws \Illuminate\Validation\ValidationException
-     */
-//    protected function deleteSomething(Request $request, Model $model): JsonResponse
-//    {
-
-//    }
-
 //    /**
 //     * @throws \Illuminate\Validation\ValidationException
 //     */
@@ -158,12 +140,6 @@ class AdminBaseController extends Controller
 //            if (!$seoExistFlag) $seoFields = [];
 //        }
 //        return $seoFields;
-//    }
-
-//    protected function convertTimestamp($time): int
-//    {
-//        $time = explode('/', $time);
-//        return strtotime($time[1].'/'.$time[0].'/'.$time[2]);
 //    }
 
     protected function showView($view): View

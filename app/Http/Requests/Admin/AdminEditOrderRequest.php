@@ -29,7 +29,7 @@ class AdminEditOrderRequest extends FormRequest
             'user_id' => $this->validationUserId,
             'order_type_id' => 'required|exists:order_types,id',
             'subtype_id' => 'nullable|exists:subtypes,id',
-            'name' => 'required|min:3|max:50',
+            'name' => $this->validationName,
             'need_performers' => 'required|min:1|max:20',
             'address' => $this->validationString,
             'latitude' => 'required|numeric',

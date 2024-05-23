@@ -57,7 +57,7 @@ class AdminPartnersController extends AdminBaseController
             broadcast(new AdminPartnerEvent('change_item',$partner));
         }
         $this->saveCompleteMessage();
-        return redirect(route('admin.partners'));
+        return redirect()->back();
     }
 
     /**
@@ -70,7 +70,10 @@ class AdminPartnersController extends AdminBaseController
     {
         $this->validate($request, ['id' => 'required|exists:partners,id']);
         $partner = Partner::find($request->id);
-        if ($partner->logo) $deleteFile->handle($partner->avatar);
+        if ($partner->logo) $deleteFile->handle($partner->logo);
+
+        broadcast(new AdminPartnerEvent('del_item',$partner));
+
         $partner->delete();
         return response()->json([],200);
     }

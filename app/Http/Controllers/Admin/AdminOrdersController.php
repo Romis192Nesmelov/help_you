@@ -36,7 +36,7 @@ class AdminOrdersController extends AdminBaseController
      */
     public function orders(Order $order, $slug=null): View
     {
-        $this->data['users'] = User::select(['id','name','family'])->get();
+        $this->data['users'] = User::query()->select(['id','name','family','phone','email'])->get();
         $this->data['types'] = OrderType::with(['subtypes'])->get();
         return $this->getSomething($order, $slug);
     }
@@ -46,11 +46,10 @@ class AdminOrdersController extends AdminBaseController
         return response()->json([
             'orders' => Order::query()
                 ->filtered()
-                ->with(['user.ratings'])
-                ->with(['orderType'])
+                ->with(['user.ratings','orderType'])
                 ->orderBy(request('field') ?? 'id',request('direction') ?? 'desc')
                 ->paginate(request('show_by') ?? 10),
-            'users' => User::query()->select(['id','name','family'])->get(),
+            'users' => User::query()->select(['id','name','family','phone','email'])->get(),
             'types' => OrderType::query()->select(['id','name'])->get(),
         ]);
     }
@@ -125,7 +124,7 @@ class AdminOrdersController extends AdminBaseController
         }
 
         $this->saveCompleteMessage();
-        return redirect(route('admin.orders'));
+        return redirect()->back();
     }
 
     public function deleteOrderImage(DelOrderImageRequest $request, RemoveOrderImage $removeOrderImage, DeleteFile $deleteFile): JsonResponse

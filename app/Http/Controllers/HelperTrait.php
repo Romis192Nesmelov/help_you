@@ -5,8 +5,9 @@ use Illuminate\Foundation\Http\FormRequest;
 
 trait HelperTrait
 {
+    public string $validationName = 'required|min:3|max:50';
     public string $validationPhone = 'regex:/^((\+)?(\d)(\s)?(\()?[0-9]{3}(\))?(\s)?([0-9]{3})(\-)?([0-9]{2})(\-)?([0-9]{2}))$/';
-    public string $validationBorn = 'required|regex:/^((\d){2}-(\d){2}-([1-2]\d\d\d))$/';
+    public string $validationBorn = 'regex:/^((\d){2}-(\d){2}-([1-2]\d\d\d))$/';
     public string $validationPassword = 'required|min:3|max:20';
     public string $validationPasswordConfirmed = 'required|confirmed|min:6|max:20';
     public string $validationCode = 'required|regex:/^(([0-9]{2})\-([0-9]{2})-([0-9]{2}))$/';
@@ -21,9 +22,9 @@ trait HelperTrait
     public string $validationJpgAndPngSmall = 'mimes:jpg,png|max:300';
     public string $validationJpg = 'mimes:jpg|max:2000';
     public string $validationPng = 'mimes:png|max:2000';
-    public string $validationDate = 'regex:/^(\d{2})\/(\d{2})\/(\d{4})$/';
+    public string $validationDate = 'date_format:Y-m-d H:i:s';
     public string $validationOrderId = 'required|exists:orders,id';
-    public string $validationUserId = 'required|exists:users,id';
+    public string $validationUserId = 'required|integer|exists:users,id';
 
     public $metas = [
         'meta_description' => ['name' => 'description', 'property' => false],
