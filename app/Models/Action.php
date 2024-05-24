@@ -47,5 +47,10 @@ class Action extends Model
                 else $q->orWhere($field, 'LIKE', "%{$filter}%");
             }
         });
+
+        $query->when(request('partners_ids'), function (Builder $q) {
+            if (!request('filter')) $q->whereIn('partner_id',request('partners_ids'));
+            else $q->orWhereIn('partner_id',request('partners_ids'));
+        });
     }
 }

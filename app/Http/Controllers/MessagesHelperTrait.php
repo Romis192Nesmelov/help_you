@@ -105,15 +105,7 @@ trait MessagesHelperTrait
         }
 
         if ($actionId && !$alreadyAwarded) {
-            $incentive = ActionUser::create([
-                'action_id' => $actionId,
-                'user_id' => $userId,
-                'active' => 1
-            ]);
-            broadcast(new IncentivesEvent('new_incentive', $incentive, $userId));
-            if ($user->email && $user->mail_notice) {
-                $this->sendMessage('new_award_notice', $user->email, null, ['action' => $incentive->action]);
-            }
+            $this->createNewIncentive($user, $actionId);
         }
     }
 
@@ -141,13 +133,26 @@ trait MessagesHelperTrait
 
     public function sendMessage(string $template, string $mailTo, string|null $cc, array $fields, string|null $pathToFile=null)
     {
-        dispatch(new SendMessage($template, $mailTo, null, $fields));
+        dispatch(new SendMessage($template, $mailTo, $cc, $fields));
     }
 
     public function mailOrderNotice(Order $order, User $user, string $template): void
     {
         if ($user->email && $user->mail_notice) {
             $this->sendMessage($template, $user->email, null, ['order' => $order]);
+        }
+    }
+
+    public function createNewIncentive(User $user, int $actionId): void
+    {
+        $incentive = ActionUser::create([
+            'action_id' => $actionId,
+            'user_id' => $user->id,
+            'active' => 1
+        ]);
+        broadcast(new IncentivesEvent('new_incentive', $incentive, $user->id));
+        if ($user->email && $user->mail_notice) {
+            $this->sendMessage('new_award_notice', $user->email, null, ['action' => $incentive->action]);
         }
     }
 }

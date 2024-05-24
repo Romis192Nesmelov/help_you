@@ -15,9 +15,9 @@ return new class extends Migration
         Schema::create('actions', function (Blueprint $table) {
             $table->id();
             $table->string('name',50);
-            $table->longText('html');
-            $table->dateTime('start');
-            $table->dateTime('end');
+            $table->longText('html')->nullable();
+            $table->timestamp('start');
+            $table->timestamp('end');
             $table->tinyInteger('rating');
             $table->foreignIdFor(Partner::class)->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->timestamps();

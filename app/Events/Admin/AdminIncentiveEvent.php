@@ -2,27 +2,26 @@
 
 namespace App\Events\Admin;
 
-use App\Models\Partner;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class AdminPartnerEvent implements ShouldBroadcast
+class AdminIncentiveEvent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
      * Create a new event instance.
      */
-    private string $noticeType;
-    private Partner $partner;
+    private array $usersIds;
 
-    public function __construct(string $noticeType, Partner $partner)
+    public function __construct(array $usersIds)
     {
-        $this->noticeType = $noticeType;
-        $this->partner = $partner;
+        foreach ($usersIds as $id) {
+            $this->usersIds[] = (int)$id;
+        }
     }
 
     /**
@@ -33,7 +32,7 @@ class AdminPartnerEvent implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('admin_partner_event'),
+            new PrivateChannel('admin_incentive_event'),
         ];
     }
 
@@ -42,7 +41,7 @@ class AdminPartnerEvent implements ShouldBroadcast
      */
     public function broadcastAs(): string
     {
-        return 'admin_partner';
+        return 'admin_incentive';
     }
 
     /**
@@ -53,8 +52,7 @@ class AdminPartnerEvent implements ShouldBroadcast
     public function broadcastWith(): array
     {
         return [
-            'notice' => $this->noticeType,
-            'model' => $this->partner,
+            'ids' => $this->usersIds
         ];
     }
 }

@@ -49,11 +49,13 @@ class AdminPartnersController extends AdminBaseController
             $partner = Partner::query()->where('id',$request->input('id'))->with('actions')->first();
             $processingImage->handle($request, $fields, 'logo', $logoPath, 'logo'.$partner->id);
             $partner->update($fields);
+            $partner->refresh();
             broadcast(new AdminPartnerEvent('new_item',$partner));
         } else {
             $partner = Partner::query()->create($fields);
             $processingImage->handle($request, [], 'logo', $logoPath, 'logo'.$partner->id);
             $partner->update($fields);
+            $partner->refresh();
             broadcast(new AdminPartnerEvent('change_item',$partner));
         }
         $this->saveCompleteMessage();

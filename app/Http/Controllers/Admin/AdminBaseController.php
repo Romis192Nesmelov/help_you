@@ -151,7 +151,7 @@ class AdminBaseController extends Controller
                 'menu' => $this->menu,
                 'notices' => AdminNotice::query()
                     ->where('read',null)
-                    ->with('order.user')
+                    ->with(['order.user','order.performers'])
                     ->select(['order_id'])
                     ->orderByDesc('created_at')
                     ->get()

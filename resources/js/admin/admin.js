@@ -8,6 +8,8 @@ import UsersComponent from "../components/admin/UsersComponent.vue";
 import EditOrderMapComponent from "../components/admin/blocks/EditOrderMapComponent.vue";
 import NoticeComponent from "../components/admin/blocks/NoticeComponent.vue";
 import PartnerComponent from "../components/admin/PartnerComponent.vue";
+import ActionsComponent from "../components/admin/ActionsComponent.vue";
+import ActionUsersComponent from "../components/admin/blocks/ActionUsersComponent.vue";
 
 const app = createApp({
     components: {
@@ -17,7 +19,9 @@ const app = createApp({
         UserRatingComponent,
         EditOrderMapComponent,
         NoticeComponent,
-        PartnerComponent
+        PartnerComponent,
+        ActionsComponent,
+        ActionUsersComponent
     }
 });
 
@@ -45,11 +49,8 @@ $(document).ready(function () {
     const messageModal = $('#message-modal');
     if (messageModal.find('h4').html()) messageModal.modal('show');
 
-    if ($('textarea[name=info]').length) {
-        CKEDITOR.replace('info',{
-            height: '300px'
-        });
-    }
+    initCKEditor('info',300);
+    initCKEditor('html',680);
 
     // Init avatar
     setTimeout(() => {
@@ -93,17 +94,17 @@ $(document).ready(function () {
     });
 
     // Single picker
-    // $('.daterange-single').daterangepicker({
-    //     singleDatePicker: true,
-    //     locale: {
-    //         format: 'DD/MM/YYYY',
-    //         monthNames : ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'],
-    //         daysOfWeek : ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'],
-    //         week: moment.locale('en', {
-    //             week: { dow: 1 }
-    //         })
-    //     }
-    // });
+    $('.daterange-single').daterangepicker({
+        singleDatePicker: true,
+        locale: {
+            format: 'DD/MM/YYYY',
+            monthNames : ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'],
+            daysOfWeek : ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'],
+            week: moment.locale('en', {
+                week: { dow: 1 }
+            })
+        }
+    });
 
     // Preview upload image
     // $('input[type=file]').change(function () {
@@ -126,3 +127,11 @@ $(document).ready(function () {
     //     }
     // });
 });
+
+const initCKEditor = (name, height) => {
+    if ($('textarea[name='+ name +']').length) {
+        CKEDITOR.replace(name,{
+            height: height + 'px'
+        });
+    }
+}

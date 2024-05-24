@@ -1,16 +1,17 @@
 <?php
 
 namespace App\Http\Controllers\Admin;
-use App\Actions\ProcessingSpecialFields;
+use App\Actions\ConvertTimestamp;
 use App\Events\Admin\AdminActionEvent;
+use App\Events\Admin\AdminIncentiveEvent;
 use App\Events\Admin\AdminOrderEvent;
-use App\Events\Admin\AdminUserEvent;
 use App\Events\IncentivesEvent;
 use App\Http\Controllers\MessagesHelperTrait;
 use App\Http\Requests\Admin\AdminEditActionRequest;
 use App\Models\Action;
 use App\Models\ActionUser;
 use App\Models\Partner;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -25,7 +26,10 @@ class AdminActionsController extends AdminBaseController
      */
     public function actions(Action $action, Partner $partner, $slug=null): View
     {
-        $this->data['partners'] = Partner::select(['id','name'])->get();
+        if (request()->has('id')) {
+            $this->data['users'] = User::query()->select(['id','name','family','phone','email'])->get();
+            $this->data['partners'] = Partner::select(['id','name'])->get();
+        }
         return $this->getSomething($action, $slug);
     }
 
@@ -34,8 +38,8 @@ class AdminActionsController extends AdminBaseController
         return response()->json([
             'actions' => Action::query()
                 ->filtered()
-                ->select(['name','start','end','rating','partner_id'])
-                ->with('partner')
+                ->select(['id','name','start','end','rating','partner_id'])
+                ->with(['partner'])
                 ->orderBy(request('field') ?? 'id',request('direction') ?? 'desc')
                 ->paginate(request('show_by') ?? 10),
             'partners' => Partner::select(['id','name'])->get()
@@ -47,40 +51,39 @@ class AdminActionsController extends AdminBaseController
      */
     public function editAction(
         AdminEditActionRequest $request,
-        ProcessingSpecialFields $processingSpecialFields,
+        ConvertTimestamp $convertTimestamp
     ): RedirectResponse
     {
         $fields = $request->validated();
-        $fields = $processingSpecialFields->handle($fields, 'active');
+        foreach (['start','end'] as $timeField) {
+            $fields[$timeField] = $convertTimestamp->handle($fields[$timeField]);
+        }
 
         if ($request->has('id')) {
-            $action = Action::query()->create($fields);
-            $action = $action->users->sync(request('user_ids'));
-            broadcast(new AdminOrderEvent('new_item',$action));
-        } else {
             $action = Action::query()->where('id',$request->id)->with(['users','actionUsers'])->first();
-            $pastIncentivesIds = $action->actionUsers->pluck('user_id')->toArray();
+            $action->update($fields);
+            $action->refresh();
+            broadcast(new AdminActionEvent('change_item',$action));
 
             foreach ($action->actionUsers as $incentive) {
-                if (!in_array($incentive->user_id, request('user_ids'))) {
-                    broadcast(new AdminUserEvent('del_item', $incentive->user));
+                if (!in_array($incentive->user_id, request('users_ids'))) {
                     broadcast(new IncentivesEvent('remove_incentive', $incentive, $incentive->user_id));
                 }
             }
-
-            $action = $action->users->sync(request('user_ids'));
-            $action->refresh();
-
-            foreach ($action->actionUsers as $incentive) {
-                if (!in_array($incentive->user_id, $pastIncentivesIds)) {
-                    broadcast(new AdminUserEvent('new_item',$incentive->user));
-                    broadcast(new IncentivesEvent('new_incentive', $incentive, $incentive->user_id));
-                }
-            }
-
-            $action->update($fields);
-            broadcast(new AdminOrderEvent('change_item',$action));
+        } else {
+            $action = Action::query()->create($fields);
+            broadcast(new AdminOrderEvent('new_item',$action));
         }
+
+        $lastIncentivesIds = $action->actionUsers->pluck('user_id')->toArray();
+        foreach (request('users_ids') as $userId) {
+            if (!in_array($userId, $lastIncentivesIds)) {
+                $this->createNewIncentive(User::find($userId), $action->id);
+            }
+        }
+
+        $action->users()->sync(request('users_ids'));
+        broadcast(new AdminIncentiveEvent(request('users_ids')));
 
         $this->saveCompleteMessage();
         return redirect()->back();
@@ -96,7 +99,6 @@ class AdminActionsController extends AdminBaseController
 
         foreach ($action->actionUsers as $incentive) {
             broadcast(new IncentivesEvent('remove_incentive', $incentive, $incentive->user_id));
-            broadcast(new AdminUserEvent('del_item', $incentive->user));
         }
         broadcast(new AdminActionEvent('del_item',$action));
 

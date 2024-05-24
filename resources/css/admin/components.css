@@ -340,7 +340,7 @@ a.badge,
 .navigation > li.active > a,
 .navigation > li.active > a:hover,
 .navigation > li.active > a:focus {
-  background-color: #00a512;
+  background-color: #166dba;
   color: #fff;
 }
 .navigation > li.active > a > [class*=text-] {
@@ -765,8 +765,8 @@ a.badge,
     position: absolute;
     top: 0;
     right: -260px;
-    background-color: #00a512;
-    border: 1px solid #00a512;
+    background-color: #166dba;
+    border: 1px solid #166dba;
     padding: 11px 20px;
     width: 260px;
     text-align: left;
@@ -1400,12 +1400,12 @@ body[class*=navbar-bottom] .footer:not(.navbar) {
 .selectable-demo-list > .ui-sortable-handle.ui-selecting,
 .selectable-demo-list > .ui-selectee.ui-selecting {
   background-color: #29B6F6;
-  border-color: #00a512;
+  border-color: #166dba;
   color: #fff;
 }
 .selectable-demo-list > .ui-sortable-handle.ui-selected,
 .selectable-demo-list > .ui-selectee.ui-selected {
-  background-color: #00a512;
+  background-color: #166dba;
   border-color: #0288D1;
   color: #fff;
 }
@@ -2512,7 +2512,7 @@ label.switchery-double.checkbox-switchery {
 .bootstrap-switch-handle-on.bootstrap-switch-info,
 .bootstrap-switch-handle-off.bootstrap-switch-info {
   color: #fff;
-  background-color: #00a512;
+  background-color: #166dba;
 }
 .bootstrap-switch-handle-on {
   border-bottom-left-radius: 2px;
@@ -4453,7 +4453,7 @@ legend.alpaca-container-label {
 }
 .tokenfield .token:not([class*=bg-]):hover,
 .tokenfield .token:not([class*=bg-]):focus {
-  background-color: #00a512;
+  background-color: #166dba;
   color: #fff;
 }
 .tokenfield .token.invalid {
@@ -4933,7 +4933,7 @@ legend.alpaca-container-label {
   top: 43px;
   width: 50%;
   height: 2px;
-  background-color: #00a512;
+  background-color: #166dba;
   z-index: 9;
 }
 .wizard > .steps > ul > li:before {
@@ -4957,9 +4957,9 @@ legend.alpaca-container-label {
 }
 .wizard > .steps > ul > li.current .number {
   font-size: 0;
-  border-color: #00a512;
+  border-color: #166dba;
   background-color: #fff;
-  color: #00a512;
+  color: #166dba;
 }
 .wizard > .steps > ul > li.current .number:after {
   content: '\e913';
@@ -4986,8 +4986,8 @@ legend.alpaca-container-label {
 }
 .wizard > .steps > ul > li.done .number {
   font-size: 0;
-  background-color: #00a512;
-  border-color: #00a512;
+  background-color: #166dba;
+  border-color: #166dba;
   color: #fff;
 }
 .wizard > .steps > ul > li.done .number:after {
@@ -5023,7 +5023,7 @@ legend.alpaca-container-label {
     content: '';
   }
   .wizard > .steps > ul > li:last-child:after {
-    background-color: #00a512;
+    background-color: #166dba;
   }
 }
 @media (max-width: 480px) {
@@ -5031,7 +5031,7 @@ legend.alpaca-container-label {
     width: 100%;
   }
   .wizard > .steps > ul > li.current:after {
-    background-color: #00a512;
+    background-color: #166dba;
   }
 }
 .wizard > .steps .number {
@@ -5212,7 +5212,7 @@ legend.alpaca-container-label {
   top: 43px;
   width: 50%;
   height: 2px;
-  background-color: #00a512;
+  background-color: #166dba;
   z-index: 9;
 }
 .stepy-header li:before {
@@ -5226,7 +5226,7 @@ legend.alpaca-container-label {
   content: none;
 }
 .stepy-header li div {
-  background-color: #00a512;
+  background-color: #166dba;
   font-size: 0;
   position: relative;
   color: #fff;
@@ -5234,7 +5234,7 @@ legend.alpaca-container-label {
   margin-right: auto;
   width: 38px;
   height: 38px;
-  border: 2px solid #00a512;
+  border: 2px solid #166dba;
   z-index: 10;
   line-height: 34px;
   text-align: center;
@@ -5268,9 +5268,9 @@ legend.alpaca-container-label {
 }
 .stepy-header li.stepy-active div {
   cursor: auto;
-  border-color: #00a512;
+  border-color: #166dba;
   background-color: #fff;
-  color: #00a512;
+  color: #166dba;
 }
 .stepy-header li.stepy-active div:after {
   content: '\e913';
@@ -5293,7 +5293,7 @@ legend.alpaca-container-label {
     content: '';
   }
   .stepy-header li.stepy-active:last-child:after {
-    background-color: #00a512;
+    background-color: #166dba;
   }
 }
 @media (max-width: 480px) {
@@ -5301,7 +5301,7 @@ legend.alpaca-container-label {
     width: 100%;
   }
   .stepy-header li.stepy-active:after {
-    background-color: #00a512;
+    background-color: #166dba;
   }
 }
 .stepy-navigator {
@@ -6154,7 +6154,7 @@ legend.alpaca-container-label {
 .daterangepicker td.active,
 .daterangepicker td.active:hover,
 .daterangepicker td.active:focus {
-  background-color: #00a512;
+  background-color: #166dba;
   color: #fff;
   border-radius: 3px;
 }
@@ -6254,7 +6254,7 @@ legend.alpaca-container-label {
 }
 .ranges ul li.active {
   color: #fff;
-  background-color: #00a512;
+  background-color: #166dba;
 }
 .ranges .daterangepicker-inputs {
   padding: 12px;
@@ -6564,7 +6564,7 @@ legend.alpaca-container-label {
   right: 2px;
   width: 0;
   height: 0;
-  border-top: 6px solid #00a512;
+  border-top: 6px solid #166dba;
   border-left: 6px solid transparent;
 }
 .picker__day--outfocus {
@@ -6588,12 +6588,12 @@ legend.alpaca-container-label {
 .picker--focused .picker__day--highlighted {
   cursor: pointer;
   color: #fff;
-  background-color: #00a512;
+  background-color: #166dba;
 }
 .picker__day--selected,
 .picker__day--selected:hover,
 .picker--focused .picker__day--selected {
-  background-color: #00a512;
+  background-color: #166dba;
   color: #fff;
 }
 .picker__day--disabled,
@@ -6717,12 +6717,12 @@ legend.alpaca-container-label {
 .picker--focused .picker__list-item--highlighted {
   cursor: pointer;
   color: #fff;
-  background-color: #00a512;
+  background-color: #166dba;
 }
 .picker__list-item--selected,
 .picker__list-item--selected:hover,
 .picker--focused .picker__list-item--selected {
-  background-color: #00a512;
+  background-color: #166dba;
   color: #fff;
   z-index: 10;
 }
@@ -6816,7 +6816,7 @@ legend.alpaca-container-label {
 }
 .AnyTime-mons .ui-state-highlight,
 .AnyTime-mons .ui-state-highlight:hover {
-  background-color: #00a512;
+  background-color: #166dba;
   color: #fff;
 }
 .AnyTime-time .ui-state-highlight,
@@ -7526,7 +7526,7 @@ legend.alpaca-container-label {
 .datepicker table tr td span.active:hover,
 .datepicker table tr td.active.disabled:hover,
 .datepicker table tr td span.active.disabled:hover {
-  background-color: #00a512;
+  background-color: #166dba;
   color: #fff;
 }
 .datepicker table tr td span {
@@ -7675,7 +7675,7 @@ legend.alpaca-container-label {
 .datepaginator .pagination > li > .dp-selected,
 .datepaginator .pagination > li > .dp-selected:hover,
 .datepaginator .pagination > li > .dp-selected:focus {
-  background-color: #00a512;
+  background-color: #166dba;
   color: #fff;
   width: 140px;
 }
@@ -9813,8 +9813,8 @@ body.stop-scrolling {
   border-color: #FF5722;
 }
 .noui-slider-solid.noui-slider-info .noUi-handle {
-  background-color: #00a512;
-  border-color: #00a512;
+  background-color: #166dba;
+  border-color: #166dba;
 }
 .noui-slider-primary .noUi-connect,
 .noui-slider-primary.noUi-connect {
@@ -9834,7 +9834,7 @@ body.stop-scrolling {
 }
 .noui-slider-info .noUi-connect,
 .noui-slider-info.noUi-connect {
-  background-color: #00a512;
+  background-color: #166dba;
 }
 .noUi-tooltip {
   display: none;
@@ -10000,7 +10000,7 @@ body.stop-scrolling {
   left: 0;
   width: 0;
   height: 6px;
-  background-color: #00a512;
+  background-color: #166dba;
   border-radius: 100px;
 }
 .irs-bar-edge {
@@ -10673,7 +10673,7 @@ body.stop-scrolling {
   color: #999999;
 }
 .ui-datepicker table td.ui-datepicker-current-day .ui-state-active {
-  background-color: #00a512;
+  background-color: #166dba;
   color: #fff;
 }
 .ui-datepicker table td.ui-datepicker-today .ui-state-highlight {
@@ -11323,8 +11323,8 @@ body.stop-scrolling {
 }
 .ui-slider-info .ui-slider-range,
 .ui-slider-solid.ui-slider-info .ui-slider-handle {
-  background-color: #00a512;
-  border-color: #00a512;
+  background-color: #166dba;
+  border-color: #166dba;
 }
 .ui-spinner {
   position: relative;
@@ -12014,7 +12014,7 @@ pre[class*="language-"] {
 .token.atrule,
 .token.attr-value,
 .token.keyword {
-  color: #00a512;
+  color: #166dba;
 }
 .token.function {
   color: #DD4A68;
@@ -13082,8 +13082,8 @@ img.fancytree-icon {
 .fc-event {
   position: relative;
   display: block;
-  border: 1px solid #00a512;
-  background-color: #00a512;
+  border: 1px solid #166dba;
+  background-color: #166dba;
   font-weight: normal;
   border-radius: 2px;
 }
@@ -13528,7 +13528,7 @@ a.fc-more:hover {
 .plupload_header {
   display: none;
   position: relative;
-  background-color: #00a512;
+  background-color: #166dba;
   margin: -1px -1px 0 -1px;
   border-top-right-radius: 3px;
   border-top-left-radius: 3px;
@@ -13595,7 +13595,7 @@ a.plupload_disabled:focus {
   box-shadow: none;
 }
 .plupload_start {
-  background-color: #00a512;
+  background-color: #166dba;
 }
 .plupload_filelist {
   margin: 0;
@@ -14363,7 +14363,7 @@ a.plupload_disabled:focus {
   left: 0;
   width: 0%;
   height: 100%;
-  background-color: #00a512;
+  background-color: #166dba;
   -webkit-transition: width 0.3s ease-in-out;
   -o-transition: width 0.3s ease-in-out;
   transition: width 0.3s ease-in-out;
@@ -16296,7 +16296,7 @@ thead .htCollapseButton:after {
 }
 .is-selected .pika-button {
   color: #fff;
-  background-color: #00a512;
+  background-color: #166dba;
 }
 .is-today .pika-button:before,
 .is-selected .pika-button:before,
@@ -16316,7 +16316,7 @@ thead .htCollapseButton:after {
 .is-startrange .pika-button,
 .is-endrange .pika-button {
   color: #fff;
-  background: #00a512;
+  background: #166dba;
 }
 .is-inrange .pika-button {
   background: #f5f5f5;

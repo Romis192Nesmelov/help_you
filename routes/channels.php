@@ -25,3 +25,23 @@ Broadcast::channel('notice_{id}', function ($user, $id) {
 Broadcast::channel('incentive_{id}', function ($user, $id) {
     return (int) $user->id === (int) $id;
 });
+
+Broadcast::channel('admin_incentive{id}', function ($user) {
+    return (int) $user->admin;
+});
+
+Broadcast::channel('admin_action{id}', function ($user) {
+    return (int) $user->admin;
+});
+
+Broadcast::channel('admin_order{id}', function ($user) {
+    return (int) $user->admin;
+});
+
+Broadcast::channel('admin_partner{id}', function ($user) {
+    return (int) $user->admin;
+});
+
+Broadcast::channel('admin_user{id}', function ($user) {
+    return (int) $user->admin;
+});

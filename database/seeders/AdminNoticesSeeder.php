@@ -13,9 +13,13 @@ class AdminNoticesSeeder extends Seeder
      */
     public function run(): void
     {
-        $newOrders = Order::where('status',3)->select('id')->get();
-        foreach ($newOrders as $order) {
-            AdminNotice::create(['order_id' => $order->id]);
+        $orders = Order::all();
+        foreach ($orders as $order) {
+            $fields = [
+                'read' => $order->status == 0 || $order->status == 3 ? null : 1,
+                'order_id' => $order->id
+            ];
+            AdminNotice::query()->create($fields);
         }
     }
 }

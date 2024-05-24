@@ -59,6 +59,7 @@ class AdminUsersController extends AdminBaseController
             $user = User::query()->where('id',$request->input('id'))->with('ratings')->first();
             if ($request->input('password')) $fields['password'] = bcrypt($fields['password']);
             $user->update($fields);
+            $user->refresh();
             /** @var USER $user */
             broadcast(new AdminUserEvent('new_item',$user));
         } else {
@@ -67,6 +68,7 @@ class AdminUsersController extends AdminBaseController
             $user = User::query()->create($fields);
             $fields = $processingImage->handle($request, [], 'avatar', 'images/avatars/', 'avatar'.$user->id);
             $user->update($fields);
+            $user->refresh();
             /** @var USER $user */
             broadcast(new AdminUserEvent('change_item',$user));
         }

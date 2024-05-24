@@ -28,40 +28,36 @@
                 <tr>
                     <th class="text-center arrange" v-for="(descr, field) in fields" :key="'dt-arrange-by-' + field">
                         <i
-                            v-if="field !== 'avatar' && field !== 'rating'"
                             :class="(arrangeCol.field === field ? 'text-info ' : '') + (arrangeCol.field === field && arrangeCol.direction === 'desc' ? 'icon-arrow-up12' : 'icon-arrow-down12')"
-                            @click="setArrange((field === 'user' || field === 'order_type' ? field + '_id' : field),arrangeCol.field === field ? arrangeCol.direction : 'asc')"
+                            @click="setArrange(field,arrangeCol.field === field ? arrangeCol.direction : 'asc')"
                         ></i>
                     </th>
                     <th class="text-center arrange" v-if="edit_url || delete_url"></th>
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="order in orders.data" :key="'dt-row-' + order.id">
-                    <td :class="'text-center' + (field === 'id' || field === 'user' || field === 'status' ? ' ' + field : '')" v-for="(desc, field) in fields" :key="'dt-cell-' + field">
-                        <UserPropertiesComponent
-                            v-if="field === 'user'"
-                            :user="order.user"
-                            :small="true"
-                            :use_rating="true"
-                            :allow_change_rating="false"
-                        ></UserPropertiesComponent>
-                        <span v-else-if="field === 'status'" :class="'label label-' + statuses[order.status].color">{{ statuses[order.status].text }}</span>
-                        <strong v-else-if="field === 'order_type'">{{ order.order_type.name }}</strong>
-                        <span v-else>{{ order[field] }}</span>
+                <tr v-for="action in actions.data" :key="'dt-row-' + action.id">
+                    <td :class="'text-center' + (field === 'id' || field === 'rating' ? ' ' + field : '')" v-for="(desc, field) in fields" :key="'dt-cell-' + field">
+                        <div v-if="field === 'partner_id'">
+                            <img class="logo" :src="'/' + action.partner.logo" />
+                            {{ action.partner.name }}
+                        </div>
+                        <span v-else-if="field === 'rating'" :class="'label label-' + ratings[action.rating-1].color">{{ ratings[action.rating-1].text }}</span>
+                        <strong v-else-if="field === 'start' || field === 'end'">{{ new Date(action[field]).toLocaleDateString('ru-RU') }}</strong>
+                        <span v-else>{{ action[field] }}</span>
                     </td>
                     <td class="tools" v-if="edit_url || delete_url">
-                        <a v-if="edit_url" :href="edit_url + '?id=' + order.id">
+                        <a v-if="edit_url" :href="edit_url + '?id=' + action.id">
                             <i title="Редактировать" class="icon-pencil7"></i>
                         </a>
-                        <i title="Удалить" class="icon-cancel-circle2 text-danger cursor-pointer" @click="confirmDel(order.id)"></i>
+                        <i title="Удалить" class="icon-cancel-circle2 text-danger cursor-pointer" @click="confirmDel(action.id)"></i>
                     </td>
                 </tr>
             </tbody>
         </table>
         <paginator-component
-            v-if="orders.links"
-            :links="orders.links"
+            v-if="actions.links"
+            :links="actions.links"
             @paginate="paginate"
         ></paginator-component>
     </div>
@@ -74,21 +70,18 @@ import PaginatorComponent from "./PaginatorComponent.vue";
 
 export default {
     extends: DataTableComponent,
-    name: "OrdersDataTableComponent",
+    name: "ActionsDataTableComponent",
     components: {
         UserPropertiesComponent,
         PaginatorComponent
     },
     data() {
         return {
-            orders: Object,
-            users: Object,
-            types: Object,
-            statuses: [
-                {color:'success','text':'Закрыта'},
-                {color:'primary','text':'В работе'},
-                {color:'default','text':'Открыта'},
-                {color:'danger','text':'Новая'},
+            actions: Object,
+            partners: Object,
+            ratings: [
+                {color:'success','text':'Первый'},
+                {color:'primary','text':'Второй'},
             ]
         }
     },
@@ -96,21 +89,15 @@ export default {
         getData(url) {
             let self = this;
             axios.get(url).then(function (response) {
-                self.orders = response.data.orders;
-                self.users = response.data.users;
-                self.types = response.data.types;
+                self.actions = response.data.actions;
+                self.partners = response.data.partners;
             });
         },
         getAdditionalFilters() {
             let addFilter = '';
-            for (let i=0;i<this.types.length;i++) {
-                if (this.types[i].name.toLowerCase().indexOf(this.filter.toLowerCase()) !== -1) {
-                    addFilter += '&order_types_ids[]=' + this.types[i].id;
-                }
-            }
-            for (let i=0;i<this.users.length;i++) {
-                if (this.users[i].name.toLowerCase().indexOf(this.filter.toLowerCase()) !== -1 || this.users[i].family.toLowerCase().indexOf(this.filter.toLowerCase()) !== -1) {
-                    addFilter += '&users_ids[]=' + this.users[i].id;
+            for (let i=0;i<this.partners.length;i++) {
+                if (this.partners[i].name.toLowerCase().indexOf(this.filter.toLowerCase()) !== -1) {
+                    addFilter += '&partners_ids[]=' + this.partners[i].id;
                 }
             }
             return addFilter;

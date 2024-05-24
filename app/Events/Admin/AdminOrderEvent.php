@@ -3,12 +3,13 @@
 namespace App\Events\Admin;
 
 use App\Models\Order;
-use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class AdminOrderEvent
+class AdminOrderEvent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -32,7 +33,7 @@ class AdminOrderEvent
     public function broadcastOn(): array
     {
         return [
-            new Channel('admin_order_event'),
+            new PrivateChannel('admin_order_event'),
         ];
     }
 
@@ -53,7 +54,7 @@ class AdminOrderEvent
     {
         return [
             'notice' => $this->noticeType,
-            'model' => $this->order->with(['user']),
+            'model' => $this->order->with(['user','performers']),
         ];
     }
 }

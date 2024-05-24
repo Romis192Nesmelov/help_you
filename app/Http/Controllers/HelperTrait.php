@@ -22,7 +22,7 @@ trait HelperTrait
     public string $validationJpgAndPngSmall = 'mimes:jpg,png|max:300';
     public string $validationJpg = 'mimes:jpg|max:2000';
     public string $validationPng = 'mimes:png|max:2000';
-    public string $validationDate = 'date_format:Y-m-d H:i:s';
+    public string $validationDate = 'regex:/^(\d{2})\/(\d{2})\/(\d{4})$/';
     public string $validationOrderId = 'required|exists:orders,id';
     public string $validationUserId = 'required|integer|exists:users,id';
 

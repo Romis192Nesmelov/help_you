@@ -22,7 +22,14 @@
                         <div class="media-body">
                             <span class="text-semibold"><UserNameComponent :user="notice.order.user"></UserNameComponent></span>
                             <span class="media-annotation pull-right">{{ new Date(notice.order.created_at).toLocaleDateString('ru-RU') }}</span>
-                            <a :href="orders_url + '?id=' + notice.order.id" class="media-heading">Создал новую заявку «{{ notice.order.name }}»</a>
+                            <a :href="orders_url + '?id=' + notice.order.id" class="media-heading">
+                                <span v-if="notice.order.status === 3">Создал новую заявку «{{ notice.order.name }}»</span>
+                                <span v-else>Закрыл заявку «{{ notice.order.name }}»</span>
+                            </a>
+                            <div v-if="notice.order.status === 0">
+                                <hr>
+                                <a :href="users_url + '?id=' + notice.order.performers[0].id">Исполнитель: <UserNameComponent :user="notice.order.performers[0]"></UserNameComponent></a>
+                            </div>
                         </div>
                     </li>
                 </ul>
@@ -63,6 +70,7 @@ export default {
         'incoming_notices': String,
         'incoming_user': String,
         'orders_url': String,
+        'users_url': String,
         'logout_url': String
     },
     created() {
@@ -70,8 +78,8 @@ export default {
         this.user = JSON.parse(this.incoming_user);
         this.notices = JSON.parse(this.incoming_notices);
 
-        window.Echo.channel('admin_order_event').listen('.admin_order', res => {
-            if (res.notice === 'new_item') {
+        window.Echo.private('admin_order_event').listen('.admin_order', res => {
+            if (res.notice === 'new_item' || (res.notice === 'change_item' && res.model.status === 0) ) {
                 self.notices.unshift({
                     order: res.model
                 });

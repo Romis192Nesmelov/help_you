@@ -3,12 +3,9 @@
 namespace App\Http\Controllers;
 use App\Actions\DeleteFile;
 use App\Actions\DeleteOrder;
-use App\Actions\NewOrderStatusEvents;
 use App\Actions\OrderResponse;
-use App\Actions\OrderResponseEvents;
 use App\Actions\ProcessingImage;
 use App\Actions\ProcessingOrderImages;
-use App\Actions\RemoveOrderEvents;
 use App\Actions\RemoveOrderImage;
 use App\Actions\RemoveOrderUnreadMessages;
 use App\Actions\RemovePerformer;
@@ -145,8 +142,6 @@ class OrderController extends BaseController
     public function orderResponse(
         OrderRequest $request,
         OrderResponse $orderResponse,
-        OrderResponseEvents $orderResponseEvents,
-        NewOrderStatusEvents $newOrderStatusEvents
     ): JsonResponse
     {
         $order = Order::find($request->id);
@@ -157,8 +152,11 @@ class OrderController extends BaseController
             $order->refresh();
 
             $orderResponse->handle($order);
-            $orderResponseEvents->handle($order);
-            $newOrderStatusEvents->handle($order);
+
+            broadcast(new NotificationEvent('new_performer', $order, $order->user_id));
+            broadcast(new NotificationEvent('new_order_status', $order, $order->user_id));
+            broadcast(new OrderEvent('new_order_status', $order));
+            broadcast(new AdminOrderEvent('change_item', $order));
 
             $this->mailOrderNotice($order, $order->userCredentials, 'new_performer_notice');
             $this->mailOrderNotice($order, $order->userCredentials, 'new_order_status_notice');
@@ -271,7 +269,9 @@ class OrderController extends BaseController
     {
         $order = Order::find($request->id);
         $this->authorize('owner', $order);
-        return $removeOrderImage->handle($order, $deleteFile, $request->pos);
+        $removeOrderImage->handle($order->id, $deleteFile, $request->pos);
+        broadcast(new AdminOrderEvent('change_item', $order));
+        return response()->json([],200);
     }
 
     /**
@@ -280,7 +280,6 @@ class OrderController extends BaseController
     public function closeOrder(
         OrderRequest $request,
         RemoveOrderUnreadMessages $removeOrderUnreadMessages,
-        RemoveOrderEvents $removeOrderEvents
     ): JsonResponse
     {
         $order = Order::find($request->id);
@@ -288,8 +287,11 @@ class OrderController extends BaseController
         $order->status = 0;
         $order->save();
 
+        AdminNotice::query()->where(['order_id' => $order->id])->update(['read',null]);
+
         $removeOrderUnreadMessages->handle($request->id);
-        $removeOrderEvents->handle($order);
+        broadcast(new OrderEvent('remove_order', $order));
+        broadcast(new AdminOrderEvent('change_item', $order));
 
         return response()->json([],200);
     }

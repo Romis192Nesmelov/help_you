@@ -121,7 +121,7 @@ export default {
         this.getData(this.get_data_url);
 
         if (this.broadcast_on) {
-            window.Echo.channel(this.broadcast_on).listen('.' + this.broadcast_as, res => {
+            window.Echo.private(this.broadcast_on).listen('.' + this.broadcast_as, res => {
                 if (res.notice === 'new_item' || res.notice === 'del_item') {
                     self.getData(self.getUrl());
                 } else if (res.notice === 'change_item') {

@@ -28,7 +28,6 @@ export default {
     },
     data() {
         return {
-            ordersData: Object,
             fields: {
                 id:'id',
                 user:'Пользователь',

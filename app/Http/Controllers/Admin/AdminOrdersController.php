@@ -3,16 +3,14 @@
 namespace App\Http\Controllers\Admin;
 use App\Actions\DeleteFile;
 use App\Actions\DeleteOrder;
-use App\Actions\NewOrderStatusEvents;
 use App\Actions\OrderResponse;
-use App\Actions\OrderResponseEvents;
 use App\Actions\ProcessingImage;
 use App\Actions\ProcessingOrderImages;
-use App\Actions\RemoveOrderEvents;
 use App\Actions\RemoveOrderImage;
 use App\Actions\RemoveOrderUnreadMessages;
 use App\Events\Admin\AdminOrderEvent;
 use App\Events\NotificationEvent;
+use App\Events\OrderEvent;
 use App\Http\Controllers\MessagesHelperTrait;
 use App\Http\Requests\Admin\AdminEditOrderRequest;
 use App\Http\Requests\Order\DelOrderImageRequest;
@@ -36,8 +34,10 @@ class AdminOrdersController extends AdminBaseController
      */
     public function orders(Order $order, $slug=null): View
     {
-        $this->data['users'] = User::query()->select(['id','name','family','phone','email'])->get();
-        $this->data['types'] = OrderType::with(['subtypes'])->get();
+        if (request()->has('id')) {
+            $this->data['users'] = User::query()->select(['id','name','family','phone','email'])->get();
+            $this->data['types'] = OrderType::with(['subtypes'])->get();
+        }
         return $this->getSomething($order, $slug);
     }
 
@@ -62,10 +62,7 @@ class AdminOrdersController extends AdminBaseController
         ProcessingImage $processingImage,
         ProcessingOrderImages $actionOrderImages,
         RemoveOrderUnreadMessages $removeOrderUnreadMessages,
-        RemoveOrderEvents $removeOrderEvents,
         OrderResponse $orderResponse,
-        OrderResponseEvents $orderResponseEvents,
-        NewOrderStatusEvents $newOrderStatusEvents
     ): RedirectResponse
     {
         $fields = $request->validated();
@@ -79,6 +76,9 @@ class AdminOrdersController extends AdminBaseController
             $lastStatus = $order->status;
 
             $order->update($fields);
+            $order->refresh();
+            broadcast(new AdminOrderEvent('change_item', $order));
+
             if ($order->adminNotice && $order->adminNotice->read != 1) {
                 $order->adminNotice->read = 1;
                 $order->adminNotice->save();
@@ -92,17 +92,18 @@ class AdminOrdersController extends AdminBaseController
 
         if ($order->status != $lastStatus) {
             $this->mailOrderNotice($order, $order->userCredentials, 'new_order_status_notice');
-            $newOrderStatusEvents->handle($order);
+            broadcast(new NotificationEvent('new_order_status', $order, $order->user_id));
+            broadcast(new OrderEvent('new_order_status', $order));
 
             if (!$order->status) {
                 $removeOrderUnreadMessages->handle($order->id);
-                $removeOrderEvents->handle($order);
+                broadcast(new OrderEvent('remove_order', $order));
             } elseif ($order->status == 1) {
                 OrderUser::query()->create(['order_id' => $order->id, 'user_id' => $request->performer_id]);
 
                 $removeOrderUnreadMessages->handle($order->id);
                 $orderResponse->handle($order);
-                $orderResponseEvents->handle($order);
+                broadcast(new NotificationEvent('new_performer', $order, $order->user_id));
 
                 $this->mailOrderNotice($order, $order->userCredentials, 'new_performer_notice');
                 if (!$order->messages->count()) $this->chatMessage($order, trans('content.new_chat_message'));
@@ -127,10 +128,16 @@ class AdminOrdersController extends AdminBaseController
         return redirect()->back();
     }
 
-    public function deleteOrderImage(DelOrderImageRequest $request, RemoveOrderImage $removeOrderImage, DeleteFile $deleteFile): JsonResponse
+    public function deleteOrderImage(
+        DelOrderImageRequest $request,
+        RemoveOrderImage $removeOrderImage,
+        DeleteFile $deleteFile
+    ): JsonResponse
     {
         $order = Order::find($request->id);
-        return $removeOrderImage->handle($order, $deleteFile, $request->pos);
+        $removeOrderImage->handle($order->id, $deleteFile, $request->pos);
+        broadcast(new AdminOrderEvent('change_item', $order));
+        return response()->json([],200);
     }
 
     /**

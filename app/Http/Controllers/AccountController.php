@@ -107,9 +107,9 @@ class AccountController extends BaseController
             ]);
     }
 
-    public function myOrders(): View
+    public function myOrders(SetReadUnread $actionSetReadUnread): View
     {
-        $this->setReadUnreadByMyOrders();
+        $this->setReadUnreadByMyOrders($actionSetReadUnread);
         $this->data['active_left_menu'] = 'my_orders';
         return $this->showView('my_orders');
     }

@@ -3,12 +3,13 @@
 namespace App\Events\Admin;
 
 use App\Models\User;
-use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class AdminUserEvent
+class AdminUserEvent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -32,7 +33,7 @@ class AdminUserEvent
     public function broadcastOn(): array
     {
         return [
-            new Channel('admin_user_event'),
+            new PrivateChannel('admin_user_event'),
         ];
     }
 
