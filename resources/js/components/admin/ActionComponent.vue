@@ -95,6 +95,20 @@ export default {
         window.Echo.private('admin_incentive_event').listen('.admin_incentive', res => {
             self.activeUsers = res.ids;
         });
+
+        window.Echo.private('admin.admin_action_event').listen('.admin_action', res => {
+            if (res.notice === 'change_item' && res.model.id === self.objId) {
+                let newStart = self.convertTime(res.model.start),
+                    newEnd = self.convertTime(res.model.end);
+
+                $('input[name=start]').val(newStart);
+                $('input[name=end]').val(newEnd);
+            }
+        });
+
+        setTimeout(() => {
+            $('input[name=start]').val('14/07/1976');
+        }, 2000);
     },
     data() {
         return {
