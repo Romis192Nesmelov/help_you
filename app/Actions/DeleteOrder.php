@@ -26,6 +26,6 @@ class DeleteOrder
         broadcast(new AdminOrderEvent('del_item', $order));
 
         $order->delete();
-        return response()->json([],200);
+        return response()->json(['message' => trans('admin.delete_complete')],200);
     }
 }

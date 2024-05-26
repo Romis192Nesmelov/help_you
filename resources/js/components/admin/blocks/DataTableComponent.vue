@@ -173,11 +173,12 @@ export default {
             formData.append('id', this.deleteId);
 
             axios.post(this.delete_url, formData)
-                .then(function () {
+                .then(function (response) {
                     self.getData(self.getUrl());
+                    window.showMessage(response.data.message);
                 })
                 .catch(function (error) {
-                    console.log(error);
+                    // console.log(error);
                 });
         },
         setArrange(field, currentDirection) {

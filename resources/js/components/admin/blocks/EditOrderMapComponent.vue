@@ -43,11 +43,12 @@ export default {
         this.longitude = parseFloat(this.incoming_longitude);
     },
     props: {
-        'incoming_latitude': String,
-        'incoming_longitude': String,
+        'incoming_latitude': String|Number,
+        'incoming_longitude': String|Number,
         'incoming_address': String,
         'yandex_api_key': String,
     },
+    emits: ['setPlaceMark'],
     data() {
         return {
             address: String,
@@ -69,6 +70,11 @@ export default {
             this.longitude = window.singlePoint[1];
             this.address = address;
             this.disabledButton = false;
+            this.$emit('setPlaceMark',{
+                address: this.address,
+                latitude: this.latitude,
+                longitude: this.longitude
+            });
         }
     }
 }

@@ -34,14 +34,14 @@ class AdminEditOrderRequest extends FormRequest
             'address' => $this->validationString,
             'latitude' => 'required|numeric',
             'longitude' => 'required|numeric',
-            'description_short' => 'nullable|string|min:5|max:200',
-            'description_full' => 'nullable|string|min:5|max:1000',
-            'status' => 'nullable|max:3',
+            'description_short' => 'nullable|string|max:200',
+            'description_full' => 'nullable|string|max:1000',
+            'status' => 'integer|min:0|max:3',
         ];
 
-        if (request()->has('id')) $rules['id'] = 'required|exists:orders,id';
-        if (request()->has('status') && request('status') == 1) $rules['performer_id'] = $this->validationUserId;
-        if (request()->has('performer_id')) $rules['status'] = 'required|integer|in:1';
+        if (request('id')) $rules['id'] = 'required|exists:orders,id';
+        if (request('status') && request('status') == 1) $rules['performer_id'] = $this->validationUserId;
+        if (request('performer_id')) $rules['status'] = 'required|integer|min:1|max:1';
 
         for ($i=1;$i<=3;$i++) {
             $fileName = 'photo'.$i;

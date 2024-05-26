@@ -40,7 +40,7 @@ class AdminPartnersController extends AdminBaseController
     public function editPartner(
         AdminEditPartnerRequest $request,
         ProcessingImage $processingImage
-    ): RedirectResponse
+    ): JsonResponse
     {
         $fields = $request->validated();
         $logoPath = 'images/partners/';
@@ -58,8 +58,9 @@ class AdminPartnersController extends AdminBaseController
             $partner->refresh();
             broadcast(new AdminPartnerEvent('change_item',$partner));
         }
-        $this->saveCompleteMessage();
-        return redirect()->back();
+//        $this->saveCompleteMessage();
+//        return redirect()->back();
+        return response()->json(['message' => trans('content.save_complete')],200);
     }
 
     /**
@@ -77,6 +78,6 @@ class AdminPartnersController extends AdminBaseController
         broadcast(new AdminPartnerEvent('del_item',$partner));
 
         $partner->delete();
-        return response()->json([],200);
+        return response()->json(['message' => trans('admin.delete_complete')],200);
     }
 }

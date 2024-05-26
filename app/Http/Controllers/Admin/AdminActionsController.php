@@ -52,7 +52,7 @@ class AdminActionsController extends AdminBaseController
     public function editAction(
         AdminEditActionRequest $request,
         ConvertTimestamp $convertTimestamp
-    ): RedirectResponse
+    ): JsonResponse
     {
         $fields = $request->validated();
         foreach (['start','end'] as $timeField) {
@@ -85,8 +85,9 @@ class AdminActionsController extends AdminBaseController
         $action->users()->sync(request('users_ids'));
         broadcast(new AdminIncentiveEvent(request('users_ids')));
 
-        $this->saveCompleteMessage();
-        return redirect()->back();
+//        $this->saveCompleteMessage();
+//        return redirect()->back();
+        return response()->json(['message' => trans('content.save_complete')],200);
     }
 
     /**
@@ -104,6 +105,6 @@ class AdminActionsController extends AdminBaseController
 
         ActionUser::query()->where('action_id',$request->id)->delete();
         $action->delete();
-        return response()->json([],200);
+        return response()->json(['message' => trans('admin.delete_complete')],200);
     }
 }

@@ -22,7 +22,6 @@ use App\Models\ReadOrder;
 use App\Models\Subscription;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
 class AdminOrdersController extends AdminBaseController
@@ -34,11 +33,9 @@ class AdminOrdersController extends AdminBaseController
      */
     public function orders(Order $order, $slug=null): View
     {
-        if (request()->has('id')) {
-            $this->data['users'] = User::query()->select(['id','name','family','phone','email'])->get();
-            $this->data['types'] = OrderType::with(['subtypes'])->get();
-        }
-        return $this->getSomething($order, $slug);
+        $this->data['users'] = User::query()->select(['id','name','family','phone','email'])->get();
+        $this->data['types'] = OrderType::with(['subtypes'])->get();
+        return $this->getSomething($order, $slug, ['performers','images']);
     }
 
     public function getOrders(): JsonResponse
@@ -63,14 +60,14 @@ class AdminOrdersController extends AdminBaseController
         ProcessingOrderImages $actionOrderImages,
         RemoveOrderUnreadMessages $removeOrderUnreadMessages,
         OrderResponse $orderResponse,
-    ): RedirectResponse
+    ): JsonResponse
     {
         $fields = $request->validated();
         $lastStatus = 0;
         if ($request->has('id')) {
             $order = Order::query()
                 ->where('id',$request->id)
-                ->with(['adminNotice','userCredentials'])
+                ->with(['user','performers','images','adminNotice','userCredentials'])
                 ->first();
 
             $lastStatus = $order->status;
@@ -85,6 +82,7 @@ class AdminOrdersController extends AdminBaseController
             }
         } else {
             $order = Order::query()->create($fields);
+            $order->load(['user','performers','images']);
             /** @var ORDER $order */
             broadcast(new AdminOrderEvent('new_item', $order));
         }
@@ -124,8 +122,9 @@ class AdminOrdersController extends AdminBaseController
             }
         }
 
-        $this->saveCompleteMessage();
-        return redirect()->back();
+//        $this->saveCompleteMessage();
+//        return redirect()->back();
+        return response()->json(['message' => trans('content.save_complete')],200);
     }
 
     public function deleteOrderImage(
@@ -134,10 +133,10 @@ class AdminOrdersController extends AdminBaseController
         DeleteFile $deleteFile
     ): JsonResponse
     {
-        $order = Order::find($request->id);
+        $order = Order::query()->where('id',$request->id)->with(['user','performers','images'])->first();
         $removeOrderImage->handle($order->id, $deleteFile, $request->pos);
         broadcast(new AdminOrderEvent('change_item', $order));
-        return response()->json([],200);
+        return response()->json(['message' => trans('admin.delete_complete')],200);
     }
 
     /**

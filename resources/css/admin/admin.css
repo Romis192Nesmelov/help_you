@@ -274,7 +274,8 @@ textarea {
     resize: none;
 }
 
-select#addressesselect#action-users {
+select#addresses,
+select#action-users {
     width: 100%;
     height: 100px;
 }

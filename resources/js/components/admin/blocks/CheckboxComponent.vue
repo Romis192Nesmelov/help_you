@@ -1,21 +1,22 @@
 <template>
-    <div class="form-check form-switch mt-3">
+    <div class="form-group mt-3">
         <label class="checkbox-inline">
             <input
-                class="form-check-input"
+                class="styled"
                 :id="id"
+                :checked="checked"
                 type="checkbox"
                 :name="name"
                 @input="$emit('update:checked', $event.target.checked)"
             >
-            <label class="form-check-label" :for="id">{{ label }}</label>
+            {{ label }}
         </label>
     </div>
 </template>
 
 <script>
 export default {
-    props: ['id','name','value','checked','label'],
     name: "CheckboxComponent",
+    props: ['id','name','value','checked','label'],
 }
 </script>

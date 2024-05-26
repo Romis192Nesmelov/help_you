@@ -54,7 +54,7 @@ class AdminOrderEvent implements ShouldBroadcast
     {
         return [
             'notice' => $this->noticeType,
-            'model' => $this->order->with(['user','performers']),
+            'model' => $this->order,
         ];
     }
 }

@@ -74,9 +74,10 @@ class OrderController extends BaseController
     public function editOrder(EditOrderRequest $request): View
     {
         if ($request->has('id')) {
-            $this->data['order'] = Order::with('images')->find($request->id);
+            $this->data['order'] = Order::query()->find($request->id);
             $this->authorize('owner', $this->data['order']);
             $this->data['order']->update(['status' => 3]);
+            $this->data['order']->load(['user','performers','images']);
             $this->data['order']->refresh();
 
             broadcast(new OrderEvent('new_order_status', $this->data['order']));
@@ -144,11 +145,12 @@ class OrderController extends BaseController
         OrderResponse $orderResponse,
     ): JsonResponse
     {
-        $order = Order::find($request->id);
+        $order = Order::query()->find($request->id);
         if ($order->user_id == Auth::id()) return response()->json([],403);
         else {
             $order->status = 1;
             $order->save();
+            $order->load(['user','performers','images']);
             $order->refresh();
 
             $orderResponse->handle($order);
@@ -210,12 +212,14 @@ class OrderController extends BaseController
             $orderType = OrderType::find($steps[0]['order_type_id']);
             if (!$orderType->subtypes->count()) unset($fields['subtype_id']);
             if ($request->has('id')) {
-                $order = Order::find($request->id);
+                $order = Order::query()->find($request->id);
                 $this->authorize('owner', $order);
                 if (!$order->status) return response()->json([],403);
                 $order->update($fields);
+                $order->load(['user','performers','images']);
             } else {
                 $order = Order::create($fields);
+                $order->load(['user','performers','images']);
                 AdminNotice::create(['order_id' => $order->id]);
 
                 broadcast(new AdminOrderEvent('new_item', $order));
@@ -248,14 +252,13 @@ class OrderController extends BaseController
         OrderRequest $request,
         DeleteOrder $deleteOrder,
         DeleteFile $deleteFile,
-        RemoveOrderUnreadMessages $removeOrderUnreadMessages
     ): JsonResponse
     {
         $order = Order::find($request->id);
         $this->authorize('owner', $order);
 
         if ($order->status <= 1) return response()->json([],403);
-        else return $deleteOrder->handle($order, $deleteFile, $removeOrderUnreadMessages);
+        else return $deleteOrder->handle($order, $deleteFile);
     }
 
     /**
@@ -267,7 +270,7 @@ class OrderController extends BaseController
         DeleteFile $deleteFile
     ): JsonResponse
     {
-        $order = Order::find($request->id);
+        $order = Order::query()->find($request->id)->with(['user','performers','images'])->first();
         $this->authorize('owner', $order);
         $removeOrderImage->handle($order->id, $deleteFile, $request->pos);
         broadcast(new AdminOrderEvent('change_item', $order));
@@ -282,7 +285,7 @@ class OrderController extends BaseController
         RemoveOrderUnreadMessages $removeOrderUnreadMessages,
     ): JsonResponse
     {
-        $order = Order::find($request->id);
+        $order = Order::query()->where('id',$request->id)->with(['user','performers','images'])->first();
         $this->authorize('owner', $order);
         $order->status = 0;
         $order->save();
@@ -327,11 +330,13 @@ class OrderController extends BaseController
      */
     public function resumeOrder(OrderRequest $request): JsonResponse
     {
-        $order = Order::find($request->id);
+        $order = Order::query()->find($request->id);
         $this->authorize('owner', $order);
         OrderUser::query()->where('order_id',$order->id)->delete();
         $order->status = 3;
         $order->save();
+        $order->load(['user','performers','images']);
+        $order->refresh();
 
         AdminNotice::query()->where(['order_id' => $order->id])->update(['read',null]);
         OrderUser::query()->where('order_id',$request->id)->delete();

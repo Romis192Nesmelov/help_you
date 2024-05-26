@@ -67,8 +67,8 @@ class AdminBaseController extends Controller
     protected function getSomething(
         Model $model,
         string|null $slug=null,
+        array $width=[],
         Model|null $parentModel=null,
-        string|null $parentRelation=null
     ): View
     {
         $key = $model->getTable();
@@ -99,7 +99,7 @@ class AdminBaseController extends Controller
 
         if (request('id')) {
 //            $this->data['metas'] = $this->metas;
-            $this->data[$this->data['singular_key']] = $model->findOrFail(request('id'));
+            $this->data[$this->data['singular_key']] = $model->query()->where('id',request('id'))->with($width)->first();
             $breadcrumbsParams['id'] = $this->data[$this->data['singular_key']]->id;
             $this->breadcrumbs[] = [
                 'key' => $this->menu[$key]['key'],

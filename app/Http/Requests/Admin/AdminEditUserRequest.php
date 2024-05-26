@@ -31,7 +31,10 @@ class AdminEditUserRequest extends FormRequest
             'born' => $this->validationBorn,
             'phone' => $this->validationPhone,
             'email' => 'nullable|email|unique:users,email',
-            'info_about' => $this->validationText
+            'info_about' => $this->validationText,
+            'mail_notice' => 'integer|min:0|max:1',
+            'active' => 'integer|min:0|max:1',
+            'admin' => 'integer|min:0|max:1'
         ];
 
         if (request()->has('id')) {

@@ -3,8 +3,10 @@ import {createApp} from "vue/dist/vue.esm-bundler";
 import mitt from 'mitt';
 import AvatarComponent from "../components/blocks/AvatarComponent.vue";
 import OrdersComponent from "../components/admin/OrdersComponent.vue";
+import OrderComponent from "../components/admin/OrderComponent.vue";
 import UserRatingComponent from "../components/admin/blocks/UserRatingComponent.vue";
 import UsersComponent from "../components/admin/UsersComponent.vue";
+import UserComponent from "../components/admin/UserComponent.vue";
 import EditOrderMapComponent from "../components/admin/blocks/EditOrderMapComponent.vue";
 import NoticeComponent from "../components/admin/blocks/NoticeComponent.vue";
 import PartnerComponent from "../components/admin/PartnerComponent.vue";
@@ -14,7 +16,9 @@ import ActionUsersComponent from "../components/admin/blocks/ActionUsersComponen
 const app = createApp({
     components: {
         UsersComponent,
+        UserComponent,
         OrdersComponent,
+        OrderComponent,
         AvatarComponent,
         UserRatingComponent,
         EditOrderMapComponent,
@@ -32,7 +36,6 @@ app.mount('#app');
 // window.allMonths = ['Янв.', 'Фев.', 'Март', 'Апр.', 'Май', 'Июнь', 'Июль', 'Авг.', 'Сент.', 'Окт.', 'Нояб.', 'Декаб.'];
 // window.statisticsData = [];
 $(document).ready(function () {
-    $(".radio-input").bootstrapSwitch();
     $('.styled').uniform();
 
     $.mask.definitions['c'] = "[1-2]";

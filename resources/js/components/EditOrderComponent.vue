@@ -64,14 +64,13 @@
                 ></InputComponent>
                 <h2 class="mt-4">Добавьте изображения</h2>
                 <div class="row">
-                    <div class="col-lg-4 col-md-4 col-sm-12" v-for="count in 3" :key="'order-image-' + count">
-                        <div :id="'photo' + count" :class="'order-photo' + (errors['photo'+count] ? ' error' : '')" :style="this['photo' + count] ? `background-image:url(/${this['photo' + count]});` : ''">
-                            <i class="icon-file-plus2" v-show="!this['photo' + count]"></i>
-                            <img class="hover-image" :src="input_image_hover" />
-                            <i :class="'icon-close2' + (!this['photo' + count] ? ' d-none' : '')"></i>
-                            <input type="file" :name="'photo' + count">
-                        </div>
-                    </div>
+                    <OrderImagesComponent
+                        :errors="errors"
+                        :photo1="photo1"
+                        :photo2="photo2"
+                        :photo3="photo2"
+                        :input_image_hover="input_image_hover"
+                    ></OrderImagesComponent>
                 </div>
             </div>
             <div class="inputs-step" v-show="currentStep === 3">
@@ -140,6 +139,7 @@ import ModalComponent from "./blocks/ModalComponent.vue";
 import InputComponent from "./blocks/InputComponent.vue";
 import TextAreaComponent from "./blocks/TextAreaComponent.vue";
 import CheckboxComponent from "./blocks/CheckboxComponent.vue";
+import OrderImagesComponent from "./blocks/OrderImagesComponent.vue";
 import ButtonComponent from "./blocks/ButtonComponent.vue";
 
 export default {
@@ -150,6 +150,7 @@ export default {
         InputComponent,
         TextAreaComponent,
         CheckboxComponent,
+        OrderImagesComponent,
         ButtonComponent,
     },
     created() {

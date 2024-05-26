@@ -29,7 +29,7 @@ class AdminUsersController extends AdminBaseController
      */
     public function users(User $users, $slug=null): View
     {
-        return $this->getSomething($users, $slug);
+        return $this->getSomething($users, $slug, ['ratings']);
     }
 
     public function getUsers(User $users): JsonResponse
@@ -48,14 +48,12 @@ class AdminUsersController extends AdminBaseController
      */
     public function editUser(
         AdminEditUserRequest $request,
-        ProcessingSpecialFields $processingSpecialFields,
         ProcessingImage $processingImage
-    ): RedirectResponse
+    ): JsonResponse
     {
         $fields = $request->validated();
 
         if ($request->has('id')) {
-            $fields = $this->getUserSpecialFields($processingSpecialFields, $fields);
             $user = User::query()->where('id',$request->input('id'))->with('ratings')->first();
             if ($request->input('password')) $fields['password'] = bcrypt($fields['password']);
             $user->update($fields);
@@ -63,7 +61,6 @@ class AdminUsersController extends AdminBaseController
             /** @var USER $user */
             broadcast(new AdminUserEvent('new_item',$user));
         } else {
-            $fields = $this->getUserSpecialFields($processingSpecialFields, $fields);
             $fields['password'] = bcrypt($fields['password']);
             $user = User::query()->create($fields);
             $fields = $processingImage->handle($request, [], 'avatar', 'images/avatars/', 'avatar'.$user->id);
@@ -72,8 +69,9 @@ class AdminUsersController extends AdminBaseController
             /** @var USER $user */
             broadcast(new AdminUserEvent('change_item',$user));
         }
-        $this->saveCompleteMessage();
-        return redirect()->back();
+//        $this->saveCompleteMessage();
+//        return redirect()->back();
+        return response()->json(['message' => trans('content.save_complete')],200);
     }
 
     public function changeAvatar(
@@ -108,14 +106,6 @@ class AdminUsersController extends AdminBaseController
         broadcast(new AdminUserEvent('del_item', $user));
 
         $user->delete();
-        return response()->json([],200);
-    }
-
-    #[Pure] private function getUserSpecialFields(ProcessingSpecialFields $processingSpecialFields, array $fields): array
-    {
-        foreach (['mail_notice','active','admin'] as $field) {
-            $fields = $processingSpecialFields->handle($fields, $field);
-        }
-        return $fields;
+        return response()->json(['message' => trans('admin.delete_complete')],200);
     }
 }
