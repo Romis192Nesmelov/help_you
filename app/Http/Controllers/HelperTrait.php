@@ -20,6 +20,7 @@ trait HelperTrait
     public string $validationSvg = 'required|mimes:svg|max:10';
     public string $validationJpgAndPng = 'mimes:jpg,png|max:2000';
     public string $validationJpgAndPngSmall = 'mimes:jpg,png|max:300';
+    public string $validationJpgAndPngAndSvgSmall = 'mimes:jpg,png,svg|max:300';
     public string $validationJpg = 'mimes:jpg|max:2000';
     public string $validationPng = 'mimes:png|max:2000';
     public string $validationDate = 'regex:/^(\d{2})\/(\d{2})\/(\d{4})$/';

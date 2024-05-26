@@ -21,7 +21,7 @@ class AdminPartnersController extends AdminBaseController
      */
     public function partners(Partner $partners, $slug=null): View
     {
-        return $this->getSomething($partners, $slug);
+        return $this->getSomething($partners, $slug, ['actions']);
     }
 
     public function getPartners(Partner $partners): JsonResponse
@@ -55,6 +55,7 @@ class AdminPartnersController extends AdminBaseController
             $partner = Partner::query()->create($fields);
             $processingImage->handle($request, [], 'logo', $logoPath, 'logo'.$partner->id);
             $partner->update($fields);
+            $partner->load(['actions']);
             $partner->refresh();
             broadcast(new AdminPartnerEvent('change_item',$partner));
         }

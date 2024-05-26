@@ -201,9 +201,7 @@ export default {
     },
     data() {
         return {
-            objId: null,
             obj: {
-                id: 1,
                 user_id: 0,
                 order_type_id: 1,
                 subtype_id: 1,

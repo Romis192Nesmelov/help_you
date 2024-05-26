@@ -14,7 +14,6 @@ use App\Models\Partner;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
 class AdminActionsController extends AdminBaseController

@@ -9,6 +9,7 @@ import UsersComponent from "../components/admin/UsersComponent.vue";
 import UserComponent from "../components/admin/UserComponent.vue";
 import EditOrderMapComponent from "../components/admin/blocks/EditOrderMapComponent.vue";
 import NoticeComponent from "../components/admin/blocks/NoticeComponent.vue";
+import PartnersComponent from "../components/admin/PartnersComponent.vue";
 import PartnerComponent from "../components/admin/PartnerComponent.vue";
 import ActionsComponent from "../components/admin/ActionsComponent.vue";
 import ActionUsersComponent from "../components/admin/blocks/ActionUsersComponent.vue";
@@ -23,6 +24,7 @@ const app = createApp({
         UserRatingComponent,
         EditOrderMapComponent,
         NoticeComponent,
+        PartnersComponent,
         PartnerComponent,
         ActionsComponent,
         ActionUsersComponent
@@ -133,7 +135,7 @@ $(document).ready(function () {
 
 const initCKEditor = (name, height) => {
     if ($('textarea[name='+ name +']').length) {
-        CKEDITOR.replace(name,{
+        window.editor = CKEDITOR.replace(name,{
             height: height + 'px'
         });
     }

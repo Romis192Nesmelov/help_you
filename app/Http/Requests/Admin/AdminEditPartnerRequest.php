@@ -25,13 +25,13 @@ class AdminEditPartnerRequest extends FormRequest
     public function rules(): array
     {
         $rules = [
-            'logo' => 'nullable|mimes:jpg,png|max:300',
             'name' => $this->validationName,
             'about' => $this->validationText,
             'info' => $this->validationLongText
         ];
 
         if (request()->has('id')) $rules['id'] = 'required|exists:orders,id';
+        if (request()->hasFile('logo')) $rules['logo'] = $this->validationJpgAndPngAndSvgSmall;
 
         return $rules;
     }
