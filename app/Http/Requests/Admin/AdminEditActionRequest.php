@@ -30,6 +30,7 @@ class AdminEditActionRequest extends FormRequest
             'start' => $this->validationDate,
             'end' => $this->validationDate,
             'rating' => 'required|min:1|max:2',
+            'users_ids' => 'required|string',
             'partner_id' => 'required|integer|exists:partners,id'
         ];
 

@@ -255,6 +255,7 @@ export default {
             let self = this;
             axios.post(this.edit_url, formData)
                 .then(function (response) {
+                    console.log(response);
                     window.showMessage(response.data.message);
                     self.disabledSubmit = false;
                 })

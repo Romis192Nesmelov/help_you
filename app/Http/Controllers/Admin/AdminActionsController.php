@@ -25,11 +25,9 @@ class AdminActionsController extends AdminBaseController
      */
     public function actions(Action $action, Partner $partner, $slug=null): View
     {
-        if (request()->has('id')) {
-            $this->data['users'] = User::query()->select(['id','name','family','phone','email'])->get();
-            $this->data['partners'] = Partner::select(['id','name'])->get();
-        }
-        return $this->getSomething($action, $slug);
+        $this->data['users'] = User::query()->select(['id','name','family','phone','email'])->get();
+        $this->data['partners'] = Partner::select(['id','name'])->get();
+        return $this->getSomething($action, $slug, ['users']);
     }
 
     public function getActions(): JsonResponse
@@ -54,6 +52,11 @@ class AdminActionsController extends AdminBaseController
     ): JsonResponse
     {
         $fields = $request->validated();
+        $usersIds = [];
+        foreach (explode(',',$fields['users_ids']) as $userId) {
+            $usersIds[] = (int)$userId;
+        }
+        unset($fields['users_ids']);
         foreach (['start','end'] as $timeField) {
             $fields[$timeField] = $convertTimestamp->handle($fields[$timeField]);
         }
@@ -65,24 +68,28 @@ class AdminActionsController extends AdminBaseController
             broadcast(new AdminActionEvent('change_item',$action));
 
             foreach ($action->actionUsers as $incentive) {
-                if (!in_array($incentive->user_id, request('users_ids'))) {
+                if (!in_array($incentive->user_id, $usersIds)) {
                     broadcast(new IncentivesEvent('remove_incentive', $incentive, $incentive->user_id));
                 }
             }
         } else {
             $action = Action::query()->create($fields);
+            $action->load(['users','actionUsers']);
             broadcast(new AdminOrderEvent('new_item',$action));
         }
 
         $lastIncentivesIds = $action->actionUsers->pluck('user_id')->toArray();
-        foreach (request('users_ids') as $userId) {
+
+//        return response()->json(['fields' => $usersIds],200);
+
+        foreach ($usersIds as $userId) {
             if (!in_array($userId, $lastIncentivesIds)) {
                 $this->createNewIncentive(User::find($userId), $action->id);
             }
         }
 
-        $action->users()->sync(request('users_ids'));
-        broadcast(new AdminIncentiveEvent(request('users_ids')));
+        $action->users()->sync($usersIds);
+        broadcast(new AdminIncentiveEvent($usersIds));
 
 //        $this->saveCompleteMessage();
 //        return redirect()->back();

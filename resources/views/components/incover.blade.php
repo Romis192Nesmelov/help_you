@@ -11,6 +11,8 @@
     @endif
     <div class="form-group {{ $error ? "error" : '' }}">
         {!! $slot !!}
-        @include('admin.blocks.wrap_error_block')
+        @error($name)
+            @include('admin.blocks.error_block')
+        @enderror
     </div>
 </div>

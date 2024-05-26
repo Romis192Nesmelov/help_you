@@ -12,7 +12,7 @@ import NoticeComponent from "../components/admin/blocks/NoticeComponent.vue";
 import PartnersComponent from "../components/admin/PartnersComponent.vue";
 import PartnerComponent from "../components/admin/PartnerComponent.vue";
 import ActionsComponent from "../components/admin/ActionsComponent.vue";
-import ActionUsersComponent from "../components/admin/blocks/ActionUsersComponent.vue";
+import ActionComponent from "../components/admin/ActionComponent.vue";
 
 const app = createApp({
     components: {
@@ -27,7 +27,7 @@ const app = createApp({
         PartnersComponent,
         PartnerComponent,
         ActionsComponent,
-        ActionUsersComponent
+        ActionComponent,
     }
 });
 
@@ -100,6 +100,9 @@ $(document).ready(function () {
 
     // Single picker
     $('.daterange-single').daterangepicker({
+        onSelect: function(dateText) {
+            console.log(dateText);
+        },
         singleDatePicker: true,
         locale: {
             format: 'DD/MM/YYYY',
@@ -108,29 +111,11 @@ $(document).ready(function () {
             week: moment.locale('en', {
                 week: { dow: 1 }
             })
-        }
+        },
+    }).on('apply.daterangepicker', function(e) {
+        window.emitter.emit('date-change',{name: $(e.target).attr('name'), value: $(e.target).val()});
+        $(e.target).parents('.date').find('.error').html('');
     });
-
-    // Preview upload image
-    // $('input[type=file]').change(function () {
-    //     let input = $(this)[0],
-    //         parent = $(this).parents('.edit-image-preview'),
-    //         imagePreview = parent.find('img');
-    //
-    //     if (input.files[0].type.match('image.*')) {
-    //         let reader = new FileReader();
-    //         reader.onload = function (e) {
-    //             imagePreview.attr('src', e.target.result);
-    //             if (!imagePreview.is(':visible')) imagePreview.fadeIn();
-    //         };
-    //         reader.readAsDataURL(input.files[0]);
-    //     } else if (parent.hasClass('file-advanced')) {
-    //         imagePreview.attr('src', '');
-    //         imagePreview.fadeOut();
-    //     } else {
-    //         imagePreview.attr('src', '/images/placeholder.jpg');
-    //     }
-    // });
 });
 
 const initCKEditor = (name, height) => {
