@@ -38,6 +38,13 @@ class Action extends Model
         return $this->belongsTo(Partner::class);
     }
 
+    public function scopeWithPartnerId(Builder $query): void
+    {
+        $query->when(request('parent_id'), function (Builder $q) {
+            $q->where('partner_id',request('parent_id'));
+        });
+    }
+
     public function scopeFiltered(Builder $query): void
     {
         $query->when(request('filter'), function (Builder $q) {

@@ -14,4 +14,33 @@
             ></partner-component>
         </div>
     </div>
+    @if (isset($partner))
+        <div class="panel panel-flat">
+            <x-atitle>Акции партнера</x-atitle>
+            <div class="panel-body">
+                <div class="panel-body">
+                    @if ($partner->actions->count())
+                        <actions-component
+                            get_actions_url="{{ route('admin.get_actions',['parent_id' => $partner->id]) }}"
+                            edit_action_url="{{ route('admin.actions',['parent_id' => $partner->id]) }}"
+                            delete_action_url="{{ route('admin.delete_action') }}"
+                            arrange="{{ json_encode(['field' => 'id', 'direction' => 'desc']) }}"
+                        >
+                        </actions-component>
+                    @endif
+                </div>
+                <div class="panel-body">
+                    <a href="{{ route('admin.actions',['slug' => 'add','parent_id' => $partner->id]) }}">
+                        @include('admin.blocks.button_block', [
+                            'primary' => true,
+                            'buttonType' => 'button',
+                            'icon' => 'icon-database-add',
+                            'buttonText' => 'Добавить акцию',
+                            'addClass' => 'pull-right'
+                        ])
+                    </a>
+                </div>
+            </div>
+        </div>
+    @endif
 @endsection

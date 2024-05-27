@@ -35,13 +35,15 @@ class AdminOrdersController extends AdminBaseController
     {
         $this->data['users'] = User::query()->select(['id','name','family','phone','email'])->get();
         $this->data['types'] = OrderType::with(['subtypes'])->get();
-        return $this->getSomething($order, $slug, ['performers','images']);
+//        $this->data['parent_key'] = 'users';
+        return $this->getSomething($order, $slug, ['performers','images'], new User());
     }
 
     public function getOrders(): JsonResponse
     {
         return response()->json([
             'orders' => Order::query()
+                ->withUserId()
                 ->filtered()
                 ->with(['user.ratings','orderType'])
                 ->orderBy(request('field') ?? 'id',request('direction') ?? 'desc')

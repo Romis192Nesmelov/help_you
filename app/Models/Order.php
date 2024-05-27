@@ -92,6 +92,13 @@ class Order extends Model
             ->where('user_id','!=',Auth::id());
     }
 
+    public function scopeWithUserId(Builder $query): void
+    {
+        $query->when(request('parent_id'), function (Builder $q) {
+            $q->where('user_id',request('parent_id'));
+        });
+    }
+
     public function scopeFiltered(Builder $query): void
     {
         $query->when(request('order_type'), function (Builder $q) {

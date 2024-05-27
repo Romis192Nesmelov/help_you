@@ -78,14 +78,15 @@ class AdminBaseController extends Controller
         if (request('parent_id')) {
             $isParentModelUser = $parentModel instanceof User;
             $selectFields = $isParentModelUser ? ['name','family','phone','email'] : ['name'];
+            $parentKey = $parentModel->getTable();
             $this->data['parent'] = $parentModel->query()->where('id',request('parent_id'))->select($selectFields)->first();
-            $this->data['menu_key'] = $this->data['parent_key'];
+            $this->data['menu_key'] = $parentKey;
             $this->breadcrumbs[] = [
-                'key' => $this->menu[$this->data['parent_key']]['key'],
-                'name' => trans('admin_menu.'.$this->data['parent_key']),
+                'key' => $this->menu[$parentKey]['key'],
+                'name' => trans('admin_menu.'.$parentKey),
             ];
             $this->breadcrumbs[] = [
-                'key' => $this->menu[$this->data['parent_key']]['key'],
+                'key' => $this->menu[$parentKey]['key'],
                 'params' => ['id' => request('parent_id')],
                 'name' => $isParentModelUser ? getItemName($this->data['parent']) : $this->data['parent']->name,
             ];

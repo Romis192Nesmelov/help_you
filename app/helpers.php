@@ -25,7 +25,7 @@ function getItemName(Model $model): string
     $name = '';
     foreach (['name','family','phone','email'] as $k => $field) {
         if (isset($model[$field])) {
-            $name = $name ? ' '.$model[$field] : $model[$field];
+            $name .= $name ? ' '.$model[$field] : $model[$field];
             if ($k) break;
         }
     }

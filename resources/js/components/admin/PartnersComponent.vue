@@ -32,7 +32,6 @@ export default {
                 logo:'Логотип',
                 name:'Название',
                 about:'О партнере',
-                info:'Описание',
             },
             arrangeCol: Object
         }

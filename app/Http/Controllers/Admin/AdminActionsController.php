@@ -27,13 +27,14 @@ class AdminActionsController extends AdminBaseController
     {
         $this->data['users'] = User::query()->select(['id','name','family','phone','email'])->get();
         $this->data['partners'] = Partner::select(['id','name'])->get();
-        return $this->getSomething($action, $slug, ['users']);
+        return $this->getSomething($action, $slug, ['users'], new Partner());
     }
 
     public function getActions(): JsonResponse
     {
         return response()->json([
             'actions' => Action::query()
+                ->withPartnerId()
                 ->filtered()
                 ->select(['id','name','start','end','rating','partner_id'])
                 ->with(['partner'])

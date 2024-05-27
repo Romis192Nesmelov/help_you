@@ -1,6 +1,6 @@
 <template>
     <div class="col-lg-3 col-md-4 col-sm-12">
-        <div class="panel panel-flat">
+        <div class="panel panel-flat" v-if="!parent_id">
             <div class="panel-heading">
                 <h5 class="panel-title">Партнер акции</h5>
             </div>
@@ -73,20 +73,23 @@ import UserComponent from "./UserComponent.vue";
 import UserNameComponent from "../blocks/UserNameComponent.vue";
 
 export default {
-    name: "ActionComponent",
     extends: UserComponent,
+    name: "ActionComponent",
     components: {
         UserComponent,
         UserNameComponent,
     },
     props: {
         'incoming_users': String,
-        'incoming_partners': String
+        'incoming_partners': String,
+        'parent_id': String|NaN
     },
     created() {
         let self = this;
         this.users = JSON.parse(this.incoming_users);
         this.partners = JSON.parse(this.incoming_partners);
+
+        if (this.parent_id) this.obj.partner_id = parseInt(this.parent_id);
 
         window.emitter.on('date-change', (res) => {
             self.obj[res.name] = res.value;
@@ -94,16 +97,6 @@ export default {
 
         window.Echo.private('admin_incentive_event').listen('.admin_incentive', res => {
             self.activeUsers = res.ids;
-        });
-
-        window.Echo.private('admin.admin_action_event').listen('.admin_action', res => {
-            if (res.notice === 'change_item' && res.model.id === self.objId) {
-                let newStart = self.convertTime(res.model.start),
-                    newEnd = self.convertTime(res.model.end);
-
-                $('input[name=start]').val(newStart);
-                $('input[name=end]').val(newEnd);
-            }
         });
 
         setTimeout(() => {
@@ -129,21 +122,13 @@ export default {
             $.each(newObj.users, function(k,user) {
                 self.activeUsers.push(user.id);
             });
-            this.obj.start = this.convertTime(this.obj.start);
-            this.obj.end = this.convertTime(this.obj.end);
+            this.obj.start = window.convertTime(this.obj.start);
+            this.obj.end = window.convertTime(this.obj.end);
         }
     },
     methods: {
-        convertTime(date) {
-            return new Date(date).toLocaleDateString('ru-RU').replaceAll('.','/');
-        },
-        getDate(date) {
-            let dateArr = date.split('/'),
-                newDate = dateArr[1] + '.' + dateArr[0] + '.' + dateArr[2];
-            return new Date(newDate).getTime();
-        },
         save() {
-            if (this.getDate(this.obj.start) >= this.getDate(this.obj.end)) {
+            if (window.getDate(this.obj.start) >= window.getDate(this.obj.end)) {
                 $('.date .error').html('Время начала акции не может быть больше или равно времени окончания!');
                 this.disabledSubmit = false;
             } else {

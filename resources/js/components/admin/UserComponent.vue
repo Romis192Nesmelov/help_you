@@ -172,7 +172,7 @@ export default {
             this.objId = this.obj.id;
             this.skipFields.push('avatar');
         }
-        if (this.objId.ratings) this.rating = window.userRating(this.rating);
+        if (this.objId) this.rating = window.userRating(this.rating);
 
         $.each(this.obj, function (field) {
             if (self.skipFields.indexOf(field) === -1) self.errors[field] = null;
@@ -184,6 +184,17 @@ export default {
                     window.location.href = self.back_url;
                 } else if (res.notice === 'change_item' && res.model.id === self.objId) {
                     self.obj = res.model;
+
+                    let timeStartField = $('input[name=start]'),
+                        timeEndField = $('input[name=end]');
+
+                    if (timeStartField.length && timeEndField.length) {
+                        let newStart = window.convertTime(res.model.start),
+                            newEnd = window.convertTime(res.model.end);
+
+                        timeStartField.val(newStart);
+                        timeEndField.val(newEnd);
+                    }
                 }
             });
         }
@@ -238,7 +249,7 @@ export default {
             $.each(this.errors, function (field) {
                 if ((self.obj[field] === false || self.obj[field] === null) && (['mail_notice','admin','active','status'].indexOf(field) !== -1)) formData.append(field, 0);
                 else if (self.obj[field] === true) formData.append(field, 1);
-                else if (self.obj[field]) formData.append(field, self.obj[field]);
+                else if (self.obj[field] !== null) formData.append(field, self.obj[field]);
             });
             return formData;
         },

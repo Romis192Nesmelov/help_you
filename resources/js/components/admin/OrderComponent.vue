@@ -1,6 +1,6 @@
 <template>
     <div class="col-lg-3 col-md-4 col-sm-12">
-        <div class="panel panel-flat">
+        <div class="panel panel-flat" v-if="!parent_id">
             <div class="panel-heading">
                 <h5 class="panel-title">Автор заявки</h5>
             </div>
@@ -174,6 +174,8 @@ export default {
         this.users = JSON.parse(this.incoming_users);
         this.types = JSON.parse(this.incoming_types);
 
+        if (this.parent_id) this.obj.user_id = parseInt(this.parent_id);
+
         $(document).ready(function () {
             $('.order-photo .icon-close2').click(function () {
                 let pos = parseInt($(this).attr('id').replace('remove-',''));
@@ -197,12 +199,13 @@ export default {
         'delete_image': String,
         'incoming_users': String,
         'incoming_types': String,
-        'yandex_api_key': String
+        'yandex_api_key': String,
+        'parent_id': String|NaN
     },
     data() {
         return {
             obj: {
-                user_id: 0,
+                user_id: 1,
                 order_type_id: 1,
                 subtype_id: 1,
                 city_id: 1,
@@ -245,7 +248,7 @@ export default {
     },
     watch: {
         obj(newObj) {
-            this.performer_id = newObj.performers[0].id;
+            if (newObj.performers.length) this.performer_id = newObj.performers[0].id;
             for(let i=1;i<=3;i++) {
                 for(let im=0;im<newObj.images.length;im++) {
                     if (i === newObj.images[im].position) {

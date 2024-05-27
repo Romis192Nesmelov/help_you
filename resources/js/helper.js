@@ -153,3 +153,13 @@ window.mapStepsInit = () => {
         });
     }
 }
+
+window.convertTime = (date) => {
+    return new Date(date).toLocaleDateString('ru-RU').replaceAll('.','/');
+}
+
+window.getDate = (date) => {
+    let dateArr = date.split('/'),
+        newDate = dateArr[1] + '.' + dateArr[0] + '.' + dateArr[2];
+    return new Date(newDate).getTime();
+}

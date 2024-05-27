@@ -51,7 +51,7 @@
                         <span v-else>{{ order[field] }}</span>
                     </td>
                     <td class="tools" v-if="edit_url || delete_url">
-                        <a v-if="edit_url" :href="edit_url + '?id=' + order.id">
+                        <a v-if="edit_url" :href="edit_url + (edit_url.indexOf('?') === -1 ? '?' : '&') + 'id=' + order.id">
                             <i title="Редактировать" class="icon-pencil7"></i>
                         </a>
                         <i title="Удалить" class="icon-cancel-circle2 text-danger cursor-pointer" @click="confirmDel(order.id)"></i>

@@ -17,4 +17,30 @@
             </user-component>
         </div>
     </div>
+    @if (isset($user))
+        <div class="panel panel-flat">
+            <x-atitle>Заявки пользователя</x-atitle>
+            <div class="panel-body">
+                @if ($user->orders->count())
+                    <orders-component
+                        get_orders_url="{{ route('admin.get_orders',['parent_id' => $user->id]) }}"
+                        edit_order_url="{{ route('admin.orders',['parent_id' => $user->id]) }}"
+                        delete_order_url="{{ route('admin.delete_order') }}"
+                        arrange="{{ json_encode(['field' => 'id', 'direction' => 'desc']) }}"
+                    ></orders-component>
+                @endif
+            </div>
+            <div class="panel-body">
+                <a href="{{ route('admin.orders',['slug' => 'add','parent_id' => $user->id]) }}">
+                    @include('admin.blocks.button_block', [
+                        'primary' => true,
+                        'buttonType' => 'button',
+                        'icon' => 'icon-database-add',
+                        'buttonText' => 'Добавить заявку',
+                        'addClass' => 'pull-right'
+                    ])
+                </a>
+            </div>
+        </div>
+    @endif
 @endsection

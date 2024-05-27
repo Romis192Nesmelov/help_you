@@ -15,6 +15,7 @@
                 incoming_users="{{ json_encode($users) }}"
                 incoming_types="{{ json_encode($types) }}"
                 yandex_api_key="{{ env('YANDEX_API_KEY') }}"
+                parent_id="{{ request('parent_id') }}"
             ></order-component>
         </div>
     </div>

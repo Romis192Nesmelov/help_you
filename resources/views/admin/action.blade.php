@@ -33,6 +33,7 @@
                 back_url="{{ route('admin.actions') }}"
                 broadcast_on="admin_action_event"
                 broadcast_as="admin_action"
+                parent_id="{{ request('parent_id') }}"
             ></action-component>
         </div>
     </div>
