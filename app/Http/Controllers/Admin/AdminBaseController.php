@@ -6,6 +6,7 @@ use App\Http\Controllers\HelperTrait;
 use App\Http\Controllers\Controller;
 //use App\Models\Seo;
 use App\Models\AdminNotice;
+use App\Models\Ticket;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -48,6 +49,15 @@ class AdminBaseController extends Controller
                 'icon' => 'icon-trophy3',
                 'hidden' => false,
             ],
+            'tickets' => [
+                'key' => 'tickets',
+                'icon' => 'icon-ticket',
+                'hidden' => false,
+            ],
+            'answers' => [
+                'key' => 'answers',
+                'hidden' => true,
+            ],
         ];
         $this->breadcrumbs[] = $this->menu['home'];
     }
@@ -69,34 +79,58 @@ class AdminBaseController extends Controller
         string|null $slug=null,
         array $width=[],
         Model|null $parentModel=null,
+        Model|null $parentParentModel=null,
+        string $rootKey=null
     ): View
     {
         $key = $model->getTable();
         $this->data['menu_key'] = $key;
         $this->data['singular_key'] = substr($key, 0, -1);
+        $breadcrumbsParams = [];
 
         if (request('parent_id')) {
-            $isParentModelUser = $parentModel instanceof User;
-            $selectFields = $isParentModelUser ? ['name','family','phone','email'] : ['name'];
             $parentKey = $parentModel->getTable();
-            $this->data['parent'] = $parentModel->query()->where('id',request('parent_id'))->select($selectFields)->first();
-            $this->data['menu_key'] = $parentKey;
-            $this->breadcrumbs[] = [
-                'key' => $this->menu[$parentKey]['key'],
-                'name' => trans('admin_menu.'.$parentKey),
-            ];
+
+            if (request('parent_parent_id')) {
+
+                $parentParentKey = $parentParentModel->getTable();
+                $parentKeyFields = $this->getSelectedFields($parentParentModel);
+                $breadcrumbsParams['parent_parent_id'] = request('parent_parent_id');
+                $parentParent = $parentParentModel->query()->where('id',request('parent_parent_id'))->select($parentKeyFields)->first();
+
+                $this->breadcrumbs[] = [
+                    'key' => $this->menu[$rootKey]['key'],
+                    'name' => trans('admin_menu.'.$rootKey),
+                ];
+                $this->data['menu_key'] = $rootKey;
+
+                $this->breadcrumbs[] = [
+                    'key' => $this->menu[$parentParentKey]['key'],
+                    'params' => ['id' => request('parent_parent_id')],
+                    'name' => is_array($parentKeyFields) ? getItemName($parentParent) : $parentParent[$parentKeyFields],
+                ];
+
+            } else {
+                $this->breadcrumbs[] = [
+                    'key' => $this->menu[$parentKey]['key'],
+                    'name' => trans('admin_menu.'.$parentKey),
+                ];
+                $this->data['menu_key'] = $parentKey;
+            }
+
+            $parentKeyFields = $this->getSelectedFields($parentModel);
+            $breadcrumbsParams['parent_id'] = request('parent_id');
+            $parent = $parentModel->query()->where('id',request('parent_id'))->select($parentKeyFields)->first();
             $this->breadcrumbs[] = [
                 'key' => $this->menu[$parentKey]['key'],
                 'params' => ['id' => request('parent_id')],
-                'name' => $isParentModelUser ? getItemName($this->data['parent']) : $this->data['parent']->name,
+                'name' => is_array($parentKeyFields) ? getItemName($parent) : $parent[$parentKeyFields],
             ];
+
         } else if (!$this->menu[$key]['hidden']) {
             $this->data['menu_key'] = $key;
             $this->breadcrumbs[] = $this->menu[$key];
         }
-
-        $breadcrumbsParams = [];
-        if ($parentModel) $breadcrumbsParams['parent_id'] = request('parent_id');
 
         if (request('id')) {
 //            $this->data['metas'] = $this->metas;
@@ -108,7 +142,7 @@ class AdminBaseController extends Controller
                 'name' => trans('admin.edit_'.$this->data['singular_key']).' id#'.$this->data[$this->data['singular_key']]->id,
             ];
             return $this->showView($this->data['singular_key']);
-        } else if ($slug && $slug == 'add') {
+        } else if ($slug == 'add') {
 //            $this->data['metas'] = $this->metas;
             $breadcrumbsParams['slug'] = 'add';
             $this->breadcrumbs[] = [
@@ -158,5 +192,17 @@ class AdminBaseController extends Controller
                     ->get()
             ]
         ));
+    }
+
+    private function getSelectedFields(Model $parentModel): string|array
+    {
+        if ($parentModel instanceof User) {
+            $selectFields = ['name','family','phone','email'];
+        } elseif ($parentModel instanceof Ticket) {
+            $selectFields = 'subject';
+        } else {
+            $selectFields = 'name';
+        }
+        return $selectFields;
     }
 }

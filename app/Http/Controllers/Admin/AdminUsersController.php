@@ -56,7 +56,7 @@ class AdminUsersController extends AdminBaseController
             $user->update($fields);
             $user->refresh();
             /** @var USER $user */
-            broadcast(new AdminUserEvent('new_item',$user));
+            if ($user->wasChanged()) broadcast(new AdminUserEvent('change_item',$user));
         } else {
             $fields['password'] = bcrypt($fields['password']);
             $user = User::query()->create($fields);
@@ -64,7 +64,7 @@ class AdminUsersController extends AdminBaseController
             $user->update($fields);
             $user->refresh();
             /** @var USER $user */
-            broadcast(new AdminUserEvent('change_item',$user));
+            broadcast(new AdminUserEvent('new_item',$user));
         }
 //        $this->saveCompleteMessage();
 //        return redirect()->back();

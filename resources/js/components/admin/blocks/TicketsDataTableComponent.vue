@@ -28,40 +28,41 @@
                 <tr>
                     <th class="text-center arrange" v-for="(descr, field) in fields" :key="'dt-arrange-by-' + field">
                         <i
-                            v-if="field !== 'avatar' && field !== 'rating'"
                             :class="(arrangeCol.field === field ? 'text-info ' : '') + (arrangeCol.field === field && arrangeCol.direction === 'desc' ? 'icon-arrow-up12' : 'icon-arrow-down12')"
-                            @click="setArrange((field === 'user' || field === 'order_type' ? field + '_id' : field),arrangeCol.field === field ? arrangeCol.direction : 'asc')"
+                            @click="setArrange((field === 'user' ? field + '_id' : field),arrangeCol.field === field ? arrangeCol.direction : 'asc')"
                         ></i>
                     </th>
                     <th class="text-center arrange"></th>
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="order in orders.data" :key="'dt-row-' + order.id">
-                    <td :class="'text-center' + (field === 'id' || field === 'user' || field === 'status' ? ' ' + field : '')" v-for="(desc, field) in fields" :key="'dt-cell-' + field">
+                <tr v-for="object in objects.data" :key="'dt-row-' + object.id">
+                    <td :class="'text-center' + (field === 'id' || field === 'user' || field === 'status' || field === 'read_admin' || field === 'read_owner' ? ' ' + field : '')" v-for="(desc, field) in fields" :key="'dt-cell-' + field">
                         <UserPropertiesComponent
                             v-if="field === 'user'"
-                            :user="order.user"
+                            :user="object.user"
                             :small="true"
                             :use_rating="true"
                             :allow_change_rating="false"
                         ></UserPropertiesComponent>
-                        <span v-else-if="field === 'status'" :class="'label label-' + statuses[order.status].color">{{ statuses[order.status].text }}</span>
-                        <strong v-else-if="field === 'order_type'">{{ order.order_type.name }}</strong>
-                        <span v-else>{{ order[field] }}</span>
+                        <span v-else-if="field === 'status'" :class="'label label-' + statuses[object.status].color">{{ statuses[object.status].text }}</span>
+                        <span v-else-if="field === 'read_admin'" :class="'label label-' + readStatuses[object.read_admin].color">{{ readStatuses[object.read_admin].text }}</span>
+                        <span v-else-if="field === 'read_owner'" :class="'label label-' + readStatuses[object.read_owner].color">{{ readStatuses[object.read_owner].text }}</span>
+                        <span v-else-if="field === 'text'">{{ cutString(object[field],300) }}</span>
+                        <span v-else>{{ object[field] }}</span>
                     </td>
                     <td class="tools" v-if="edit_url || delete_url">
-                        <a v-if="edit_url" :href="getUrlWithParam(order.id)">
+                        <a v-if="edit_url" :href="getUrlWithParam(object.id)">
                             <i title="Редактировать" class="icon-pencil7"></i>
                         </a>
-                        <i title="Удалить" class="icon-cancel-circle2 text-danger cursor-pointer" @click="confirmDel(order.id)"></i>
+                        <i title="Удалить" class="icon-cancel-circle2 text-danger cursor-pointer" @click="confirmDel(object.id)"></i>
                     </td>
                 </tr>
             </tbody>
         </table>
         <paginator-component
-            v-if="orders.links"
-            :links="orders.links"
+            v-if="objects.links"
+            :links="objects.links"
             @paginate="paginate"
         ></paginator-component>
     </div>
@@ -74,21 +75,22 @@ import PaginatorComponent from "./PaginatorComponent.vue";
 
 export default {
     extends: DataTableComponent,
-    name: "OrdersDataTableComponent",
+    name: "TicketsDataTableComponent",
     components: {
         UserPropertiesComponent,
         PaginatorComponent
     },
     data() {
         return {
-            orders: Object,
+            objects: Object,
             users: Object,
-            types: Object,
             statuses: [
-                {color:'success','text':'Закрыта'},
-                {color:'primary','text':'В работе'},
-                {color:'default','text':'Открыта'},
-                {color:'danger','text':'Новая'},
+                {color:'danger','text':'Открыт'},
+                {color:'primary','text':'Закрыт'},
+            ],
+            readStatuses: [
+                {color:'danger','text':'Не прочитано'},
+                {color:'primary','text':'Прочитано'},
             ]
         }
     },
@@ -96,20 +98,13 @@ export default {
         getData(url) {
             let self = this;
             axios.get(url).then(function (response) {
-                self.orders = response.data.orders;
+                self.objects = response.data.objects;
                 self.users = response.data.users;
-                self.types = response.data.types;
             });
         },
         getAdditionalFilters() {
-            let addFilter = this.getAdditionalFilterUser();
-            for (let i=0;i<this.types.length;i++) {
-                if (this.types[i].name.toLowerCase().indexOf(this.filter.toLowerCase()) !== -1) {
-                    addFilter += '&order_types_ids[]=' + this.types[i].id;
-                }
-            }
-            return addFilter;
-        },
+            return this.getAdditionalFilterUser();
+        }
     }
 }
 </script>

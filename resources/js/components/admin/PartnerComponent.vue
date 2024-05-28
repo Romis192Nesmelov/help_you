@@ -2,7 +2,8 @@
     <div class="col-lg-2 col-md-3 col-sm-4 col-xs-12">
         <InputImageComponent
             name="logo"
-            :image="'/' + obj.logo"
+            :placeholder_image = "placeholder_image"
+            :image="obj.logo"
             :error="errors.logo"
         ></InputImageComponent>
     </div>

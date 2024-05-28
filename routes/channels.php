@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Broadcast;
 use App\Models\Order;
+use App\Models\Ticket;
+use App\Models\Answer;
 /*
 |--------------------------------------------------------------------------
 | Broadcast Channels
@@ -14,34 +16,52 @@ use App\Models\Order;
 */
 
 Broadcast::channel('chat_{id}', function ($user, $id) {
-    $order = Order::find($id);
+    $order = Order::query()->where('id',$id)->select(['status','user_id'])->with('performers')->first();
     return $order->status && ($user->id == 1 || $user->id == $order->user_id || in_array($user->id, $order->performers->pluck('id')->toArray()));
 });
 
+Broadcast::channel('ticket_{id}', function ($user, $id) {
+    $ticket = Ticket::query()->where('id',$id)->select('user_id')->first();
+    return $ticket->user_id === $user->id;
+});
+
+Broadcast::channel('answer_{id}', function ($user, $id) {
+    $answer = Answer::query()->where('id',$id)->with('ticket')->first();
+    return $answer->ticket->user_id === $user->id;
+});
+
 Broadcast::channel('notice_{id}', function ($user, $id) {
-    return (int) $user->id === (int) $id;
+    return (int)$user->id === (int) $id;
 });
 
 Broadcast::channel('incentive_{id}', function ($user, $id) {
-    return (int) $user->id === (int) $id;
+    return (int)$user->id === (int) $id;
 });
 
 Broadcast::channel('admin_incentive{id}', function ($user) {
-    return (int) $user->admin;
+    return (int)$user->admin;
 });
 
 Broadcast::channel('admin_action{id}', function ($user) {
-    return (int) $user->admin;
+    return (int)$user->admin;
 });
 
 Broadcast::channel('admin_order{id}', function ($user) {
-    return (int) $user->admin;
+    return (int)$user->admin;
 });
 
 Broadcast::channel('admin_partner{id}', function ($user) {
-    return (int) $user->admin;
+    return (int)$user->admin;
 });
 
 Broadcast::channel('admin_user{id}', function ($user) {
-    return (int) $user->admin;
+    return (int)$user->admin;
+});
+
+Broadcast::channel('admin_ticket{id}', function ($user) {
+    return (int)$user->admin;
+});
+
+Broadcast::channel('admin_answer{id}', function ($user) {
+    return (int)$user->admin;
 });

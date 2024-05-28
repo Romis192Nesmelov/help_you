@@ -8,7 +8,7 @@
                 incoming_obj="{{ isset($partner) ? json_encode($partner) : '' }}"
                 edit_url="{{ route('admin.edit_partner') }}"
                 back_url="{{ route('admin.partners') }}"
-                placeholder_image="{{ asset('images/placeholder.gif') }}"
+                placeholder_image="{{ asset('images/placeholder.jpg') }}"
                 broadcast_on="admin_partner_event"
                 broadcast_as="admin_partner"
             ></partner-component>

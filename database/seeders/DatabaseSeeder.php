@@ -3,10 +3,10 @@
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use App\Models\Action;
+use App\Models\Answer;
 use App\Models\Order;
+use App\Models\Ticket;
 use Illuminate\Database\Seeder;
-use App\Models\Partner;
 
 class DatabaseSeeder extends Seeder
 {
@@ -27,5 +27,7 @@ class DatabaseSeeder extends Seeder
         $this->call(PartnersSeeder::class);
         $this->call(ActionsSeeder::class);
         $this->call(ActionsUsersSeeder::class);
+        Ticket::factory(50)->create();
+        Answer::factory(200)->create();
     }
 }

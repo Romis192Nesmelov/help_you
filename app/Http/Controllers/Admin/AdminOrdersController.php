@@ -31,12 +31,11 @@ class AdminOrdersController extends AdminBaseController
     /**
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function orders(Order $order, $slug=null): View
+    public function orders(Order $order, User $user, $slug=null): View
     {
-        $this->data['users'] = User::query()->select(['id','name','family','phone','email'])->get();
+        $this->data['users'] = User::query()->default()->get();
         $this->data['types'] = OrderType::with(['subtypes'])->get();
-//        $this->data['parent_key'] = 'users';
-        return $this->getSomething($order, $slug, ['performers','images'], new User());
+        return $this->getSomething($order, $slug, ['performers','images'], $user);
     }
 
     public function getOrders(): JsonResponse
@@ -48,7 +47,7 @@ class AdminOrdersController extends AdminBaseController
                 ->with(['user.ratings','orderType'])
                 ->orderBy(request('field') ?? 'id',request('direction') ?? 'desc')
                 ->paginate(request('show_by') ?? 10),
-            'users' => User::query()->select(['id','name','family','phone','email'])->get(),
+            'users' => User::query()->default()->get(),
             'types' => OrderType::query()->select(['id','name'])->get(),
         ]);
     }
@@ -76,7 +75,7 @@ class AdminOrdersController extends AdminBaseController
 
             $order->update($fields);
             $order->refresh();
-            broadcast(new AdminOrderEvent('change_item', $order));
+            if ($order->wasChanged()) broadcast(new AdminOrderEvent('change_item', $order));
 
             if ($order->adminNotice && $order->adminNotice->read != 1) {
                 $order->adminNotice->read = 1;

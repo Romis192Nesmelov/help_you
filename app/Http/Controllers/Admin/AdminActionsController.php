@@ -25,9 +25,9 @@ class AdminActionsController extends AdminBaseController
      */
     public function actions(Action $action, Partner $partner, $slug=null): View
     {
-        $this->data['users'] = User::query()->select(['id','name','family','phone','email'])->get();
-        $this->data['partners'] = Partner::select(['id','name'])->get();
-        return $this->getSomething($action, $slug, ['users'], new Partner());
+        $this->data['users'] = User::query()->default()->get();
+        $this->data['partners'] = Partner::query()->select(['id','name'])->get();
+        return $this->getSomething($action, $slug, ['users'], $partner);
     }
 
     public function getActions(): JsonResponse
@@ -40,7 +40,7 @@ class AdminActionsController extends AdminBaseController
                 ->with(['partner'])
                 ->orderBy(request('field') ?? 'id',request('direction') ?? 'desc')
                 ->paginate(request('show_by') ?? 10),
-            'partners' => Partner::select(['id','name'])->get()
+            'partners' => Partner::query()->select(['id','name'])->get()
         ]);
     }
 
@@ -66,7 +66,7 @@ class AdminActionsController extends AdminBaseController
             $action = Action::query()->where('id',$request->id)->with(['users','actionUsers'])->first();
             $action->update($fields);
             $action->refresh();
-            broadcast(new AdminActionEvent('change_item',$action));
+            if ($action->wasChanged()) broadcast(new AdminActionEvent('change_item',$action));
 
             foreach ($action->actionUsers as $incentive) {
                 if (!in_array($incentive->user_id, $usersIds)) {
@@ -80,8 +80,6 @@ class AdminActionsController extends AdminBaseController
         }
 
         $lastIncentivesIds = $action->actionUsers->pluck('user_id')->toArray();
-
-//        return response()->json(['fields' => $usersIds],200);
 
         foreach ($usersIds as $userId) {
             if (!in_array($userId, $lastIncentivesIds)) {

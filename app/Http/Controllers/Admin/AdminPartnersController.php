@@ -47,17 +47,17 @@ class AdminPartnersController extends AdminBaseController
 
         if ($request->has('id')) {
             $partner = Partner::query()->where('id',$request->input('id'))->with('actions')->first();
-            $processingImage->handle($request, $fields, 'logo', $logoPath, 'logo'.$partner->id);
+            $fields = $processingImage->handle($request, $fields, 'logo', $logoPath, 'logo'.$partner->id);
             $partner->update($fields);
             $partner->refresh();
-            broadcast(new AdminPartnerEvent('new_item',$partner));
+            if ($partner->wasChanged()) broadcast(new AdminPartnerEvent('change_item',$partner));
         } else {
             $partner = Partner::query()->create($fields);
-            $processingImage->handle($request, [], 'logo', $logoPath, 'logo'.$partner->id);
-            $partner->update($fields);
+            $fields = $processingImage->handle($request, [], 'logo', $logoPath, 'logo'.$partner->id);
+            if (count($fields)) $partner->update($fields);
             $partner->load(['actions']);
             $partner->refresh();
-            broadcast(new AdminPartnerEvent('change_item',$partner));
+            broadcast(new AdminPartnerEvent('new_item',$partner));
         }
 //        $this->saveCompleteMessage();
 //        return redirect()->back();

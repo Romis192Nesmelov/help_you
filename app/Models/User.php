@@ -63,6 +63,11 @@ class User extends Authenticatable
         return Carbon::parse($this->born)->age;
     }
 
+    public function scopeDefault(Builder $query): void
+    {
+        $query->select(['id','name','family','phone','email']);
+    }
+
     public function scopeFiltered(Builder $query): void
     {
         $query->when(request('filter'), function (Builder $q) {
@@ -89,7 +94,12 @@ class User extends Authenticatable
         return $this->hasMany(Order::class);
     }
 
-    public function orderPerformer(): BelongsToMany
+    public function tickets(): HasMany
+    {
+        return $this->hasMany(Ticket::class);
+    }
+
+    public function orderPerformers(): BelongsToMany
     {
         return $this->belongsToMany(Order::class)->orderByDesc('created_at');
     }
@@ -98,10 +108,7 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Order::class)
             ->where('status',1)
-            ->with('user.ratings')
-            ->with('performers.ratings')
-            ->with('orderType')
-            ->with('subType')
+            ->with(['user.ratings','performers.ratings','orderType','subType'])
             ->orderByDesc('created_at');
     }
 
@@ -109,11 +116,13 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Order::class)
             ->where('status',0)
-            ->with('user.ratings')
-            ->with('performers.ratings')
-            ->with('orderType')
-            ->with('subType')
+            ->with(['user.ratings','performers.ratings','orderType','subType'])
             ->orderByDesc('created_at');
+    }
+
+    public function readRemovedPerformer(): HasMany
+    {
+        return $this->hasMany(ReadRemovedPerformer::class);
     }
 
     public function messages(): HasMany

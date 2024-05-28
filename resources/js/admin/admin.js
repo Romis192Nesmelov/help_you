@@ -13,6 +13,10 @@ import PartnersComponent from "../components/admin/PartnersComponent.vue";
 import PartnerComponent from "../components/admin/PartnerComponent.vue";
 import ActionsComponent from "../components/admin/ActionsComponent.vue";
 import ActionComponent from "../components/admin/ActionComponent.vue";
+import TicketsComponent from "../components/admin/TicketsComponent.vue";
+import TicketComponent from "../components/admin/TicketComponent.vue";
+import AnswersComponent from "../components/admin/AnswersComponent.vue";
+import AnswerComponent from "../components/admin/AnswerComponent.vue";
 
 const app = createApp({
     components: {
@@ -28,6 +32,10 @@ const app = createApp({
         PartnerComponent,
         ActionsComponent,
         ActionComponent,
+        TicketsComponent,
+        TicketComponent,
+        AnswersComponent,
+        AnswerComponent
     }
 });
 

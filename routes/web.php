@@ -2,10 +2,12 @@
 
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\Admin\AdminActionsController;
+use App\Http\Controllers\Admin\AdminAnswersController;
 use App\Http\Controllers\Admin\AdminBaseController;
 use App\Http\Controllers\Admin\AdminLoginController;
 use App\Http\Controllers\Admin\AdminOrdersController;
 use App\Http\Controllers\Admin\AdminPartnersController;
+use App\Http\Controllers\Admin\AdminTicketsController;
 use App\Http\Controllers\Admin\AdminUsersController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BaseController;
@@ -151,5 +153,19 @@ Route::prefix('admin')->middleware(['admin'])->name('admin.')->group(function ()
         Route::get('/get-actions', 'getActions')->name('get_actions');
         Route::post('/edit-action', 'editAction')->name('edit_action');
         Route::post('/delete-action', 'deleteAction')->name('delete_action');
+    });
+
+    Route::controller(AdminTicketsController::class)->group(function () {
+        Route::get('/tickets/{slug?}', 'tickets')->name('tickets');
+        Route::get('/get-tickets', 'getTickets')->name('get_tickets');
+        Route::post('/edit-ticket', 'editTicket')->name('edit_ticket');
+        Route::post('/delete-ticket', 'deleteTicket')->name('delete_ticket');
+    });
+
+    Route::controller(AdminAnswersController::class)->group(function () {
+        Route::get('/answers/{slug?}', 'answers')->name('answers');
+        Route::get('/get-answers', 'getAnswers')->name('get_answers');
+        Route::post('/edit-answer', 'editAnswer')->name('edit_answer');
+        Route::post('/delete-answer', 'deleteAnswer')->name('delete_answer');
     });
 });

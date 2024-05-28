@@ -30,7 +30,7 @@
                 incoming_partners="{{ json_encode($partners) }}"
                 incoming_obj="{{ isset($action) ? json_encode($action) : '' }}"
                 edit_url="{{ route('admin.edit_action') }}"
-                back_url="{{ route('admin.actions') }}"
+                back_url="{{ request('parent_id') ? route('admin.actions',['id' => request('parent_id')]) : request('parent_id') }}"
                 broadcast_on="admin_action_event"
                 broadcast_as="admin_action"
                 parent_id="{{ request('parent_id') }}"

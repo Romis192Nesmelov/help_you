@@ -94,6 +94,8 @@ td.image,
 td.active:not(.start-date),
 td.status,
 td.rating,
+td.read_admin,
+td.read_owner,
 td.admin {
     width: 70px;
 }

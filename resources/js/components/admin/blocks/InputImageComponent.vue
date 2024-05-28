@@ -1,7 +1,7 @@
 <template>
     <div class="panel panel-flat">
-        <a class="fancybox" :href="image">
-            <img class="image" :src="image" />
+        <a class="fancybox" :href="image ? '/' + image : placeholder_image">
+            <img class="image" :src="image ? '/' + image : placeholder_image" />
         </a>
     </div>
     <input
@@ -18,6 +18,7 @@ export default {
     props: {
         'name': String,
         'image': String,
+        'placeholder_image': String,
         'error': String|null
     }
 }

@@ -42,5 +42,27 @@
                 </a>
             </div>
         </div>
+        <div class="panel panel-flat">
+            <x-atitle>Обращения в тех.поддержку</x-atitle>
+            <div class="panel-body">
+                <tickets-component
+                    get_tickets_url="{{ route('admin.get_tickets',['parent_id' => $user->id]) }}"
+                    edit_ticket_url="{{ route('admin.tickets',['parent_id' => $user->id]) }}"
+                    delete_ticket_url="{{ route('admin.delete_ticket') }}"
+                    arrange="{{ json_encode(['field' => 'id', 'direction' => 'desc']) }}"
+                ></tickets-component>
+            </div>
+            <div class="panel-body">
+                <a href="{{ route('admin.tickets',['slug' => 'add','parent_id' => $user->id]) }}">
+                    @include('admin.blocks.button_block', [
+                        'primary' => true,
+                        'buttonType' => 'button',
+                        'icon' => 'icon-database-add',
+                        'buttonText' => 'Добавить обращение',
+                        'addClass' => 'pull-right'
+                    ])
+                </a>
+            </div>
+        </div>
     @endif
 @endsection
