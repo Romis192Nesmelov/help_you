@@ -63,9 +63,13 @@
         <div class="navbar-right">
             <notice-component
                 incoming_notices="{{ json_encode($notices) }}"
+                incoming_tickets="{{ json_encode($tickets) }}"
+                incoming_answers="{{ json_encode($answers) }}"
                 incoming_user="{{ json_encode(auth()->user()) }}"
                 orders_url="{{ route('admin.orders') }}"
                 users_url="{{ route('admin.users') }}"
+                tickets_url="{{ route('admin.tickets') }}"
+                answers_url="{{ route('admin.answers') }}"
                 logout_url="{{ route('auth.logout') }}"
             ></notice-component>
         </div>

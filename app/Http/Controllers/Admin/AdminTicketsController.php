@@ -48,7 +48,7 @@ class AdminTicketsController extends AdminBaseController
         $imagePath = 'images/ticket_images/';
 
         if ($request->has('id')) {
-            $ticket = Ticket::query()->where('id',$request->id)->with(['user'])->first();
+            $ticket = Ticket::query()->where('id',$request->id)->with(['user.ratings'])->first();
             $fields = $processingImage->handle($request, $fields, 'image', $imagePath, 'image'.$ticket->id);
             $ticket->update($fields);
             $ticket->refresh();
@@ -58,7 +58,7 @@ class AdminTicketsController extends AdminBaseController
             $ticket = Ticket::query()->create($fields);
             $fields = $processingImage->handle($request, [], 'image', $imagePath, 'logo'.$ticket->id);
             if (count($fields)) $ticket->update($fields);
-            $ticket->load('user');
+            $ticket->load('user.ratings');
             $ticket->refresh();
 
             broadcast(new AdminTicketEvent('new_item',$ticket));

@@ -6,6 +6,7 @@ use App\Http\Controllers\HelperTrait;
 use App\Http\Controllers\Controller;
 //use App\Models\Seo;
 use App\Models\AdminNotice;
+use App\Models\Answer;
 use App\Models\Ticket;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -119,8 +120,8 @@ class AdminBaseController extends Controller
             }
 
             $parentKeyFields = $this->getSelectedFields($parentModel);
-            $breadcrumbsParams['parent_id'] = request('parent_id');
             $parent = $parentModel->query()->where('id',request('parent_id'))->select($parentKeyFields)->first();
+            $breadcrumbsParams['parent_id'] = request('parent_id');
             $this->breadcrumbs[] = [
                 'key' => $this->menu[$parentKey]['key'],
                 'params' => ['id' => request('parent_id')],
@@ -189,7 +190,19 @@ class AdminBaseController extends Controller
                     ->with(['order.user','order.performers'])
                     ->select(['order_id'])
                     ->orderByDesc('created_at')
-                    ->get()
+                    ->get(),
+                'tickets' => Ticket::query()
+                    ->where('read_admin',0)
+                    ->with('user')
+                    ->select('id','user_id','subject')
+                    ->orderByDesc('created_at')
+                    ->get(),
+                'answers' => Answer::query()
+                    ->where('read_admin',0)
+                    ->with(['user','ticket'])
+                    ->select('id','user_id','ticket_id')
+                    ->orderByDesc('created_at')
+                    ->get(),
             ]
         ));
     }

@@ -10,6 +10,7 @@ use App\Http\Requests\Admin\AdminEditAnswerRequest;
 use App\Models\Answer;
 use App\Models\Ticket;
 use App\Models\User;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\View\View;
@@ -21,9 +22,12 @@ class AdminAnswersController extends AdminBaseController
     /**
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function answers(Answer $answer, Ticket $ticket, User $user, $slug=null): View
+    public function answers(Answer $answer, Ticket $ticket, User $user, $slug=null): View|RedirectResponse
     {
-        return $this->getSomething($answer, $slug, [], $ticket, $user, 'users');
+        if (request('id') && !request('parent_id')) {
+            $answer = Answer::query()->where('id',request('id'))->select('ticket_id')->first();
+            return redirect(route('admin.answers',['id' => request('id'), 'parent_id' => $answer->ticket_id]));
+        } else return $this->getSomething($answer, $slug, [], $ticket, $user, 'users');
     }
 
     public function getAnswers(): JsonResponse
@@ -48,7 +52,7 @@ class AdminAnswersController extends AdminBaseController
         $imagePath = 'images/ticket_images/';
 
         if ($request->has('id')) {
-            $answer = Answer::query()->where('id',$request->id)->with(['ticket'])->first();
+            $answer = Answer::query()->where('id',$request->id)->with(['ticket','user.ratings'])->first();
             $fields = $processingImage->handle($request, $fields, 'image', $imagePath, 'image'.$answer->ticket->id.'_answer'.$answer->id);
             $answer->update($fields);
             $answer->load(['ticket','user.ratings']);

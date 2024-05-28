@@ -68,7 +68,7 @@ class AdminOrdersController extends AdminBaseController
         if ($request->has('id')) {
             $order = Order::query()
                 ->where('id',$request->id)
-                ->with(['user','performers','images','adminNotice','userCredentials'])
+                ->with(['user.ratings','performers','images','adminNotice','userCredentials'])
                 ->first();
 
             $lastStatus = $order->status;
@@ -83,7 +83,7 @@ class AdminOrdersController extends AdminBaseController
             }
         } else {
             $order = Order::query()->create($fields);
-            $order->load(['user','performers','images']);
+            $order->load(['user.ratings','performers','images']);
             /** @var ORDER $order */
             broadcast(new AdminOrderEvent('new_item', $order));
         }
@@ -134,7 +134,7 @@ class AdminOrdersController extends AdminBaseController
         DeleteFile $deleteFile
     ): JsonResponse
     {
-        $order = Order::query()->where('id',$request->id)->with(['user','performers','images'])->first();
+        $order = Order::query()->where('id',$request->id)->with(['user.ratings','performers','images'])->first();
         $removeOrderImage->handle($order->id, $deleteFile, $request->pos);
         broadcast(new AdminOrderEvent('change_item', $order));
         return response()->json(['message' => trans('admin.delete_complete')],200);
