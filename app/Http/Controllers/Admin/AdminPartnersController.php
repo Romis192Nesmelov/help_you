@@ -26,12 +26,12 @@ class AdminPartnersController extends AdminBaseController
 
     public function getPartners(Partner $partners): JsonResponse
     {
-        return response()->json(
-            $partners::query()
+        return response()->json([
+            'items' => $partners::query()
                 ->filtered()
                 ->orderBy(request('field') ?? 'id',request('direction') ?? 'desc')
                 ->paginate(request('show_by') ?? 10)
-        );
+        ]);
     }
 
     /**

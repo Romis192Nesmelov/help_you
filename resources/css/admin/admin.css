@@ -96,7 +96,8 @@ td.status,
 td.rating,
 td.read_admin,
 td.read_owner,
-td.admin {
+td.admin,
+.dt-image {
     width: 70px;
 }
 

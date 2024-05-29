@@ -36,7 +36,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="object in objects.data" :key="'dt-row-' + object.id">
+                <tr v-for="object in items.data" :key="'dt-row-' + object.id">
                     <td :class="'text-center' + (field === 'id' || field === 'user' || field === 'status' || field === 'read_admin' || field === 'read_owner' ? ' ' + field : '')" v-for="(desc, field) in fields" :key="'dt-cell-' + field">
                         <UserPropertiesComponent
                             v-if="field === 'user'"
@@ -45,6 +45,7 @@
                             :use_rating="true"
                             :allow_change_rating="false"
                         ></UserPropertiesComponent>
+                        <img v-else-if="field === 'image' && object.image" class="dt-image" :src="'/' + object.image" />
                         <span v-else-if="field === 'status'" :class="'label label-' + statuses[object.status].color">{{ statuses[object.status].text }}</span>
                         <span v-else-if="field === 'read_admin'" :class="'label label-' + readStatuses[object.read_admin].color">{{ readStatuses[object.read_admin].text }}</span>
                         <span v-else-if="field === 'read_owner'" :class="'label label-' + readStatuses[object.read_owner].color">{{ readStatuses[object.read_owner].text }}</span>
@@ -61,8 +62,8 @@
             </tbody>
         </table>
         <paginator-component
-            v-if="objects.links"
-            :links="objects.links"
+            v-if="items.links"
+            :links="items.links"
             @paginate="paginate"
         ></paginator-component>
     </div>
@@ -82,7 +83,6 @@ export default {
     },
     data() {
         return {
-            objects: Object,
             users: Object,
             statuses: [
                 {color:'danger','text':'Открыт'},
@@ -98,7 +98,7 @@ export default {
         getData(url) {
             let self = this;
             axios.get(url).then(function (response) {
-                self.objects = response.data.objects;
+                self.items = response.data.items;
                 self.users = response.data.users;
             });
         },

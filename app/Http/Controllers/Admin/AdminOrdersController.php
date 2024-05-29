@@ -11,6 +11,7 @@ use App\Actions\RemoveOrderUnreadMessages;
 use App\Events\Admin\AdminOrderEvent;
 use App\Events\NotificationEvent;
 use App\Events\OrderEvent;
+use App\Http\Controllers\FieldsHelperTrait;
 use App\Http\Controllers\MessagesHelperTrait;
 use App\Http\Requests\Admin\AdminEditOrderRequest;
 use App\Http\Requests\Order\DelOrderImageRequest;
@@ -27,6 +28,7 @@ use Illuminate\View\View;
 class AdminOrdersController extends AdminBaseController
 {
     use MessagesHelperTrait;
+    use FieldsHelperTrait;
 
     /**
      * @throws \Illuminate\Validation\ValidationException
@@ -41,7 +43,7 @@ class AdminOrdersController extends AdminBaseController
     public function getOrders(): JsonResponse
     {
         return response()->json([
-            'orders' => Order::query()
+            'items' => Order::query()
                 ->withUserId()
                 ->filtered()
                 ->with(['user.ratings','orderType'])
@@ -68,13 +70,12 @@ class AdminOrdersController extends AdminBaseController
         if ($request->has('id')) {
             $order = Order::query()
                 ->where('id',$request->id)
-                ->with(['user.ratings','performers','images','adminNotice','userCredentials'])
+                ->with($this->orderLoadFields)
                 ->first();
 
             $lastStatus = $order->status;
 
             $order->update($fields);
-            $order->refresh();
             if ($order->wasChanged()) broadcast(new AdminOrderEvent('change_item', $order));
 
             if ($order->adminNotice && $order->adminNotice->read != 1) {
@@ -83,7 +84,7 @@ class AdminOrdersController extends AdminBaseController
             }
         } else {
             $order = Order::query()->create($fields);
-            $order->load(['user.ratings','performers','images']);
+            $order->load($this->orderLoadFields);
             /** @var ORDER $order */
             broadcast(new AdminOrderEvent('new_item', $order));
         }

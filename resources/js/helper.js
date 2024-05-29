@@ -15,7 +15,8 @@ window.singlePoint = null;
 const imagePreview = (container, defImage) => {
     container.each(function () {
         let currentContainer = $(this),
-            hoverImg = currentContainer.find('img'),
+            hoverImg = currentContainer.find('img.hover-image'),
+            previewImage = currentContainer.find('img.image'),
             inputFile = currentContainer.find('input[type=file]'),
             addFileIcon = currentContainer.find('i.icon-file-plus2'),
             clearInputIcon = currentContainer.find('i.icon-close2');
@@ -26,7 +27,8 @@ const imagePreview = (container, defImage) => {
             if (input.type.match('image.*')) {
                 let reader = new FileReader();
                 reader.onload = function (e) {
-                    currentContainer.css('background-image', 'url(' + e.target.result + ')');
+                    if (previewImage.length) previewImage.attr('src',e.target.result);
+                    else currentContainer.css('background-image', 'url(' + e.target.result + ')');
                     currentContainer.trigger('onload_image',[e.target.result]);
                     // if (callBack) callBack(e.target.result);
                 };
@@ -95,6 +97,7 @@ window.initImages = () => {
     window.defAvatar = '/images/def_avatar.svg';
     imagePreview(window.avatarBlock, window.defAvatar);
     imagePreview($('.order-photo'));
+    imagePreview($('.admin-image'));
 }
 
 window.addLoader = () => {

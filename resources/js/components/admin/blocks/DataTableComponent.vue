@@ -61,7 +61,7 @@
                             :allow_change_rating="false"
                             v-else-if="field === 'rating'"
                         ></RatingLineComponent>
-                        <a v-else-if="field === 'logo' || field === 'image'" class="fancybox" :href="'/' + item[field]"><img :src="'/' + item[field]" /></a>
+                        <a v-else-if="field === 'logo' || field === 'image'" class="fancybox" :href="'/' + item[field]"><img class="dt-image" :src="'/' + item[field]" /></a>
                         <span v-else-if="field === 'active'" :class="'label label-' + (item['active'] ? 'success' : 'warning')">{{ (item['active'] ? 'активен' : 'не активен') }}</span>
                         <span v-else-if="field === 'admin'" :class="'label label-' + (item['admin'] ? 'info' : 'primary')">{{ (item['admin'] ? 'админ' : 'пользователь') }}</span>
                         <span v-else>{{ item[field] }}</span>
@@ -126,8 +126,8 @@ export default {
                     self.getData(self.getUrl());
                 } else if (res.notice === 'change_item') {
                     for (let i=0;i<self.items.data.length;i++) {
-                        if (items.data[i].id === res.model.id) {
-                            items.data[i] = res.model;
+                        if (self.items.data[i].id === res.model.id) {
+                            self.items.data[i] = res.model;
                             break;
                         }
                     }
@@ -139,19 +139,20 @@ export default {
         return {
             getDataUrl: String,
             items: Object,
+            itemsSubData: '',
             showBy: 10,
             filter: '',
             deleteId: Number,
             arrangeCol: Object,
             deleteModal: Object|null,
-            deletingId: null
+            deletingId: null,
         }
     },
     methods: {
         getData(url) {
             let self = this;
             axios.get(url).then(function (response) {
-                self.items = response.data;
+                self.items = response.data.items;
             });
         },
         paginate(url) {

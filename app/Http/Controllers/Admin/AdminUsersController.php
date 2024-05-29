@@ -31,13 +31,13 @@ class AdminUsersController extends AdminBaseController
 
     public function getUsers(User $users): JsonResponse
     {
-        return response()->json(
-            $users::query()
+        return response()->json([
+            'items' => $users::query()
                 ->filtered()
                 ->with('ratings')
                 ->orderBy(request('field') ?? 'id',request('direction') ?? 'desc')
                 ->paginate(request('show_by') ?? 10)
-        );
+        ]);
     }
 
     /**

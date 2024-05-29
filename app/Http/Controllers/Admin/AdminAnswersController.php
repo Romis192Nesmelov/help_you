@@ -33,7 +33,7 @@ class AdminAnswersController extends AdminBaseController
     public function getAnswers(): JsonResponse
     {
         return response()->json([
-            'objects' => Answer::query()
+            'items' => Answer::query()
                 ->withTicketId()
                 ->filtered()
                 ->with(['ticket','user.ratings'])
@@ -58,8 +58,10 @@ class AdminAnswersController extends AdminBaseController
             $answer->load(['ticket','user.ratings']);
             $answer->refresh();
 
-            broadcast(new AdminAnswerEvent('change_item',$answer));
-            if ($answer->wasChanged()) broadcast(new AnswerEvent('change_item',$answer));
+            if ($answer->wasChanged()) {
+                broadcast(new AdminAnswerEvent('change_item',$answer));
+                broadcast(new AnswerEvent('change_item',$answer));
+            }
         } else {
             $answer = Answer::query()->create($fields);
             $fields = $processingImage->handle($request, [], 'image', $imagePath, 'image'.$answer->ticket->id.'_answer'.$answer->id);

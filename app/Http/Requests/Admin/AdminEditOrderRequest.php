@@ -41,7 +41,6 @@ class AdminEditOrderRequest extends FormRequest
 
         if (request('id')) $rules['id'] = 'required|exists:orders,id';
         if (request('status') && request('status') == 1) $rules['performer_id'] = $this->validationUserId;
-        if (request('performer_id')) $rules['status'] = 'required|integer|min:1|max:1';
 
         for ($i=1;$i<=3;$i++) {
             $fileName = 'photo'.$i;

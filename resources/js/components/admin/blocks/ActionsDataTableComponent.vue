@@ -36,12 +36,9 @@
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="action in actions.data" :key="'dt-row-' + action.id">
+                <tr v-for="action in items.data" :key="'dt-row-' + action.id">
                     <td :class="'text-center' + (field === 'id' || field === 'rating' ? ' ' + field : '')" v-for="(desc, field) in fields" :key="'dt-cell-' + field">
-                        <div v-if="field === 'partner_id'">
-                            <img class="logo" :src="'/' + action.partner.logo" />
-                            {{ action.partner.name }}
-                        </div>
+                        <img v-if="field === 'image' && object.image" class="dt-image" :src="'/' + object.image" />
                         <span v-else-if="field === 'rating'" :class="'label label-' + ratings[action.rating-1].color">{{ ratings[action.rating-1].text }}</span>
                         <strong v-else-if="field === 'start' || field === 'end'">{{ new Date(action[field]).toLocaleDateString('ru-RU') }}</strong>
                         <span v-else>{{ action[field] }}</span>
@@ -56,8 +53,8 @@
             </tbody>
         </table>
         <paginator-component
-            v-if="actions.links"
-            :links="actions.links"
+            v-if="items.links"
+            :links="items.links"
             @paginate="paginate"
         ></paginator-component>
     </div>
@@ -77,7 +74,8 @@ export default {
     },
     data() {
         return {
-            actions: Object,
+            items: Object,
+            itemsSubData: 'actions',
             partners: Object,
             ratings: [
                 {color:'success','text':'Первый'},
@@ -89,7 +87,7 @@ export default {
         getData(url) {
             let self = this;
             axios.get(url).then(function (response) {
-                self.actions = response.data.actions;
+                self.items = response.data.items;
                 self.partners = response.data.partners;
             });
         },

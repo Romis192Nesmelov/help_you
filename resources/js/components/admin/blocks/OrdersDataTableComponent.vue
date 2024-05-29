@@ -37,7 +37,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="order in orders.data" :key="'dt-row-' + order.id">
+                <tr v-for="order in items.data" :key="'dt-row-' + order.id">
                     <td :class="'text-center' + (field === 'id' || field === 'user' || field === 'status' ? ' ' + field : '')" v-for="(desc, field) in fields" :key="'dt-cell-' + field">
                         <UserPropertiesComponent
                             v-if="field === 'user'"
@@ -60,8 +60,8 @@
             </tbody>
         </table>
         <paginator-component
-            v-if="orders.links"
-            :links="orders.links"
+            v-if="items.links"
+            :links="items.links"
             @paginate="paginate"
         ></paginator-component>
     </div>
@@ -81,7 +81,7 @@ export default {
     },
     data() {
         return {
-            orders: Object,
+            items: Object,
             users: Object,
             types: Object,
             statuses: [
@@ -96,7 +96,7 @@ export default {
         getData(url) {
             let self = this;
             axios.get(url).then(function (response) {
-                self.orders = response.data.orders;
+                self.items = response.data.items;
                 self.users = response.data.users;
                 self.types = response.data.types;
             });

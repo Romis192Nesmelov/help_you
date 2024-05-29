@@ -29,7 +29,7 @@ class AdminTicketsController extends AdminBaseController
     public function getTickets(): JsonResponse
     {
         return response()->json([
-            'objects' => Ticket::query()
+            'items' => Ticket::query()
                 ->withUserId()
                 ->filtered()
                 ->with('user.ratings')

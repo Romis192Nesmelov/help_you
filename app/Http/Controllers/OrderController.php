@@ -36,19 +36,21 @@ use Illuminate\View\View;
 
 class OrderController extends BaseController
 {
-    use HelperTrait;
     use MessagesHelperTrait;
+    use FieldsHelperTrait;
+
+    private array $orderTypesAndSubtypesFields = ['orderType','subtypesActive'];
 
     public function newOrder(): View
     {
-        $this->data['order_types'] = OrderType::where('active',1)->with('subtypesActive')->get();
+        $this->data['order_types'] = OrderType::where('active',1)->with($this->orderTypesAndSubtypesFields)->get();
         $this->data['session_key'] = 'steps';
         return $this->showView('edit_order');
     }
 
     public function orders(): View
     {
-        $this->data['order_types'] = OrderType::where('active',1)->with('subtypesActive')->get();
+        $this->data['order_types'] = OrderType::where('active',1)->with($this->orderTypesAndSubtypesFields)->get();
         return $this->showView('orders');
     }
 
@@ -59,7 +61,7 @@ class OrderController extends BaseController
                 ->default()
                 ->filtered()
                 ->searched()
-                ->with(['orderType','subType','images','user.ratings','performers'])
+                ->with($this->orderLoadFields)
                 ->get(),
             'subscriptions' => Subscription::query()
                 ->with('orders')
@@ -77,14 +79,13 @@ class OrderController extends BaseController
             $this->data['order'] = Order::query()->find($request->id);
             $this->authorize('owner', $this->data['order']);
             $this->data['order']->update(['status' => 3]);
-            $this->data['order']->load(['user','performers','images']);
-            $this->data['order']->refresh();
+            $this->data['order']->load($this->orderLoadFields);
 
             broadcast(new OrderEvent('new_order_status', $this->data['order']));
             broadcast(new AdminOrderEvent('change_item', $this->data['order']));
         }
         $this->data['session_key'] = $this->getSessionKey($request);
-        $this->data['order_types'] = OrderType::where('active',1)->with('subtypesActive')->get();
+        $this->data['order_types'] = OrderType::where('active',1)->with($this->orderTypesAndSubtypesFields)->get();
         return $this->showView('edit_order');
     }
 
@@ -107,7 +108,7 @@ class OrderController extends BaseController
                 ->where('user_id',Auth::id())
                 ->where('status',3)
                 ->filtered()
-                ->with(['orderType','subType','images','user','performers'])
+                ->with($this->orderLoadFields)
                 ->orderByDesc('created_at')
                 ->limit(1)
                 ->get(),
@@ -150,8 +151,7 @@ class OrderController extends BaseController
         else {
             $order->status = 1;
             $order->save();
-            $order->load(['user','performers','images']);
-            $order->refresh();
+            $order->load($this->orderLoadFields);
 
             $orderResponse->handle($order);
 
@@ -216,10 +216,10 @@ class OrderController extends BaseController
                 $this->authorize('owner', $order);
                 if (!$order->status) return response()->json([],403);
                 $order->update($fields);
-                $order->load(['user','performers','images']);
+                $order->load($this->orderLoadFields);
             } else {
                 $order = Order::create($fields);
-                $order->load(['user','performers','images']);
+                $order->load($this->orderLoadFields);
                 AdminNotice::create(['order_id' => $order->id]);
 
                 broadcast(new AdminOrderEvent('new_item', $order));
@@ -270,7 +270,7 @@ class OrderController extends BaseController
         DeleteFile $deleteFile
     ): JsonResponse
     {
-        $order = Order::query()->find($request->id)->with(['user','performers','images'])->first();
+        $order = Order::query()->find($request->id)->with($this->orderLoadFields)->first();
         $this->authorize('owner', $order);
         $removeOrderImage->handle($order->id, $deleteFile, $request->pos);
         broadcast(new AdminOrderEvent('change_item', $order));
@@ -285,7 +285,7 @@ class OrderController extends BaseController
         RemoveOrderUnreadMessages $removeOrderUnreadMessages,
     ): JsonResponse
     {
-        $order = Order::query()->where('id',$request->id)->with(['user','performers','images'])->first();
+        $order = Order::query()->where('id',$request->id)->with($this->orderLoadFields)->first();
         $this->authorize('owner', $order);
         $order->status = 0;
         $order->save();
@@ -335,8 +335,7 @@ class OrderController extends BaseController
         OrderUser::query()->where('order_id',$order->id)->delete();
         $order->status = 3;
         $order->save();
-        $order->load(['user','performers','images']);
-        $order->refresh();
+        $order->load($this->orderLoadFields);
 
         AdminNotice::query()->where(['order_id' => $order->id])->update(['read',null]);
         OrderUser::query()->where('order_id',$request->id)->delete();

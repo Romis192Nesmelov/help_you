@@ -185,6 +185,11 @@ export default {
                 } else if (res.notice === 'change_item' && res.model.id === self.objId) {
                     self.obj = res.model;
 
+                    $.each(['mail_notice','admin','active','status'], function (k, field){
+                        $('input[name=' + field + ']').prop('checked', self.obj[field]);
+                    });
+                    $.uniform.update();
+
                     let timeStartField = $('input[name=start]'),
                         timeEndField = $('input[name=end]');
 

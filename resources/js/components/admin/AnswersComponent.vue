@@ -6,8 +6,8 @@
         :delete_url="delete_answer_url"
         delete_phrase="Вы действительно хотите удалить эту заявку?"
         :arrange="arrange"
-        broadcast_on="admin_ticket_event"
-        broadcast_as="admin_ticket"
+        broadcast_on="admin_answer_event"
+        broadcast_as="admin_answer"
     ></TicketsDataTableComponent>
 </template>
 

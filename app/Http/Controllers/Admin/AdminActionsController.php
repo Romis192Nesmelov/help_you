@@ -6,6 +6,7 @@ use App\Events\Admin\AdminActionEvent;
 use App\Events\Admin\AdminIncentiveEvent;
 use App\Events\Admin\AdminOrderEvent;
 use App\Events\IncentivesEvent;
+use App\Http\Controllers\FieldsHelperTrait;
 use App\Http\Controllers\MessagesHelperTrait;
 use App\Http\Requests\Admin\AdminEditActionRequest;
 use App\Models\Action;
@@ -19,6 +20,7 @@ use Illuminate\View\View;
 class AdminActionsController extends AdminBaseController
 {
     use MessagesHelperTrait;
+    use FieldsHelperTrait;
 
     /**
      * @throws \Illuminate\Validation\ValidationException
@@ -33,7 +35,7 @@ class AdminActionsController extends AdminBaseController
     public function getActions(): JsonResponse
     {
         return response()->json([
-            'actions' => Action::query()
+            'items' => Action::query()
                 ->withPartnerId()
                 ->filtered()
                 ->select(['id','name','start','end','rating','partner_id'])
@@ -63,9 +65,8 @@ class AdminActionsController extends AdminBaseController
         }
 
         if ($request->has('id')) {
-            $action = Action::query()->where('id',$request->id)->with(['users','actionUsers'])->first();
+            $action = Action::query()->where('id',$request->id)->with($this->actionLoadFields)->first();
             $action->update($fields);
-            $action->refresh();
             if ($action->wasChanged()) broadcast(new AdminActionEvent('change_item',$action));
 
             foreach ($action->actionUsers as $incentive) {
@@ -75,7 +76,7 @@ class AdminActionsController extends AdminBaseController
             }
         } else {
             $action = Action::query()->create($fields);
-            $action->load(['users','actionUsers']);
+            $action->load($this->actionLoadFields);
             broadcast(new AdminOrderEvent('new_item',$action));
         }
 
@@ -101,7 +102,7 @@ class AdminActionsController extends AdminBaseController
     public function deleteAction(Request $request): JsonResponse
     {
         $this->validate($request,['id' => 'required|exists:actions,id']);
-        $action = Action::query()->where('id',$request->id)->with(['users','actionUsers'])->first();
+        $action = Action::query()->where('id',$request->id)->with($this->actionLoadFields)->first();
 
         foreach ($action->actionUsers as $incentive) {
             broadcast(new IncentivesEvent('remove_incentive', $incentive, $incentive->user_id));
