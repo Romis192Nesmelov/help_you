@@ -36,6 +36,7 @@ use Illuminate\View\View;
 
 class OrderController extends BaseController
 {
+    use HelperTrait;
     use MessagesHelperTrait;
     use FieldsHelperTrait;
 
@@ -85,7 +86,7 @@ class OrderController extends BaseController
             broadcast(new AdminOrderEvent('change_item', $this->data['order']));
         }
         $this->data['session_key'] = $this->getSessionKey($request);
-        $this->data['order_types'] = OrderType::where('active',1)->with($this->orderTypesAndSubtypesFields)->get();
+        $this->data['order_types'] = OrderType::query()->where('active',1)->with($this->orderTypesAndSubtypesFields)->get();
         return $this->showView('edit_order');
     }
 
@@ -132,11 +133,17 @@ class OrderController extends BaseController
         if (!$order->performers->count()) {
             $order->status = 2;
             $order->save();
-        }
+            $order->load($this->orderLoadFields);
 
-        $removePerformer->handle($order, $request->user_id);
-        broadcast(new NotificationEvent('remove_performer', $order, $request->user_id));
-        $this->mailOrderNotice($order, $performer, 'remove_performer_notice');
+            $removePerformer->handle($order, $request->user_id);
+            broadcast(new NotificationEvent('remove_performer', $order, $request->user_id));
+            broadcast(new NotificationEvent('new_order_status', $order, $order->user_id));
+            broadcast(new OrderEvent('new_order_status', $order));
+            broadcast(new AdminOrderEvent('change_item', $order));
+
+            $this->mailOrderNotice($order, $performer, 'remove_performer_notice');
+            $this->mailOrderNotice($order, $order->userCredentials, 'new_order_status_notice');
+        }
 
         return response()->json(['message' => trans('content.the_performer_is_removed'), 'performers_count' => $order->performers->count()],200);
     }

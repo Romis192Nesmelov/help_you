@@ -5,10 +5,16 @@ use App\Actions\ChangeAvatar;
 use App\Actions\DeleteFile;
 use App\Actions\DeleteOrder;
 use App\Actions\ProcessingImage;
+use App\Events\Admin\AdminOrderEvent;
 use App\Events\Admin\AdminUserEvent;
+use App\Events\NotificationEvent;
+use App\Events\OrderEvent;
+use App\Http\Controllers\FieldsHelperTrait;
 use App\Http\Controllers\HelperTrait;
+use App\Http\Controllers\MessagesHelperTrait;
 use App\Http\Requests\Account\ChangeAvatarRequest;
 use App\Http\Requests\Admin\AdminEditUserRequest;
+use App\Models\OrderUser;
 use App\Models\Subscription;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -20,6 +26,8 @@ use Illuminate\View\View;
 class AdminUsersController extends AdminBaseController
 {
     use HelperTrait;
+    use FieldsHelperTrait;
+    use MessagesHelperTrait;
 
     /**
      * @throws \Illuminate\Validation\ValidationException
@@ -91,11 +99,28 @@ class AdminUsersController extends AdminBaseController
     {
         $this->validate($request, ['id' => $this->validationUserId]);
         $user = User::where('id',$request->id)->select('id')->with('orders')->first();
+
         if ($user->orders->count()) {
             foreach ($user->orders as $order) {
                 $deleteOrder->handle($order, $deleteFile);
             }
         }
+
+        $ordersUser = OrderUser::query()->where('user_id',$user->id)->with('order')->get();
+        foreach ($ordersUser as $orderUser) {
+            if ($orderUser->order->status != 2) {
+                $orderUser->order->status = 2;
+                $orderUser->order->save();
+                $orderUser->load($this->orderLoadFields);
+
+                broadcast(new NotificationEvent('new_order_status', $orderUser, $orderUser->user_id));
+                broadcast(new OrderEvent('new_order_status', $orderUser));
+                broadcast(new AdminOrderEvent('change_item', $orderUser));
+
+                $this->mailOrderNotice($orderUser, $orderUser->userCredentials, 'new_order_status_notice');
+            }
+        }
+
         if ($user->avatar) $deleteFile->handle($user->avatar);
         Subscription::query()->where('user_id',$user->id)->delete();
         Subscription::query()->where('subscriber_id',$user->id)->delete();

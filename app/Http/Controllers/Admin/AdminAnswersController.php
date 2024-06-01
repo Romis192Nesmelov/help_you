@@ -72,6 +72,12 @@ class AdminAnswersController extends AdminBaseController
             broadcast(new AdminAnswerEvent('new_item',$answer));
             broadcast(new AnswerEvent('new_item',$answer));
         }
+
+        if ($answer->ticket->status !== 0) {
+            $answer->ticket->status = 0;
+            $answer->ticket->save();
+        }
+
         return response()->json(['message' => trans('content.save_complete')],200);
     }
 

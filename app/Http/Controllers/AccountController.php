@@ -277,7 +277,7 @@ class AccountController extends BaseController
     public function subscription(SubscriptionRequest $request): JsonResponse
     {
         if (Auth::id() == $request->user_id) return response()->json([],403);
-        $subscription = Subscription::where('subscriber_id',Auth::id())->where('user_id',$request->user_id)->first();
+        $subscription = Subscription::query()->where('subscriber_id',Auth::id())->where('user_id',$request->user_id)->first();
         if ($subscription) {
             $subscription->delete();
             $subscriptionExist = false;
