@@ -85,7 +85,6 @@ $(document).ready(function () {
             let subtypesRadioButtons = currentSubtypesBlock.find('input[type=radio]');
             $(subtypesRadioButtons[0]).prop('checked', true);
         }
-
     });
 
     // Remove order image in edit order page

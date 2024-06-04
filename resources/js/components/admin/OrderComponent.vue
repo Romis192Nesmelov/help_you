@@ -262,11 +262,14 @@ export default {
     methods: {
         changeStatusOrPerformer()
         {
+            console.log(this.obj.status);
+
             this.errors.status=null;
             this.errors.performer_id=null;
 
             if (!this.performer_id && this.obj.status <= 1) this.obj.status = 3;
             else if (this.obj.status === 3 && this.performer_id) this.performer_id = 0;
+            else if (this.obj.status === 2 && this.performer_id) this.obj.status = 1;
         },
         save() {
             let formData = this.preparingFields();
