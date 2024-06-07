@@ -135,7 +135,7 @@ export default {
     methods: {
         runTimer() {
             this.getCodeAgainVisible = true;
-            this.getCodeAgainTimer = 45;
+            this.getCodeAgainTimer = 60;
 
             let countDown = setInterval(() => {
                     if (!this.getCodeAgainTimer) {

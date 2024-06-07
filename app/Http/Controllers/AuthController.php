@@ -17,6 +17,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Str;
 
 class AuthController extends Controller
@@ -41,7 +42,9 @@ class AuthController extends Controller
     public function generateCode(GenerateCodeRequest $request, AuthGeneratingCode $actionGeneratingCode, UnifyPhone $actionUnifyPhone): JsonResponse
     {
         $phone = $actionUnifyPhone->handle($request->phone);
-        $user = User::query()->where('phone',$phone)->first();
+        $user = User::query()->where('phone', $phone)->first();
+        $attempts = $this->getSmsAttempts();
+
         if (!$user) {
             $user = User::query()->create([
                 'phone' => $phone,
@@ -50,10 +53,15 @@ class AuthController extends Controller
                 'active' => 0
             ]);
             event(new Registered($user));
-            return response()->json(['message' => trans('auth.sms_sent')],200);
+            return response()->json(['message' => trans('auth.sms_sent')], 200);
         } elseif ($user->active) {
             return response()->json(['errors' => ['phone' => [trans('auth.user_with_this_phone_is_already_registered')]]], 400);
+        } else if (time() - $user->updated_at->timestamp < 55) {
+            return response()->json(['message' => trans('auth.the_minute_has_not_expired')], 403);
+        } else if ($attempts >= 10) {
+            return response()->json(['message' => trans('auth.too_many_tries')], 403);
         } else {
+            $this->setSmsAttempts($attempts + 1);
             $user->code = $actionGeneratingCode->handle();
             $user->save();
             event(new Registered($user));
@@ -65,6 +73,7 @@ class AuthController extends Controller
     {
         $credentials = $request->validated();
         $user = User::query()->where('phone',$actionUnifyPhone->handle($request->phone))->first();
+
         if ($user->code == $request->code) {
             $user->update([
                 'password' => bcrypt($credentials['password']),
@@ -80,13 +89,19 @@ class AuthController extends Controller
     public function resetPassword(ResetPasswordRequest $request, UnifyPhone $unifyPhone): JsonResponse
     {
         $user = User::query()
-            ->where('phone','+7(958)815-85-65')
-//            ->where('phone',$unifyPhone->handle($request->phone))
+            ->where('phone',$unifyPhone->handle($request->phone))
             ->where('active',1)
             ->first();
-//        return response()->json(['user' => $user],200);
-        if (!$user) return response()->json(['errors' => ['phone' => [trans('auth.wrong_phone')]]], 401);
-        else {
+        $attempts = $this->getSmsAttempts();
+
+        if (!$user) {
+            return response()->json(['errors' => ['phone' => [trans('auth.wrong_phone')]]], 401);
+        } else if (time() - $user->updated_at->timestamp < (60 * 60 * 24)) {
+            return response()->json(['message' => trans('auth.the_minute_has_not_expired')], 403);
+        } else if ($attempts >= 10) {
+            return response()->json(['message' => trans('auth.too_many_tries')], 403);
+        } else {
+            $this->setSmsAttempts($attempts + 1);
             $password = Str::random(5);
             $user->update(['password' => bcrypt($password)]);
             event(new ChangePasswordEvent($user, $password));
@@ -100,5 +115,20 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         return redirect(route('home'));
+    }
+
+    private function setSmsAttempts($attempts): void
+    {
+        Cookie::queue('sms-attempts', $attempts, (60 * 60 * 24));
+    }
+
+    private function getSmsAttempts(): int
+    {
+        return (int)Cookie::get('sms-attempts');
+    }
+
+    private function checkAttempts(User $user)
+    {
+
     }
 }

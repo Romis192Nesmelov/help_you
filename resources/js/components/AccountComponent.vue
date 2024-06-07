@@ -22,10 +22,10 @@
             text="Получить код"
             @click="getCode"
         ></ButtonComponent>
-        <get-code-again-component
+        <GetCodeAgainComponent
             v-if="getCodeAgainVisible"
             :timer="getCodeAgainTimer"
-        ></get-code-again-component>
+        ></GetCodeAgainComponent>
         <ButtonComponent
             id="change-phone-button"
             class_name="btn btn-primary"

@@ -5,7 +5,6 @@ use App\Http\Requests\Feedback\FeedbackRequest;
 use App\Models\Partner;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Session;
 
