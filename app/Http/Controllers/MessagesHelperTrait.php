@@ -14,6 +14,7 @@ use App\Models\Order;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use GreenSMS\GreenSMS;
 
 trait MessagesHelperTrait
 {
@@ -109,27 +110,15 @@ trait MessagesHelperTrait
         }
     }
 
-//    public function sendSms($phone, $text)
-//    {
-//        $data = array(
-//            'user_name' => env('MOIZVONKI_USER_NAME'),
-//            'api_key' => env('MOIZVONKI_API_KEY'),
-//            'action' => 'calls.send_sms',
-//            'to' => $phone,
-//            'text' => $text
-//        );
-//
-//        $fields = json_encode($data);
-//
-//        $ch = curl_init();
-//        curl_setopt($ch, CURLOPT_URL, 'https://apollomotors.moizvonki.ru/api/v1');
-//        curl_setopt($ch, CURLOPT_POST, true);
-//        curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
-//        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type:application/json','Content-Length:'.mb_strlen($fields,'UTF-8')]);
-//        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-//        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-//        return json_decode(curl_exec($ch));
-//    }
+    /**
+     * @throws \Exception
+     */
+    public function sendSms($phone, $text): void
+    {
+        $client = new GreenSMS(['user' => env('GREENSMS_LOGIN'), 'pass' => env('GREENSMS_PASSWORD')]);
+        $response = $client->sms->send(['to' => $phone, 'txt' => $text]);
+//        return $response->request_id;
+    }
 
     public function sendMessage(string $template, string $mailTo, string|null $cc, array $fields, string|null $pathToFile=null)
     {

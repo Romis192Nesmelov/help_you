@@ -36,17 +36,17 @@ class UsersSeeder extends Seeder
                 'admin' => 1,
                 'active' => 1
             ],
-            [
-                'name' => 'Romis',
-                'family' => 'Nesmelov',
-                'born' => '14-07-1976',
-                'phone' => '+7(958)815-85-65',
-                'email' => 'romis.nesmelov@gmail.com',
-                'password' => bcrypt('apg192'),
-                'code' => '99-99-99',
-                'admin' => 1,
-                'active' => 1
-            ],
+//            [
+//                'name' => 'Romis',
+//                'family' => 'Nesmelov',
+//                'born' => '14-07-1976',
+//                'phone' => '+7(958)815-85-65',
+//                'email' => 'romis.nesmelov@gmail.com',
+//                'password' => bcrypt('apg192'),
+//                'code' => '99-99-99',
+//                'admin' => 1,
+//                'active' => 1
+//            ],
             [
                 'name' => 'Unknown',
                 'family' => 'Unknown',

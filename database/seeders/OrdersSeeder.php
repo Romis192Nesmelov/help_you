@@ -17,7 +17,7 @@ class OrdersSeeder extends Seeder
     public function run(): void
     {
         $me = User::where('phone','+7(926)247-77-25')->select('id')->first();
-        $anotherUser = User::where('phone','+7(958)815-85-65')->select('id')->first();
+//        $anotherUser = User::where('phone','+7(958)815-85-65')->select('id')->first();
 
         $order = Order::create([
             'user_id' => $me->id,
@@ -33,10 +33,10 @@ class OrdersSeeder extends Seeder
             'status' => 1
         ]);
 
-        OrderUser::create([
-            'order_id' => $order->id,
-            'user_id' => $anotherUser->id
-        ]);
+//        OrderUser::create([
+//            'order_id' => $order->id,
+//            'user_id' => $anotherUser->id
+//        ]);
 
 //        InformingOrder::create([
 //            'message' => trans('content.to_over_order'),

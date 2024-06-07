@@ -48,13 +48,14 @@ class AuthController extends Controller
                 'active' => 0
             ]);
             event(new Registered($user));
-            return response()->json(['message' => trans('auth.code').': '.$user->code],200);
+            return response()->json(['message' => trans('auth.sms_sent')],200);
         } elseif ($user->active) {
             return response()->json(['errors' => ['phone' => [trans('auth.user_with_this_phone_is_already_registered')]]], 400);
         } else {
             $user->code = $actionGeneratingCode->handle();
             $user->save();
-            return response()->json(['message' => trans('auth.code').': '.$user->code],200);
+            event(new Registered($user));
+            return response()->json(['message' => trans('auth.sms_sent')],200);
         }
     }
 
