@@ -58,7 +58,7 @@ class AuthController extends Controller
             return response()->json(['errors' => ['phone' => [trans('auth.user_with_this_phone_is_already_registered')]]], 400);
         } else if (time() - $user->updated_at->timestamp < 55) {
             return response()->json(['message' => trans('auth.the_minute_has_not_expired')], 403);
-        } else if ($attempts >= 10) {
+        } else if ($attempts >= 5) {
             return response()->json(['message' => trans('auth.too_many_tries')], 403);
         } else {
             $this->setSmsAttempts($attempts + 1);
@@ -98,7 +98,7 @@ class AuthController extends Controller
             return response()->json(['errors' => ['phone' => [trans('auth.wrong_phone')]]], 401);
         } else if (time() - $user->updated_at->timestamp < (60 * 60 * 24)) {
             return response()->json(['message' => trans('auth.the_minute_has_not_expired')], 403);
-        } else if ($attempts >= 10) {
+        } else if ($attempts >= 5) {
             return response()->json(['message' => trans('auth.too_many_tries')], 403);
         } else {
             $this->setSmsAttempts($attempts + 1);
