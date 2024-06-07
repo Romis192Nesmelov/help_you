@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Actions\AuthGeneratingCode;
+use App\Actions\StripPhone;
 use App\Actions\UnifyPhone;
+use App\Events\ChangePasswordEvent;
 use App\Http\Requests\Auth\GenerateCodeRequest;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
@@ -39,9 +41,9 @@ class AuthController extends Controller
     public function generateCode(GenerateCodeRequest $request, AuthGeneratingCode $actionGeneratingCode, UnifyPhone $actionUnifyPhone): JsonResponse
     {
         $phone = $actionUnifyPhone->handle($request->phone);
-        $user = User::where('phone',$phone)->first();
+        $user = User::query()->where('phone',$phone)->first();
         if (!$user) {
-            $user = User::create([
+            $user = User::query()->create([
                 'phone' => $phone,
                 'code' => $actionGeneratingCode->handle(),
                 'admin' => 0,
@@ -62,7 +64,7 @@ class AuthController extends Controller
     public function register(RegisterRequest $request, UnifyPhone $actionUnifyPhone): JsonResponse
     {
         $credentials = $request->validated();
-        $user = User::where('phone',$actionUnifyPhone->handle($request->phone))->first();
+        $user = User::query()->where('phone',$actionUnifyPhone->handle($request->phone))->first();
         if ($user->code == $request->code) {
             $user->update([
                 'password' => bcrypt($credentials['password']),
@@ -75,14 +77,20 @@ class AuthController extends Controller
         }
     }
 
-    public function resetPassword(ResetPasswordRequest $request, UnifyPhone $actionUnifyPhone): JsonResponse
+    public function resetPassword(ResetPasswordRequest $request, UnifyPhone $unifyPhone): JsonResponse
     {
-        $user = User::where('phone',$actionUnifyPhone->handle($request->phone))->where('active',1)->first();
+        $user = User::query()
+            ->where('phone','+7(958)815-85-65')
+//            ->where('phone',$unifyPhone->handle($request->phone))
+            ->where('active',1)
+            ->first();
+//        return response()->json(['user' => $user],200);
         if (!$user) return response()->json(['errors' => ['phone' => [trans('auth.wrong_phone')]]], 401);
         else {
             $password = Str::random(5);
-            $user->update(['password' => $password]);
-            return response()->json(['message' => trans('auth.new_password_has_been_sent_to_your_phone').'<br>'.$password],200);
+            $user->update(['password' => bcrypt($password)]);
+            event(new ChangePasswordEvent($user, $password));
+            return response()->json(['message' => trans('auth.new_password_has_been_sent_to_your_phone')],200);
         }
     }
 

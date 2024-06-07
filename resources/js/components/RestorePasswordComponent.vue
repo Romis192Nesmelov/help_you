@@ -47,7 +47,7 @@ export default {
         $(document).ready(function () {
             $('#restore-password-modal input[name=phone]').mask(window.phoneMask).on('blur keypress keyup change', function () {
                 self.phone = $(this).val();
-                self.disabledSubmit = self.phone.match(window.phoneRegExp) !== null;
+                self.disabledSubmit = self.phone.match(window.phoneRegExp) === null;
                 self.errors['phone'] = null;
             });
         });
@@ -64,16 +64,16 @@ export default {
     methods: {
         onSubmit(event) {
             let self = this;
-            this.phone = window.inputRestorePasswordPhone;
             this.disabledSubmit = true;
             window.addLoader();
 
             axios.post(this.reset_pass_url, {
                 _token: window.tokenField,
-                phone: window.inputRestorePasswordPhone,
+                phone: this.phone,
             })
                 .then(function (response) {
                     window.showMessage(response.data.message);
+                    $('#restore-password-modal').modal('hide');
                     window.removeLoader();
                 })
                 .catch(function (error) {

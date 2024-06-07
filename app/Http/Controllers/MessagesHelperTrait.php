@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Actions\StripPhone;
+use App\Actions\UnifyPhone;
 use App\Events\ChatMessageEvent;
 use App\Events\IncentivesEvent;
 use App\Events\NotificationEvent;
@@ -113,10 +115,11 @@ trait MessagesHelperTrait
     /**
      * @throws \Exception
      */
-    public function sendSms($phone, $text): void
+    public function sendSms(string $phone, string $text): void
     {
+        $stripPhone = new StripPhone();
         $client = new GreenSMS(['user' => env('GREENSMS_LOGIN'), 'pass' => env('GREENSMS_PASSWORD')]);
-        $response = $client->sms->send(['to' => $phone, 'txt' => $text]);
+        $response = $client->sms->send(['to' => $stripPhone->handle($phone), 'txt' => $text]);
 //        return $response->request_id;
     }
 

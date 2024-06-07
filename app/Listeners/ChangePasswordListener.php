@@ -1,12 +1,9 @@
 <?php
 
-namespace App\Listeners\Admin;
-
-use App\Events\Admin\AdminUserEvent;
+namespace App\Listeners;
 use App\Http\Controllers\MessagesHelperTrait;
-use function broadcast;
 
-class NewUserListener
+class ChangePasswordListener
 {
     use MessagesHelperTrait;
     /**
@@ -23,7 +20,6 @@ class NewUserListener
      */
     public function handle(object $event): void
     {
-        $this->sendSms($event->user->phone,$event->user->code);
-        broadcast(new AdminUserEvent('new_item',$event->user));
+        $this->sendSms($event->user->phone, 'Ваш новый пароль: '.$event->password);
     }
 }

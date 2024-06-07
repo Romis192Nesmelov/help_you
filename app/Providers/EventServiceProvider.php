@@ -2,8 +2,10 @@
 
 namespace App\Providers;
 
+use App\Events\ChangePasswordEvent;
 use App\Listeners\Admin\ChangeUserListener;
 use App\Listeners\Admin\NewUserListener;
+use App\Listeners\ChangePasswordListener;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -23,6 +25,10 @@ class EventServiceProvider extends ServiceProvider
 
         Verified::class => [
             ChangeUserListener::class
+        ],
+
+        ChangePasswordEvent::class => [
+            ChangePasswordListener::class
         ],
     ];
 

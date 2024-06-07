@@ -1,8 +1,8 @@
 <template>
     <div v-if="!authCheck">
-        <login-component :login_url="login_url" @logged-in="loggedIn"></login-component>
-        <register-component :register_url="register_url" :get_code_url="get_code_url"></register-component>
-        <restore-password-component :reset_pass_url="reset_pass_url"></restore-password-component>
+        <LoginComponent :login_url="login_url" @logged-in="loggedIn"></LoginComponent>
+        <RegisterComponent :register_url="register_url" :get_code_url="get_code_url"></RegisterComponent>
+        <RestorePasswordComponent :reset_pass_url="reset_pass_url"></RestorePasswordComponent>
     </div>
 
     <div id="top-line" class="w-100 d-flex align-items-center justify-content-between">
