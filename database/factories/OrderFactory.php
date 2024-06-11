@@ -22,6 +22,7 @@ class OrderFactory extends Factory
         if ($orderType == 1) {
             $subtype = rand(1,4);
         } else $subtype = null;
+
         return [
             'user_id' => User::all()->random()->id,
             'order_type_id' => $orderType,
@@ -36,7 +37,7 @@ class OrderFactory extends Factory
 //            'estimated_end_time' => Carbon::now()->addDays(rand(1,10)),
             'description_short' => fake()->text(200),
             'description_full' => fake()->text(1000),
-            'status' => 3
+            'status' => rand(2,3)
         ];
     }
 }
