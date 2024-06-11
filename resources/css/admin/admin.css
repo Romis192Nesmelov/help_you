@@ -323,3 +323,8 @@ select#action-users {
 .site-map-tag {
     margin-left: 40px;
 }
+
+.action-partner img {
+    width: 13%;
+    margin-right: 10px;
+}

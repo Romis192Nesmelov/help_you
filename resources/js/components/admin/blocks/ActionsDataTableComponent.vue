@@ -41,6 +41,10 @@
                         <img v-if="field === 'image' && object.image" class="dt-image" :src="'/' + object.image" />
                         <span v-else-if="field === 'rating'" :class="'label label-' + ratings[action.rating-1].color">{{ ratings[action.rating-1].text }}</span>
                         <strong v-else-if="field === 'start' || field === 'end'">{{ new Date(action[field]).toLocaleDateString('ru-RU') }}</strong>
+                        <div class="action-partner" v-else-if="field === 'partner_id'">
+                            <img class="w-25" :src="'/' + action.partner.logo">
+                            <strong>{{ action.partner.name }}</strong>
+                        </div>
                         <span v-else>{{ action[field] }}</span>
                     </td>
                     <td class="tools" v-if="edit_url || delete_url">
@@ -78,8 +82,9 @@ export default {
             itemsSubData: 'actions',
             partners: Object,
             ratings: [
-                {color:'success','text':'Первый'},
+                {color:'success','text':'Стартовый'},
                 {color:'primary','text':'Второй'},
+                {color:'info','text':'Третий'},
             ]
         }
     },

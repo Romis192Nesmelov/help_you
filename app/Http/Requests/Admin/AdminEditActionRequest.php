@@ -29,7 +29,7 @@ class AdminEditActionRequest extends FormRequest
             'html' => $this->validationLongText,
             'start' => $this->validationDate,
             'end' => $this->validationDate,
-            'rating' => 'required|min:1|max:2',
+            'rating' => 'required|min:1|max:3',
             'users_ids' => 'required|string',
             'partner_id' => 'required|integer|exists:partners,id'
         ];

@@ -27,9 +27,9 @@
                 <h5 class="panel-title">Рейтинг акции</h5>
             </div>
             <div class="panel-body">
-                <div class="form-group no-margin-bottom" v-for="(name, rating) in ['Один','Два']">
-                    <input :id="'action_rating_' + rating" :value="rating" type="radio" v-model="obj.rating">
-                    <label class="ml-10 form-check-label" :for="'action_rating_' + rating">{{ name }}</label>
+                <div class="form-group no-margin-bottom" v-for="(name, rating) in ['Стартовый','Второй','Третий']">
+                    <input :id="'action_rating_' + (rating + 1)" :value="rating + 1" type="radio" v-model="obj.rating">
+                    <label class="ml-10 form-check-label" :for="'action_rating_' + (rating + 1)">{{ name }}</label>
                 </div>
             </div>
         </div>
