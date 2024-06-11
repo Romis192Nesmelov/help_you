@@ -21,6 +21,7 @@ use App\Models\OrderType;
 use App\Models\OrderUser;
 use App\Models\ReadOrder;
 use App\Models\ReadPerformer;
+use App\Models\ReadRemovedPerformer;
 use App\Models\Subscription;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -123,13 +124,36 @@ class AdminOrdersController extends AdminBaseController
         }
 
         if ($order->performers->count() && $request->performer_id && $order->performers[0]->id != $request->performer_id) {
-            ReadPerformer::query()->where('order_id',$order->id)->where('user_id',$order->performers[0]->id)->delete();
+            if ($order->readPerformers->count()) {
+                ReadPerformer::query()
+                    ->where('order_id',$order->id)
+                    ->where('user_id',$order->id)
+                    ->update(['read' => null]);
+            } else {
+                ReadPerformer::query()->create([
+                    'order_id' => $order->id,
+                    'user_id' => $order->user_id,
+                ]);
+            }
+
+            if ($order->readRemovedPerformers->count()) {
+                ReadRemovedPerformer::query()
+                    ->where('order_id',$order->id)
+                    ->where('user_id',$order->performers[0]->id)
+                    ->update(['read' => null]);
+            } else {
+                ReadRemovedPerformer::query()->create([
+                    'order_id' => $order->id,
+                    'user_id' => $order->performers[0]->id
+                ]);
+            }
+
             OrderUser::query()->where('order_id',$order->id)->update(['user_id' => $request->performer_id]);
             broadcast(new NotificationEvent('new_performer', $order, $order->user_id));
             $this->mailOrderNotice($order, $order->userCredentials, 'new_performer_notice');
         }
 
-        return response()->json(['message' => trans('content.save_complete'), 'order' => $order],200);
+        return response()->json(['message' => trans('content.save_complete')],200);
     }
 
     public function deleteOrderImage(
