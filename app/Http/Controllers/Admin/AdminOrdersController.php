@@ -102,7 +102,6 @@ class AdminOrdersController extends AdminBaseController
                 $removeOrderUnreadMessages->handle($order->id);
                 $orderResponse->handle($order);
                 broadcast(new NotificationEvent('new_performer', $order, $order->user_id));
-
                 $this->mailOrderNotice($order, $order->userCredentials, 'new_performer_notice');
                 if (!$order->messages->count()) $this->chatMessage($order, trans('content.new_chat_message'));
             } elseif ($order->status == 2) {
@@ -124,6 +123,8 @@ class AdminOrdersController extends AdminBaseController
 
         if ($order->performers->count() && $request->performer_id && $order->performers[0]->id != $request->performer_id) {
             OrderUser::query()->where('order_id',$order->id)->update(['user_id' => $request->performer_id]);
+            broadcast(new NotificationEvent('new_performer', $order, $order->user_id));
+            $this->mailOrderNotice($order, $order->userCredentials, 'new_performer_notice');
         }
 
         return response()->json(['message' => trans('content.save_complete'), 'order' => $order],200);
