@@ -20,6 +20,7 @@ use App\Models\Order;
 use App\Models\OrderType;
 use App\Models\OrderUser;
 use App\Models\ReadOrder;
+use App\Models\ReadPerformer;
 use App\Models\Subscription;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -122,6 +123,7 @@ class AdminOrdersController extends AdminBaseController
         }
 
         if ($order->performers->count() && $request->performer_id && $order->performers[0]->id != $request->performer_id) {
+            ReadPerformer::query()->where('order_id',$order->id)->where('user_id',$order->performers[0]->id)->delete();
             OrderUser::query()->where('order_id',$order->id)->update(['user_id' => $request->performer_id]);
             broadcast(new NotificationEvent('new_performer', $order, $order->user_id));
             $this->mailOrderNotice($order, $order->userCredentials, 'new_performer_notice');
