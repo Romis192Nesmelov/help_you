@@ -262,8 +262,6 @@ export default {
     methods: {
         changeStatusOrPerformer()
         {
-            console.log(this.obj.status);
-
             this.errors.status=null;
             this.errors.performer_id=null;
 

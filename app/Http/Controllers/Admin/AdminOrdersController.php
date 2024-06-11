@@ -99,8 +99,6 @@ class AdminOrdersController extends AdminBaseController
                 $removeOrderUnreadMessages->handle($order->id);
                 broadcast(new OrderEvent('remove_order', $order));
             } elseif ($order->status == 1) {
-                OrderUser::query()->create(['order_id' => $order->id, 'user_id' => $request->performer_id]);
-
                 $removeOrderUnreadMessages->handle($order->id);
                 $orderResponse->handle($order);
                 broadcast(new NotificationEvent('new_performer', $order, $order->user_id));
@@ -124,9 +122,11 @@ class AdminOrdersController extends AdminBaseController
             }
         }
 
-//        $this->saveCompleteMessage();
-//        return redirect()->back();
-        return response()->json(['message' => trans('content.save_complete')],200);
+        if ($order->performers->count() && $request->performer_id && $order->performers[0]->id != $request->performer_id) {
+            OrderUser::query()->where('order_id',$order->id)->update(['user_id' => $request->performer_id]);
+        }
+
+        return response()->json(['message' => trans('content.save_complete'), 'order' => $order],200);
     }
 
     public function deleteOrderImage(

@@ -271,12 +271,12 @@ export default {
             let self = this;
             axios.post(this.edit_url, formData)
                 .then(function (response) {
-                    console.log(response);
+                    // console.log(response);
                     window.showMessage(response.data.message);
                     self.disabledSubmit = false;
                 })
                 .catch(function (error) {
-                    console.log(error);
+                    // console.log(error);
                     $.each(error.response.data.errors, (name,error) => {
                         if (name === 'password') self.passwordErr = error[0];
                         else if (name === 'password_confirmation') self.passwordConfirmErr = error[0];
