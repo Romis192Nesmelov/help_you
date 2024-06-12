@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Actions\AuthGeneratingCode;
-use App\Actions\StripPhone;
 use App\Actions\UnifyPhone;
 use App\Events\ChangePasswordEvent;
 use App\Http\Requests\Auth\GenerateCodeRequest;
@@ -19,6 +18,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\RateLimiter;
 
 class AuthController extends Controller
 {
@@ -58,8 +58,10 @@ class AuthController extends Controller
             return response()->json(['errors' => ['phone' => [trans('auth.user_with_this_phone_is_already_registered')]]], 400);
         } else if (time() - $user->updated_at->timestamp < 55) {
             return response()->json(['message' => trans('auth.the_minute_has_not_expired')], 403);
-        } else if ($attempts >= 5) {
-            return response()->json(['message' => trans('auth.too_many_tries')], 403);
+        } else if ($attempts >= 3) {
+            return response()->json(['message' => trans('auth.too_many_tries_delay')], 403);
+        } else if (RateLimiter::tooManyAttempts('register:'.request('email'), $perMinute = 5)) {
+            return response()->json(['message' => trans('auth.too_many_tries')], 425);
         } else {
             $this->setSmsAttempts($attempts + 1);
             $user->code = $actionGeneratingCode->handle();
@@ -98,8 +100,10 @@ class AuthController extends Controller
             return response()->json(['errors' => ['phone' => [trans('auth.wrong_phone')]]], 401);
         } else if (time() - $user->updated_at->timestamp < (60 * 60 * 24)) {
             return response()->json(['message' => trans('auth.the_minute_has_not_expired')], 403);
-        } else if ($attempts >= 5) {
-            return response()->json(['message' => trans('auth.too_many_tries')], 403);
+        } else if ($attempts >= 3) {
+            return response()->json(['message' => trans('auth.too_many_tries_delay')], 403);
+        } else if (RateLimiter::tooManyAttempts('register:'.request('email'), $perMinute = 5)) {
+            return response()->json(['message' => trans('auth.too_many_tries')], 425);
         } else {
             $this->setSmsAttempts($attempts + 1);
             $password = Str::random(5);

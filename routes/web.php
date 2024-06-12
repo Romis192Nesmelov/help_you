@@ -58,6 +58,7 @@ Route::prefix('account')->name('account.')->controller(AccountController::class)
     Route::get('/change', 'account')->name('change');
     Route::get('/messages', 'messages')->name('messages');
 
+    Route::get('/subscription', 'subscription')->name('subscription');
     Route::get('/my-subscriptions', 'mySubscriptions')->name('my_subscriptions');
     Route::get('/my-unread-subscriptions', 'getMyUnreadSubscriptions')->name('my_unread_subscriptions');
 
@@ -79,7 +80,7 @@ Route::prefix('account')->name('account.')->controller(AccountController::class)
     Route::get('/get-my-incentive', 'getMyIncentives')->name('get_my_incentive');
     Route::post('/delete-incentive', 'deleteIncentive')->name('delete_incentive');
 
-    Route::get('/subscription', 'subscription')->name('subscription');
+    // TODO: Route to tickets
 });
 
 Route::middleware(['auth','account.completed'])->name('order.')->controller(OrderController::class)->group(function () {

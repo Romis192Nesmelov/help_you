@@ -4,6 +4,7 @@ namespace App\Http\Requests\Auth;
 
 use App\Http\Controllers\HelperTrait;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\Password;
 
 class RegisterRequest extends FormRequest
 {
@@ -25,7 +26,7 @@ class RegisterRequest extends FormRequest
     {
         return [
             'phone' => 'required|unique:users,phone|'.$this->validationPhone,
-            'password' => $this->validationPasswordConfirmed,
+            'password' => ['required','confirmed',Password::defaults()],
             'code' => $this->validationCode,
             'i_agree' => 'accepted'
         ];

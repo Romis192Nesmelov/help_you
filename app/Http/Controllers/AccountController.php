@@ -77,6 +77,8 @@ class AccountController extends BaseController
                 ->with('action')
                 ->get(),
         ]);
+
+        // TODO: Getting tickets news
     }
 
     public function mySubscriptions() :View
@@ -153,9 +155,10 @@ class AccountController extends BaseController
             ->paginate(4);
     }
 
-    public function myHelp(): View
+    public function myHelp(SetReadUnreadUser $setReadUnreadUser): View
     {
-        $this->setReadUnreadByPerformer();
+        $setReadUnreadUser->handle(new ReadPerformer());
+        $setReadUnreadUser->handle(new ReadRemovedPerformer());
         $this->data['active_left_menu'] = 'my_help';
         return $this->showView('my_help');
     }
@@ -194,13 +197,6 @@ class AccountController extends BaseController
         $incentive->active = 0;
         $incentive->save();
         return response()->json([],200);
-    }
-
-    public function setReadUnreadByPerformer(SetReadUnreadUser $setReadUnreadUser): JsonResponse
-    {
-        $setReadUnreadUser->handle(new ReadPerformer());
-        $setReadUnreadUser->handle(new ReadRemovedPerformer());
-        return response()->json(200);
     }
 
     public function myHelpActive(): JsonResponse

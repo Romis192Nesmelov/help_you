@@ -76,6 +76,8 @@ class BaseController extends Controller
                     ['id' => 'my-orders', 'icon' => 'icon-drawer-out', 'key' => 'my_orders', 'name' => trans('account.my_orders'), 'url' => route('account.my_orders')],
                     ['id' => 'my-help', 'icon' => 'icon-lifebuoy', 'key' => 'my_help', 'name' => trans('account.my_help'), 'url' => route('account.my_help')],
                     ['id' => 'incentives', 'icon' => 'icon-gift', 'key' => 'incentives', 'name' => trans('account.incentives'), 'url' => route('account.incentives')]
+
+                    // TODO: Tickets menu
                 ],
                 'activeMainMenu' => $this->activeMainMenu,
                 'activeLeftMenu' => $this->activeLeftMenu,

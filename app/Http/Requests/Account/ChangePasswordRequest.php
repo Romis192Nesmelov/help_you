@@ -4,6 +4,7 @@ namespace App\Http\Requests\Account;
 
 use App\Http\Controllers\HelperTrait;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\Password;
 
 class ChangePasswordRequest extends FormRequest
 {
@@ -26,7 +27,7 @@ class ChangePasswordRequest extends FormRequest
     {
         return [
             'old_password' => $this->validationString,
-            'password' => $this->validationPasswordConfirmed,
+            'password' => ['required','confirmed',Password::defaults()],
         ];
     }
 }
