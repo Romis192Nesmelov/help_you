@@ -78,7 +78,7 @@ class AccountController extends BaseController
                 ->get(),
         ]);
 
-        // TODO: Getting tickets news
+        // TODO: Getting tickets answers news
     }
 
     public function mySubscriptions() :View

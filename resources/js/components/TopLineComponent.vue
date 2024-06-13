@@ -344,7 +344,7 @@ export default {
                 }
             });
 
-            //TODO: TicketEvent listener and corresponding emitter
+            //TODO: AnswerEvent listener and corresponding emitter
 
             window.emitter.on('read-order', orderId => {
                 key = self.findOrder(self.newsSubscriptions, orderId);

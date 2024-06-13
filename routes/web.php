@@ -81,6 +81,7 @@ Route::prefix('account')->name('account.')->controller(AccountController::class)
     Route::post('/delete-incentive', 'deleteIncentive')->name('delete_incentive');
 
     // TODO: Route to tickets
+    Route::get('/tickets', 'tickets')->name('tickets');
 });
 
 Route::middleware(['auth','account.completed'])->name('order.')->controller(OrderController::class)->group(function () {

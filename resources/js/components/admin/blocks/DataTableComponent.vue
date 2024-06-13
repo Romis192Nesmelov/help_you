@@ -195,6 +195,28 @@ export default {
         getUrl(url) {
             if (url) this.getDataUrl = url;
             let firstDelimiter = this.getDataUrl.indexOf('page') !== -1 ? '&' : '?';
+
+            if (this.filter) {
+                if (
+                    this.filter.length === 3        &&
+                    this.filter.indexOf('(') === -1 &&
+                    (
+                        (this.filter[0] === '+' && (this.filter[1] === '7' || this.filter[1] === '8') && this.filter[2] === '9')) ||
+                        ( (this.filter[0] === '7' || this.filter[0] === '8') && this.filter[1] === '9')
+                    )
+                {
+                    this.filter = '+7(9';
+                } else if (this.filter.length === 6 && this.filter.match(/^(\+7\(9\d{2})$/gi) !== null) {
+                    this.filter = this.filter + ')';
+                } else if (this.filter.length === 10 && this.filter.match(/^(\+7\(9\d{2}\)\d{3})$/gi) !== null) {
+                    this.filter = this.filter + '-';
+                } else if (this.filter.length === 13 && this.filter.match(/^(\+7\(9\d{2}\)\d{3}-\d{2})$/gi) !== null) {
+                    this.filter = this.filter + '-';
+                } else if (this.filter.length > 16 && this.filter.match(/^(\+7\(9\d{2}\)\d{3}-\d{2}-\d{3})$/gi) !== null) {
+                    this.filter = this.filter.slice(0,16);
+                }
+            }
+
             return this.getDataUrl
                 + firstDelimiter + 'field=' + this.arrangeCol.field
                 + '&direction=' + this.arrangeCol.direction
