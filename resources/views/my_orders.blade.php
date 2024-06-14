@@ -2,12 +2,7 @@
 
 @section('content')
 <div class="row">
-    <left-menu-component
-        user="{{ json_encode(auth()->user()) }}"
-        left_menu="{{ json_encode($leftMenu) }}"
-        logout_url="{{ route('auth.logout') }}"
-        active_left_menu="{{ $active_left_menu }}"
-    ></left-menu-component>
+    @include('blocks.left_menu_block')
     <my-orders-list-component
         user_id="{{ auth()->id() }}"
         orders_urls="{{ json_encode(['active' => route('account.my_orders_active'), 'open' => route('account.my_orders_open'),'approving' => route('account.my_orders_approving'),'archive' => route('account.my_orders_archive')]) }}"

@@ -86,11 +86,6 @@
             </a>
             <div class="dropdown-menu" aria-labelledby="navbar-dropdown-messages" v-show="authCheck && hasMessages">
                 <ul id="dropdown">
-                    <li v-for="(news, id) in newsIncentives" :key="id">
-                        <a :href="incentives_url + '?id=' + news.action.id">У вас новая награда:</a><br>
-                        Акция «{{ news.action.name }}»
-                        <hr>
-                    </li>
                     <li v-for="(message, id) in newsMessages" :key="id">
                         Новых сообщений: <span class="counter">{{ message.count }}</span><br>
                         <a :href="chat_url+'?id=' + message.order.id">в чате по заявке «{{ message.order.name }}»</a>
@@ -109,6 +104,21 @@
                     <li v-for="(news, id) in newsRemovedPerformers" :key="id">
                         <a :href="my_help_url">Вам было отказано в участии</a><br>
                         в выполнении заяки «{{ news.order.name }}»
+                        <hr>
+                    </li>
+                    <li v-for="(news, id) in newsIncentives" :key="id">
+                        <a :href="incentives_url + '?id=' + news.action.id">У вас новая награда:</a><br>
+                        Акция «{{ news.action.name }}»
+                        <hr>
+                    </li>
+                    <li v-for="(news, id) in newsAnswers" :key="id">
+                        <a :href="my_tickets_url + '?id=' + news.ticket.id">У вас новый ответ на обращение:</a><br>
+                        «{{ cropContent(news.ticket.subject,70) }}»
+                        <hr>
+                    </li>
+                    <li v-for="(news, id) in newsTickets" :key="id">
+                        Запрос на тему «{{ cropContent(news.subject,70) }}» закрыт<br>
+                        <a :href="my_tickets_url">К списку запросов »</a>
                         <hr>
                     </li>
                     <li v-for="(news, id) in newsStatusOrders" :key="id">
@@ -186,12 +196,14 @@ export default {
             onRoot: Number,
             userId: 0,
             mainMenu: {},
-            newsIncentives: [],
             newsMessages: [],
             newsSubscriptions: [],
             newsPerformers: [],
             newsRemovedPerformers: [],
             newsStatusOrders: [],
+            newsIncentives: [],
+            newsTickets: [],
+            newsAnswers: [],
             ordersStatuses: []
         }
     },
@@ -216,11 +228,6 @@ export default {
         getNews() {
             let self = this;
             axios.get(this.get_news_url).then(function (response) {
-                if (response.data.news_incentive.length) {
-                    self.newsIncentives = response.data.news_incentive;
-                    self.setEmitter('incentives',true);
-                    self.hasMessages = true;
-                }
                 if (response.data.news_subscriptions.length) {
                     self.newsSubscriptions = response.data.news_subscriptions;
                     self.setEmitter('my-subscriptions',true);
@@ -239,6 +246,21 @@ export default {
                 if (response.data.news_status_orders.length) {
                     self.newsStatusOrders = response.data.news_status_orders;
                     self.setEmitter('my-orders',true);
+                    self.hasMessages = true;
+                }
+                if (response.data.news_incentive.length) {
+                    self.newsIncentives = response.data.news_incentive;
+                    self.setEmitter('incentives',true);
+                    self.hasMessages = true;
+                }
+                if (response.data.news_tickets.length) {
+                    self.newsTickets = response.data.news_tickets;
+                    self.setEmitter('my-tickets',true);
+                    self.hasMessages = true;
+                }
+                if (response.data.news_answers.length) {
+                    self.newsAnswers = response.data.news_answers;
+                    self.setEmitter('my-tickets',true);
                     self.hasMessages = true;
                 }
                 self.bellAlert(self.hasMessages);
@@ -344,7 +366,35 @@ export default {
                 }
             });
 
-            //TODO: AnswerEvent listener and corresponding emitter
+            window.Echo.channel('ticket_' + this.userId).listen('.ticket', res => {
+                key = self.findTicket(res.ticket.id);
+                if (res.notice === 'change_item') {
+                    if (key !== false && self.newsTickets[k].subject !== res.ticket.subject) {
+                        self.newsTickets[k] = res.ticket;
+                    }
+
+                    if (res.ticket.status && !res.ticket.read_owner) {
+                        self.newsTickets.push(res.ticket);
+                        self.bellAlert(true);
+                    } else if (key && ( (res.ticket.status && res.ticket.read_owner) || res.notice === 'del_item' )) {
+                        self.newsTickets.splice(key,1);
+                    }
+                }
+                self.setEmitter('my-tickets',(self.newsTickets.length || self.newsAnswers.length));
+                self.setHasMessages();
+            });
+
+            window.Echo.channel('answer_' + this.userId).listen('.answer', res => {
+                if (res.notice === 'new_item') {
+                    self.newsAnswers.push(res.answer);
+                    self.bellAlert(true);
+                } else if ((res.notice === 'change_item' && res.answer.read_owner) || res.notice === 'del_item') {
+                    key = self.findAnswer(res.answer.id);
+                    if (key !== false) self.newsAnswers.splice(key,1);
+                }
+                self.setEmitter('my-tickets',(self.newsTickets.length || self.newsAnswers.length));
+                self.setHasMessages();
+            });
 
             window.emitter.on('read-order', orderId => {
                 key = self.findOrder(self.newsSubscriptions, orderId);
@@ -389,32 +439,37 @@ export default {
         },
         setHasMessages() {
             this.hasMessages =
-                this.newsMessages.length ||
                 this.newsSubscriptions.length ||
                 this.newsPerformers.length ||
-                this.newsStatusOrders.length ||
                 this.newsRemovedPerformers.length ||
-                this.newsIncentives.length;
+                this.newsStatusOrders.length ||
+                this.newsIncentives.length ||
+                this.newsMessages.length
         },
         findOrder(newsArr, orderId) {
+            return this.findSomethingNews(newsArr, orderId);
+        },
+        findIncentive(incentiveId) {
+            return this.findSomethingNews(this.newsIncentives, incentiveId);
+        },
+        findTicket(ticketId) {
+            return this.findSomethingNews(this.newsTickets, ticketId);
+        },
+        findAnswer(answerId) {
+            return this.findSomethingNews(this.newsAnswers, answerId);
+        },
+        findSomethingNews(newsArr, id) {
             let key = false;
             $.each(newsArr, function (k,news) {
-                if (news.order.id === orderId) {
+                if (news.id === id) {
                     key = k;
                     return false;
                 }
             });
             return key;
         },
-        findIncentive(incentiveId) {
-            let key = false;
-            $.each(this.newsIncentives, function (k,news) {
-                if (news.id === incentiveId) {
-                    key = k;
-                    return false;
-                }
-            });
-            return key;
+        cropContent(string,max) {
+            return window.cropContent(string,max);
         },
     },
     components: {
@@ -450,6 +505,7 @@ export default {
         'my_orders_url': String,
         'my_help_url': String,
         'incentives_url': String,
+        'my_tickets_url': String,
         'order_statuses': String
     },
 }

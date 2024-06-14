@@ -8,10 +8,12 @@ use App\Events\NotificationEvent;
 use App\Jobs\SendMessage;
 use App\Models\Action;
 use App\Models\ActionUser;
+use App\Models\Answer;
 use App\Models\InformingOrder;
 use App\Models\Message;
 use App\Models\MessageUser;
 use App\Models\Order;
+use App\Models\Ticket;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -131,6 +133,20 @@ trait MessagesHelperTrait
     {
         if ($user->email && $user->mail_notice) {
             $this->sendMessage($template, $user->email, null, ['order' => $order]);
+        }
+    }
+
+    public function mailTicketNotice(Ticket $ticket, string $template): void
+    {
+        if ($ticket->user->email && $ticket->user->mail_notice) {
+            $this->sendMessage($template, $ticket->user->email, null, ['ticket' => $ticket]);
+        }
+    }
+
+    public function mailAnswerNotice(Answer $answer, string $template): void
+    {
+        if ($answer->ticket->user->email && $answer->ticket->user->mail_notice) {
+            $this->sendMessage($template, $answer->ticket->user->email, null, ['answer' => $answer]);
         }
     }
 

@@ -66,11 +66,12 @@ class AdminAnswersController extends AdminBaseController
             $answer = Answer::query()->create($fields);
             $fields = $processingImage->handle($request, [], 'image', $imagePath, 'image'.$answer->ticket->id.'_answer'.$answer->id);
             if (count($fields)) $answer->update($fields);
-            $answer->load(['ticket','user.ratings']);
+            $answer->load(['ticket.user','user.ratings']);
             $answer->refresh();
 
             broadcast(new AdminAnswerEvent('new_item',$answer));
             broadcast(new AnswerEvent('new_item',$answer));
+            $this->mailAnswerNotice($answer, 'new_answer_notice');
         }
 
         if ($answer->ticket->status !== 0) {

@@ -15,4 +15,8 @@ return [
     'from_user_with_name' => 'От пользователя с именем: ',
     'message' => 'Сообщение:',
     'thanks_for_your_feedback' => 'Спасибо за Ваш отзыв!',
+    'ticket_closed' => 'Запрос по теме: «:subject» закрыт',
+    'to_tickets' => 'К списку запросов.',
+    'new_answer' => 'У вас новый ответ по запросу: «:subject»',
+    'read_answer' => 'Прочитать сообщение',
 ];

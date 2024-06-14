@@ -60,7 +60,6 @@
 
     <div id="map-container" class="rounded-block">
         <div id="map"></div>
-
         <div id="selected-points">
             <i id="close-selected-points" class="icon-close2"></i>
             <div id="points-container">
@@ -99,7 +98,6 @@
                     <hr>
                 </div>
             </div>
-
         </div>
     </div>
 </template>

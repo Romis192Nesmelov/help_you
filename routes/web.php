@@ -13,6 +13,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BaseController;
 use App\Http\Controllers\OrderController;
 use \App\Http\Controllers\ChatsController;
+use App\Http\Controllers\TicketsController as TicketsControllerAlias;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -79,9 +80,6 @@ Route::prefix('account')->name('account.')->controller(AccountController::class)
     Route::get('/incentives', 'incentives')->name('incentives');
     Route::get('/get-my-incentive', 'getMyIncentives')->name('get_my_incentive');
     Route::post('/delete-incentive', 'deleteIncentive')->name('delete_incentive');
-
-    // TODO: Route to tickets
-    Route::get('/tickets', 'tickets')->name('tickets');
 });
 
 Route::middleware(['auth','account.completed'])->name('order.')->controller(OrderController::class)->group(function () {
@@ -115,6 +113,14 @@ Route::middleware(['auth','account.completed'])->name('messages.')->controller(C
     Route::get('/get-unread-messages', 'getUnreadMessages')->name('get_unread_messages');
     Route::post('/read-message', 'readMessage')->name('read_message');
     Route::post('/new-message', 'newMessage')->name('new_message');
+});
+
+Route::middleware(['auth','account.completed'])->name('tickets.')->controller(TicketsControllerAlias::class)->group(function () {
+    Route::get('/my-tickets', 'myTickets')->name('my_tickets');
+    Route::get('/get-tickets', 'getTickets')->name('get_tickets');
+    Route::post('/new-ticket', 'newTicket')->name('new_ticket');
+    Route::post('/new-answer', 'newAnswer')->name('new_answer');
+    Route::post('/close-ticket', 'closeTicket')->name('close_ticket');
 });
 
 Route::controller(AdminLoginController::class)->prefix('admin')->name('admin.')->group(function () {

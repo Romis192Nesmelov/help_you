@@ -33,7 +33,7 @@ class TicketEvent implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('answer_'.$this->ticket->user_id),
+            new PrivateChannel('ticket_'.$this->ticket->user_id),
         ];
     }
 
@@ -42,7 +42,7 @@ class TicketEvent implements ShouldBroadcast
      */
     public function broadcastAs(): string
     {
-        return 'answer';
+        return 'ticket';
     }
 
     /**
@@ -54,7 +54,7 @@ class TicketEvent implements ShouldBroadcast
     {
         return [
             'notice' => $this->noticeType,
-            'answer' => $this->ticket,
+            'ticket' => $this->ticket,
         ];
     }
 }

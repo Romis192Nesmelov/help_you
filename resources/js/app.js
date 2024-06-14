@@ -14,6 +14,7 @@ import MyChatsComponent from "./components/MyChatsComponent.vue";
 import EditOrderComponent from "./components/EditOrderComponent.vue";
 import OrdersComponent from "./components/OrdersComponent.vue";
 import ChatComponent from "./components/ChatComponent.vue";
+import MyTicketsComponent from "./components/MyTicketsComponent.vue";
 
 const app = createApp({
     components: {
@@ -29,7 +30,8 @@ const app = createApp({
         MyChatsComponent,
         EditOrderComponent,
         OrdersComponent,
-        ChatComponent
+        ChatComponent,
+        MyTicketsComponent
     }
 });
 

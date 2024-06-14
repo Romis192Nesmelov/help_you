@@ -18,7 +18,8 @@ class Ticket extends Model
         'text',
         'user_id',
         'status',
-        'read_admin'
+        'read_admin',
+        'read_owner',
     ];
 
     public function user(): BelongsTo
@@ -28,7 +29,7 @@ class Ticket extends Model
 
     public function answers(): HasMany
     {
-        return $this->hasMany(Answer::class);
+        return $this->hasMany(Answer::class)->orderByDesc('id');
     }
 
     public function scopeWithUserId(Builder $query): void

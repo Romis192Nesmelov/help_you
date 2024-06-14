@@ -29,6 +29,7 @@ class AdminEditAnswerRequest extends FormRequest
             'ticket_id' => 'required|integer|exists:tickets,id',
             'user_id' => $this->validationUserId,
             'read_admin' => 'integer|min:0|max:1',
+            'read_owner' => 'integer|min:0|max:1',
         ];
         if (request()->has('id')) $rules['id'] = 'required|exists:answers,id';
         if (request()->hasFile('image')) $rules['image'] = $this->validationJpgAndPngSmall;

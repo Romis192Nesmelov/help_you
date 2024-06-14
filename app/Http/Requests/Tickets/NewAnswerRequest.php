@@ -1,14 +1,13 @@
 <?php
 
-namespace App\Http\Requests\Admin;
+namespace App\Http\Requests\Tickets;
 
 use App\Http\Controllers\HelperTrait;
 use Illuminate\Foundation\Http\FormRequest;
 
-class AdminEditTicketRequest extends FormRequest
+class NewAnswerRequest extends FormRequest
 {
     use HelperTrait;
-
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -24,17 +23,10 @@ class AdminEditTicketRequest extends FormRequest
      */
     public function rules(): array
     {
-        $rules = [
-            'subject' => 'required|min:3|max:255',
+        return [
+            'image' => $this->validationJpgAndPngSmall,
             'text' => $this->validationText,
-            'user_id' => $this->validationUserId,
-            'status' => 'integer|min:0|max:1',
-            'read_admin' => 'integer|min:0|max:1',
-            'read_owner' => 'integer|min:0|max:1'
+            'ticket_id' => 'required|exists:tickets,id',
         ];
-        if (request()->has('id')) $rules['id'] = 'required|exists:tickets,id';
-        if (request()->hasFile('image')) $rules['image'] = $this->validationJpgAndPngSmall;
-
-        return $rules;
     }
 }

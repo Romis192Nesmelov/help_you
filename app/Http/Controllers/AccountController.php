@@ -21,6 +21,7 @@ use App\Http\Requests\Account\IncentivesRequest;
 use App\Http\Requests\Account\SubscriptionRequest;
 use App\Models\Action;
 use App\Models\ActionUser;
+use App\Models\Answer;
 use App\Models\Order;
 use App\Models\OrderUser;
 use App\Models\ReadOrder;
@@ -28,6 +29,7 @@ use App\Models\ReadPerformer;
 use App\Models\ReadRemovedPerformer;
 use App\Models\ReadStatusOrder;
 use App\Models\Subscription;
+use App\Models\Ticket;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -55,7 +57,7 @@ class AccountController extends BaseController
                 ->with('order.user')
                 ->get(),
             'news_performers' => ReadPerformer::query()
-                ->whereIn('order_id',Order::where('user_id',Auth::id())->pluck('id')->toArray())
+                ->whereIn('order_id',Order::query()->where('user_id',Auth::id())->pluck('id')->toArray())
                 ->where('read',null)
                 ->with('order')
                 ->with('user')
@@ -76,9 +78,18 @@ class AccountController extends BaseController
                 ->where('active', 1)
                 ->with('action')
                 ->get(),
+            'news_tickets' => Ticket::query()
+                ->where('status',1)
+                ->select(['id','subject'])
+                ->where('read_owner',0)
+                ->get(),
+            'news_answers' => Answer::query()
+                ->whereIn('ticket_id',Ticket::query()->where('user_id',Auth::id())->where('status',0)->pluck('id')->toArray())
+                ->where('read_owner',0)
+                ->select(['id','ticket_id'])
+                ->with('ticket')
+                ->get()
         ]);
-
-        // TODO: Getting tickets answers news
     }
 
     public function mySubscriptions() :View

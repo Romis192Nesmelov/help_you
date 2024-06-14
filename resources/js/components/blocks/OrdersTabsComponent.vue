@@ -119,8 +119,7 @@ export default {
     emits: ['closingOrder','resumingOrder','deletingOrder','performers','removingPerformer','changePage','respond','unsubscribe'],
     methods: {
         cropContent(string,max) {
-            string = string.toString();
-            return string.length > max ? string.substr(0,max) + '…' : string;
+            return window.cropContent(string,max);
         },
         paginate(params) {
             this.$emit('changePage',params);

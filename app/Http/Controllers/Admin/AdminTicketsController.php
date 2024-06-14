@@ -50,15 +50,20 @@ class AdminTicketsController extends AdminBaseController
         if ($request->has('id')) {
             $ticket = Ticket::query()->where('id',$request->id)->with(['user.ratings'])->first();
             $fields = $processingImage->handle($request, $fields, 'image', $imagePath, 'image'.$ticket->id);
+
             $ticket->update($fields);
+            $ticket->load(['user.ratings','answers']);
             $ticket->refresh();
             broadcast(new AdminTicketEvent('change_item',$ticket));
-            if ($ticket->wasChanged()) broadcast(new TicketEvent('change_item',$ticket));
+            if ($ticket->wasChanged()) {
+                broadcast(new TicketEvent('change_item',$ticket));
+                if ($ticket->status) $this->mailTicketNotice($ticket, 'ticket_closed_notice');
+            }
         } else {
             $ticket = Ticket::query()->create($fields);
-            $fields = $processingImage->handle($request, [], 'image', $imagePath, 'logo'.$ticket->id);
+            $fields = $processingImage->handle($request, [], 'image', $imagePath, 'image'.$ticket->id);
             if (count($fields)) $ticket->update($fields);
-            $ticket->load('user.ratings');
+            $ticket->load(['user.ratings','answers']);
             $ticket->refresh();
 
             broadcast(new AdminTicketEvent('new_item',$ticket));

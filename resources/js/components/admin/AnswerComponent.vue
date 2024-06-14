@@ -25,6 +25,16 @@
                     :error="errors.text"
                     @change="errors.text=null"
                 ></TextAreaComponent>
+            </div>
+        </div>
+        <div class="panel panel-flat">
+            <div class="panel-body">
+                <CheckboxComponent
+                    name="read_owner"
+                    label="Прочитано пользователем"
+                    :checked="obj.read_owner"
+                    v-model:checked="obj.read_owner"
+                ></CheckboxComponent>
                 <ButtonComponent
                     class_name="btn btn-primary mt-3 pull-right"
                     text="Сохранить"

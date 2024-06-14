@@ -99,6 +99,11 @@ class User extends Authenticatable
         return $this->hasMany(Ticket::class);
     }
 
+    public function answers(): HasMany
+    {
+        return $this->hasMany(Answer::class);
+    }
+
     public function orderPerformers(): BelongsToMany
     {
         return $this->belongsToMany(Order::class)->orderByDesc('created_at');

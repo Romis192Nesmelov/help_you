@@ -180,27 +180,13 @@ export default {
 
         if (this.broadcast_on) {
             window.Echo.private(this.broadcast_on).listen('.' + this.broadcast_as, res => {
-                if (res.notice === 'del_item' && res.model.id === self.objId) {
-                    window.location.href = self.back_url;
-                } else if (res.notice === 'change_item' && res.model.id === self.objId) {
-                    self.obj = res.model;
+                self.broadcasting(res);
+            });
+        }
 
-                    $.each(['mail_notice','admin','active','status'], function (k, field){
-                        $('input[name=' + field + ']').prop('checked', self.obj[field]);
-                    });
-                    $.uniform.update();
-
-                    let timeStartField = $('input[name=start]'),
-                        timeEndField = $('input[name=end]');
-
-                    if (timeStartField.length && timeEndField.length) {
-                        let newStart = window.convertTime(res.model.start),
-                            newEnd = window.convertTime(res.model.end);
-
-                        timeStartField.val(newStart);
-                        timeEndField.val(newEnd);
-                    }
-                }
+        if (this.channel_on) {
+            window.Echo.channel(this.channel_on).listen('.' + this.channel_as, res => {
+                self.broadcasting(res);
             });
         }
     },
@@ -211,8 +197,10 @@ export default {
         'change_avatar_url': String|NaN,
         'def_avatar': String|NaN,
         'input_image_hover': String|NaN,
-        'broadcast_on': String,
-        'broadcast_as': String,
+        'broadcast_on': String|NaN,
+        'broadcast_as': String|NaN,
+        'channel_on': String|NaN,
+        'channel_as': String|NaN,
     },
     data() {
         return {
@@ -242,6 +230,29 @@ export default {
         }
     },
     methods: {
+        broadcasting(res) {
+            if (res.notice === 'del_item' && res.model.id === this.objId) {
+                window.location.href = this.back_url;
+            } else if (res.notice === 'change_item' && res.model.id === this.objId) {
+                this.obj = res.model;
+
+                $.each(['mail_notice','admin','active','status'], function (k, field){
+                    $('input[name=' + field + ']').prop('checked', this.obj[field]);
+                });
+                $.uniform.update();
+
+                let timeStartField = $('input[name=start]'),
+                    timeEndField = $('input[name=end]');
+
+                if (timeStartField.length && timeEndField.length) {
+                    let newStart = window.convertTime(res.model.start),
+                        newEnd = window.convertTime(res.model.end);
+
+                    timeStartField.val(newStart);
+                    timeEndField.val(newEnd);
+                }
+            }
+        },
         preparingFields() {
             let self = this,
                 formData = new FormData();
@@ -252,7 +263,10 @@ export default {
             if (this.objId) formData.append('id', this.objId);
 
             $.each(this.errors, function (field) {
-                if ((self.obj[field] === false || self.obj[field] === null) && (['mail_notice','admin','active','status'].indexOf(field) !== -1)) formData.append(field, 0);
+                if (
+                    (self.obj[field] === false || self.obj[field] === null) &&
+                    (['mail_notice','admin','active','status','read_admin','read_owner'].indexOf(field) !== -1)
+                ) formData.append(field, 0);
                 else if (self.obj[field] === true) formData.append(field, 1);
                 else if (self.obj[field] !== null) formData.append(field, self.obj[field]);
             });

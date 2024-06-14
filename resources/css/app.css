@@ -4,6 +4,10 @@ body {
     /*background-color: #d0d2d6;*/
 }
 
+.w-70 {
+    width: 70% !important;
+}
+
 .mCSB_scrollTools .mCSB_draggerContainer,
 .mCS-light-3.mCSB_scrollTools .mCSB_draggerRail, .mCS-dark-3.mCSB_scrollTools .mCSB_draggerRail {
     background-color: white;
@@ -297,6 +301,10 @@ table {
     height: 230px;
 }
 
+.form-group textarea[name=text] {
+    height: 200px;
+}
+
 select#addresses {
     margin-top: 20px;
     padding: 5px 0;
@@ -312,6 +320,15 @@ select#addresses {
     margin-top: 10px;
     border: 1px solid #e65639;
     box-shadow: 1px 1px 3px #adadad;
+}
+
+.status-label {
+    font-weight: bolder;
+    padding: 2px 5px 1px 5px;
+    line-height: 1.5384616;
+    text-transform: uppercase;
+    font-size: 10px;
+    border-radius: 2px;
 }
 
 .paginate-button {
@@ -414,6 +431,10 @@ textarea {
 .modal-content button.btn {
     width: 100%;
     margin-top: 15px;
+}
+
+#new-ticket-modal .modal-dialog {
+    min-width: 930px;
 }
 
 button.btn {
@@ -619,7 +640,7 @@ button.btn > i {
 }
 
 .rounded-block.tall .h-100.without-tabs {
-    height: 700px !important;
+    height: 680px !important;
 }
 
 #map-container {
@@ -997,6 +1018,14 @@ button.btn > i {
     cursor: pointer;
 }
 
+.uploader .action {
+    height: 40px;
+}
+
+img.image {
+    width: 100%;
+}
+
 .chat-input {
     width: 100%;
     height: 60px;
@@ -1123,6 +1152,10 @@ button.btn > i {
 }
 
 @media (max-width: 991px) {
+    .w-70 {
+        width: 100% !important;
+    }
+
     #main-container {
         margin-bottom: 25px;
     }
@@ -1217,6 +1250,10 @@ button.btn > i {
 
     #messages {
         height: 598px;
+    }
+
+    #new-ticket-modal .modal-dialog {
+        min-width: 98%;
     }
 }
 

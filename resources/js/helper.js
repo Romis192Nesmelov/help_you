@@ -93,6 +93,11 @@ window.getUserAge = (born) => {
 }
 
 window.initImages = () => {
+    $(".file-styled").uniform({
+        wrapperClass: 'bg-orange-800',
+        fileButtonHtml: '<i class="icon-file-plus"></i>'
+    });
+
     window.avatarBlock = $('.avatar.cir');
     window.defAvatar = '/images/def_avatar.svg';
     imagePreview(window.avatarBlock, window.defAvatar);
@@ -165,4 +170,9 @@ window.getDate = (date) => {
     let dateArr = date.split('/'),
         newDate = dateArr[1] + '.' + dateArr[0] + '.' + dateArr[2];
     return new Date(newDate).getTime();
+}
+
+window.cropContent = (string,max) => {
+    string = string.toString();
+    return string.length > max ? string.substr(0,max) + '…' : string;
 }

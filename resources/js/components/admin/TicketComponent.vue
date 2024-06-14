@@ -68,6 +68,12 @@
                     :checked="obj.read_admin"
                     v-model:checked="obj.read_admin"
                 ></CheckboxComponent>
+                <CheckboxComponent
+                    name="read_owner"
+                    label="Прочитано автором"
+                    :checked="obj.read_owner"
+                    v-model:checked="obj.read_owner"
+                ></CheckboxComponent>
                 <ButtonComponent
                     class_name="btn btn-primary mt-3 pull-right"
                     text="Сохранить"
@@ -109,6 +115,7 @@ export default {
                 subject: '',
                 text: '',
                 read_admin: 1,
+                read_owner: 0,
                 status: 0,
             },
             users: [],

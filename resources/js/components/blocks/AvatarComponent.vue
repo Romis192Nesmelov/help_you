@@ -35,7 +35,7 @@
             ${this.avatarProps && this.avatarProps['background-size'] ? 'background-size:'+(this.avatarProps['background-size']) : ''};
         `"
     >
-        <img v-if="change_avatar_url" :src="'/images/input_image_hover.svg'" />
+        <img class="hover-image" v-if="change_avatar_url" :src="'/images/input_image_hover.svg'" />
         <input v-if="change_avatar_url" type="file" name="avatar" @change="avatarTune">
     </div>
 </template>

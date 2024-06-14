@@ -19,7 +19,7 @@ export default {
     name: "InputImageComponent",
     props: {
         'name': String,
-        'image': String,
+        'image': String|null,
         'placeholder_image': String,
         'error': String|null
     }

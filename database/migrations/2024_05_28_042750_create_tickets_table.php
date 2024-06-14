@@ -19,6 +19,7 @@ return new class extends Migration
             $table->text('text');
             $table->foreignIdFor(User::class)->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->boolean('read_admin');
+            $table->boolean('read_owner');
             $table->boolean('status');
             $table->timestamps();
         });

@@ -69,7 +69,8 @@ export default {
                 'my-subscriptions': false,
                 'my-orders': false,
                 'my-help': false,
-                'incentives': false
+                'incentives': false,
+                'my-tickets': false
             },
         }
     },

@@ -113,6 +113,8 @@ export default {
         'change_avatar_url': String|NaN,
         'broadcast_on': String|null,
         'broadcast_as': String|null,
+        'channel_on': String|null,
+        'channel_as': String|null,
     },
     created() {
         let self = this;
@@ -122,16 +124,13 @@ export default {
 
         if (this.broadcast_on) {
             window.Echo.private(this.broadcast_on).listen('.' + this.broadcast_as, res => {
-                if (res.notice === 'new_item' || res.notice === 'del_item') {
-                    self.getData(self.getUrl());
-                } else if (res.notice === 'change_item') {
-                    for (let i=0;i<self.items.data.length;i++) {
-                        if (self.items.data[i].id === res.model.id) {
-                            self.items.data[i] = res.model;
-                            break;
-                        }
-                    }
-                }
+                self.broadcasting(res)
+            });
+        }
+
+        if (this.channel_on) {
+            window.Echo.channel(this.channel_on).listen('.' + this.channel_as, res => {
+                self.broadcasting(res)
             });
         }
     },
@@ -149,6 +148,18 @@ export default {
         }
     },
     methods: {
+        broadcasting(res) {
+            if (res.notice === 'new_item' || res.notice === 'del_item') {
+                this.getData(this.getUrl());
+            } else if (res.notice === 'change_item') {
+                for (let i=0;i<this.items.data.length;i++) {
+                    if (this.items.data[i].id === res.model.id) {
+                        this.items.data[i] = res.model;
+                        break;
+                    }
+                }
+            }
+        },
         getData(url) {
             let self = this;
             axios.get(url).then(function (response) {
