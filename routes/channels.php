@@ -21,13 +21,11 @@ Broadcast::channel('chat_{id}', function ($user, $id) {
 });
 
 Broadcast::channel('ticket_{id}', function ($user, $id) {
-    $ticket = Ticket::query()->where('id',$id)->select('user_id')->first();
-    return $ticket->user_id === $user->id;
+    return (int)$user->id === (int) $id;
 });
 
 Broadcast::channel('answer_{id}', function ($user, $id) {
-    $answer = Answer::query()->where('id',$id)->with('ticket')->first();
-    return $answer->ticket->user_id === $user->id;
+    return (int)$user->id === (int) $id;
 });
 
 Broadcast::channel('notice_{id}', function ($user, $id) {

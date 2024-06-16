@@ -24,9 +24,9 @@ class NewAnswerRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'image' => $this->validationJpgAndPngSmall,
-            'text' => $this->validationText,
             'ticket_id' => 'required|exists:tickets,id',
+            'image' => $this->validationJpgAndPngSmall,
+            'text' => 'required|min:1|max:3000',
         ];
     }
 }

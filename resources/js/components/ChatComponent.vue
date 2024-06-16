@@ -174,7 +174,8 @@ export default {
             return window.getUserAge(born);
         },
         getDate(createdAt) {
-            return new Date(createdAt).toLocaleDateString('ru-RU');
+            return window.convertTime(createdAt);
+            // return new Date(createdAt).toLocaleDateString('ru-RU');
         },
         newDate(k) {
             if (k) {

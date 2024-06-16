@@ -6,7 +6,7 @@ use App\Events\Admin\AdminAnswerEvent;
 use App\Events\Admin\AdminTicketEvent;
 use App\Events\AnswerEvent;
 use App\Events\TicketEvent;
-use App\Http\Requests\Tickets\ClosingTicketRequest;
+use App\Http\Requests\Tickets\GetTicketRequest;
 use App\Http\Requests\Tickets\NewAnswerRequest;
 use App\Http\Requests\Tickets\NewTicketRequest;
 use App\Http\Requests\Tickets\TicketRequest;
@@ -28,8 +28,12 @@ class TicketsController extends BaseController
     {
         $this->data['active_left_menu'] = 'my_tickets';
         if ($request->has('id')) {
-            $this->data['ticket'] = Ticket::query()->where('id',$request->id)->with('answers')->first();
+            $this->data['ticket'] = Ticket::query()
+                ->where('id',$request->id)
+                ->with(['answers.user','user'])
+                ->first();
             $this->authorize('owner', $this->data['ticket']);
+            Answer::query()->where('ticket_id',$request->id)->update(['read_owner' => 1]);
             return $this->showView('ticket');
         } else return $this->showView('my_tickets');
     }
@@ -54,7 +58,13 @@ class TicketsController extends BaseController
         $fields['read_admin'] = 0;
         $fields['read_owner'] = 1;
         $ticket = Ticket::query()->create($fields);
-        $fields = $processingImage->handle($request, [], 'image', 'images/ticket_images/', 'image'.$ticket->id);
+        $fields = $processingImage->handle(
+            $request,
+            [],
+            'image',
+            'images/ticket_images/',
+            'ticket_image'.$ticket->id
+        );
         if (count($fields)) $ticket->update($fields);
         $ticket->load('user.ratings');
         broadcast(new AdminTicketEvent('new_item',$ticket));
@@ -65,15 +75,27 @@ class TicketsController extends BaseController
     /**
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    public function newAnswer(NewAnswerRequest $request): JsonResponse
+    public function newAnswer(NewAnswerRequest $request, ProcessingImage $processingImage): JsonResponse
     {
         $fields = $request->validated();
-        $ticket = Ticket::where('id',$request->ticket_id)->first();
+        $ticket = Ticket::query()
+            ->where('id',$request->ticket_id)
+            ->select(['id','user_id','status'])
+            ->first();
         $this->authorize('owner', $ticket);
+        if ($ticket->status) abort(403);
         $fields['user_id'] = Auth::id();
         $fields['read_admin'] = 0;
         $fields['read_owner'] = 1;
         $answer = Answer::query()->create($fields);
+        $fields = $processingImage->handle(
+            $request,
+            [],
+            'image',
+            'images/ticket_images/',
+            'answer_image'.$answer->id
+        );
+        if (count($fields)) $answer->update($fields);
         $answer->load(['ticket.user','user.ratings']);
         broadcast(new AdminAnswerEvent('new_item',$answer));
         broadcast(new AnswerEvent('new_item',$answer));
@@ -83,16 +105,32 @@ class TicketsController extends BaseController
     /**
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    public function closeTicket(ClosingTicketRequest $request): JsonResponse
+    public function closeTicket(GetTicketRequest $request): JsonResponse
     {
-        $ticket = Ticket::query()->where('id',$request->ticket_id)->first();
+        return $this->changeUserStatus($request->ticket_id,1);
+    }
+
+    /**
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
+    public function resumeTicket(GetTicketRequest $request): JsonResponse
+    {
+        return $this->changeUserStatus($request->ticket_id,0);
+    }
+
+    /**
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
+    private function changeUserStatus(int $id, int $status): JsonResponse
+    {
+        $ticket = Ticket::query()->where('id',$id)->first();
         $this->authorize('owner', $ticket);
         $ticket->update([
-            'status' => 1,
+            'status' => $status,
             'read_admin' => 1,
             'read_owner' => 1,
         ]);
-        $ticket->load('user.ratings');
+        $ticket->load(['user.ratings','answers']);
         $ticket->refresh();
         broadcast(new AdminTicketEvent('change_item',$ticket));
         broadcast(new TicketEvent('change_item',$ticket));

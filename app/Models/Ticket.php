@@ -29,7 +29,7 @@ class Ticket extends Model
 
     public function answers(): HasMany
     {
-        return $this->hasMany(Answer::class)->orderByDesc('id');
+        return $this->hasMany(Answer::class);
     }
 
     public function scopeWithUserId(Builder $query): void

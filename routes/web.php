@@ -121,6 +121,7 @@ Route::middleware(['auth','account.completed'])->name('tickets.')->controller(Ti
     Route::post('/new-ticket', 'newTicket')->name('new_ticket');
     Route::post('/new-answer', 'newAnswer')->name('new_answer');
     Route::post('/close-ticket', 'closeTicket')->name('close_ticket');
+    Route::post('/resume-ticket', 'resumeTicket')->name('resume_ticket');
 });
 
 Route::controller(AdminLoginController::class)->prefix('admin')->name('admin.')->group(function () {

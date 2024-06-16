@@ -26,7 +26,7 @@ class NewTicketRequest extends FormRequest
         return [
             'image' => 'nullable|'.$this->validationJpgAndPngSmall,
             'subject' => $this->validationString,
-            'text' => $this->validationText
+            'text' => 'required|min:1|max:3000'
         ];
     }
 }

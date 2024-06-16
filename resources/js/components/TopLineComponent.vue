@@ -447,26 +447,16 @@ export default {
                 this.newsMessages.length
         },
         findOrder(newsArr, orderId) {
-            return this.findSomethingNews(newsArr, orderId);
+            return window.findSomething(newsArr, orderId);
         },
         findIncentive(incentiveId) {
-            return this.findSomethingNews(this.newsIncentives, incentiveId);
+            return window.findSomething(this.newsIncentives, incentiveId);
         },
         findTicket(ticketId) {
-            return this.findSomethingNews(this.newsTickets, ticketId);
+            return window.findSomething(this.newsTickets, ticketId);
         },
         findAnswer(answerId) {
-            return this.findSomethingNews(this.newsAnswers, answerId);
-        },
-        findSomethingNews(newsArr, id) {
-            let key = false;
-            $.each(newsArr, function (k,news) {
-                if (news.id === id) {
-                    key = k;
-                    return false;
-                }
-            });
-            return key;
+            return window.findSomething(this.newsAnswers, answerId);
         },
         cropContent(string,max) {
             return window.cropContent(string,max);

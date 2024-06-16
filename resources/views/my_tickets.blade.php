@@ -9,6 +9,7 @@
         get_tickets_url = "{{ route('tickets.get_tickets') }}"
         new_ticket_url = "{{ route('tickets.new_ticket') }}"
         close_ticket_url = "{{ route('tickets.close_ticket') }}"
+        resume_ticket_url = "{{ route('tickets.resume_ticket') }}"
     ></my-tickets-component>
 </div>
 @endsection

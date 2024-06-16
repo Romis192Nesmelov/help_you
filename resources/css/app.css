@@ -4,10 +4,6 @@ body {
     /*background-color: #d0d2d6;*/
 }
 
-.w-70 {
-    width: 70% !important;
-}
-
 .mCSB_scrollTools .mCSB_draggerContainer,
 .mCS-light-3.mCSB_scrollTools .mCSB_draggerRail, .mCS-dark-3.mCSB_scrollTools .mCSB_draggerRail {
     background-color: white;
@@ -433,6 +429,7 @@ textarea {
     margin-top: 15px;
 }
 
+#new-answer-modal .modal-dialog,
 #new-ticket-modal .modal-dialog {
     min-width: 930px;
 }
@@ -479,6 +476,7 @@ label {
 }
 
 button.btn.btn-primary {
+    min-width: 150px;
     color: white;
     background: #e65639;
 }
@@ -565,6 +563,10 @@ button.btn > i {
     color: #e65639;
 }
 
+.nav-link:hover {
+    color: #eeb1a3;
+}
+
 .navbar-collapse .nav-item {
     margin-left: 0;
     font-size: 18px;
@@ -640,7 +642,7 @@ button.btn > i {
 }
 
 .rounded-block.tall .h-100.without-tabs {
-    height: 680px !important;
+    height: 675px !important;
 }
 
 #map-container {
@@ -923,12 +925,21 @@ button.btn > i {
     background: url("../../public/images/shadow.png") repeat-x top left;
 }
 
+#messages.answers {
+    height: 675px;
+}
+
 #messages .attached-image {
     width: 50%;
     margin-bottom: 5px;
     border-radius: 20px;
     position: relative;
     border: 1px solid grey;
+}
+
+#messages.answers .attached-image {
+    border: none;
+    padding: 10px;
 }
 
 #messages .attached-image.preview {
@@ -977,7 +988,20 @@ button.btn > i {
     max-width: 90%;
     display: flex;
     justify-content: start;
+    padding: 15px !important;
+}
+
+#messages.answers .message-row .message-block {
     padding: 10px;
+    border: 1px solid grey;
+    background-color: #ececec;
+    border-radius: 10px;
+    margin-top: 7px;
+    margin-bottom: 7px;
+}
+
+#messages.answers .message-row.my-self .message-block {
+    background-color: white;
 }
 
 #messages .message-row .message-block .message {
@@ -1019,7 +1043,12 @@ button.btn > i {
 }
 
 .uploader .action {
-    height: 40px;
+    height: 10px;
+}
+
+.uploader .filename {
+    padding: 7px;
+    font-size: 13px;
 }
 
 img.image {
@@ -1152,10 +1181,6 @@ img.image {
 }
 
 @media (max-width: 991px) {
-    .w-70 {
-        width: 100% !important;
-    }
-
     #main-container {
         margin-bottom: 25px;
     }
@@ -1252,6 +1277,7 @@ img.image {
         height: 598px;
     }
 
+    #new-answer-modal .modal-dialog,
     #new-ticket-modal .modal-dialog {
         min-width: 98%;
     }

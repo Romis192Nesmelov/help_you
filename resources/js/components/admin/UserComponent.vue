@@ -237,7 +237,8 @@ export default {
                 this.obj = res.model;
 
                 $.each(['mail_notice','admin','active','status'], function (k, field){
-                    $('input[name=' + field + ']').prop('checked', this.obj[field]);
+                    let input = $('input[name=' + field + ']');
+                    if (input.length) input.prop('checked', this.obj[field]);
                 });
                 $.uniform.update();
 

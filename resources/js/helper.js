@@ -102,7 +102,7 @@ window.initImages = () => {
     window.defAvatar = '/images/def_avatar.svg';
     imagePreview(window.avatarBlock, window.defAvatar);
     imagePreview($('.order-photo'));
-    imagePreview($('.admin-image'));
+    imagePreview($('.box-image'));
 }
 
 window.addLoader = () => {
@@ -175,4 +175,15 @@ window.getDate = (date) => {
 window.cropContent = (string,max) => {
     string = string.toString();
     return string.length > max ? string.substr(0,max) + '…' : string;
+}
+
+window.findSomething = (arr, id) => {
+    let key = false;
+    $.each(arr, function (k,item) {
+        if (item.id === id) {
+            key = k;
+            return false;
+        }
+    });
+    return key;
 }
