@@ -94,6 +94,13 @@ window.scrollBottomMessages = () => {
     $('#messages').mCustomScrollbar('scrollTo','bottom');
 }
 
+window.changeTab = (currentTabKey, newTabKey) => {
+    $('#tab-' + currentTabKey).fadeOut(() => {
+        window.emitter.emit('tab-changed',newTabKey);
+        $('#tab-' + newTabKey).fadeIn();
+    });
+}
+
 $(document).ready(function () {
     // MAIN BLOCK BEGIN
     $('.form-group.has-label i.icon-eye').click(function () {

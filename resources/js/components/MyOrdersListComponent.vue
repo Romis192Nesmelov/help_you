@@ -130,6 +130,10 @@ export default {
         this.ordersUrls = JSON.parse(this.orders_urls);
         this.refreshOrders();
 
+        window.emitter.on('tab-changed', (tab) => {
+            this.activeTab = tab;
+        });
+
         window.Echo.private('notice_' + this.userId).listen('.notice', res => {
             orderIndex = self.getOrderIndex('active', res.order.id);
             if (res.notice === 'new_order_status') {
@@ -225,10 +229,7 @@ export default {
             });
         },
         changeTab(key) {
-            $('#tab-' + this.activeTab).fadeOut(() => {
-                this.activeTab = key;
-                $('#tab-' + this.activeTab).fadeIn();
-            });
+            window.changeTab(this.activeTab, key);
         },
         closeOrder(order) {
             this.closingOrderId = order.id;

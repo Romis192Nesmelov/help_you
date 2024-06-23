@@ -167,6 +167,20 @@ export default {
                 subject: null,
                 text: null,
             },
+            tabs: {
+                active: {
+                    name: 'В работе',
+                    counter: 0,
+                    tickets: Array,
+                    links: []
+                },
+                closed: {
+                    name: 'Закрыты',
+                    counter: 0,
+                    tickets: Array,
+                    links: []
+                },
+            },
         }
     },
     props: {
@@ -178,7 +192,7 @@ export default {
         'resume_ticket_url': String
     },
     methods: {
-        getTickets(url) {
+        getTickets(url, callBack) {
             let self = this;
             axios.get(url)
                 .then(function (response) {
@@ -187,6 +201,7 @@ export default {
                         self.tickets.push(self.getTicketProps(ticket));
                     });
                     self.links = response.data.tickets.links;
+                    if (callBack) callBack();
                 }).catch(function (error) {
                     console.log(error);
                 });
@@ -260,7 +275,16 @@ export default {
             return window.cropContent(string,max);
         },
         changePage(params) {
-            this.getTickets(params.url)
+            let ticketsContainer = $('#my-tickets .without-tabs .row'),
+                paginator = $('.paginator');
+
+            paginator.fadeOut();
+            ticketsContainer.fadeOut(() => {
+                this.getTickets(params.url, () => {
+                    ticketsContainer.fadeIn();
+                    paginator.fadeIn();
+                });
+            });
         },
         getTicketProps(ticket) {
             let newAnswers = 0;
