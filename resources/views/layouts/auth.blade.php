@@ -14,10 +14,10 @@
     @vite([
         'resources/css/admin/bootstrap.css',
         'resources/css/admin/core.css',
-        'resources/css/admin/components.css',
+        'resources/css/components.css',
         'resources/css/admin/admin.css',
         'resources/js/admin/bootstrap.min.js',
-        'resources/js/admin/styling/uniform.min.js',
+        'resources/js/styling/uniform.min.js',
         'resources/js/admin/app.js',
         'resources/js/admin/login.js',
     ])
