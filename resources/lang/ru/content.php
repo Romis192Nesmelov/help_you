@@ -32,6 +32,7 @@ return [
 	'save_complete' => 'Сохранение произведено',
     'ticket_created' => 'Обращение в техподдержку создано',
     'ticket_closed' => 'Обращение закрыто',
+    'ticket_resume' => 'Обращение возобновлено',
     'answer_sent' => 'Ответ отправлен',
 
     'how_does_it_work_head1' => 'Для тех,<br>кому нужна помощь',

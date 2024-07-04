@@ -32,7 +32,7 @@
             <div class="col-12 col-lg-3 col-md-4 d-flex align-items-end pt-3">
                 <InputImageComponent
                     name="image"
-                    placeholder_image="/images/input_image_hover.svg"
+                    :placeholder_image="def_image"
                     :error="errors.image"
                     @change="errors.image=null"
                 ></InputImageComponent>
@@ -147,8 +147,8 @@ export default {
         window.Echo.private('ticket_' + this.userId).listen('.ticket', res => {
             if (res.notice === 'new_item' || res.notice === 'del_item') self.getTickets(self.get_tickets_url);
             else {
-                let key = window.findSomething(this.tickets.length, res.ticket.id);
-                if (key !== false) self.tickets[key] = self.getTicketProps(res.ticket)
+                let key = window.findSomething(self.tickets, res.ticket.id);
+                if (key !== false) self.tickets[key] = self.getTicketProps(res.ticket);
             }
         });
     },
@@ -185,6 +185,7 @@ export default {
     },
     props: {
         'user_id': String,
+        'def_image': String,
         'my_tickets_url': String,
         'get_tickets_url': String,
         'new_ticket_url': String,
@@ -203,7 +204,7 @@ export default {
                     self.links = response.data.tickets.links;
                     if (callBack) callBack();
                 }).catch(function (error) {
-                    console.log(error);
+                    // console.log(error);
                 });
         },
         newTicket() {
@@ -222,9 +223,20 @@ export default {
                 .then(function (response) {
                     self.getTickets(self.get_tickets_url);
                     $('#new-ticket-modal').modal('hide');
+
+                    self.subject = '';
+                    self.text = '';
+                    $('img.image').attr('src',self.def_image);
+                    inputImage.val('');
+                    inputImage.next('span.filename').html('Выберите файл');
+
                     window.showMessage(response.data.message);
+                    self.disabledSubmit = false;
                 }).catch(function (error) {
-                    console.log(error);
+                    $.each(error.response.data.errors, function (field,error) {
+                        self.errors[field] = error[0];
+                    });
+                    self.disabledSubmit = false;
                 });
         },
         resumeTicketConfirm(ticketId) {

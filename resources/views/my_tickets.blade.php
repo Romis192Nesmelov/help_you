@@ -5,6 +5,7 @@
     @include('blocks.left_menu_block')
     <my-tickets-component
         user_id="{{ auth()->id() }}"
+        def_image="{{ asset('images/input_image_hover.svg') }}"
         my_tickets_url = "{{ route('tickets.my_tickets') }}"
         get_tickets_url = "{{ route('tickets.get_tickets') }}"
         new_ticket_url = "{{ route('tickets.new_ticket') }}"

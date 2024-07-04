@@ -14,7 +14,7 @@
             <div class="col-12 col-lg-3 col-md-4 d-flex align-items-end pt-3">
                 <InputImageComponent
                     name="image"
-                    placeholder_image="/images/input_image_hover.svg"
+                    :placeholder_image="def_image"
                     :error="errors.image"
                     @change="errors.image=null"
                 ></InputImageComponent>
@@ -150,6 +150,7 @@ export default {
     },
     props: {
         'user_id': String,
+        'def_image': String,
         'incoming_ticket': String,
         'new_answer_url': String,
         'back_url': String
@@ -170,13 +171,19 @@ export default {
             axios.post(this.new_answer_url, formData)
                 .then(function (response) {
                     $('#new-answer-modal').modal('hide');
+
+                    self.text = '';
+                    $('img.image').attr('src',self.def_image);
+                    inputImage.val('');
+                    inputImage.next('span.filename').html('Выберите файл');
+
                     window.showMessage(response.data.message);
                     self.disabledSubmit = false;
                 }).catch(function (error) {
                     $.each(error.response.data.errors, (name,error) => {
                         self.errors[name] = error[0];
-                        self.disabledSubmit = false;
                     });
+                    self.disabledSubmit = false;
                 });
         },
         findAnswer(answerId) {

@@ -107,7 +107,8 @@ class TicketsController extends BaseController
      */
     public function closeTicket(GetTicketRequest $request): JsonResponse
     {
-        return $this->changeUserStatus($request->ticket_id,1);
+        $this->changeTicketStatus($request->ticket_id,1);
+        return response()->json(['message' => trans('content.ticket_closed')],200);
     }
 
     /**
@@ -115,13 +116,14 @@ class TicketsController extends BaseController
      */
     public function resumeTicket(GetTicketRequest $request): JsonResponse
     {
-        return $this->changeUserStatus($request->ticket_id,0);
+        $this->changeTicketStatus($request->ticket_id,0);
+        return response()->json(['message' => trans('content.ticket_resume')],200);
     }
 
     /**
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    private function changeUserStatus(int $id, int $status): JsonResponse
+    private function changeTicketStatus(int $id, int $status): void
     {
         $ticket = Ticket::query()->where('id',$id)->first();
         $this->authorize('owner', $ticket);
@@ -134,6 +136,5 @@ class TicketsController extends BaseController
         $ticket->refresh();
         broadcast(new AdminTicketEvent('change_item',$ticket));
         broadcast(new TicketEvent('change_item',$ticket));
-        return response()->json(['message' => trans('content.ticket_closed')],200);
     }
 }
