@@ -20,7 +20,7 @@ class TicketFactory extends Factory
         return [
             'subject' => fake()->text(50),
             'text' => fake()->realText(100),
-            'user_id' => User::all()->random()->id,
+            'user_id' => 2,
             'status' => rand(0,1),
             'read_admin' => rand(0,1),
             'read_owner' => rand(0,1)

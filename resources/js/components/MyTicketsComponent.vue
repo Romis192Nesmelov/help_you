@@ -69,20 +69,18 @@
             </div>
             <div class="h-100 without-tabs d-flex flex-column justify-content-between" v-if="tickets.length">
                 <div class="row pt-2">
-                    <div class="col-lg-6 col-sm-12 mb-1" v-for="ticket in tickets" :key="ticket.id">
-                        <div class="item-in-list text-center p-3">
-                            <div class="fs-6"><small>Дата создания: {{ new Date(ticket.created_at).toLocaleDateString('ru-RU') }}</small></div>
-                            <hr class="mt-1 mb-1">
-                            <div class="h6 fw-bold mb-0">«{{ cropContent(ticket.subject,30) }}»</div>
-                            <hr class="mt-1 mb-1">
+                    <div class="col-lg-6 col-sm-12 ticket" v-for="ticket in tickets" :key="ticket.id">
+                        <div class="item-in-list text-center">
+                            <div class="ticket-date">Дата создания: {{ new Date(ticket.created_at).toLocaleDateString('ru-RU') }}</div>
+                            <hr>
+                            <div class="ticket-head">«{{ cropContent(ticket.subject,40) }}»</div>
+                            <hr>
                             <div :class="'status-label ' + (ticket.status ? 'bg-success' : 'bg-danger')">{{ ticket.status ? 'Закрыто' : 'В работе' }}</div>
-                            <hr class="mt-1 mb-0">
-                            <div class="fs-6">
-                                <small>
-                                    <span>Всего сообщений:<b>{{ ticket.answers }}</b></span> | <span>Новых сообщений:<b>{{ ticket.new_answers }}</b></span>
-                                </small>
+                            <hr>
+                            <div class="ticket-messages-count">
+                                <span>Всего сообщений:<b>{{ ticket.answers }}</b></span><br><span class="delimiter">|</span><span>Новых сообщений:<b>{{ ticket.new_answers }}</b></span>
                             </div>
-                            <hr class="mt-0 mb-2">
+                            <hr>
                             <div class="w-100 d-flex justify-content-center">
                                 <a class="w-50 me-1" :href="my_tickets_url + '?id=' + ticket.id">
                                     <ButtonComponent

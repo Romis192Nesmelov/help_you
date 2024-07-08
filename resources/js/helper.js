@@ -18,17 +18,21 @@ const imagePreview = (container, defImage) => {
             hoverImg = currentContainer.find('img.hover-image'),
             previewImage = currentContainer.find('img.image'),
             inputFile = currentContainer.find('input[type=file]'),
+            fancyboxImage = currentContainer.find('a.fancybox'),
             addFileIcon = currentContainer.find('i.icon-file-plus2'),
             clearInputIcon = currentContainer.find('i.icon-close2');
 
         inputFile.change(function () {
             let input = $(this)[0].files[0];
-
-            if (input.type.match('image.*')) {
+            if (input !== undefined && input.type.match('image.*')) {
                 let reader = new FileReader();
                 reader.onload = function (e) {
-                    if (previewImage.length) previewImage.attr('src',e.target.result);
-                    else currentContainer.css('background-image', 'url(' + e.target.result + ')');
+                    if (previewImage.length) {
+                        previewImage.attr('src',e.target.result);
+                        if (fancyboxImage.length) fancyboxImage.attr('href',e.target.result);
+                    } else {
+                        currentContainer.css('background-image', 'url(' + e.target.result + ')');
+                    }
                     currentContainer.trigger('onload_image',[e.target.result]);
                     // if (callBack) callBack(e.target.result);
                 };

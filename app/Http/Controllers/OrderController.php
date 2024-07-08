@@ -40,18 +40,16 @@ class OrderController extends BaseController
     use MessagesHelperTrait;
     use FieldsHelperTrait;
 
-    private array $orderTypesAndSubtypesFields = ['orderType','subtypesActive'];
-
     public function newOrder(): View
     {
-        $this->data['order_types'] = OrderType::where('active',1)->with($this->orderTypesAndSubtypesFields)->get();
+        $this->data['order_types'] = OrderType::where('active',1)->with('subtypesActive')->get();
         $this->data['session_key'] = 'steps';
         return $this->showView('edit_order');
     }
 
     public function orders(): View
     {
-        $this->data['order_types'] = OrderType::where('active',1)->with($this->orderTypesAndSubtypesFields)->get();
+        $this->data['order_types'] = OrderType::where('active',1)->with('subtypesActive')->get();
         return $this->showView('orders');
     }
 
@@ -86,7 +84,7 @@ class OrderController extends BaseController
             broadcast(new AdminOrderEvent('change_item', $this->data['order']));
         }
         $this->data['session_key'] = $this->getSessionKey($request);
-        $this->data['order_types'] = OrderType::query()->where('active',1)->with($this->orderTypesAndSubtypesFields)->get();
+        $this->data['order_types'] = OrderType::query()->where('active',1)->with('subtypesActive')->get();
         return $this->showView('edit_order');
     }
 
