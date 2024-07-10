@@ -160,7 +160,7 @@ export default {
         getCode() {
             if (!this.getCodeAgainTimer) {
                 let self = this;
-                this.disabledGetCode = true;
+                this.disableGetCode = true;
 
                 axios.post(this.get_code_url, {
                     _token: window.tokenField,
@@ -174,6 +174,7 @@ export default {
                         window.showMessage(response.data.message);
                     })
                     .catch(function (error) {
+                        console.log(error);
                         $.each(error.response.data.errors, (name,error) => {
                             self.errors[name] = error[0];
                         });

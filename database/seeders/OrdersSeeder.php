@@ -16,10 +16,10 @@ class OrdersSeeder extends Seeder
      */
     public function run(): void
     {
-        $me = User::where('phone','+7(926)247-77-25')->select('id')->first();
-        $anotherUser = User::where('phone','+7(958)815-85-65')->select('id')->first();
+        $me = User::query()->where('phone','+7(926)247-77-25')->select('id')->first();
+        $anotherUser = User::query()->where('phone','+7(958)815-85-65')->select('id')->first();
 
-        $order = Order::create([
+        $order = Order::query()->create([
             'user_id' => $me->id,
             'order_type_id' => 1,
             'city_id' => 1,
@@ -33,10 +33,12 @@ class OrdersSeeder extends Seeder
             'status' => 1
         ]);
 
-        OrderUser::create([
-            'order_id' => $order->id,
-            'user_id' => $anotherUser->id
-        ]);
+        if ($anotherUser) {
+            OrderUser::query()->create([
+                'order_id' => $order->id,
+                'user_id' => $anotherUser->id
+            ]);
+        }
 
 //        InformingOrder::create([
 //            'message' => trans('content.to_over_order'),

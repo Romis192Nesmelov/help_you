@@ -6,6 +6,7 @@
                 :id="id"
                 type="checkbox"
                 :name="name"
+                :checked="checked"
                 @input="$emit('update:checked', $event.target.checked)"
             >
             <label class="form-check-label" :for="id">{{ label }}</label>
