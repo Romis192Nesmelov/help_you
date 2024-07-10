@@ -118,9 +118,9 @@ trait MessagesHelperTrait
      */
     public function sendSms(string $phone, string $text): void
     {
-//        $stripPhone = new StripPhone();
-//        $client = new GreenSMS(['user' => env('GREENSMS_LOGIN'), 'pass' => env('GREENSMS_PASSWORD')]);
-//        $client->sms->send(['to' => $stripPhone->handle($phone), 'txt' => $text]);
+        $stripPhone = new StripPhone();
+        $client = new GreenSMS(['user' => env('GREENSMS_LOGIN'), 'pass' => env('GREENSMS_PASSWORD')]);
+        $client->sms->send(['to' => $stripPhone->handle($phone), 'txt' => $text]);
 //        return $response->request_id;
     }
 
