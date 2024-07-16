@@ -27,7 +27,8 @@ class GenerateCodeRequest extends FormRequest
     {
         return [
             'phone' => 'required|'.$this->validationPhone,
-            'password' => ['required','confirmed',Password::defaults()],
+//            'password' => ['required','confirmed',Password::defaults()],
+            'password' => $this->validationPassword,
             'i_agree' => 'accepted'
         ];
     }

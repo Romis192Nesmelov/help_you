@@ -174,10 +174,14 @@ export default {
                         window.showMessage(response.data.message);
                     })
                     .catch(function (error) {
-                        console.log(error);
-                        $.each(error.response.data.errors, (name,error) => {
-                            self.errors[name] = error[0];
-                        });
+                        // console.log(error.response.data.message);
+                        if (error.response.data.message) {
+                            window.showMessage(error.response.data.message);
+                        } else {
+                            $.each(error.response.data.errors, (name,error) => {
+                                self.errors[name] = error[0];
+                            });
+                        }
                     });
             }
         },

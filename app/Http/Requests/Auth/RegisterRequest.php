@@ -26,7 +26,8 @@ class RegisterRequest extends FormRequest
     {
         return [
             'phone' => 'required|unique:users,phone|'.$this->validationPhone,
-            'password' => ['required','confirmed',Password::defaults()],
+//            'password' => ['required','confirmed',Password::defaults()],
+            'password' => $this->validationPassword,
             'code' => $this->validationCode,
             'i_agree' => 'accepted'
         ];

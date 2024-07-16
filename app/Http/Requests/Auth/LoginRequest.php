@@ -25,7 +25,7 @@ class LoginRequest extends FormRequest
     {
         return [
             'phone' => $this->validationPhone,
-            'password' => 'required|min:3|max:20'
+            'password' => $this->validationPassword
         ];
     }
 }
