@@ -174,14 +174,18 @@ export default {
                         window.showMessage(response.data.message);
                     })
                     .catch(function (error) {
-                        // console.log(error.response.data.message);
-                        if (error.response.data.message) {
-                            window.showMessage(error.response.data.message);
-                        } else {
-                            $.each(error.response.data.errors, (name,error) => {
-                                self.errors[name] = error[0];
-                            });
-                        }
+                        // console.log(error.response.data);
+                        var validFields = [
+                            'phone',
+                            'password',
+                            'password_confirmation',
+                            'code'
+                        ], errorFieldFlag = false;
+                        $.each(error.response.data.errors, (name,error) => {
+                            self.errors[name] = error[0];
+                            if (validFields.indexOf(name) !== -1) errorFieldFlag = true;
+                        });
+                        if (!errorFieldFlag) window.showMessage(error.response.data.message);
                     });
             }
         },
