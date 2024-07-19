@@ -221,8 +221,8 @@ export default {
     },
     data() {
         return {
-            name: String,
-            family: String,
+            name: '',
+            family: '',
             born: String,
             phone: String,
             code: '',
@@ -262,7 +262,14 @@ export default {
             $.each(['name','family','born','email'],function (k,field) {
                 self.errors[field] = null;
             });
-            this.disabledSubmit = !(this.name.length && this.family.length && this.born.match(window.bornRegExp) && this.email.match(window.emailRegExp));
+            this.disabledSubmit = !(
+                this.name &&
+                this.name.length &&
+                this.family &&
+                this.family.length &&
+                this.born.match(window.bornRegExp) &&
+                this.email.match(window.emailRegExp)
+            );
         },
         enableChangePhoneModalButton() {
             this.disabledChangePhone = this.phone.match(window.phoneRegExp) === null || this.code.match(window.codeRegExp) === null;

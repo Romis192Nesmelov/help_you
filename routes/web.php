@@ -105,7 +105,7 @@ Route::middleware(['auth','account.completed'])->name('order.')->controller(Orde
     Route::post('/delete-response', 'deleteResponse')->name('delete_response');
 });
 
-Route::middleware(['auth','account.completed'])->name('messages.')->controller(ChatsController::class)->group(function () {
+Route::middleware('auth')->name('messages.')->controller(ChatsController::class)->group(function () {
     Route::get('/chats', 'chats')->name('chats');
     Route::get('/chats-my-orders', 'chatsMyOrders')->name('chats_my_orders');
     Route::get('/chats-performer', 'chatsPerformer')->name('chats_performer');
