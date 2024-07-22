@@ -20,7 +20,7 @@ class UsersSeeder extends Seeder
                 'born' => '14-07-1976',
                 'phone' => '+7(000)000-00-00',
                 'email' => 'info@need-help.online',
-                'password' => bcrypt('apg192'),
+                'password' => bcrypt('123456'),
                 'code' => '99-99-99',
                 'admin' => 1,
                 'active' => 1
