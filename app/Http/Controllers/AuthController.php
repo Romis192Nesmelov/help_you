@@ -87,6 +87,7 @@ class AuthController extends Controller
                 'password' => bcrypt($credentials['password']),
                 'active' => 1
             ]);
+            Auth::login($user);
             event(new Verified($user));
             return response()->json(['message' => trans('auth.register_complete')],200);
         }

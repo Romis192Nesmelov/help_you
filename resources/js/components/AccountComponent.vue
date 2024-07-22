@@ -267,8 +267,8 @@ export default {
                 this.name.length &&
                 this.family &&
                 this.family.length &&
-                this.born.match(window.bornRegExp) &&
-                this.email.match(window.emailRegExp)
+                this.born.match(window.bornRegExp)
+                // this.email.match(window.emailRegExp)
             );
         },
         enableChangePhoneModalButton() {

@@ -233,7 +233,7 @@ export default {
                 selfUrl = this.orders_url,
                 urlConnector = '?';
 
-            if (this.previewFlag) url = this.get_preview_url;
+            if (window.previewFlag) url = this.get_preview_url;
             else {
 
                 if (this.searchingString !== null) fields.search = this.searchingString;
@@ -246,6 +246,8 @@ export default {
                 fields.performers_from = this.filterPerformersFrom;
                 fields.performers_to = this.filterPerformersTo;
             }
+
+            console.log(url);
 
             $.each(fields, function (field,value) {
                 if (field !== '_token' && value) {
@@ -305,8 +307,8 @@ export default {
                                     description_full: point.description_full
                                 }));
 
-                                if (window.getPreviewFlag) {
-                                    window.getPreviewFlag = false;
+                                if (window.previewFlag) {
+                                    window.previewFlag = false;
                                     self.forceOpenOrder(0);
                                 } else if (window.openOrderId && window.openOrderId === point.id) {
                                     self.forceOpenOrder(k);
@@ -355,7 +357,7 @@ export default {
                     }
                 })
                 .catch(function (error) {
-                    console.log(error);
+                    // console.log(error);
                 });
         },
         forceOpenOrder(k) {
