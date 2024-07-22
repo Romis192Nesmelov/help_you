@@ -24,8 +24,8 @@ class DatabaseSeeder extends Seeder
 //        $this->call(OrderImagesSeeder::class);
 //        $this->call(SubscriptionTypesSeeder::class);
         $this->call(MessageKeywordsSeeder::class);
-        $this->call(PartnersSeeder::class);
-        $this->call(ActionsSeeder::class);
+//        $this->call(PartnersSeeder::class);
+//        $this->call(ActionsSeeder::class);
 //        $this->call(ActionsUsersSeeder::class);
 //        Ticket::factory(50)->create();
 //        Answer::factory(200)->create();
