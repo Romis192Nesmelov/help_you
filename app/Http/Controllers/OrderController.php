@@ -42,14 +42,14 @@ class OrderController extends BaseController
 
     public function newOrder(): View
     {
-        $this->data['order_types'] = OrderType::where('active',1)->with('subtypesActive')->get();
+        $this->getOrderTypes();
         $this->data['session_key'] = 'steps';
         return $this->showView('edit_order');
     }
 
     public function orders(): View
     {
-        $this->data['order_types'] = OrderType::where('active',1)->with('subtypesActive')->get();
+        $this->getOrderTypes();
         return $this->showView('orders');
     }
 
@@ -354,5 +354,10 @@ class OrderController extends BaseController
         $orderUser = OrderUser::query()->where('order_id',$request->id)->where('user_id',Auth::id())->first();
         $orderUser->delete();
         return response()->json([],200);
+    }
+
+    private function getOrderTypes(): void
+    {
+        $this->data['order_types'] = OrderType::query()->where('active',1)->with('subtypesActive')->get();
     }
 }
