@@ -76,15 +76,20 @@ class AuthController extends Controller
         $credentials = $request->validated();
         $user = User::query()->where('phone',$actionUnifyPhone->handle($request->phone))->first();
 
-        if ($user->code == $request->code) {
+        if (!$user) {
+            return response()->json(['errors' => ['phone' => [trans('auth.the_verification_code_was_requested_for_a_another_phone')]]], 400);
+        } else if ($user->active) {
+            return response()->json(['errors' => ['phone' => [trans('auth.user_with_this_phone_is_already_registered')]]], 400);
+        } else if ($user->code != $request->code) {
+            return response()->json(['errors' => ['code' => [trans('auth.wrong_code')]]], 401);
+        } else {
             $user->update([
                 'password' => bcrypt($credentials['password']),
                 'active' => 1
             ]);
+            Auth::login($user);
             event(new Verified($user));
             return response()->json(['message' => trans('auth.register_complete')],200);
-        } else {
-            return response()->json(['errors' => ['code' => [trans('auth.wrong_code')]]], 401);
         }
     }
 

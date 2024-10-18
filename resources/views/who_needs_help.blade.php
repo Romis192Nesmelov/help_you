@@ -18,7 +18,7 @@
         <div class="col-12 col-lg-6">
             @include('blocks.how_does_it_work_block',[
                 'head' => '1. Создайте заявку',
-                'description' => 'Заполните все поля. чтобы исполнителю было проще откликнуться.',
+                'description' => 'Заполните все поля, чтобы исполнителю было проще откликнуться.',
                 'imageDesc' => 'images/how_does_it_work/desktop1.jpg',
                 'imageMob' => 'images/how_does_it_work/mobile1.jpg',
             ])

@@ -4,7 +4,7 @@ namespace App\Http\Requests\Auth;
 
 use App\Http\Controllers\HelperTrait;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rules\Password;
+//use Illuminate\Validation\Rules\Password;
 
 class GenerateCodeRequest extends FormRequest
 {
@@ -27,7 +27,8 @@ class GenerateCodeRequest extends FormRequest
     {
         return [
             'phone' => 'required|'.$this->validationPhone,
-            'password' => ['required','confirmed',Password::defaults()],
+//            'password' => ['required','confirmed',Password::defaults()],
+            'password' => $this->validationPassword.'|confirmed',
             'i_agree' => 'accepted'
         ];
     }

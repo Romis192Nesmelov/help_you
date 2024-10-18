@@ -247,6 +247,8 @@ export default {
                 fields.performers_to = this.filterPerformersTo;
             }
 
+            console.log(url);
+
             $.each(fields, function (field,value) {
                 if (field !== '_token' && value) {
                     selfUrl += urlConnector + field + '=' + value;
@@ -355,7 +357,7 @@ export default {
                     }
                 })
                 .catch(function (error) {
-                    console.log(error);
+                    // console.log(error);
                 });
         },
         forceOpenOrder(k) {

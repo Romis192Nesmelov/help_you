@@ -112,7 +112,8 @@ export default {
     },
     props: {
         'register_url': String,
-        'get_code_url': String
+        'get_code_url': String,
+        'account_change_url': String,
     },
     data() {
         return {
@@ -174,10 +175,18 @@ export default {
                         window.showMessage(response.data.message);
                     })
                     .catch(function (error) {
-                        console.log(error);
+                        // console.log(error.response.data);
+                        var validFields = [
+                            'phone',
+                            'password',
+                            'password_confirmation',
+                            'code'
+                        ], errorFieldFlag = false;
                         $.each(error.response.data.errors, (name,error) => {
                             self.errors[name] = error[0];
+                            if (validFields.indexOf(name) !== -1) errorFieldFlag = true;
                         });
+                        if (!errorFieldFlag) window.showMessage(error.response.data.message);
                     });
             }
         },
@@ -198,8 +207,16 @@ export default {
                     window.showMessage(response.data.message);
                     $('#register-modal').modal('hide');
                     window.removeLoader();
+
+                    setTimeout(function () {
+                        window.location.href = self.account_change_url;
+                    }, 3000);
+                    $('#message-modal').modal('show').on('hidden.bs.modal', () => {
+                        window.location.href = self.account_change_url;
+                    });
                 })
                 .catch(function (error) {
+                    // console.log(error);
                     $.each(error.response.data.errors, (name,error) => {
                         self.errors[name] = error[0];
                         window.removeLoader();

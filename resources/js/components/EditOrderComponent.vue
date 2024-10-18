@@ -316,10 +316,11 @@ export default {
                             }, 3000);
                             $('#complete-modal').modal('show').on('hidden.bs.modal', () => {
                                 window.location.href = self.order_preview_url;
-                            })
+                            });
                         }
                     })
                     .catch(function (error) {
+                        // console.log(error);
                         self.disabledButtons = false;
                         $.each(error.response.data.errors, (name,error) => {
                             self.errors[name] = error[0];

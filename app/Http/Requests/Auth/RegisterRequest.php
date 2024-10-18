@@ -25,8 +25,9 @@ class RegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'phone' => 'required|unique:users,phone|'.$this->validationPhone,
-            'password' => ['required','confirmed',Password::defaults()],
+            'phone' => 'required|'.$this->validationPhone,
+//            'password' => ['required','confirmed',Password::defaults()],
+            'password' => $this->validationPassword,
             'code' => $this->validationCode,
             'i_agree' => 'accepted'
         ];

@@ -1,7 +1,11 @@
 <template>
     <div v-if="!authCheck">
         <LoginComponent :login_url="login_url" @logged-in="loggedIn"></LoginComponent>
-        <RegisterComponent :register_url="register_url" :get_code_url="get_code_url"></RegisterComponent>
+        <RegisterComponent
+            :register_url="register_url"
+            :get_code_url="get_code_url"
+            :account_change_url="account_change_url"
+        ></RegisterComponent>
         <RestorePasswordComponent :reset_pass_url="reset_pass_url"></RestorePasswordComponent>
     </div>
 
