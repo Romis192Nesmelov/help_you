@@ -14,7 +14,7 @@ class OrderResponse
     {
         OrderUser::query()->create([
             'order_id' => $order->id,
-            'user_id' => request('performer_id')
+            'user_id' => request('performer_id') ? request('performer_id') : auth()->id()
         ]);
         ReadPerformer::query()->create([
             'order_id' => $order->id,
