@@ -16,7 +16,7 @@ use App\Models\Answer;
 */
 
 Broadcast::channel('chat_{id}', function ($user, $id) {
-    $order = Order::query()->where('id',$id)->select(['status','user_id'])->with('performers')->first();
+    $order = Order::query()->where('id',$id)->select(['id','status','user_id'])->with('performers')->first();
     return $order->status && ($user->id == 1 || $user->id == $order->user_id || in_array($user->id, $order->performers->pluck('id')->toArray()));
 });
 
