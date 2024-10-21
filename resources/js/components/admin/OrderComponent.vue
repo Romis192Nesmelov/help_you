@@ -281,7 +281,7 @@ export default {
         setPlaceMark(coordinates) {
             this.obj.address = coordinates.address;
             this.obj.latitude = coordinates.latitude;
-            this.obj.latitude = coordinates.longitude;
+            this.obj.longitude = coordinates.longitude;
         }
     }
 }
