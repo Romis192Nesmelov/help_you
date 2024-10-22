@@ -88,7 +88,7 @@
 
                     <p class="text-left mb-2"><b>Кол-во исполнителей:</b> {{ point.properties.get('performers') + ' из ' + point.properties.get('need_performers') }}</p>
 
-                    <button @click="orderRespond(point)" type="button" class="btn btn-primary w-100">
+                    <button @click="orderRespond(point)" type="button" class="btn btn-primary w-100" v-if="showRespondButton">
                         <span>Откликнуться на заявку</span>
                     </button>
 
@@ -130,7 +130,7 @@ export default {
         this.filterPerformersTo = parseInt(this.performers_to);
 
         this.orderTypes = JSON.parse(this.order_types);
-        window.previewFlag = parseInt(this.get_preview_flag);
+        this.previewFlag = parseInt(this.get_preview_flag);
         window.pointsContainer = $('#points-container');
         window.cickedTarget = null;
         window.pointsOpenedFlag = false;
@@ -202,6 +202,8 @@ export default {
         return {
             userId: Number,
             orders: [],
+            previewFlag: false,
+            showRespondButton: true,
             selectedPoints: [],
             respondOrderId: 0,
             respondOrderName: '',
@@ -233,9 +235,11 @@ export default {
                 selfUrl = this.orders_url,
                 urlConnector = '?';
 
-            if (window.previewFlag) url = this.get_preview_url;
+            if (self.previewFlag) {
+                url = this.get_preview_url;
+                this.showRespondButton = false;
+            }
             else {
-
                 if (this.searchingString !== null) fields.search = this.searchingString;
                 else if (this.search) {
                     fields.search = this.search;
@@ -246,8 +250,6 @@ export default {
                 fields.performers_from = this.filterPerformersFrom;
                 fields.performers_to = this.filterPerformersTo;
             }
-
-            console.log(url);
 
             $.each(fields, function (field,value) {
                 if (field !== '_token' && value) {
@@ -307,8 +309,8 @@ export default {
                                     description_full: point.description_full
                                 }));
 
-                                if (window.previewFlag) {
-                                    window.previewFlag = false;
+                                if (self.previewFlag) {
+                                    self.previewFlag = false;
                                     self.forceOpenOrder(0);
                                 } else if (window.openOrderId && window.openOrderId === point.id) {
                                     self.forceOpenOrder(k);
