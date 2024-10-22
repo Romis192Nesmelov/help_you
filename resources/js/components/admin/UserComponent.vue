@@ -231,6 +231,7 @@ export default {
     },
     methods: {
         broadcasting(res) {
+            let self = this;
             if (res.notice === 'del_item' && res.model.id === this.objId) {
                 window.location.href = this.back_url;
             } else if (res.notice === 'change_item' && res.model.id === this.objId) {
@@ -238,7 +239,7 @@ export default {
 
                 $.each(['mail_notice','admin','active','status'], function (k, field){
                     let input = $('input[name=' + field + ']');
-                    if (input.length) input.prop('checked', this.obj[field]);
+                    if (input.length) input.prop('checked', self.obj[field]);
                 });
                 $.uniform.update();
 
@@ -264,6 +265,7 @@ export default {
             if (this.objId) formData.append('id', this.objId);
 
             $.each(this.errors, function (field) {
+                // console.log(field,self.obj[field]);
                 if (
                     (self.obj[field] === false || self.obj[field] === null) &&
                     (['mail_notice','admin','active','status','read_admin','read_owner'].indexOf(field) !== -1)
