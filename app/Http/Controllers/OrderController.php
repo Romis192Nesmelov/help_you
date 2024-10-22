@@ -295,7 +295,7 @@ class OrderController extends BaseController
         $order->status = 0;
         $order->save();
 
-        AdminNotice::query()->where(['order_id' => $order->id])->update(['read',null]);
+        AdminNotice::query()->where(['order_id' => $order->id])->update(['read' => null]);
 
         $removeOrderUnreadMessages->handle($request->id);
         broadcast(new OrderEvent('remove_order', $order));
