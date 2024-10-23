@@ -61,16 +61,17 @@ export default {
     },
     created() {
         if (!this.objId) this.obj.user_id = parseInt(this.admin_id);
-        if (this.parent_id) this.obj.ticket_id = parseInt(this.parent_id);
+        this.obj.ticket_id = parseInt(this.parent_id);
     },
     props: {
         'admin_id': String,
-        'parent_id': String|NaN,
+        'parent_id': String,
         'placeholder_image': String
     },
     data() {
         return {
             obj: {
+                ticket_id: 0,
                 user_id: 1,
                 image: '',
                 text: '',

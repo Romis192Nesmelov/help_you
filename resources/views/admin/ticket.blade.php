@@ -41,7 +41,7 @@
                     @endif
                 </div>
                 <div class="panel-body">
-                    <a href="{{ route('admin.answers',$addButtonParams) }}">
+                    <a href="{{ route('admin.answers',['slug' => 'add', 'parent_id' => $ticket->id]) }}">
                         @include('admin.blocks.button_block', [
                             'primary' => true,
                             'buttonType' => 'button',
