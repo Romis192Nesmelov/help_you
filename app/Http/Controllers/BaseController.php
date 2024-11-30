@@ -68,7 +68,7 @@ class BaseController extends Controller
                 'mainMenu' => [
                     ['key' => 'about', 'name' => trans('menu.about'), 'url' => route('about')],
                     ['key' => 'how_does_it_work', 'name' => trans('menu.how_does_it_work'), 'url' => route('how_does_it_work')],
-                    ['key' => 'partners', 'name' => trans('menu.partners'), 'url' => route('partners')]
+//                    ['key' => 'partners', 'name' => trans('menu.partners'), 'url' => route('partners')]
                 ],
                 'leftMenu' => [
                     ['id' => 'my-messages', 'icon' => 'icon-bubbles4', 'key' => 'my_chats', 'name' => trans('account.my_chats'), 'url' => route('messages.chats')],
