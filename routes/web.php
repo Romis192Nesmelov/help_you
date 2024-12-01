@@ -34,7 +34,7 @@ Route::controller(BaseController::class)->group(function () {
     Route::post('/feedback', 'feedback')->name('feedback');
 
     Route::get('/how_does_it_work/{slug?}', 'howDoesItWork')->name('how_does_it_work');
-    Route::get('/partners', 'partners')->name('partners');
+//    Route::get('/partners', 'partners')->name('partners');
     Route::get('/prev-url', 'prevUrl')->name('prev_url');
 });
 
