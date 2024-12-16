@@ -10,6 +10,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
     <title>{{ isset($title) && $title ? $title : trans('content.can_i_help_you') }}</title>
+    <meta name="yandex-verification" content="96d8b8ee40afc1dd" />
     @if (isset($keywords) && $keywords)
         <meta name="keywords" content="{{ $keywords }}">
     @endif
