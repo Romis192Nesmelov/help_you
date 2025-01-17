@@ -19,7 +19,7 @@ class UsersSeeder extends Seeder
                 'family' => 'Ресурса',
                 'born' => '14-07-1976',
                 'phone' => '+7(000)000-00-00',
-                'email' => 'info@need-help.online',
+                'email' => 'info@need-help.com',
                 'password' => bcrypt('need_help'),
                 'code' => '99-99-99',
                 'admin' => 1,
