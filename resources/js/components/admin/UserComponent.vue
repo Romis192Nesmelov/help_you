@@ -77,6 +77,7 @@
                     max="10"
                     placeholder="__-__-____"
                     :error="errors.born"
+                    v-model:value="obj.born"
                     @change="errors.born=null"
                 ></InputComponent>
                 <InputComponent
@@ -86,6 +87,7 @@
                     max="16"
                     placeholder="+7(___)___-__-__"
                     :error="errors.phone"
+                    v-model:value="obj.phone"
                     @change="errors.phone=null"
                 ></InputComponent>
                 <InputComponent
@@ -210,6 +212,8 @@ export default {
                 avatar: null,
                 name: '',
                 family: '',
+                born: '',
+                phone: '',
                 email: '',
                 password: '',
                 info_about: '',
@@ -260,7 +264,7 @@ export default {
             formData.append('_token', window.tokenField);
             if (this.objId) formData.append('id', this.objId);
 
-            $.each(self.errors, function (field) {
+            $.each(this.errors, function (field) {
                 // console.log(field,self.obj[field]);
                 if (
                     (self.obj[field] === false || self.obj[field] === null) &&
