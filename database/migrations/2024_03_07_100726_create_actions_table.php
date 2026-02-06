@@ -16,8 +16,8 @@ return new class extends Migration
             $table->id();
             $table->string('name',50);
             $table->longText('html')->nullable();
-            $table->timestamp('start');
-            $table->timestamp('end');
+            $table->timestamp('start')->nullable();
+            $table->timestamp('end')->nullable();
             $table->tinyInteger('rating');
             $table->foreignIdFor(Partner::class)->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->timestamps();
